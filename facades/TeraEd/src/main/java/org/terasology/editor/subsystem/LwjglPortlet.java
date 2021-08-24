@@ -11,6 +11,8 @@ import org.lwjgl.opengl.awt.GLData;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
+import org.terasology.engine.core.schedulers.ExternalTickScheduler;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
@@ -50,6 +52,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     private Context context;
     private RenderingConfig config;
+    private ExternalTickScheduler scheduler;
 
     private GameEngine engine;
     private AWTGLCanvas canvas;
@@ -93,6 +96,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         graphics.processActions();
+        scheduler.processTasks();
 
         currentState.render();
 
@@ -108,13 +112,8 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     }
 
     public void setupThreads() {
-        GameThread.reset();
-        GameThread.setToCurrentThread();
-
-        EventSystem eventSystem = CoreRegistry.get(EventSystem.class);
-        if (eventSystem != null) {
-            eventSystem.setToCurrentThread();
-        }
+        scheduler = new ExternalTickScheduler(Thread.currentThread());
+        GameScheduler.setupGraphicsScheduler(scheduler);
     }
 
     public void createCanvas() {

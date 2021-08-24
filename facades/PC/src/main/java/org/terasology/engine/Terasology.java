@@ -15,7 +15,7 @@ import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
-import org.terasology.engine.core.ThreadCaptureScheduler;
+import org.terasology.engine.core.schedulers.ThreadCaptureScheduler;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
@@ -51,8 +51,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -129,10 +127,15 @@ public final class Terasology implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        ThreadCaptureScheduler graphics = (ThreadCaptureScheduler) GameScheduler.graphics();
+
+        //Switch threads.
+        // Main thread became graphics threads - requring by MacOS.
+        // New Thread became main logic thread.
+
+        ThreadCaptureScheduler graphics = new ThreadCaptureScheduler(Thread.currentThread());
 
         Thread thread = new Thread(()-> {
-            try{
+            try {
                 new CommandLine(new Terasology()).execute(args);
             } finally {
                  graphics.dispose();
@@ -143,7 +146,7 @@ public final class Terasology implements Callable<Integer> {
         thread.start();
 
         Thread.currentThread().setName("GRAPHICS");
-        graphics.setCapturedThread(Thread.currentThread());
+        GameScheduler.setupGraphicsScheduler(graphics);
         graphics.start();
     }
 

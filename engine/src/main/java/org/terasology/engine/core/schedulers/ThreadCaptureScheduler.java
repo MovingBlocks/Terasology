@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.core;
+package org.terasology.engine.core.schedulers;
 
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
@@ -13,13 +13,32 @@ import reactor.core.scheduler.Scheduler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ThreadCaptureScheduler implements Scheduler {
+/**
+ * Single thread scheduler which capture thread full.
+ * Usage:
+ * <pre>
+ * {@code
+ *        ThreadCaptureScheduler scheduler = new ThreadCaptureScheduler(Thread.currentThread());
+ *        scheduler.start(); // Thread will block there.
+ *
+ *        // many code ....
+ *
+ *       // somewhere in another thread.
+ *        scheduler.dispose(); // there interupts thread and disposes scheduler
+ * }
+ * </pre>
+ */
+public class ThreadCaptureScheduler implements ThreadAwareScheduler {
 
     private static Logger logger = LoggerFactory.getLogger(ThreadCaptureScheduler.class);
 
-    private Thread capturedThread;
+    private final Thread capturedThread;
     private AtomicBoolean requestToDispose = new AtomicBoolean(false);
     private BlockingQueue<Runnable> tasks = Queues.newArrayBlockingQueue(200);
+
+    public ThreadCaptureScheduler(Thread capturedThread) {
+        this.capturedThread = capturedThread;
+    }
 
     @Override
     public Disposable schedule(Runnable task) {
@@ -48,19 +67,15 @@ public class ThreadCaptureScheduler implements Scheduler {
         }
     }
 
-
-    public Thread getCapturedThread() {
-        return capturedThread;
-    }
-
-    public ThreadCaptureScheduler setCapturedThread(Thread capturedThread) {
-        this.capturedThread = capturedThread;
-        return this;
-    }
-
     @Override
     public void dispose() {
         requestToDispose.set(true);
+        capturedThread.interrupt();
+    }
+
+    @Override
+    public boolean isSchedulerThread(Thread thread) {
+        return capturedThread.equals(thread);
     }
 
     public class ThreadCapturedWorker implements Worker {
