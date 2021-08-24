@@ -24,13 +24,6 @@ import java.util.regex.Pattern;
  * This implementation also supports decimal values such as <code>3.5G</code>.
  */
 public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
-    protected final static Pattern pattern = Pattern.compile(
-            "(?<n>\\d+([.,]\\d*)?)" + // digits, maybe also a decimal part
-            "\\s*" +
-            "(?<suffix>\\p{Alpha})?b?",  // a suffix character, optionally followed by B
-            Pattern.CASE_INSENSITIVE
-    );
-
     @SuppressWarnings("unused")  // used by Unit.valueOf
     enum Unit {
         B(1),
@@ -68,4 +61,11 @@ public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
         }
         return n.toBigInteger().longValueExact();
     }
+
+    protected final static Pattern pattern = Pattern.compile(
+            "(?<n>\\d+([.,]\\d*)?)" + // digits, maybe also a decimal part
+                    "\\s*" +
+                    "(?<suffix>\\p{Alpha})?b?",  // a suffix character, optionally followed by B
+            Pattern.CASE_INSENSITIVE
+    );
 }
