@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -44,17 +43,15 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
-                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing,
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data,
                               OpenGLSkeletalMesh.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
         reload(data);
     }
 
-    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
-                                            SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
-        return new OpenGLSkeletalMesh(urn, assetType, data, graphicsProcessing, new DisposalAction(urn));
+    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data) {
+        return new OpenGLSkeletalMesh(urn, assetType, data, new DisposalAction(urn));
     }
 
 

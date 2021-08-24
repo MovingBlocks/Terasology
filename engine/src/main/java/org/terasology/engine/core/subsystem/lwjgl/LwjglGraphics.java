@@ -76,7 +76,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         GameScheduler.runBlockingGraphics("Lwjgl post-update", () -> {
-                    graphics.processActions();
                     currentState.render();
                     lwjglDisplay.update();
 

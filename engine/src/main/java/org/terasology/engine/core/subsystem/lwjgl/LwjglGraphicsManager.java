@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.terasology.engine.context.Context;
@@ -34,8 +32,6 @@ import org.terasology.gestalt.assets.module.ModuleAssetScanner;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.concurrent.BlockingDeque;
 import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -46,9 +42,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexParameterf;
 
-public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
-
-    private final BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
+public class LwjglGraphicsManager {
 
     private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
 
@@ -75,15 +69,13 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
                         return path.getPath().get(1).equals("fonts");
                     }
                 }));
-        assetTypeManager.createAssetType(Shader.class, (urn, assetType, data) -> GLSLShader.create(urn, assetType, data, this), "shaders");
-        assetTypeManager.createAssetType(Material.class, (urn, assetType, data) ->
-                        GLSLMaterial.create(urn, this, assetType, data),
+        assetTypeManager.createAssetType(Shader.class, (urn, assetType, data) -> GLSLShader.create(urn, assetType, data), "shaders");
+        assetTypeManager.createAssetType(Material.class, (urn, assetType, data) -> GLSLMaterial.create(urn, assetType, data),
                 "materials");
-        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data, this),
+        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data),
                 "mesh");
         assetTypeManager.createAssetType(SkeletalMesh.class,
-                (urn, assetType, data) ->
-                        OpenGLSkeletalMesh.create(urn, assetType, data, this),
+                (urn, assetType, data) -> OpenGLSkeletalMesh.create(urn, assetType, data),
                 "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new,
                 "animations", "skeletalMesh");
@@ -97,23 +89,9 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
     }
 
-    public void processActions() {
-        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
-
-        if (!displayThreadActions.isEmpty()) {
-            List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
-            displayThreadActions.drainTo(actions);
-            actions.forEach(Runnable::run);
-        }
-    }
-
-    public void asynchToDisplayThread(Runnable action) {
-        GameScheduler.runBlockingGraphics("Run somethingTODO rename", action); //TODO remove?
-    }
-
     public void createTexture3D(ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
                                 int size, Consumer<Integer> idConsumer) {
-        asynchToDisplayThread(() -> {
+        GameScheduler.runOnGraphics("createTexture3D", () -> {
             int id = glGenTextures();
             reloadTexture3D(id, alignedBuffer, wrapMode, filterMode, size);
             idConsumer.accept(id);
@@ -122,7 +100,7 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
 
     public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode,
                                 Texture.FilterMode filterMode, int size) {
-        asynchToDisplayThread(() -> {
+        GameScheduler.runOnGraphics("createTexture3D", () -> {
             glBindTexture(GL12.GL_TEXTURE_3D, id);
 
             glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
@@ -176,7 +154,7 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
     }
 
     public void disposeTexture(int id) {
-        asynchToDisplayThread(() -> glDeleteTextures(id));
+        GameScheduler.runOnGraphics("dispose texture", () -> glDeleteTextures(id));
     }
 
     public DisplayDeviceInfo getDisplayDeviceInfo() {

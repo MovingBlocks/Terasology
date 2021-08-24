@@ -21,7 +21,6 @@ import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.shader.ShaderData;
@@ -83,7 +82,6 @@ public class GLSLShader extends Shader {
 
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;
-    private final LwjglGraphicsProcessing graphicsProcessing;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
 
     private Config config = CoreRegistry.get(Config.class);
@@ -92,17 +90,15 @@ public class GLSLShader extends Shader {
 
 
     public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
-                      DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
+                      DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
-        this.graphicsProcessing = graphicsProcessing;
         reload(data);
     }
 
 
-    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
-                                    LwjglGraphicsProcessing graphicsProcessing) {
-        return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn, graphicsProcessing), graphicsProcessing);
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
+        return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn));
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {
@@ -133,7 +129,7 @@ public class GLSLShader extends Shader {
 
     @Override
     public void recompile() {
-        graphicsProcessing.asynchToDisplayThread(() -> {
+        GameScheduler.runOnGraphics("recompile shader", () -> {
             registerAllShaderPermutations();
         });
     }
@@ -387,16 +383,14 @@ public class GLSLShader extends Shader {
     public static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
-        private final LwjglGraphicsProcessing graphicsProcessing;
 
         private final TIntIntMap fragmentPrograms = new TIntIntHashMap();
         private final TIntIntMap vertexPrograms = new TIntIntHashMap();
         private final TIntIntMap geometryPrograms = new TIntIntHashMap();
 
         // made package-private after CheckStyle's suggestion
-        public DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
+        public DisposalAction(ResourceUrn urn) {
             this.urn = urn;
-            this.graphicsProcessing = graphicsProcessing;
         }
 
         private void disposeData() {
@@ -407,13 +401,13 @@ public class GLSLShader extends Shader {
 
         private void disposePrograms(TIntIntMap programs) {
             final TIntIntMap disposedPrograms = new TIntIntHashMap(programs);
-            graphicsProcessing.asynchToDisplayThread(() -> {
-                TIntIntIterator it = disposedPrograms.iterator();
-                while (it.hasNext()) {
-                    it.advance();
-                    GL20.glDeleteShader(it.value());
-                }
-            });
+            GameScheduler.runOnGraphics("disposePrograms", () -> {
+                    TIntIntIterator it = disposedPrograms.iterator();
+                    while (it.hasNext()) {
+                        it.advance();
+                        GL20.glDeleteShader(it.value());
+                    }
+                });
             programs.clear();
         }
 
