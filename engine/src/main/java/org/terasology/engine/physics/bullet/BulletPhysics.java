@@ -49,7 +49,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -73,7 +72,6 @@ import org.terasology.engine.physics.components.shapes.CylinderShapeComponent;
 import org.terasology.engine.physics.components.shapes.HullShapeComponent;
 import org.terasology.engine.physics.components.shapes.SphereShapeComponent;
 import org.terasology.engine.physics.engine.CharacterCollider;
-import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.physics.events.BlockImpactEvent;
 import org.terasology.engine.physics.events.ChangeVelocityEvent;
@@ -100,7 +98,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
@@ -109,8 +106,6 @@ import java.util.function.BiConsumer;
 @Share(Physics.class)
 public class BulletPhysics extends BaseComponentSystem implements UpdateSubscriberSystem, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
-
-    public static final float SIMD_EPSILON = 1.1920929E-7F;
 
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
@@ -556,10 +551,15 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
         PerformanceMonitor.startActivity("Physics Update");
         updateCollisionPairs();
+        updateRigidBodies(delta);
         if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
             lastNetsync = time.getGameTimeInMs();
         }
+        PerformanceMonitor.endActivity();
+    }
+
+    private void updateRigidBodies(float delta) {
         Matrix4f transform = new Matrix4f();
         entityRigidBodies.forEach((entity, rigidBody) -> {
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
@@ -618,43 +618,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                 }
             }
         });
-
-        PerformanceMonitor.endActivity();
-    }
-
-    private void sendSyncMessages() {
-        Vector3f tempPosition = new Vector3f();
-        Quaternionf tempRotation = new Quaternionf();
-        entityRigidBodies.forEach((entity, body) -> {
-            if (entity.hasComponent(NetworkComponent.class)) {
-                //TODO after implementing rigidbody interface
-                if (body.isActive()) {
-                    Matrix4f transform = body.getWorldTransform();
-
-                    entity.send(new LocationResynchEvent( transform.getTranslation(tempPosition), tempRotation.setFromUnnormalized(transform)));
-                    entity.send(new PhysicsResynchEvent(body.getLinearVelocity(), body.getAngularVelocity()));
-                }
-            }
-        });
-    }
-
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
-    public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
-        btRigidBody rb = entityRigidBodies.get(entity);
-        if (rb != null) {
-            rb.setLinearVelocity(event.getVelocity());
-            rb.setAngularVelocity(event.getAngularVelocity());
-        }
-    }
-
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
-    public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
-        btRigidBody rb = entityRigidBodies.get(entity);
-        if (rb != null) {
-            Matrix4f transform = new Matrix4f();
-            transform.set(new Matrix4f().translationRotateScale(event.getPosition(), event.getRotation(), 1.0f));
-            rb.setWorldTransform(transform);
-        }
     }
 
     private void updateCollisionPairs() {
@@ -735,6 +698,41 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                 btBroadphaseProxy.free(p1);
 
             }
+        }
+    }
+
+    private void sendSyncMessages() {
+        Vector3f tempPosition = new Vector3f();
+        Quaternionf tempRotation = new Quaternionf();
+        entityRigidBodies.forEach((entity, body) -> {
+            if (entity.hasComponent(NetworkComponent.class)) {
+                //TODO after implementing rigidbody interface
+                if (body.isActive()) {
+                    Matrix4f transform = body.getWorldTransform();
+
+                    entity.send(new LocationResynchEvent( transform.getTranslation(tempPosition), tempRotation.setFromUnnormalized(transform)));
+                    entity.send(new PhysicsResynchEvent(body.getLinearVelocity(), body.getAngularVelocity()));
+                }
+            }
+        });
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
+        btRigidBody rb = entityRigidBodies.get(entity);
+        if (rb != null) {
+            rb.setLinearVelocity(event.getVelocity());
+            rb.setAngularVelocity(event.getAngularVelocity());
+        }
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
+        btRigidBody rb = entityRigidBodies.get(entity);
+        if (rb != null) {
+            Matrix4f transform = new Matrix4f();
+            transform.set(new Matrix4f().translationRotateScale(event.getPosition(), event.getRotation(), 1.0f));
+            rb.setWorldTransform(transform);
         }
     }
 
