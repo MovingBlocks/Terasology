@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
+import com.sun.jna.Platform;
+import com.sun.jna.platform.unix.LibC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
@@ -11,7 +13,6 @@ import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.ThreadCaptureScheduler;
@@ -44,8 +45,10 @@ import picocli.CommandLine.Option;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -73,11 +76,24 @@ public final class Terasology implements Callable<Integer> {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
     @SuppressWarnings("unused")
-    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
+    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "Show help")
     private boolean helpRequested;
 
     @Option(names = "--headless", description = "Start headless (no graphics)")
     private boolean isHeadless;
+
+    @Option(names = "--max-data-size",
+            description = "Set maximum process data size [Linux only]",
+            paramLabel = "<size>",
+            converter = DataSizeConverter.class
+    )
+    Long maxDataSize;
+
+    @Option(names = "--oom-score",
+            description = "Adjust out-of-memory score [Linux only]",
+            paramLabel = "<score>"
+    )
+    Integer outOfMemoryScore;
 
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
@@ -214,6 +230,13 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private void handleLaunchArguments() throws IOException {
+        if (outOfMemoryScore!= null) {
+            adjustOutOfMemoryScore(outOfMemoryScore);
+        }
+        if (maxDataSize != null) {
+            setMemoryLimit(maxDataSize);
+        }
+
         if (homeDir != null) {
             logger.info("homeDir is {}", homeDir);
             PathManager.getInstance().useOverrideHomePath(homeDir);
@@ -307,4 +330,27 @@ public final class Terasology implements Callable<Integer> {
         return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
+    private static void setMemoryLimit(long bytes) {
+        // Memory-limiting techniques are highly platform-specific.
+        if (Platform.isLinux()) {
+            final LibC.Rlimit dataLimit = new LibC.Rlimit();
+            dataLimit.rlim_cur = bytes;
+            dataLimit.rlim_max = bytes;
+            // Under Linux ≥ 4.7, we can limit the maximum size of the process's data segment, which includes its
+            // heap. Note we cannot directly limit its resident set size, see setrlimit(3).
+            LibC.INSTANCE.setrlimit(LibC.RLIMIT_DATA, dataLimit);
+        } else {
+            logger.warn("--max-data-size is not supported on platform {}", Platform.RESOURCE_PREFIX);
+        }
+    }
+
+    private static void adjustOutOfMemoryScore(int adjustment) {
+        Path procFile = Paths.get("/proc", "self", "oom_score_adj");
+        try {
+            Files.write(procFile, String.valueOf(adjustment).getBytes(),
+                    StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Failed to adjust out-of-memory score.", e);
+        }
+    }
 }
