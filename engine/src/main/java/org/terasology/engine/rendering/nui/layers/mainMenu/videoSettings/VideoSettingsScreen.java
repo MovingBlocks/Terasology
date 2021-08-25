@@ -5,17 +5,20 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.Resolution;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.input.Keyboard;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.databinding.Binding;
@@ -26,11 +29,6 @@ import org.terasology.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
-import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.ShaderManager;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 
 import javax.imageio.ImageIO;
 import java.util.Arrays;
@@ -45,16 +43,10 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     private static final long RESOLUTION_REVERT_TIME_MS = 15000;
 
     @In
-    private GameEngine engine;
-
-    @In
     private Config config;
 
     @In
     private DisplayDevice displayDevice;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @In
     private TranslationSystem translationSystem;
@@ -238,7 +230,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fboScaleSlider.setPrecision(0);
             fboScaleSlider.setMinimum(25);
             fboScaleSlider.setRange(200);
-            fboScaleSlider.setLabelFunction(input -> String.valueOf(input.intValue()) + "%");
+            fboScaleSlider.setLabelFunction(input -> input.intValue() + "%");
             fboScaleSlider.bindValue(new Binding<Float>() {
                 @Override
                 public Float get() {

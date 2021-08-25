@@ -217,9 +217,9 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext(); ) {
-                        chunk = it.next();
-                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
+                    while (nearbyChunks.hasNext()) {
+                        chunk = nearbyChunks.next();
+                        if (chunk.getPosition().equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
                             break;
@@ -371,11 +371,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                     statVisibleChunks++;
 
-                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
-                        chunk.setAnimated(true);
-                    } else {
-                        chunk.setAnimated(false);
-                    }
+                    chunk.setAnimated(statVisibleChunks < MAX_ANIMATED_CHUNKS);
                 }
 
                 if (isChunkVisibleReflection(chunk)) {
@@ -517,13 +513,7 @@ class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (distance1 == distance2) {
-                return 0;
-            } else if (distance2 > distance1) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return Double.compare(distance2, distance1);
         }
     }
 
