@@ -95,7 +95,6 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     @Override
     public void postUpdate(GameState currentState, float delta) {
-        graphics.processActions();
         scheduler.processTasks();
 
         currentState.render();
