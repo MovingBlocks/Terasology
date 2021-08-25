@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
+import com.sun.jna.Platform;
+import com.sun.jna.platform.unix.LibC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
@@ -10,7 +12,6 @@ import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.modes.StateLoading;
@@ -43,8 +44,10 @@ import picocli.CommandLine.Option;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -64,19 +67,40 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@CommandLine.Command(name = "terasology", usageHelpAutoWidth = true,
-footer = "%nAlternatively use our standalone Launcher from%n https://github.com/MovingBlocks/TerasologyLauncher/releases")
+@CommandLine.Command(
+        name = "terasology",
+        usageHelpAutoWidth = true,
+        footer = "%n" +
+                "For details, see%n" +
+                " https://github.com/MovingBlocks/Terasology/wiki/Advanced-Options%n" +
+                "%n" +
+                "Alternatively use our standalone Launcher from%n" +
+                " https://github.com/MovingBlocks/TerasologyLauncher/releases"
+)
 public final class Terasology implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
 
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
     @SuppressWarnings("unused")
-    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
+    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "Show help")
     private boolean helpRequested;
 
     @Option(names = "--headless", description = "Start headless (no graphics)")
     private boolean isHeadless;
+
+    @Option(names = "--max-data-size",
+            description = "Set maximum process data size [Linux only]",
+            paramLabel = "<size>",
+            converter = DataSizeConverter.class
+    )
+    Long maxDataSize;
+
+    @Option(names = "--oom-score",
+            description = "Adjust out-of-memory score [Linux only]",
+            paramLabel = "<score>"
+    )
+    Integer outOfMemoryScore;
 
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
@@ -208,6 +232,13 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private void handleLaunchArguments() throws IOException {
+        if (outOfMemoryScore!= null) {
+            adjustOutOfMemoryScore(outOfMemoryScore);
+        }
+        if (maxDataSize != null) {
+            setMemoryLimit(maxDataSize);
+        }
+
         if (homeDir != null) {
             logger.info("homeDir is {}", homeDir);
             PathManager.getInstance().useOverrideHomePath(homeDir);
@@ -301,4 +332,70 @@ public final class Terasology implements Callable<Integer> {
         return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
+    /**
+     * Limit the amount of memory the operating system will allow this program.
+     * <p>
+     * Enforced by the operating system instead of the Java Virtual Machine, this limits memory usage
+     * in a different way than setting Java's maximum heap size (the <code>-Xmx</code> java option).
+     * Use this to prevent Terasology from gobbling all your system memory if it has a memory leak.
+     * <p>
+     * Set this limit to a number larger than the maximum java heap size. It is normal for a process to
+     * need <em>some</em> additional memory outside the java heap.
+     * <p>
+     * This is currently only implemented on Linux.
+     * <p>
+     * On Windows, you may be able to set a limit using one of these external tools:
+     * <ul>
+     *     <li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier">Application Verifier
+     *         (<code>AppVerif.exe</code>)</a>, available from the Windows SDK
+     *     <li><a href="https://github.com/lowleveldesign/process-governor">Process Governor (<code>procgov</code>)</a>,
+     *         an open source third-party tool
+     *
+     * @param bytes maximum allowed size
+     * @see <a href="https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE">Java command-line options</a>
+     * @see <a href="https://man7.org/linux/man-pages/man2/setrlimit.2.html">setrlimit(2)</a>
+     */
+    private static void setMemoryLimit(long bytes) {
+        // Memory-limiting techniques are highly platform-specific.
+        if (Platform.isLinux()) {
+            final LibC.Rlimit dataLimit = new LibC.Rlimit();
+            dataLimit.rlim_cur = bytes;
+            dataLimit.rlim_max = bytes;
+            // Under Linux ≥ 4.7, we can limit the maximum size of the process's data segment, which includes its
+            // heap. Note we cannot directly limit its resident set size, see setrlimit(2).
+            LibC.INSTANCE.setrlimit(LibC.RLIMIT_DATA, dataLimit);
+        } else {
+            // OS X does have setrlimit(), but as far as we can tell, it is not enforced for RLIMIT_DATA:
+            //   https://stackoverflow.com/questions/3274385/
+            // There is an API that might have a similar effect on Windows:
+            //   https://docs.microsoft.com/en-us/windows/win32/procthread/job-objects
+            logger.warn("--max-data-size is not supported on platform {}", Platform.RESOURCE_PREFIX);
+        }
+    }
+
+    /**
+     * Make the Linux Out-of-Memory killer more likely to pick Terasology.
+     * <p>
+     * When a Linux system runs out of available memory, it invokes the Out of Memory killer (aka <i>OOM killer</i>) to
+     * choose a process to terminate to free up some memory.
+     * <p>
+     * Add to this score if you want to make Terasology a bigger target. Why? If you'd rather the game process be the
+     * thing that gets killed instead of some other memory-hungry program, like your browser or IDE. A score of 1000 is
+     * equivalent to saying “this process is taking <em>all</em> the memory.”
+     * <p>
+     * This out-of-memory score is a Linux-specific mechanism.
+     *
+     * @param adjustment how much worse to make the score, 0–1000
+     *
+     * @see <a href="https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=/proc/%5Bpid%5D/-,oom_score_adj,-(since">proc(5)</a>
+     */
+    private static void adjustOutOfMemoryScore(int adjustment) {
+        Path procFile = Paths.get("/proc", "self", "oom_score_adj");
+        try {
+            Files.write(procFile, String.valueOf(adjustment).getBytes(),
+                    StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Failed to adjust out-of-memory score.", e);
+        }
+    }
 }

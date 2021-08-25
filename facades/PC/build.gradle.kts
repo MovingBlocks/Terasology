@@ -60,6 +60,7 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 dependencies {
+    implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.6.0")
     implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
 
@@ -68,6 +69,16 @@ dependencies {
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+
+    testImplementation(platform("org.junit:junit-bom:5.7.1")) {
+        // junit-bom will set version numbers for the other org.junit dependencies.
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("com.google.truth:truth:1.1.2")
+    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")
 }
 
 tasks.named<JavaCompile>("compileJava") {
