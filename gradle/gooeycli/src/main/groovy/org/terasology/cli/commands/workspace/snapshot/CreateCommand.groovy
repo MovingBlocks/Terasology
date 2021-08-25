@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.commands.workspace
+package org.terasology.cli.commands.workspace.snapshot
 
 
 import org.terasology.cli.ModuleItem
@@ -11,9 +11,9 @@ import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 
-@Command(name = "snapshot",
+@Command(name = "create",
     description = "captures a snapshot of all the modules and the associated commit")
-class SnapshotCommand implements Runnable {
+class CreateCommand implements Runnable {
 
     @Option(names = ["-tag", "-t"], description = "tag snapshot with name", required = false)
     String tag = ""

@@ -13,6 +13,7 @@ import org.terasology.cli.commands.BaseCommandType
 import org.terasology.cli.commands.BashCompletitionCommand
 import org.terasology.cli.commands.module.ModuleCommand
 import org.terasology.cli.commands.workspace.WorkspaceCommand
+import org.terasology.cli.commands.workspace.snapshot.SnapshotCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
