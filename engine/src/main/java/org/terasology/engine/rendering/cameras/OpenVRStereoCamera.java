@@ -17,7 +17,7 @@ import org.terasology.engine.world.WorldProvider;
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.
  */
-public class OpenVRStereoCamera extends SubmersibleCamera {
+public class OpenVRStereoCamera extends Camera {
 
     private final Matrix4f projectionMatrixLeftEye = new Matrix4f();
     private final Matrix4f projectionMatrixRightEye = new Matrix4f();
@@ -47,7 +47,6 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     private final OpenVRProvider vrProvider;
 
     public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
-        super(worldProvider, renderingConfig);
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;
