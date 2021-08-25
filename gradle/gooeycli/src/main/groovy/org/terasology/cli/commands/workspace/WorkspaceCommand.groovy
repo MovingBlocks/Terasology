@@ -4,18 +4,16 @@
 package org.terasology.cli.commands.workspace
 
 import org.terasology.cli.commands.BaseCommandType
-import picocli.CommandLine.HelpCommand
+import org.terasology.cli.commands.workspace.snapshot.SnapshotCommand
 import picocli.CommandLine.Command
+import picocli.CommandLine.HelpCommand
 
 @Command(name = "workspace",
-    subcommands = [
-        ListCommand.class,
-        SnapshotCommand.class,
-        OpenCommand.class,
-        HelpCommand.class,
-        RestoreCommand.class,
-        LoadCommand.class
-    ],
-    description = "workspace command")
+        subcommands = [
+                SnapshotCommand.class,
+                StatusCommand.class,
+                HelpCommand.class
+        ],
+        description = "workspace command")
 class WorkspaceCommand extends BaseCommandType {
 }

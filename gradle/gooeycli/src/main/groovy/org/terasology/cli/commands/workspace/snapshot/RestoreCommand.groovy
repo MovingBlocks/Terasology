@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.commands.workspace
+package org.terasology.cli.commands.workspace.snapshot
 
 import org.eclipse.jgit.api.Git
 import org.terasology.cli.ModuleItem
