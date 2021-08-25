@@ -3,7 +3,7 @@
 package org.terasology.engine.particles.components.generators;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.sandbox.API;
 
 /**
@@ -11,7 +11,7 @@ import org.terasology.gestalt.module.sandbox.API;
  * Upon generation sets particle velocity at random between minVelocity and maxVelocity.
  */
 @API
-public class VelocityRangeGeneratorComponent implements Component {
+public class VelocityRangeGeneratorComponent implements Component<VelocityRangeGeneratorComponent> {
     public Vector3f minVelocity;
     public Vector3f maxVelocity;
 
@@ -23,5 +23,11 @@ public class VelocityRangeGeneratorComponent implements Component {
     public VelocityRangeGeneratorComponent() {
         this.minVelocity = new Vector3f();
         this.maxVelocity = new Vector3f();
+    }
+
+    @Override
+    public void copyFrom(VelocityRangeGeneratorComponent other) {
+        this.minVelocity = new Vector3f(other.minVelocity);
+        this.maxVelocity = new Vector3f(other.maxVelocity);
     }
 }

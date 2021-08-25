@@ -3,13 +3,13 @@
 
 package org.terasology.engine.network.serialization;
 
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.engine.network.FieldReplicateType;
 import org.terasology.engine.network.ReplicationCheck;
 import org.terasology.engine.persistence.serializers.FieldSerializeCheck;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
  * Determines which fields should be sent and received by the server

@@ -14,13 +14,13 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.rendering.logic.MeshComponent;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

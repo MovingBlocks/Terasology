@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
@@ -10,6 +9,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 import java.util.Map;

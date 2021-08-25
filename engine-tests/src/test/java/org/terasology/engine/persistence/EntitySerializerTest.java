@@ -6,14 +6,10 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.assets.management.AssetManager;
-import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -23,20 +19,24 @@ import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.unittest.stubs.GetterSetterComponent;
-import org.terasology.unittest.stubs.IntegerComponent;
-import org.terasology.unittest.stubs.MappedTypeComponent;
-import org.terasology.unittest.stubs.StringComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
-import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
-import org.terasology.protobuf.EntityData;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
+import org.terasology.protobuf.EntityData;
+import org.terasology.unittest.stubs.GetterSetterComponent;
+import org.terasology.unittest.stubs.IntegerComponent;
+import org.terasology.unittest.stubs.MappedTypeComponent;
+import org.terasology.unittest.stubs.StringComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -321,6 +321,6 @@ public class EntitySerializerTest {
     }
 
     @DoNotPersist
-    public static class NonpersistedComponent implements Component {
+    public static class NonpersistedComponent extends EmptyComponent<NonpersistedComponent> {
     }
 }

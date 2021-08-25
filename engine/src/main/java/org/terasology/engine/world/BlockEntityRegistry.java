@@ -4,9 +4,9 @@ package org.terasology.engine.world;
 
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Manages creation and lookup of entities linked to blocks

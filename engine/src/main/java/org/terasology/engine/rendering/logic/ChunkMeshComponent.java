@@ -11,7 +11,7 @@ import org.terasology.joml.geom.AABBf;
  * An entity that should be rendered as though it was a chunk.
  * Requires a LocationComponent as well in order to actually be rendered.
  */
-public class ChunkMeshComponent implements VisualComponent {
+public class ChunkMeshComponent implements VisualComponent<ChunkMeshComponent> {
     @Replicate
     public ChunkMesh mesh;
     @Replicate
@@ -24,5 +24,12 @@ public class ChunkMeshComponent implements VisualComponent {
     public ChunkMeshComponent(ChunkMesh mesh, AABBf aabb) {
         this.mesh = mesh;
         this.aabb = aabb;
+    }
+
+    @Override
+    public void copyFrom(ChunkMeshComponent other) {
+        this.mesh = other.mesh; // TODO deep or shallow copy?
+        this.aabb = new AABBf(other.aabb);
+        this.animated = other.animated;
     }
 }
