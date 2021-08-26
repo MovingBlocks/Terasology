@@ -58,7 +58,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     private WorldRenderer worldRenderer;
 
     @In
-    protected AssetManager assetManager;
+    private AssetManager assetManager;
 
     @In
     private Config config;
