@@ -13,22 +13,22 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.gestalt.naming.Version;
-import org.terasology.gestalt.naming.gson.NameTypeAdapter;
-import org.terasology.gestalt.naming.gson.VersionTypeAdapter;
-import org.terasology.input.Input;
-import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.InputHandler;
 import org.terasology.engine.utilities.gson.ResolutionHandler;
 import org.terasology.engine.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
+import org.terasology.gestalt.naming.gson.NameTypeAdapter;
+import org.terasology.gestalt.naming.gson.VersionTypeAdapter;
+import org.terasology.input.Input;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -239,7 +239,7 @@ public final class Config {
      * @param clazz the class to convert the data to
      * @return a config component for the given uri and class or <code>null</code>
      */
-    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+    public <T extends Component<T>> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
         Map<String, JsonElement> map = config.getModuleConfigs().get(uri);
         if (map == null) {
             return null;

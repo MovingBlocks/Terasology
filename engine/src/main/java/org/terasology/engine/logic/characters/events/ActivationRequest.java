@@ -8,8 +8,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.NetworkEvent;
 import org.terasology.engine.network.ServerEvent;
 
-/**
- */
 @ServerEvent(lagCompensate = true)
 public class ActivationRequest extends NetworkEvent {
     /**
@@ -29,7 +27,10 @@ public class ActivationRequest extends NetworkEvent {
     private Vector3f hitNormal;
     private int activationId;
 
-    public ActivationRequest() {
+    /**
+     * INTERNAL: required for serialization.
+     */
+    protected ActivationRequest() {
     }
 
     public ActivationRequest(EntityRef instigator, boolean ownedEntityUsage, EntityRef usedOwnedEntity,
@@ -59,6 +60,9 @@ public class ActivationRequest extends NetworkEvent {
         return eventWithTarget;
     }
 
+    /**
+     * @return the entity that is hit, or {@link EntityRef#NULL} if the activation has no target
+     */
     public EntityRef getTarget() {
         return target;
     }
@@ -71,10 +75,16 @@ public class ActivationRequest extends NetworkEvent {
         return direction;
     }
 
+    /**
+     * @return the hit position if {@link #isEventWithTarget()} is true, {@code null} otherwise
+     */
     public Vector3f getHitPosition() {
         return hitPosition;
     }
 
+    /**
+     * @return the hit normal if {@link #isEventWithTarget()} is true, {@code null} otherwise
+     */
     public Vector3f getHitNormal() {
         return hitNormal;
     }

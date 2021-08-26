@@ -379,7 +379,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     /**
-     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     * Move this area to the given position {@code (x, y)}. The position is defined by the minimum corner.
      *
      * @param x the new x coordinate of the minimum corner
      * @param y the new y coordinate of the minimum corner
@@ -391,7 +391,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     /**
-     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     * Move this area to the given position {@code (x, y)}. The position is defined by the minimum corner.
      *
      * @param pos the new coordinates of the minimum corner
      * @param dest destination; will hold the result
@@ -518,14 +518,29 @@ public interface BlockAreac extends Iterable<Vector2ic> {
                 && this.minX() <= other.maxX() && this.minY() <= other.maxY();
     }
 
+    // -- distance --------------------------------------------------------------------------------------------------//
+
+    /**
+     * The squared distance to a point {@code p}.
+     *
+     * @param p the coordinates of the point
+     * @return the squared distance between this area and the point {@code p}
+     */
+    long distanceSquared(Vector2ic p);
+
+    /**
+     * The squared distance to a point {@code p} given by coordinates (x, y).
+     *
+     * @param px the x coordinate of the point
+     * @param py the y coordinate of the point
+     * @return the squared distance between this area and the point {@code p}
+     */
+    long distanceSquared(int px, int py);
+
     // ---------------------------------------------------------------------------------------------------------------//
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
-    public int hashCode();
+    int hashCode();
 
-    public String toString();
-
-    public long distanceSquared(Vector2ic p);
-
-    public long distanceSquared(int px, int py);
+    String toString();
 }

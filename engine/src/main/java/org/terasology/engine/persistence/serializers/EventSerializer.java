@@ -24,8 +24,6 @@ import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
-/**
- */
 public class EventSerializer {
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);
 
@@ -111,7 +109,8 @@ public class EventSerializer {
         if (eventMetadata == null) {
             throw new SerializationException("Unregistered event type: " + event.getClass());
         } else if (!eventMetadata.isConstructable()) {
-            throw new SerializationException("Cannot serialize event '" + eventMetadata + "' - lacks default constructor so cannot be deserialized");
+            throw new SerializationException("Cannot serialize event '" + eventMetadata
+                    + "' - lacks default constructor so cannot be deserialized");
         }
         EntityData.Event.Builder eventData = EntityData.Event.newBuilder();
         serializeEventType(event, eventData);
@@ -120,7 +119,9 @@ public class EventSerializer {
         ByteString.Output fieldIds = ByteString.newOutput();
         for (ReplicatedFieldMetadata field : eventMetadata.getFields()) {
             if (field.isReplicated()) {
-                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer.serialize(field, event, persistedDataSerializer)).getValue();
+                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer
+                        .serialize(field, event, persistedDataSerializer))
+                        .getValue();
                 if (serializedValue != null) {
                     eventData.addFieldValue(serializedValue);
                     fieldIds.write(field.getId());

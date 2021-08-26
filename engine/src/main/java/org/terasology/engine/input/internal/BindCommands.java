@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.input.internal;
 
+import com.google.common.collect.ImmutableMap;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -14,17 +15,33 @@ import org.terasology.input.Input;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.KeyId;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- */
 @RegisterSystem
 public class BindCommands extends BaseComponentSystem {
+    public static final ImmutableMap<Integer, SimpleUri> AZERTY = new ImmutableMap.Builder<Integer, SimpleUri>()
+            .put(KeyId.Z, new SimpleUri("engine:forwards"))
+            .put(KeyId.S, new SimpleUri("engine:backwards"))
+            .put(KeyId.Q, new SimpleUri("engine:left"))
+            .build();
+    public static final ImmutableMap<Integer, SimpleUri> DVORAK = new ImmutableMap.Builder<Integer, SimpleUri>()
+            .put(KeyId.COMMA, new SimpleUri("engine:forwards"))
+            .put(KeyId.A, new SimpleUri("engine:left"))
+            .put(KeyId.O, new SimpleUri("engine:backwards"))
+            .put(KeyId.E, new SimpleUri("engine:right"))
+            .put(KeyId.C, new SimpleUri("engine:inventory"))
+            .put(KeyId.PERIOD, new SimpleUri("engine:useItem"))
+            .build();
+    public static final ImmutableMap<Integer, SimpleUri> NEO = new ImmutableMap.Builder<Integer, SimpleUri>()
+            .put(Keyboard.KeyId.V, new SimpleUri("engine:forwards"))
+            .put(Keyboard.KeyId.I, new SimpleUri("engine:backwards"))
+            .put(Keyboard.KeyId.U, new SimpleUri("engine:left"))
+            .put(Keyboard.KeyId.A, new SimpleUri("engine:right"))
+            .put(Keyboard.KeyId.L, new SimpleUri("engine:useItem"))
+            .put(Keyboard.KeyId.G, new SimpleUri("engine:inventory"))
+            .build();
 
     @In
     private BindsManager bindsManager;
+
 
     @Command(shortDescription = "Maps a key to a function", requiredPermission = PermissionManager.NO_PERMISSION)
     public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {
@@ -34,36 +51,6 @@ public class BindCommands extends BaseComponentSystem {
             return "Mapped " + keyInput.getDisplayName() + " to action " + bind;
         }
         throw new IllegalArgumentException("Unknown key: " + key);
-    }
-
-    public static Map<Integer, SimpleUri> AZERTY;
-    public static Map<Integer, SimpleUri> DVORAK;
-    public static Map<Integer, SimpleUri> NEO;
-
-    static {
-        AZERTY = new HashMap<>();
-        AZERTY.put(KeyId.Z, new SimpleUri("engine:forwards"));
-        AZERTY.put(KeyId.S, new SimpleUri("engine:backwards"));
-        AZERTY.put(KeyId.Q, new SimpleUri("engine:left"));
-        AZERTY = Collections.unmodifiableMap(AZERTY);
-
-        DVORAK = new HashMap<>();
-        DVORAK.put(KeyId.COMMA, new SimpleUri("engine:forwards"));
-        DVORAK.put(KeyId.A, new SimpleUri("engine:left"));
-        DVORAK.put(KeyId.O, new SimpleUri("engine:backwards"));
-        DVORAK.put(KeyId.E, new SimpleUri("engine:right"));
-        DVORAK.put(KeyId.C, new SimpleUri("engine:inventory"));
-        DVORAK.put(KeyId.PERIOD, new SimpleUri("engine:useItem"));
-        DVORAK = Collections.unmodifiableMap(DVORAK);
-
-        NEO = new HashMap<>();
-        NEO.put(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
-        NEO.put(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
-        NEO.put(Keyboard.KeyId.U, new SimpleUri("engine:left"));
-        NEO.put(Keyboard.KeyId.A, new SimpleUri("engine:right"));
-        NEO.put(Keyboard.KeyId.L, new SimpleUri("engine:useItem"));
-        NEO.put(Keyboard.KeyId.G, new SimpleUri("engine:inventory"));
-        NEO = Collections.unmodifiableMap(NEO);
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY",

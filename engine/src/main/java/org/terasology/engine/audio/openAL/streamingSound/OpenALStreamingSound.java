@@ -35,7 +35,8 @@ public final class OpenALStreamingSound extends StreamingSound {
     private OpenALStreamingSound.DisposalAction internalResources;
     private int lastUpdatedBuffer;
 
-    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager, OpenALStreamingSound.DisposalAction disposableAction) {
+    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data,
+                                OpenALManager audioManager, OpenALStreamingSound.DisposalAction disposableAction) {
         super(urn, assetType, disposableAction);
         this.internalResources = disposableAction;
         this.internalResources.setAsset(this);
@@ -136,8 +137,8 @@ public final class OpenALStreamingSound extends StreamingSound {
 
     public static class DisposalAction implements DisposableResource {
 
-        private final ResourceUrn urn;
         protected int[] buffers = new int[0];
+        private final ResourceUrn urn;
         private WeakReference<OpenALStreamingSound> asset;
 
         public DisposalAction(ResourceUrn urn) {

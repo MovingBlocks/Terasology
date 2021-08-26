@@ -4,8 +4,6 @@ package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.block.BlockAreac;
 
-/**
- */
 public interface WorldFacet2D extends WorldFacet {
 
     /**

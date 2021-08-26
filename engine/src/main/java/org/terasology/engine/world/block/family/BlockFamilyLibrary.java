@@ -4,10 +4,12 @@ package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.util.reflection.ParameterProvider;
 import org.terasology.gestalt.util.reflection.SimpleClassFactory;
@@ -16,8 +18,6 @@ import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.engine.world.block.BlockBuilderHelper;
 
 import java.util.Optional;
 
@@ -43,7 +43,8 @@ public class BlockFamilyLibrary {
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(), (Class<? extends BlockFamily>) entry);
+            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(),
+                    (Class<? extends BlockFamily>) entry);
 
         }
     }
@@ -72,7 +73,9 @@ public class BlockFamilyLibrary {
      * @param blockBuilderHelper
      * @return
      */
-    public static BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily, BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
+    public static BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily,
+                                           BlockFamilyDefinition blockFamilyDefinition,
+                                           BlockBuilderHelper blockBuilderHelper) {
         try {
             SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
                 @Override
@@ -107,7 +110,9 @@ public class BlockFamilyLibrary {
      * @param shape
      * @return new BlockFamily
      */
-    public static BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily, BlockFamilyDefinition blockFamilyDefinition, BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
+    public static BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily,
+                                           BlockFamilyDefinition blockFamilyDefinition, BlockShape shape,
+                                           BlockBuilderHelper blockBuilderHelper) {
         try {
             SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
                 @Override

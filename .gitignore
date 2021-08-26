@@ -78,6 +78,7 @@ Thumbs.db
 /terasology-3rdclient/
 config.cfg
 entityDump.txt
+*entityDump*.json
 nuiEditorAutosave.json
 
 # Historical Output

@@ -12,13 +12,12 @@ import org.terasology.gestalt.naming.Name;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class Atlas extends Asset<AtlasData> {
     private Map<ResourceUrn, SubtextureData> subtextures = Maps.newHashMap();
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn,
+     * and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.

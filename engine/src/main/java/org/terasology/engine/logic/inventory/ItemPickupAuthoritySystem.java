@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
@@ -24,6 +23,7 @@ import org.terasology.engine.physics.events.CollideEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * This system uses the pickup prefab on an item component to add on extra components needed for the item to display in the world.

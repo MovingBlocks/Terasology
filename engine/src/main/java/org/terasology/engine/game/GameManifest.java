@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.game;
 
 import com.google.common.collect.ImmutableList;
@@ -20,10 +7,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.NameVersion;
 import org.terasology.gestalt.naming.Version;
@@ -38,8 +28,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class GameManifest {
     public static final String DEFAULT_FILE_NAME = "manifest.json";
 
@@ -50,6 +38,7 @@ public class GameManifest {
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worlds = Maps.newHashMap();
     private List<NameVersion> modules = Lists.newArrayList();
+    private Map<SimpleUri, Map<String, JsonElement>> moduleConfigs = Maps.newHashMap();
 
     public GameManifest() {
     }
@@ -62,6 +51,10 @@ public class GameManifest {
             this.seed = seed;
         }
         this.time = time;
+    }
+
+    public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {
+        return moduleConfigs;
     }
 
     public String getTitle() {
@@ -124,6 +117,37 @@ public class GameManifest {
         try (Writer writer = Files.newBufferedWriter(toFile, TerasologyConstants.CHARSET)) {
             createGson().toJson(gameManifest, writer);
         }
+    }
+
+    /**
+     * @param generatorUri the generator Uri
+     * @param configs      the new config params for the world generator
+     */
+    public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
+        Gson gson = createGson();
+        Map<String, JsonElement> map = Maps.newHashMap();
+        for (Map.Entry<String, Component> entry : configs.entrySet()) {
+            JsonElement json = gson.toJsonTree(entry.getValue());
+            map.put(entry.getKey(), json);
+        }
+        getModuleConfigs().put(generatorUri, map);
+    }
+
+    /**
+     * @param uri   the uri to look up
+     * @param key   the look-up key
+     * @param clazz the class to convert the data to
+     * @return a config component for the given uri and class or <code>null</code>
+     */
+    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+        Map<String, JsonElement> map = getModuleConfigs().get(uri);
+        if (map == null) {
+            return null;
+        }
+
+        JsonElement element = map.get(key);
+        Gson gson = createGson();
+        return gson.fromJson(element, clazz);
     }
 
     public static GameManifest load(Path filePath) throws IOException {

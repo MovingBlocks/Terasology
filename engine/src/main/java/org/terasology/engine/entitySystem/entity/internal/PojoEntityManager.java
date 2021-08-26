@@ -16,7 +16,6 @@ import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -31,6 +30,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.util.ArrayList;
@@ -607,10 +607,8 @@ public class PojoEntityManager implements EngineEntityManager {
         Optional<EngineEntityPool> pool = Optional.ofNullable(poolMap.get(id));
         if (!pool.isPresent()) {
             if (id != NULL_ID) {
-                if (isExistingEntity(id)) {
-                    // TODO: Entity pools assignment is not needed as of now, can be enabled later on when necessary.
-                    // logger.error("Entity {} doesn't have an assigned pool", id);
-                } else {
+                // TODO: Entity pools assignment is not needed as of now, can be enabled later on when necessary.
+                if (!isExistingEntity(id)) {
                     logger.error("Entity {} doesn't exist", id);
                 }
             }

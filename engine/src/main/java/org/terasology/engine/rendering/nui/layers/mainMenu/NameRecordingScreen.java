@@ -5,23 +5,23 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.modes.StateLoading;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.network.NetworkMode;
-import org.terasology.nui.widgets.UIButton;
-import org.terasology.nui.widgets.UILabel;
-import org.terasology.nui.widgets.UIText;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +102,8 @@ public class NameRecordingScreen extends CoreScreenLayer {
     }
 
     /**
-     * Last step of the recording setup process. Copies the save files from the selected game, transplants them into the 'recordings' folder, and renames the map files
+     * Last step of the recording setup process.
+     * Copies the save files from the selected game, transplants them into the 'recordings' folder, and renames the map files
      * to match the provided recording name. Then launches the game loading state.
      *
      * @param newTitle The title of the new recording.
@@ -163,7 +164,8 @@ public class NameRecordingScreen extends CoreScreenLayer {
     private boolean isNameValid(String name) {
         Path destinationPath = PathManager.getInstance().getRecordingPath(name);
 
-        // invalid characters are filtered from paths, so if the file name is made up of entirely invalid characters, the path will have a blank file name.
+        // invalid characters are filtered from paths
+        // - if the file name is made up of entirely invalid characters, the path will have a blank file name.
         // also acts as a check for blank input.
         return !destinationPath.equals(PathManager.getInstance().getRecordingPath(""));
     }

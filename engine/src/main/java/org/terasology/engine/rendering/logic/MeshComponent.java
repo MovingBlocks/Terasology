@@ -2,16 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.logic;
 
-import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.network.Replicate;
-import org.terasology.nui.Color;
+import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.nui.Color;
 
-/**
- */
 @ForceBlockActive
-public final class MeshComponent implements VisualComponent {
+public final class MeshComponent implements VisualComponent<MeshComponent> {
 
     @Replicate
     public Mesh mesh;
@@ -35,4 +33,13 @@ public final class MeshComponent implements VisualComponent {
     @Replicate
     public Color color = Color.WHITE;
 
+    @Override
+    public void copyFrom(MeshComponent other) {
+        this.mesh = other.mesh;
+        this.material = other.material;
+        this.translucent = other.translucent;
+        this.selfLuminance = other.selfLuminance;
+        this.hideFromOwner = other.hideFromOwner;
+        this.color = new Color(other.color);
+    }
 }

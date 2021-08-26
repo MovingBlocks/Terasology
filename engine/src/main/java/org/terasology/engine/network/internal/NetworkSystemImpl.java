@@ -36,7 +36,6 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
@@ -71,7 +70,7 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -850,7 +849,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
-                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
+                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity()
+                                .getComponent(NetworkComponent.class)
+                                .getNetworkId())).build());
         clientList.add(client);
         netClientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);

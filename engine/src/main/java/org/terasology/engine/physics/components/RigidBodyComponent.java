@@ -1,36 +1,20 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.physics.components;
 
 import com.google.common.collect.Lists;
-
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 
-/**
- */
 @ForceBlockActive
-public class RigidBodyComponent implements Component {
+public class RigidBodyComponent implements Component<RigidBodyComponent> {
     @Replicate
     public float mass = 10.0f;
     @Replicate
@@ -49,8 +33,8 @@ public class RigidBodyComponent implements Component {
     public float friction = 0.5f;
 
     /**
-     * The ratio of the relative velocity after impact to the relative velocity before the impact of two colliding bodies,
-     * equal to 1 for an elastic collision and 0 for an inelastic collision.
+     * The ratio of the relative velocity after impact to the relative velocity before the impact of two colliding
+     * bodies, equal to 1 for an elastic collision and 0 for an inelastic collision.
      */
     @Replicate
     public float restitution = 0f;
@@ -62,5 +46,20 @@ public class RigidBodyComponent implements Component {
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
     @Replicate
     public List<CollisionGroup> collidesWith =
-            Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
+            Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
+                    StandardCollisionGroup.KINEMATIC);
+
+    @Override
+    public void copyFrom(RigidBodyComponent other) {
+        this.mass = other.mass;
+        this.kinematic = other.kinematic;
+        this.velocity = new Vector3f(other.velocity);
+        this.angularFactor = new Vector3f(other.angularFactor);
+        this.linearFactor = new Vector3f(other.linearFactor);
+        this.friction = other.friction;
+        this.restitution = other.restitution;
+        this.angularVelocity = new Vector3f(other.angularVelocity);
+        this.collisionGroup = other.collisionGroup;
+        this.collidesWith = Lists.newArrayList(other.collidesWith);
+    }
 }

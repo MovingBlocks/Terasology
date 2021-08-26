@@ -3,11 +3,9 @@
 package org.terasology.unittest.stubs;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-/**
- */
-public class GetterSetterComponent implements Component {
+public class GetterSetterComponent implements Component<GetterSetterComponent> {
     public transient boolean getterUsed;
     public transient boolean setterUsed;
 
@@ -21,5 +19,11 @@ public class GetterSetterComponent implements Component {
     public void setValue(Vector3f value) {
         this.value = value;
         setterUsed = true;
+    }
+
+    @Override
+    public void copyFrom(GetterSetterComponent other) {
+        this.getterUsed = other.getterUsed;
+        this.setterUsed = other.setterUsed;
     }
 }

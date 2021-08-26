@@ -14,12 +14,12 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessShader;
@@ -101,7 +101,8 @@ import static org.mockito.Mockito.when;
 /**
  * Setup a headless ( = no graphics ) environment.
  * Based on TerasologyTestingEnvironment code.
- *
+ * <p>
+ * <b>Deprecated</b> for use outside of {@code engine-tests}; modules should use ModuleTestingEnvironment.
  */
 public class HeadlessEnvironment extends Environment {
 
@@ -128,7 +129,7 @@ public class HeadlessEnvironment extends Environment {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
 
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 

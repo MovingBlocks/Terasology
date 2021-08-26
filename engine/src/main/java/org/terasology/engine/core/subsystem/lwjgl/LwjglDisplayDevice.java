@@ -1,18 +1,5 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import com.google.common.base.Suppliers;
@@ -38,7 +25,6 @@ import java.util.stream.Collectors;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
@@ -49,6 +35,10 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     private RenderingConfig config;
     private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
+
+    private int windowWidth = 0;
+    private int windowHeight = 0;
+    private boolean isWindowDirty = true;
 
     public LwjglDisplayDevice(Context context) {
         this.config = context.get(Config.class).getRendering();
@@ -146,16 +136,25 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public int getWidth() {
-        int[] width = new int[1];
-        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), width, new int[1]);
-        return width[0];
+        updateWindow();
+        return this.windowWidth;
     }
 
     @Override
     public int getHeight() {
-        int[] height = new int[1];
-        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), new int[1], height);
-        return height[0];
+        updateWindow();
+        return this.windowHeight;
+    }
+
+    private void updateWindow() {
+        if (isWindowDirty) {
+            int[] windowWidth = new int[1];
+            int[] windowHeight = new int[1];
+            GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
+            this.windowWidth = windowWidth[0];
+            this.windowHeight = windowHeight[0];
+            isWindowDirty = false;
+        }
     }
 
     @Override
@@ -180,7 +179,6 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     @Override
     public void prepareToRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
     }
 
     @Override
@@ -192,6 +190,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void update() {
         processMessages();
         GLFW.glfwSwapBuffers(GLFW.glfwGetCurrentContext());
+        isWindowDirty = true;
+
     }
 
     private void updateViewport() {

@@ -13,10 +13,9 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.config.UniverseConfig;
 import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
@@ -47,7 +46,10 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -65,7 +67,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
+public final class ReadWriteStorageManager extends AbstractStorageManager
+        implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -109,9 +112,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager
-            , ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
-                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
+                                   ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus)
+            throws IOException {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }
@@ -368,6 +372,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         for (WorldInfo worldInfo: worlds) {
             gameManifest.addWorld(worldInfo);
         }
+
+        WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+        if (worldGenerator != null) {
+            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+            Map<String, Component> params = worldConfigurator.getProperties();
+            gameManifest.setModuleConfigs(worldGenerator.getUri(), params);
+        }
+
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 

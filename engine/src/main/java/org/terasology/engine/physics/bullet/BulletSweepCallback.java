@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.physics.bullet;
 
@@ -63,7 +50,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         Matrix4f from = new Matrix4f().setTranslation(fromWorld);
         Matrix4f to = new Matrix4f().setTranslation(toWorld);
         Matrix4f targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(from, to, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, resultCallback);
+        btDiscreteDynamicsWorld.rayTestSingle(from, to, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(),
+                targetTransform, resultCallback);
         if (resultCallback.hasHit()) {
             foundSlope = true;
             Vector3f result = new Vector3f();
@@ -81,7 +69,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         from = new Matrix4f().setTranslation(fromWorld);
         to = new Matrix4f().setTranslation(toWorld);
         targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(from, to, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, resultCallback);
+        btDiscreteDynamicsWorld.rayTestSingle(from, to, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(),
+                targetTransform, resultCallback);
         if (resultCallback.hasHit()) {
             foundSlope = true;
             Vector3f hitNormal = new Vector3f();
@@ -131,7 +120,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         Matrix4f transformFrom = new Matrix4f().setTranslation(fromWorld);
         Matrix4f transformTo = new Matrix4f().setTranslation(toWorld);
         Matrix4f targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
+        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(),
+                this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
             Vector3f hitNormal = new Vector3f();
@@ -144,7 +134,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         transformFrom = new Matrix4f().setTranslation(fromWorld);
         transformTo = new Matrix4f().setTranslation(toWorld);
         targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
+        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(),
+                this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
             Vector3f hitNormal = new Vector3f();

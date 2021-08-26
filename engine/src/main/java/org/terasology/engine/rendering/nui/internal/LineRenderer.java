@@ -2,17 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.internal;
 
-import org.lwjgl.BufferUtils;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
-import java.nio.FloatBuffer;
 
-/**
- *
- */
 public final class LineRenderer {
+    private static StandardMeshData lineMeshData = new StandardMeshData(DrawingMode.TRIANGLE_STRIP, AllocationType.STREAM);
+    private static Mesh lineMesh = null;
 
     private LineRenderer() {
 
@@ -34,10 +38,10 @@ public final class LineRenderer {
      * </a>
      */
     public static void draw(float x1, float y1, float x2, float y2, float width, Colorc color, Colorc background, float alpha) {
-        GL20.glUseProgram(0);
+        if(lineMesh == null) {
+            lineMesh = Assets.generateAsset(lineMeshData, Mesh.class);
+        }
         GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-        GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
 
         float t = 0;
         float r = 0;
@@ -173,112 +177,89 @@ public final class LineRenderer {
             }
         }
 
-        //draw the line by triangle strip
-        float[] lineVertex =
-            {
-                x1 - tx - rx, y1 - ty - ry,    //fading edge1
-                x2 - tx - rx, y2 - ty - ry,
-                x1 - tx, y1 - ty,        //core
-                x2 - tx, y2 - ty,
-                x1 + tx, y1 + ty,
-                x2 + tx, y2 + ty,
-                x1 + tx + rx, y1 + ty + ry,    //fading edge2
-                x2 + tx + rx, y2 + ty + ry
-            };
-        GL11.glVertexPointer(2, 0, 0, wrap(lineVertex));
+        lineMeshData.reallocate(0, 0);
+        lineMeshData.indices.rewind();
+        lineMeshData.position.rewind();
+        lineMeshData.color0.rewind();
 
+
+        Vector3f v1 = new Vector3f();
+        Vector4f v2 = new Vector4f();
+
+        lineMeshData.position.put(v1.set(x1 - tx - rx, y1 - ty - ry, 0.0f));
+        lineMeshData.position.put(v1.set(x2 - tx - rx, y2 - ty - ry, 0.0f));
+        lineMeshData.position.put(v1.set(x1 - tx, y1 - ty,   0.0f));
+        lineMeshData.position.put(v1.set(x2 - tx, y2 - ty, 0.0f));
+        lineMeshData.position.put(v1.set(x1 + tx, y1 + ty, 0.0f));
+        lineMeshData.position.put(v1.set(x2 + tx, y2 + ty, 0.0f));
+
+        if (!((Math.abs(dx) < epsilon || Math.abs(dy) < epsilon) && width <= 1.0)) {
+            lineMeshData.position.put(v1.set(x1 + tx + rx, y1 + ty + ry,  0.0f));
+            lineMeshData.position.put(v1.set(x2 + tx + rx, y2 + ty + ry,  0.0f));
+        }
+
+        Color c = new Color();
         if (!alphaBlend) {
-            float[] lineColor =
-                {
-                    bRed, bGreen, bBlue,
-                    bRed, bGreen, bBlue,
-                    cRed, cGreen, cBlue,
-                    cRed, cGreen, cBlue,
-                    cRed, cGreen, cBlue,
-                    cRed, cGreen, cBlue,
-                    bRed, bGreen, bBlue,
-                    bRed, bGreen, bBlue
-                };
-            GL11.glColorPointer(3, 0,0, wrap(lineColor));
+            lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+            lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+            lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+            lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+            lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+            lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+            lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
         } else {
-            float[] lineColor =
-                {
-                    cRed, cGreen, cBlue, 0,
-                    cRed, cGreen, cBlue, 0,
-                    cRed, cGreen, cBlue, a,
-                    cRed, cGreen, cBlue, a,
-                    cRed, cGreen, cBlue, a,
-                    cRed, cGreen, cBlue, a,
-                    cRed, cGreen, cBlue, 0,
-                    cRed, cGreen, cBlue, 0
-                };
-            GL11.glColorPointer(4, 0,0, wrap(lineColor));
-        }
+            lineMeshData.color0.put(c.set(v2.set(bRed, bGreen, bBlue, 0.0f)));
+            lineMeshData.color0.put(c.set(v2.set(bRed, bGreen, bBlue, 0.0f)));
+            lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+            lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+            lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+            lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, 0.0f)));
+            lineMeshData.color0.put(c.set(v2.set(bRed, bGreen, bBlue, 0.0f)));
 
-        if ((Math.abs(dx) < epsilon || Math.abs(dy) < epsilon) && width <= 1.0) {
-            GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 6);
-        } else {
-            GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 8);
         }
+        lineMesh.reload(lineMeshData);
+        lineMesh.render();
 
         //cap (do not draw if too thin)
         if (width >= 3) {
-            //draw cap
-            lineVertex = new float[]
-                    {
-                            x1 - rx + cx, y1 - ry + cy,    //cap1
-                            x1 + rx + cx, y1 + ry + cy,
-                            x1 - tx - rx, y1 - ty - ry,
-                            x1 + tx + rx, y1 + ty + ry,
-                            x2 - rx - cx, y2 - ry - cy,    //cap2
-                            x2 + rx - cx, y2 + ry - cy,
-                            x2 - tx - rx, y2 - ty - ry,
-                            x2 + tx + rx, y2 + ty + ry
-                    };
-            GL11.glVertexPointer(2, 0, 0, wrap(lineVertex));
+            lineMeshData.reallocate(0, 0);
+            lineMeshData.indices.rewind();
+            lineMeshData.position.rewind();
+            lineMeshData.color0.rewind();
+
+            lineMeshData.position.put(v1.set( x1 - rx + cx, y1 - ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set( x1 + rx + cx, y1 + ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set( x1 - tx - rx, y1 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set( x1 + tx + rx, y1 + ty + ry, 0.0f));
+            lineMeshData.position.put(v1.set( x2 - rx - cx, y2 - ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set( x2 + rx - cx, y2 + ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set( x2 - tx - rx, y2 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set( x2 + tx + rx, y2 + ty + ry, 0.0f));
 
             if (!alphaBlend) {
-                float[] lineColor =
-                    {
-                        bRed, bGreen, bBlue,    //cap1
-                        bRed, bGreen, bBlue,
-                        cRed, cGreen, cBlue,
-                        cRed, cGreen, cBlue,
-                        bRed, bGreen, bBlue,    //cap2
-                        bRed, bGreen, bBlue,
-                        cRed, cGreen, cBlue,
-                        cRed, cGreen, cBlue
-                    };
-                GL11.glColorPointer(3, 0, 0, wrap(lineColor));
+                lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+                lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+                lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+                lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
+                lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+                lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));
+                lineMeshData.color0.put(c.set(v1.set(cRed, cGreen, cBlue)));
             } else {
-                float[] lineColor =
-                    {
-                        cRed, cGreen, cBlue, 0,    //cap1
-                        cRed, cGreen, cBlue, 0,
-                        cRed, cGreen, cBlue, a,
-                        cRed, cGreen, cBlue, a,
-                        cRed, cGreen, cBlue, 0,    //cap2
-                        cRed, cGreen, cBlue, 0,
-                        cRed, cGreen, cBlue, a,
-                        cRed, cGreen, cBlue, a
-                    };
-                GL11.glColorPointer(4, 0, 0, wrap(lineColor));
-            }
 
-            GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
-            GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 4, 4);
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, 0)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, 0)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, 0)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, 0)));
+                lineMeshData.color0.put(c.set(v2.set(cRed, cGreen, cBlue, a)));
+            }
+            lineMesh.reload(lineMeshData);
+            lineMesh.render();
         }
 
-        GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-        GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
         GL11.glEnable(GL11.GL_CULL_FACE);
 
     }
 
-    private static FloatBuffer wrap(float[] data) {
-        FloatBuffer buf = BufferUtils.createFloatBuffer(data.length);
-        buf.put(data);
-        buf.rewind();
-        return buf;
-    }
 }

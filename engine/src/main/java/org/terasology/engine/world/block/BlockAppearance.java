@@ -3,12 +3,10 @@
 package org.terasology.engine.world.block;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -16,33 +14,57 @@ import java.util.Map;
  *
  */
 public class BlockAppearance {
+    private final BlockMeshInfo[] meshInfo = new BlockMeshInfo[BlockPart.allParts().size()];
+    private boolean hasAppearance = false;
 
-    private Map<BlockPart, BlockMeshPart> blockParts;
-    private Map<BlockPart, Vector2fc> textureAtlasPos = new EnumMap<>(BlockPart.class);
 
     public BlockAppearance() {
-        blockParts = Maps.newEnumMap(BlockPart.class);
-        textureAtlasPos = Maps.newEnumMap(BlockPart.class);
-        for (BlockPart part : BlockPart.values()) {
-            textureAtlasPos.put(part, new Vector2f());
+        for (int x = 0; x < meshInfo.length; x++) {
+            meshInfo[x] = new BlockMeshInfo();
+            meshInfo[x].textureAtlasPosition = new Vector2f();
         }
     }
 
     public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, ? extends Vector2fc> textureAtlasPos) {
         Preconditions.checkNotNull(blockParts);
         Preconditions.checkNotNull(textureAtlasPos);
-        this.blockParts = blockParts;
-        this.textureAtlasPos.putAll(textureAtlasPos);
         for (BlockPart part : BlockPart.values()) {
             Preconditions.checkNotNull(textureAtlasPos.get(part), "Missing texture atlas position for part " + part);
         }
+
+        for (BlockPart part : BlockPart.values()) {
+            meshInfo[part.ordinal()] = new BlockMeshInfo();
+            meshInfo[part.ordinal()].textureAtlasPosition = textureAtlasPos.get(part);
+            if (blockParts.containsKey(part)) {
+                meshInfo[part.ordinal()].part = blockParts.get(part);
+                hasAppearance = true;
+            }
+        }
+    }
+
+    public boolean hasAppearance() {
+        return hasAppearance;
     }
 
     public BlockMeshPart getPart(BlockPart part) {
-        return blockParts.get(part);
+        BlockMeshInfo info = meshInfo[part.ordinal()];
+        if (info == null) {
+            return null;
+        }
+        return info.part;
     }
 
     public Vector2fc getTextureAtlasPos(BlockPart part) {
-        return new Vector2f(textureAtlasPos.get(part));
+        BlockMeshInfo info = meshInfo[part.ordinal()];
+        if (info == null) {
+            return null;
+        }
+        return info.textureAtlasPosition;
     }
+
+    private static class BlockMeshInfo {
+        BlockMeshPart part;
+        Vector2fc textureAtlasPosition;
+    }
+
 }

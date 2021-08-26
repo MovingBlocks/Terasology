@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.subsystem.discordrpc;
@@ -254,14 +254,17 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
         RichPresence.Builder builder = new RichPresence.Builder()
                 .setLargeImage(DISCORD_APP_DEFAULT_IMAGE);
 
-        if (buffer.getDetails() != null)
+        if (buffer.getDetails() != null) {
             builder.setDetails(buffer.getDetails());
+        }
 
-        if (buffer.getState() != null)
+        if (buffer.getState() != null) {
             builder.setState(buffer.getState());
+        }
 
-        if (buffer.getStartTimestamp() != null)
+        if (buffer.getStartTimestamp() != null) {
             builder.setStartTimestamp(buffer.getStartTimestamp());
+        }
 
         int partySize = buffer.getPartySize();
         int partyMax = buffer.getPartyMax();

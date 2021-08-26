@@ -28,8 +28,6 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
-/**
- */
 public class OpenGLSkeletalMesh extends SkeletalMesh {
     private static final int VERTEX_SIZE = 3 * Float.BYTES;
     private static final int NORMAL_SIZE = 3 * Float.BYTES;
@@ -82,13 +80,16 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
                 GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
 
                 GL30.glEnableVertexAttribArray(StandardMeshData.VERTEX_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,  VERTEX_NORMAL_SIZE, 0);
+                GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,
+                        VERTEX_NORMAL_SIZE, 0);
 
                 GL30.glEnableVertexAttribArray(StandardMeshData.NORMAL_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false, VERTEX_NORMAL_SIZE, VERTEX_SIZE);
+                GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false,
+                        VERTEX_NORMAL_SIZE, VERTEX_SIZE);
 
                 GL30.glEnableVertexAttribArray(StandardMeshData.UV0_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false, UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
+                GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false,
+                        UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
 
                 int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
                 ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);

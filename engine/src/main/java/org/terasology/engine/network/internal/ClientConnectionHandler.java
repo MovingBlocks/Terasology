@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.naming.Name;
@@ -125,7 +125,8 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Attempts to receive a module from the server and push it to the client. Creates a file on the target machine and begins preparation to write to it.
+     * Attempts to receive a module from the server and push it to the client.
+     * Creates a file on the target machine and begins preparation to write to it.
      * @param channelHandlerContext
      * @param moduleDataHeader
      */

@@ -54,7 +54,8 @@ public class TimeAuthoritySystem extends BaseComponentSystem implements UpdateSu
         }
     }
 
-    @Command(shortDescription = "Toggle automatic time dilation", requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION, runOnServer = true)
+    @Command(shortDescription = "Toggle automatic time dilation", requiredPermission =
+            PermissionManager.SERVER_MANAGEMENT_PERMISSION, runOnServer = true)
     public String toggleAutoTimeDilation() {
         enableAutomaticTimeDilation = !enableAutomaticTimeDilation;
         if (enableAutomaticTimeDilation) {

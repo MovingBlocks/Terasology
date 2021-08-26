@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Utility class for converting timestamps to human readable format
  */
-public class DateTimeHelper {
+public final class DateTimeHelper {
 
     private DateTimeHelper() {
     }

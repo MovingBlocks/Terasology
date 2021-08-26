@@ -7,7 +7,11 @@ import gnu.trove.list.TFloatList;
 import javax.annotation.Nullable;
 
 /**
- * GLTFAccessor provides details on how to interpret a buffer view. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-accessor for details
+ * GLTFAccessor provides details on how to interpret a buffer view.
+ * <p>
+ * See <a href="https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-accessor">
+ *     glTF Specification - accessor
+ *     </a> for details.
  */
 public class GLTFAccessor {
     private Integer bufferView;

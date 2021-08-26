@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 @RegisterAssetFileFormat
 public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
     public static final float BORDER_SIZE = 0.0001f;
@@ -130,8 +128,8 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
                 Vector2f pos = new Vector2f(offset);
                 pos.x += tileX * tileSize.x;
                 pos.y += tileY * tileSize.y;
-                Rectanglef tileLocation = new Rectanglef(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y
-                    , 0.0f, 0.0f).setSize(tileSize.x, tileSize.y);
+                Rectanglef tileLocation = new Rectanglef(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y,
+                        0.0f, 0.0f).setSize(tileSize.x, tileSize.y);
                 out.put(new Name(name), new SubtextureData(texture, shrinkRegion(tileLocation)));
             }
 

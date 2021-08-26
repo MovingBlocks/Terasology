@@ -5,8 +5,6 @@ package org.terasology.engine.rendering;
 
 import org.terasology.joml.geom.AABBfc;
 
-/**
- */
 public interface BlockOverlayRenderer {
     void setAABB(AABBfc aabb);
 

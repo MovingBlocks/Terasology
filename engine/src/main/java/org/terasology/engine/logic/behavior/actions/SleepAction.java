@@ -28,7 +28,7 @@ public class SleepAction extends BaseAction {
     public BehaviorState modify(Actor actor, BehaviorState result) {
 
         float timeRemaining = 0;
-        try {// TODO figure out the delegation issue
+        try { // TODO figure out the delegation issue
             timeRemaining = actor.getValue(getId());
         } catch (NullPointerException e) {
             construct(actor);

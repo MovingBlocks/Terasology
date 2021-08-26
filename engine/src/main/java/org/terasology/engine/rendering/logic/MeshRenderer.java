@@ -22,24 +22,22 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.engine.rendering.opengl.OpenGLMesh;
-import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.WorldProvider;
+import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Set;
 
 /**
- * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
+ * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
+ *  Later note: some GelCube functionality moved to a module
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
@@ -47,9 +45,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
     @In
     private NetworkSystem network;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @In
     private Config config;
@@ -135,6 +130,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOpaque() {
         if (config.getRendering().isRenderNearest()) {
             renderEntities(Arrays.asList(opaqueMeshSorter.getNearest(config.getRendering().getMeshLimit())));
@@ -200,7 +196,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABBf aabb = meshComp.mesh.getAABB().transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
+                    AABBf aabb = meshComp.mesh.getAABB()
+                            .transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
@@ -212,7 +209,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
                         material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
-                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
+                        material.setFloat("blockLight",
+                                Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
 
                         meshComp.mesh.render();
                     }
@@ -234,14 +232,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
      */
     private boolean isRelevant(EntityRef entity, Vector3fc position) {
         return worldProvider.isBlockRelevant(position) || entity.isAlwaysRelevant();
-    }
-
-    @Override
-    public void renderOverlay() {
-    }
-
-    @Override
-    public void renderShadows() {
     }
 
     public int getLastRendered() {

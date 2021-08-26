@@ -3,16 +3,21 @@
 
 package org.terasology.unittest.stubs;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-/**
- */
 @DoNotAutoRegister
-public class UnsupportedTypeComponent implements Component {
+public class UnsupportedTypeComponent implements Component<UnsupportedTypeComponent> {
     public UnsupportedType value;
     public UnsupportedType2 value2;
     public UnsupportedType3 value3;
+
+    @Override
+    public void copyFrom(UnsupportedTypeComponent other) {
+        this.value = other.value;
+        this.value2 = other.value2;
+        this.value3 = other.value3;
+    }
 
     public interface UnsupportedType3 {
 

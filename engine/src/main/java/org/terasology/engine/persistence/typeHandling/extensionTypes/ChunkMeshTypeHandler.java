@@ -4,9 +4,7 @@
 package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
-import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -25,26 +23,31 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
         }
         List<PersistedData> data = new ArrayList<>();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
-            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalVertices)));
-            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalIndices)));
+
+            value.getVertexElements(renderType).buffer.writeBuffer(buffer -> {
+                data.add(serializer.serialize(buffer));
+            });
+            value.getVertexElements(renderType).indices.writeBuffer(buffer -> {
+                data.add(serializer.serialize(buffer));
+            });
         }
         return serializer.serialize(data);
     }
 
     @Override
     public Optional<ChunkMesh> deserialize(PersistedData data) {
-        List<IntBuffer> asBuffers = new ArrayList<>();
+        List<ByteBuffer> asBuffers = new ArrayList<>();
         for (PersistedData datum : data.getAsArray()) {
-            IntBuffer buffer = datum.getAsByteBuffer().asIntBuffer();
-            IntBuffer directBuffer = BufferUtils.createIntBuffer(buffer.limit() * 4);
+            ByteBuffer buffer = datum.getAsByteBuffer();
+            ByteBuffer directBuffer = BufferUtils.createByteBuffer(buffer.limit());
             directBuffer.put(buffer);
             directBuffer.rewind();
             asBuffers.add(directBuffer);
         }
-        ChunkMesh result = new ChunkMesh(null);
+        ChunkMesh result = new ChunkMesh();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
-            result.getVertexElements(renderType).finalVertices = asBuffers.remove(0);
-            result.getVertexElements(renderType).finalIndices = asBuffers.remove(0);
+            result.getVertexElements(renderType).buffer.copyBuffer(asBuffers.remove(0));
+            result.getVertexElements(renderType).indices.copyBuffer(asBuffers.remove(0));
         }
         result.generateVBOs();
         return Optional.of(result);

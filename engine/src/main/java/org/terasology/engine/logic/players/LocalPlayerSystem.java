@@ -12,7 +12,6 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
@@ -44,17 +43,14 @@ import org.terasology.engine.logic.characters.MovementMode;
 import org.terasology.engine.logic.characters.events.OnItemUseEvent;
 import org.terasology.engine.logic.characters.events.ScaleToRequest;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
-import org.terasology.engine.logic.delay.DelayManager;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.AABBRenderer;
-import org.terasology.engine.rendering.BlockOverlayRenderer;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.logic.MeshComponent;
@@ -80,10 +76,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
-    @In
-    private PhysicsEngine physics;
-    @In
-    private DelayManager delayManager;
 
     @In
     private Config config;
@@ -118,8 +110,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private BlockOverlayRenderer aabbRenderer = new AABBRenderer(new AABBf());
-
     private int inputSequenceNumber = 1;
 
     private AABBf aabb = new AABBf();
@@ -138,23 +128,25 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         if (localPlayerInitialized) {
             EntityRef entity = localPlayer.getCharacterEntity();
-            CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+            CharacterMovementComponent characterMovementComponent =
+                    entity.getComponent(CharacterMovementComponent.class);
 
             processInput(entity, characterMovementComponent);
-            updateCamera(characterMovementComponent, localPlayer.getViewPosition(new Vector3f()), localPlayer.getViewRotation(new Quaternionf()));
+            updateCamera(characterMovementComponent, localPlayer.getViewPosition(new Vector3f()),
+                    localPlayer.getViewRotation(new Quaternionf()));
         }
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
         lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
-        lookPitch = (float) Math.clamp(-89, 89,lookPitch + lookPitchDelta);
+        lookPitch = (float) Math.clamp(-89, 89, lookPitch + lookPitchDelta);
         lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quaternionf viewRotation =  new Quaternionf();
+        Quaternionf viewRotation = new Quaternionf();
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
@@ -177,9 +169,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
         }
-        // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
+        // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing
+        // trouble down the line.
         if (relMove.isFinite()) {
-            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch,
+                    jump, time.getGameDeltaInMs()));
         }
         jump = false;
     }
@@ -195,8 +189,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Auto move is disabled when the associated key is pressed again.
-     * This cancels the simulated repeated key stroke for the forward input button.
+     * Auto move is disabled when the associated key is pressed again. This cancels the simulated repeated key stroke
+     * for the forward input button.
      */
     private void stopAutoMove() {
         List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
@@ -209,8 +203,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key.
-     * For an input that repeats, the key must be in Down state before Repeat state can be applied to it.
+     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key. For an
+     * input that repeats, the key must be in Down state before Repeat state can be applied to it.
      */
     private void startAutoMove() {
         isAutoMove = false;
@@ -251,16 +245,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
         lookYawDelta = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
         lookPitchDelta = event.getValue();
         event.consume();
+    }
+
+    @ReceiveEvent(components = CharacterComponent.class)
+    public void setRotation(SetDirectionEvent event, EntityRef entity) {
+        if (localPlayer.getCharacterEntity().equals(entity)) {
+            lookPitch = event.getPitch();
+            lookYaw = event.getYaw();
+        }
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
@@ -273,7 +275,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = (float) event.getValue();
         if (relativeMovement.z == 0f && isAutoMove) {
@@ -282,37 +284,37 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        relativeMovement.x =  (float)event.getValue();
+        relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
         relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        relativeMovement.z =  (float)event.getValue();
+        relativeMovement.z = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
         relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
-        relativeMovement.y =  (float)event.getValue();
+        relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
         boolean toggle = event.isDown();
         run = runPerDefault ^ toggle;
@@ -320,14 +322,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     // Crouches if button is pressed. Stands if button is released.
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         boolean toggle = event.isDown();
         crouch = crouchPerDefault ^ toggle;
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onCrouchMode(CrouchModeButton event, EntityRef entity) {
         if (event.isDown()) {
             crouchPerDefault = !crouchPerDefault;
@@ -336,7 +338,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
         if (event.isDown()) {
             if (!isAutoMove) {
@@ -348,7 +350,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleSpeedPermanently(ToggleSpeedPermanentlyButton event, EntityRef entity) {
         if (event.isDown()) {
             runPerDefault = !runPerDefault;
@@ -374,7 +376,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                     MeshComponent mesh = target.getComponent(MeshComponent.class);
                     if (mesh != null && mesh.mesh != null) {
                         aabb.set(mesh.mesh.getAABB());
-                        aabb.transform(new Matrix4f().translationRotateScale(location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()), location.getWorldScale()));
+                        aabb.transform(new Matrix4f().translationRotateScale(
+                                location.getWorldPosition(new Vector3f()),
+                                location.getWorldRotation(new Quaternionf()),
+                                location.getWorldScale()));
                     }
                 }
             }
@@ -385,17 +390,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void renderOverlay() {
         // Display the block the player is aiming at
         if (config.getRendering().isRenderPlacingBox() && hasTarget) {
-            aabbRenderer.setAABB(aabb);
-            aabbRenderer.render();
+            try (AABBRenderer renderer = new AABBRenderer(aabb)) {
+                renderer.render();
+            }
         }
-    }
-
-    public BlockOverlayRenderer getAABBRenderer() {
-        return aabbRenderer;
-    }
-
-    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
-        aabbRenderer = newAABBRender;
     }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
@@ -426,7 +424,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onFrobButton(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
             return;
@@ -443,8 +441,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
-    public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+    @ReceiveEvent(components = CharacterComponent.class)
+    public void onUseItemButton(UseItemButton event, EntityRef entity,
+                                CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown()) {
             return;
         }
@@ -475,23 +474,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         return (float) java.lang.Math.sin((double) bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-    @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-
-    }
-
-    @Override
-    public void renderShadows() {
-    }
 
     /**
-     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer.
-     * This can be needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be
+     * needed in special cases where the local player isn't fully available (TODO: May be a bug?)
      *
      * @return the EntityRef that the networking system says is the client associated with this player
      */

@@ -1,25 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity.internal;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import javax.annotation.Nullable;
 
@@ -27,7 +14,7 @@ import javax.annotation.Nullable;
  * Component for storing entity system information on an entity
  */
 @DoNotPersist
-public class EntityInfoComponent implements Component {
+public class EntityInfoComponent implements Component<EntityInfoComponent> {
     // TODO: Switch this to use Optional<Prefab>
     public Prefab parentPrefab;
     /**
@@ -54,5 +41,14 @@ public class EntityInfoComponent implements Component {
                                EntityScope scope) {
         this(parentPrefab, persisted, alwaysRelevant);
         this.scope = scope;
+    }
+
+    @Override
+    public void copyFrom(EntityInfoComponent other) {
+        this.persisted = other.persisted;
+        this.parentPrefab = other.parentPrefab;
+        this.alwaysRelevant = other.alwaysRelevant;
+        this.scope = other.scope;
+        this.owner = other.owner;
     }
 }

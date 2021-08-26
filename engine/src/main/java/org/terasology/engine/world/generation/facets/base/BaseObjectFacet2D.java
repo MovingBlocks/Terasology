@@ -9,8 +9,6 @@ import org.terasology.engine.world.generation.Border3D;
 
 import java.lang.reflect.Array;
 
-/**
- */
 public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements ObjectFacet2D<T> {
 
     private T[] data;

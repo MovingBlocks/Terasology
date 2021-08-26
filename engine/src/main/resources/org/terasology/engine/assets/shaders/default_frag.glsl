@@ -1,21 +1,15 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+in vec4 v_color0;
+
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outNormal;
+layout(location = 2) out vec4 outLight;
 
 void main() {
-    gl_FragData[0].rgba = gl_Color;
-    gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
-    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
+    outColor = v_color0;
+    outNormal = vec4(0.5, 1.0, 0.5, 1.0);
+    outLight = vec4(0.0, 0.0, 0.0, 0.0);
 }

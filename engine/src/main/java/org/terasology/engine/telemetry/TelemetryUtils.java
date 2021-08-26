@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -82,7 +69,8 @@ public final class TelemetryUtils {
      * @param nameSpace The name the class tracking this metric.
      * @param bindingMap the binding map contains fields who has user's permission.
      */
-    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Emitter emitter, String nameSpace, Map<String, Boolean> bindingMap) {
+    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Emitter emitter,
+                                          String nameSpace, Map<String, Boolean> bindingMap) {
         Optional<Metric> optional = metrics.getMetric(metricClass);
         if (optional.isPresent()) {
             Metric metric = optional.get();
@@ -102,7 +90,8 @@ public final class TelemetryUtils {
      * @param metric the Metric class instance that this event belongs to.
      * @param telemetryConfiguration the telemetryConfiguration adapter which could be used in modules.
      */
-    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, TelemetryConfiguration telemetryConfiguration) {
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event,
+                                   Metric metric, TelemetryConfiguration telemetryConfiguration) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             Context context = CoreRegistry.get(Context.class);
             DisplayDevice display = context.get(DisplayDevice.class);
@@ -130,7 +119,8 @@ public final class TelemetryUtils {
      * @param metric the Metric class instance that this event belongs to.
      * @param bindingMap the binding map contains fields who has user's permission.
      */
-    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event,
+                                   Metric metric, Map<String, Boolean> bindingMap) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             Context context = CoreRegistry.get(Context.class);
             DisplayDevice display = context.get(DisplayDevice.class);

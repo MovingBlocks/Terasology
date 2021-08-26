@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -19,10 +19,11 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Setup an empty Terasology environment
- *
+ * Set up an empty Terasology environment.
+ * <p>
+ * Not for use outside {@code engine-tests}. Modules should use ModuleTestingEnvironment.
  */
-public class Environment {
+class Environment {
 
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
 

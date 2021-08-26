@@ -4,19 +4,17 @@ package org.terasology.reflection.reflect;
 
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.logic.characters.events.AttackRequest;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.reflection.reflect.ByteCodeReflectFactory;
 import org.terasology.unittest.stubs.GetterSetterComponent;
 import org.terasology.unittest.stubs.IntegerComponent;
 import org.terasology.unittest.stubs.StringComponent;
-import org.terasology.engine.reflection.reflect.ByteCodeReflectFactory;
-import org.terasology.engine.logic.characters.events.AttackRequest;
-import org.terasology.engine.logic.location.LocationComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- */
 public class ByteCodeReflectFactoryTest {
 
     @Test
@@ -38,8 +36,8 @@ public class ByteCodeReflectFactoryTest {
     @Test
     public void testCreateFieldAccessorWithGetterSetter() throws Exception {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
-        FieldAccessor<GetterSetterComponent, Vector3f> fieldAccessor
-                = reflectFactory.createFieldAccessor(GetterSetterComponent.class, GetterSetterComponent.class.getDeclaredField("value"), Vector3f.class);
+        FieldAccessor<GetterSetterComponent, Vector3f> fieldAccessor = reflectFactory.createFieldAccessor(GetterSetterComponent.class,
+                GetterSetterComponent.class.getDeclaredField("value"), Vector3f.class);
         GetterSetterComponent comp = new GetterSetterComponent();
         Vector3f newVal = new Vector3f(1, 2, 3);
         fieldAccessor.setValue(comp, newVal);

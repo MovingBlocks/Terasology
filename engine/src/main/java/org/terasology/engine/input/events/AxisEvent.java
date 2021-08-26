@@ -4,8 +4,6 @@
 package org.terasology.engine.input.events;
 
 
-/**
- */
 public abstract class AxisEvent extends InputEvent {
 
     public AxisEvent(float delta) {

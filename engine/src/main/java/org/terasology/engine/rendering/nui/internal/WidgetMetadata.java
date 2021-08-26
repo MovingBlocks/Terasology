@@ -14,8 +14,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.lang.reflect.Field;
 
-/**
- */
 public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMetadata<T, ?>> {
 
     /**
@@ -27,12 +25,14 @@ public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMe
      * @param copyStrategyLibrary A copy strategy library
      * @throws NoSuchMethodException If the class has no default constructor
      */
-    public WidgetMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
+    public WidgetMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary)
+            throws NoSuchMethodException {
         super(uri.toString(), type, factory, copyStrategyLibrary, IsConfigField.INSTANCE);
     }
 
     @Override
-    protected FieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+    protected FieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory)
+            throws InaccessibleFieldException {
         return new FieldMetadata<>(this, field, copyStrategyLibrary, factory);
     }
 

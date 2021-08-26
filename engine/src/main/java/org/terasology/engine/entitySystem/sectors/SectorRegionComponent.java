@@ -1,27 +1,15 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.sectors;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * When this component is added to a sector-scope entity, the {@link SectorSimulationComponent} will count any chunks
@@ -31,11 +19,17 @@ import java.util.Set;
  * rather than positions, if desired.
  */
 @API
-public class SectorRegionComponent implements Component {
+public class SectorRegionComponent implements Component<SectorRegionComponent> {
 
     /**
      * The set of positions of chunks for this entity to watch.
      */
     public Set<Vector3i> chunks = new HashSet<>();
 
+    @Override
+    public void copyFrom(SectorRegionComponent other) {
+        this.chunks = other.chunks.stream()
+                .map(Vector3i::new)
+                .collect(Collectors.toSet());
+    }
 }

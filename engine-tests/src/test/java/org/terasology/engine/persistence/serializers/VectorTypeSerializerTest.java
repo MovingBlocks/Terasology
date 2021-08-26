@@ -21,8 +21,6 @@ import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 
-import java.io.IOException;
-
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -66,7 +64,7 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         }).get();
 
         TestObject2 o = gsonSerializer.deserialize(new TypeInfo<TestObject2>() {
-        },data).get();
+        }, data).get();
 
         assertEquals(new Vector3f(1.0f, 2.0f, 3.0f), o.v1, .00001f);
         assertEquals(new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), o.v2, .00001f);

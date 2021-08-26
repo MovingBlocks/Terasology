@@ -6,8 +6,6 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
-/**
- */
 public class NameTypeHandler extends StringRepresentationTypeHandler<Name> {
 
     @Override

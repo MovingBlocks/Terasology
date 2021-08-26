@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.math;
 
-import com.google.common.collect.Maps;
 import org.joml.Math;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-
-import java.util.EnumMap;
 
 /**
  * An enumeration of the axis of the world from the player perspective. There is also
@@ -23,28 +20,8 @@ public enum Direction {
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
     DOWN(new Vector3i(0, -1, 0), new Vector3f(0, -1, 0));
 
-    private static final EnumMap<Direction, Direction> REVERSE_MAP;
-    private static final EnumMap<Direction, Side> CONVERSION_MAP;
-
     private final Vector3i vector3iDir;
     private final Vector3f vector3fDir;
-
-    static {
-        REVERSE_MAP = new EnumMap<>(Direction.class);
-        REVERSE_MAP.put(UP, DOWN);
-        REVERSE_MAP.put(LEFT, RIGHT);
-        REVERSE_MAP.put(RIGHT, LEFT);
-        REVERSE_MAP.put(FORWARD, BACKWARD);
-        REVERSE_MAP.put(BACKWARD, FORWARD);
-        REVERSE_MAP.put(DOWN, UP);
-        CONVERSION_MAP = Maps.newEnumMap(Direction.class);
-        CONVERSION_MAP.put(UP, Side.TOP);
-        CONVERSION_MAP.put(DOWN, Side.BOTTOM);
-        CONVERSION_MAP.put(FORWARD, Side.BACK);
-        CONVERSION_MAP.put(BACKWARD, Side.FRONT);
-        CONVERSION_MAP.put(LEFT, Side.RIGHT);
-        CONVERSION_MAP.put(RIGHT, Side.LEFT);
-    }
 
     Direction(Vector3i vector3i, Vector3f vector3f) {
         this.vector3iDir = vector3i;
@@ -67,7 +44,22 @@ public enum Direction {
     }
 
     public Side toSide() {
-        return CONVERSION_MAP.get(this);
+        switch (this) {
+            case UP:
+                return Side.TOP;
+            case DOWN:
+                return Side.BOTTOM;
+            case FORWARD:
+                return Side.BACK;
+            case BACKWARD:
+                return Side.FRONT;
+            case LEFT:
+                return Side.RIGHT;
+            case RIGHT:
+                return Side.LEFT;
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
     }
 
     /**
@@ -126,7 +118,22 @@ public enum Direction {
      * @return The opposite side to this side.
      */
     public Direction reverse() {
-        return REVERSE_MAP.get(this);
+        switch (this) {
+            case RIGHT:
+                return LEFT;
+            case LEFT:
+                return RIGHT;
+            case UP:
+                return DOWN;
+            case DOWN:
+                return UP;
+            case FORWARD:
+                return BACKWARD;
+            case BACKWARD:
+                return FORWARD;
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
     }
 
 }

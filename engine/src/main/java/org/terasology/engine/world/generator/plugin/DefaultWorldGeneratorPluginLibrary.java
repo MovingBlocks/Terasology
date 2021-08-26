@@ -14,8 +14,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.util.List;
 
-/**
- */
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
 
     private final ClassLibrary<WorldGeneratorPlugin> library;
@@ -24,7 +22,8 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
         library = new DefaultModuleClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName()).toString(), entry.asSubclass(WorldGeneratorPlugin.class));
+                ResourceUrn resourceUrn = new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName());
+                library.register(resourceUrn.toString(), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
     }
@@ -33,7 +32,9 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
     public <U extends WorldGeneratorPlugin> List<U> instantiateAllOfType(Class<U> ofType) {
         List<U> result = Lists.newArrayList();
         for (ClassMetadata<?, ?> classMetadata : library) {
-            if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable() && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
+            if (ofType.isAssignableFrom(classMetadata.getType())
+                    && classMetadata.isConstructable()
+                    && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
                 U item = ofType.cast(classMetadata.newInstance());
                 if (item != null) {
                     result.add(item);

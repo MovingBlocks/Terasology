@@ -1,3 +1,5 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.config.facade;
 
@@ -48,7 +50,7 @@ public interface BindsConfiguration {
     * Binds one or more inputs to one uri.
     * If the inputs are bound to other uris they will be dissociated from them first
      */
-    void setBinds(SimpleUri bindUri, Input ... inputs);
+    void setBinds(SimpleUri bindUri, Input... inputs);
 
     /**
     * Binds one or more inputs to one uri.

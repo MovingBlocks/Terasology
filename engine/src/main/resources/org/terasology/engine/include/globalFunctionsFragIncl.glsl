@@ -1,18 +1,5 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 float linDepth(float depth) {
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
@@ -87,10 +74,6 @@ float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
   return clamp(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0, 1.0);
 }
 
-bool checkFlag(int flag, float val) {
-    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
-}
-
 vec3 convertColorYxy(vec3 color, float colorExp) {
     if (color.x < 0.0 || color.y < 0.0 || color.z < 0.0) {
         return vec3(0.0, 0.0, 0.0);
@@ -130,25 +113,11 @@ vec2 normalizeAtlasTexCoord(vec2 atlasTexCoord) {
                 mod(atlasTexCoord.y, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET));
 }
 
-float calcPcfShadowTerm(sampler2D shadowMap, float lightDepth, vec2 texCoord, float shadowIntens, float bias)
-{
-	vec2 shadowMapCoord = SHADOW_MAP_RESOLUTION * texCoord;
-	vec2 mixScale = fract(shadowMapCoord);
-
-	float samples[4];
-	samples[0] = (texture2D(shadowMap, texCoord).x + bias < lightDepth) ? shadowIntens : 1.0;
-	samples[1] = (texture2D(shadowMap, texCoord + vec2(1.0/SHADOW_MAP_RESOLUTION, 0)).x + bias < lightDepth) ? shadowIntens: 1.0;
-	samples[2] = (texture2D(shadowMap, texCoord + vec2(0, 1.0/SHADOW_MAP_RESOLUTION)).x + bias < lightDepth) ? shadowIntens: 1.0;
-	samples[3] = (texture2D(shadowMap, texCoord + vec2(1.0/SHADOW_MAP_RESOLUTION, 1.0/SHADOW_MAP_RESOLUTION)).x + bias < lightDepth) ? shadowIntens : 1.0;
-
-	return mix(mix(samples[0], samples[1], mixScale.x), mix(samples[2], samples[3], mixScale.x), mixScale.y);
-}
-
 float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtViewer, float globalDensity, float heightFalloff) {
     vec3 cameraToFogWorldPosition = -fogWorldPosition;
 
     float totalFogToSample = length(cameraToFogWorldPosition) * globalDensity * volumetricHeightDensityAtViewer;
-    
+
     const float slopeThreshold = 0.01;
     float heightDensityFactor = heightFalloff * cameraToFogWorldPosition.y;
     if (abs(heightDensityFactor) > slopeThreshold) {

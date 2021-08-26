@@ -9,28 +9,29 @@ import com.google.common.io.CharStreams;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GL33;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.DisposableResource;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.shader.ShaderData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -50,12 +51,10 @@ import java.util.Set;
  * </p>
  */
 public class GLSLShader extends Shader {
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public static int ssaoNoiseSize = 4;
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-
-    // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
-    public static int ssaoNoiseSize = 4;
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -78,6 +77,9 @@ public class GLSLShader extends Shader {
         }
     }
 
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
+
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;
     private final LwjglGraphicsProcessing graphicsProcessing;
@@ -99,7 +101,8 @@ public class GLSLShader extends Shader {
     }
 
 
-    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                                    LwjglGraphicsProcessing graphicsProcessing) {
         return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn, graphicsProcessing), graphicsProcessing);
     }
 
@@ -344,37 +347,17 @@ public class GLSLShader extends Shader {
         GL20.glShaderSource(shaderId, shader);
         GL20.glCompileShader(shaderId);
 
-        if (!compileSuccess(shaderId)) {
+        int[] compileStatus = new int[1];
+        GL30.glGetShaderiv(shaderId, GL30.GL_COMPILE_STATUS, compileStatus);
+        if (compileStatus[0] == GL33.GL_FALSE) {
             dumpCode(type, features, assembleShader(type, features));
 
             throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
                             + "Shader Info: %n%s%n",
-                    getUrn(), features, getLogInfo(shaderId)));
+                    getUrn(), features, GL30.glGetShaderInfoLog(shaderId)));
         }
 
         return shaderId;
-    }
-
-    private String getLogInfo(int shaderId) {
-        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
-
-        if (length > 0) {
-            return ARBShaderObjects.glGetInfoLogARB(shaderId, length);
-        }
-
-        return "No Info";
-    }
-
-    private boolean compileSuccess(int shaderId) {
-        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
-        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
-        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
-
-
-        /*|| linkStatus == 0 || validateStatus == 0*/
-        return compileStatus != 0;
-
-        //logger.info("Shader '{}' successfully compiled.", getURI());
     }
 
     @Override

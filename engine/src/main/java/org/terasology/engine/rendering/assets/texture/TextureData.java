@@ -4,12 +4,12 @@ package org.terasology.engine.rendering.assets.texture;
 
 import com.google.common.math.IntMath;
 import org.terasology.gestalt.assets.AssetData;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-/**
- */
 public class TextureData implements AssetData {
     private static final int BYTES_PER_PIXEL = 4;
 
@@ -70,6 +70,17 @@ public class TextureData implements AssetData {
         for (int i = 0; i < fromCopy.data.length; ++i) {
             data[i] = fromCopy.data[i].duplicate();
         }
+    }
+
+    /**
+     * Look up the color of a given pixel in the base mipmap level.
+     */
+    public Colorc getPixel(int x, int y, Color result) {
+        ByteBuffer baseMipmap = data[0];
+        int idx = BYTES_PER_PIXEL * (x + y * width);
+        int pixel = baseMipmap.getInt(idx);
+        result.set(pixel);
+        return result;
     }
 
     public int getWidth() {

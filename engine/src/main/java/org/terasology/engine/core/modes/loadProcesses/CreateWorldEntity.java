@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
 
@@ -22,7 +9,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.game.GameManifest;
@@ -31,17 +17,12 @@ import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Iterator;
 
-/**
- */
 public class CreateWorldEntity extends SingleStepLoadProcess {
-
     private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);
-
-    private final Context context;
-    private final GameManifest gameManifest;
 
     //TODO: figure out dependencies at some point ....
     protected EntityManager entityManager;
@@ -49,6 +30,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     protected WorldConfigurator worldConfigurator;
     protected Config config;
     protected ChunkProvider chunkProvider;
+
+    private final Context context;
+    private final GameManifest gameManifest;
 
     public CreateWorldEntity(Context context, GameManifest gameManifest) {
         this.context = context;
@@ -92,7 +76,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             SimpleUri generatorUri = worldGenerator.getUri();
             worldConfigurator.getProperties().forEach((key, currentComponent) -> {
                 Class<? extends Component> clazz = currentComponent.getClass();
-                Component moduleComponent = config.getModuleConfig(generatorUri, key, clazz);
+                Component moduleComponent = gameManifest.getModuleConfig(generatorUri, key, clazz);
                 if (moduleComponent != null) {
                     // configure entity from component
                     worldEntity.addComponent(moduleComponent);

@@ -4,7 +4,6 @@ package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector2f;
-import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
@@ -15,22 +14,21 @@ import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.nui.Color;
 
 @API
 public class Tessellator {
 
-    private StandardMeshData meshData = new StandardMeshData();
-
     private int nextIndex;
 
-    private Vector4f activeColor = new Vector4f();
+    private Color activeColor = new Color();
     private Vector3f activeNormal = new Vector3f();
     private Vector2f activeTex = new Vector2f();
     private Vector3f lighting = new Vector3f();
 
     private boolean useLighting = true;
     private boolean useNormals = true;
-
+    private StandardMeshData meshData = new StandardMeshData();
 
     public Tessellator() {
         resetParams();
@@ -45,47 +43,36 @@ public class Tessellator {
     }
 
     public void resetParams() {
-        activeColor.set(1, 1, 1, 1);
+        activeColor.set(255, 255, 255, 255);
         activeTex.set(0, 0);
         lighting.set(1, 1, 1);
         activeNormal.set(0, 1, 0);
     }
+
+
 
     public void addPoly(Vector3f[] vertices, Vector2f[] texCoords) {
         if (vertices.length != texCoords.length || vertices.length < 3) {
             throw new IllegalArgumentException("addPoly expected vertices.length == texCoords.length > 2");
         }
         for (int i = 0; i < vertices.length; ++i) {
-            meshData.getVertices().add(vertices[i].x);
-            meshData.getVertices().add(vertices[i].y);
-            meshData.getVertices().add(vertices[i].z);
-
-            meshData.color0.add(activeColor.x);
-            meshData.color0.add(activeColor.y);
-            meshData.color0.add(activeColor.z);
-            meshData.color0.add(activeColor.w);
+            meshData.position.put(vertices[i]);
+            meshData.color0.put(activeColor);
 
             if (useNormals) {
-                meshData.normals.add(activeNormal.x);
-                meshData.normals.add(activeNormal.y);
-                meshData.normals.add(activeNormal.z);
+                meshData.normal.put(activeNormal);
             }
-
-            meshData.uv0.add(texCoords[i].x);
-            meshData.uv0.add(texCoords[i].y);
-
+            meshData.uv0.put(texCoords[i]);
             if (useLighting) {
-                meshData.uv1.add(lighting.x);
-                meshData.uv1.add(lighting.y);
-                meshData.uv1.add(lighting.z);
+                meshData.light0.put(lighting);
             }
         }
 
         // Standard fan
         for (int i = 0; i < vertices.length - 2; i++) {
-            meshData.getIndices().add(nextIndex);
-            meshData.getIndices().add(nextIndex + i + 1);
-            meshData.getIndices().add(nextIndex + i + 2);
+            meshData.indices.put(nextIndex);
+            meshData.indices.put(nextIndex + i + 1);
+            meshData.indices.put(nextIndex + i + 2);
         }
         nextIndex += vertices.length;
     }
@@ -101,40 +88,20 @@ public class Tessellator {
     private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
             Vector3fc vertex = part.getVertex(i);
-            meshData.getVertices().add(vertex.x());
-            meshData.getVertices().add(vertex.y());
-            meshData.getVertices().add(vertex.z());
-
-            meshData.color0.add(activeColor.x);
-            meshData.color0.add(activeColor.y);
-            meshData.color0.add(activeColor.z);
-            meshData.color0.add(activeColor.w);
-
-            Vector3fc normal = part.getNormal(i);
-            meshData.normals.add(normal.x());
-            meshData.normals.add(normal.y());
-            meshData.normals.add(normal.z());
-
-            Vector2fc uv = part.getTexCoord(i);
-            meshData.uv0.add(uv.x());
-            meshData.uv0.add(uv.y());
-
-            meshData.light0.add(lighting.x);
-            meshData.light0.add(lighting.y);
-            meshData.light0.add(lighting.z);
+            meshData.position.put(vertex);
+            meshData.color0.put(activeColor);
+            meshData.normal.put(part.getNormal(i));
+            meshData.uv0.put(part.getTexCoord(i));
+            meshData.light0.put(lighting);
         }
-
         for (int i = 0; i < part.indicesSize(); ++i) {
-            meshData.getIndices().add(nextIndex + part.getIndex(i));
+            meshData.indices.put(nextIndex + part.getIndex(i));
         }
         if (doubleSided) {
             for (int i = 0; i < part.indicesSize(); i += 3) {
-                int i1 = nextIndex + part.getIndex(i);
-                int i2 = nextIndex + part.getIndex(i + 1);
-                int i3 = nextIndex + part.getIndex(i + 2);
-                meshData.getIndices().add(i1);
-                meshData.getIndices().add(i3);
-                meshData.getIndices().add(i2);
+                meshData.indices.put(nextIndex + part.getIndex(i + 1));
+                meshData.indices.put(nextIndex + part.getIndex(i));
+                meshData.indices.put(nextIndex + part.getIndex(i + 2));
             }
         }
 
@@ -142,7 +109,7 @@ public class Tessellator {
     }
 
     public void setColor(Vector4f v) {
-        activeColor.set(v);
+        activeColor.set((int) (v.x() * 255.0f), (int) (v.y() * 255.0f), (int) (v.z() * 255.0f), (int) (v.w() * 255.0f));
     }
 
     public void setNormal(Vector3f v) {
@@ -157,22 +124,16 @@ public class Tessellator {
         lighting.set(v);
     }
 
-    public MeshData generateMeshData() {
-        MeshData result = meshData;
-        meshData = new StandardMeshData();
-        return result;
+    public MeshData buildMeshData() {
+        return new StandardMeshData(meshData);
     }
 
     public Mesh generateMesh(ResourceUrn urn) {
         Preconditions.checkNotNull(urn);
-        Mesh result = Assets.generateAsset(urn, meshData, Mesh.class);
-        meshData = new StandardMeshData();
-        return result;
+        return Assets.generateAsset(urn, buildMeshData(), Mesh.class);
     }
 
     public Mesh generateMesh() {
-        Mesh result = Assets.generateAsset(meshData, Mesh.class);
-        meshData = new StandardMeshData();
-        return result;
+        return Assets.generateAsset(buildMeshData(), Mesh.class);
     }
 }

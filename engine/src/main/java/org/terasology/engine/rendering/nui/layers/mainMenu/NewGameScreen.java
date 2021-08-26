@@ -25,7 +25,6 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
 import org.terasology.nui.Canvas;
@@ -45,9 +44,9 @@ import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
     @In

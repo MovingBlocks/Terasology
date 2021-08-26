@@ -20,6 +20,7 @@
     "behavior-editor-new": "new",
     "behavior-editor-paste": "paste",
     "behavior-editor-remove": "remove",
+    "billboard-limit": "Transparent chunk limit",
     "binding-attack": "Attack",
     "binding-autoMove-mode": "Toggle Auto Move",
     "binding-backwards": "Backwards",

@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.unittest.stubs;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-/**
- */
-public class EntityRefComponent implements Component {
+public class EntityRefComponent implements Component<EntityRefComponent> {
 
     public EntityRef entityRef = EntityRef.NULL;
 
@@ -17,5 +15,10 @@ public class EntityRefComponent implements Component {
 
     public EntityRefComponent(EntityRef ref) {
         this.entityRef = ref;
+    }
+
+    @Override
+    public void copyFrom(EntityRefComponent other) {
+        this.entityRef = other.entityRef;
     }
 }

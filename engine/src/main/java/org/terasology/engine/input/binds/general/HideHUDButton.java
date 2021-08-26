@@ -8,8 +8,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "hideHUD", description = "${engine:menu#binding-hide-hud}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.H)
 public class HideHUDButton extends BindButtonEvent {

@@ -5,7 +5,6 @@ package org.terasology.engine.logic.players;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -17,16 +16,17 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.location.Location;
-import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.math.TeraMath;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.logic.VisualComponent;
 import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.math.TeraMath;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonClientSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -91,7 +91,9 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @Command(shortDescription = "Sets the held item mount point translation for the first person view")
     public void setFirstPersonheldItemMountPointTranslation(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        FirstPersonHeldItemMountPointComponent newComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
+        FirstPersonHeldItemMountPointComponent newComponent = localPlayer
+                .getCameraEntity()
+                .getComponent(FirstPersonHeldItemMountPointComponent.class);
         if (newComponent != null) {
             newComponent.translate = new Vector3f(x, y, z);
             ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent.newInstance(), localPlayer.getCameraEntity(), newComponent);
@@ -100,7 +102,9 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @Command(shortDescription = "Sets the held item mount point rotation for the first person view")
     public void setFirstPersonheldItemMountPointRotation(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        FirstPersonHeldItemMountPointComponent newComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
+        FirstPersonHeldItemMountPointComponent newComponent = localPlayer
+                .getCameraEntity()
+                .getComponent(FirstPersonHeldItemMountPointComponent.class);
         if (newComponent != null) {
             newComponent.rotateDegrees = new Vector3f(x, y, z);
             ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent.newInstance(), localPlayer.getCameraEntity(), newComponent);
@@ -108,7 +112,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @ReceiveEvent
-    public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
+    public void onHeldItemActivated(OnActivatedComponent event, EntityRef character,
+                                    CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
             EntityRef newItem = heldItemComponent.selectedItem;
             linkHeldItemLocationForLocalPlayer(newItem);
@@ -116,7 +121,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @ReceiveEvent
-    public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
+    public void onHeldItemChanged(OnChangedComponent event, EntityRef character,
+                                  CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
             EntityRef newItem = heldItemComponent.selectedItem;
             linkHeldItemLocationForLocalPlayer(newItem);
@@ -162,7 +168,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 currentHeldItem.addComponent(new LocationComponent());
                 currentHeldItem.addComponent(new ItemIsHeldComponent());
 
-                FirstPersonHeldItemTransformComponent heldItemTransformComponent = currentHeldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
+                FirstPersonHeldItemTransformComponent heldItemTransformComponent =
+                        currentHeldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
                 if (heldItemTransformComponent == null) {
                     heldItemTransformComponent = new FirstPersonHeldItemTransformComponent();
                     currentHeldItem.addComponent(heldItemTransformComponent);
@@ -198,8 +205,12 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         }
 
         // get the first person mount point and rotate it away from the camera
-        CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
-        FirstPersonHeldItemMountPointComponent mountPointComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
+        CharacterHeldItemComponent characterHeldItemComponent = localPlayer
+                .getCharacterEntity()
+                .getComponent(CharacterHeldItemComponent.class);
+        FirstPersonHeldItemMountPointComponent mountPointComponent = localPlayer
+                .getCameraEntity()
+                .getComponent(FirstPersonHeldItemMountPointComponent.class);
         if (characterHeldItemComponent == null
                 || mountPointComponent == null) {
             return;

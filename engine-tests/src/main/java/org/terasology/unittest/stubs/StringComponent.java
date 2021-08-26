@@ -4,10 +4,10 @@ package org.terasology.unittest.stubs;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 
-public final class StringComponent implements Component {
+public final class StringComponent implements Component<StringComponent>{
     public static String staticValue = "Test";
     public String value;
 
@@ -40,5 +40,10 @@ public final class StringComponent implements Component {
         return MoreObjects.toStringHelper(this)
                 .addValue(value)
                 .toString();
+    }
+
+    @Override
+    public void copyFrom(StringComponent other) {
+        this.value = other.value;
     }
 }

@@ -33,40 +33,48 @@ public interface BlockBuilderHelper {
     Block constructSimpleBlock(BlockFamilyDefinition definition, String section, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * Constructs a basic block from the data provided. This block is assumed to have no rotations, and to use reasonable defaults
-     * The block is registered into the engine as to be directly usable
+     * Constructs a basic block from the data provided. This block is assumed to have no rotations, and to use
+     * reasonable defaults The block is registered into the engine as to be directly usable
      * <p>
-     * For blocks that contain rotations or that use custom values see {@link #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)} and {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
+     * For blocks that contain rotations or that use custom values see
+     * {@link #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)} and
+     * {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
      *
-     * @param definition  The definition for the block family this block should belong to
-     * @param shape       The shape this block should be displayed with
-     * @param section     The block family subsection this block will represent
-     * @param uri         The URI to use for the block
+     * @param definition The definition for the block family this block should belong to
+     * @param shape The shape this block should be displayed with
+     * @param section The block family subsection this block will represent
+     * @param uri The URI to use for the block
      * @param blockFamily The block family instance this block will belong to
      * @return The constructed and registered block
      */
-    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section, BlockUri uri, BlockFamily blockFamily);
+    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section,
+                               BlockUri uri, BlockFamily blockFamily);
 
     /**
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
-    Block constructTransformedBlock(BlockFamilyDefinition definition, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, Rotation rotation,
+                                    BlockUri uri, BlockFamily blockFamily);
 
     /**
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
-    Block constructTransformedBlock(BlockFamilyDefinition definition, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, String section, Rotation rotation,
+                                    BlockUri uri, BlockFamily blockFamily);
 
     /**
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
-    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation,
+                                    BlockUri uri, BlockFamily blockFamily);
 
     /**
      * Construct a block that has a specific rotation applied to it.
      * <p>
-     * For blocks that do not have a rotation, see {@link #constructSimpleBlock(BlockFamilyDefinition, BlockShape, String, BlockUri, BlockFamily)}
-     * For blocks that require more custom control/values see {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
+     * For blocks that do not have a rotation, see
+     * {@link #constructSimpleBlock(BlockFamilyDefinition, BlockShape, String, BlockUri, BlockFamily)}
+     * For blocks that require more custom control/values see
+     * {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
      *
      * @param definition  The definition for the block family this block will belong to
      * @param shape       The shape to apply to the block
@@ -76,7 +84,8 @@ public interface BlockBuilderHelper {
      * @param blockFamily The instance of the block family this block will belong to
      * @return
      */
-    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation,
+                                    BlockUri uri, BlockFamily blockFamily);
 
     /**
      * Construct a block as a member of a family with specified values and information.
@@ -92,5 +101,6 @@ public interface BlockBuilderHelper {
      * @param blockFamily The family instance to add to the block
      * @return The newly created and registered block
      */
-    Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section, BlockUri uri, BlockFamily blockFamily);
+    Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section,
+                               BlockUri uri, BlockFamily blockFamily);
 }

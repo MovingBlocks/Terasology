@@ -66,7 +66,7 @@ public class DefaultCollectiveBehaviorTreeRunner implements CollectiveBehaviorTr
 
     @Override
     public BehaviorState step() {
-        for(Actor actor: this.actors) {
+        for (Actor actor: this.actors) {
             if (state != BehaviorState.RUNNING) {
                 root.construct(actor);
             }

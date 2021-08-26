@@ -4,6 +4,8 @@ package org.terasology.engine.world.block.loader;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.gestalt.module.sandbox.API;
@@ -12,8 +14,6 @@ import org.terasology.engine.world.block.tiles.BlockTile;
 
 import java.util.EnumMap;
 
-/**
- */
 @API
 public class SectionDefinitionData {
     private String displayName = "";
@@ -40,6 +40,9 @@ public class SectionDefinitionData {
     private Vector3f tint = new Vector3f();
 
     private EnumMap<BlockPart, BlockTile> blockTiles = Maps.newEnumMap(BlockPart.class);
+    private EnumMap<BlockPart, DefaultColorSource> colorSources;
+    // Vector4f is used because it's deserializable, it will be converted into a Color later
+    private EnumMap<BlockPart, Vector4f> colorOffsets;
 
     private float mass = 10f;
     private boolean debrisOnDestroy = true;
@@ -55,6 +58,12 @@ public class SectionDefinitionData {
     private boolean ice;
 
     public SectionDefinitionData() {
+        colorSources = Maps.newEnumMap(BlockPart.class);
+        colorOffsets = Maps.newEnumMap(BlockPart.class);
+        for (BlockPart part : BlockPart.values()) {
+            colorSources.put(part, DefaultColorSource.DEFAULT);
+            colorOffsets.put(part, new Vector4f(1, 1, 1, 1));
+        }
     }
 
     public SectionDefinitionData(SectionDefinitionData other) {
@@ -81,6 +90,8 @@ public class SectionDefinitionData {
         this.tint = new Vector3f(other.tint);
 
         this.blockTiles = new EnumMap<>(other.blockTiles);
+        this.colorSources = new EnumMap<>(other.colorSources);
+        this.colorOffsets = new EnumMap<>(other.colorOffsets);
 
         this.mass = other.mass;
         this.debrisOnDestroy = other.debrisOnDestroy;
@@ -240,6 +251,26 @@ public class SectionDefinitionData {
     public void setAllTiles(BlockTile tile) {
         for (BlockPart part : BlockPart.values()) {
             blockTiles.put(part, tile);
+        }
+    }
+
+    public EnumMap<BlockPart, DefaultColorSource> getColorSources() {
+        return colorSources;
+    }
+
+    public void setAllColorSources(DefaultColorSource source) {
+        for (BlockPart part : BlockPart.values()) {
+            colorSources.put(part, source);
+        }
+    }
+
+    public EnumMap<BlockPart, Vector4f> getColorOffsets() {
+        return colorOffsets;
+    }
+
+    public void setAllColorOffsets(Vector4f offset) {
+        for (BlockPart part : BlockPart.values()) {
+            colorOffsets.put(part, offset);
         }
     }
 

@@ -6,8 +6,6 @@ package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 import gnu.trove.map.TObjectDoubleMap;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 
-/**
- */
 final class RunningMeansMode extends TimeMetricsMode {
 
      RunningMeansMode() {

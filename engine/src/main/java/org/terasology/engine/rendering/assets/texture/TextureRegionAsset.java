@@ -8,8 +8,6 @@ import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
-/**
- */
 public abstract class TextureRegionAsset<T extends AssetData> extends Asset<T> implements TextureRegion {
 
     protected TextureRegionAsset(ResourceUrn urn, AssetType<?, T> assetType) {
@@ -17,6 +15,6 @@ public abstract class TextureRegionAsset<T extends AssetData> extends Asset<T> i
     }
 
     protected TextureRegionAsset(ResourceUrn urn, AssetType<?, T> assetType, DisposableResource disposableResource) {
-        super(urn, assetType,disposableResource);
+        super(urn, assetType, disposableResource);
     }
 }

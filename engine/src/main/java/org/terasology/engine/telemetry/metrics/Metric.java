@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
@@ -45,7 +32,8 @@ import java.util.Set;
  * All metric fields should be annotated {@link org.terasology.engine.telemetry.TelemetryField}.
  * An example is {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}.
  * The metric will be instantiated automatically in {@link org.terasology.engine.telemetry.Metrics}
- * By convention, a new Metric can have only one constructor and constructor will need no arguments or only {@link org.terasology.engine.context.Context}.
+ * By convention, a new Metric can have only one constructor and constructor will need no arguments
+ * or only {@link org.terasology.engine.context.Context}.
  * If a Metric Constructor needs some specific arguments other than {@link org.terasology.engine.context.Context},
  * it should be instantiated and added to {@link org.terasology.engine.telemetry.Metrics} manually.
  */
@@ -70,7 +58,8 @@ public abstract class Metric {
     /**
      * Generates a snowplow unstructured event.
      * This method helps to implement abstract getUnstructuredMetric method.
-     * You can find example in {@link org.terasology.engine.telemetry.metrics.ModulesMetric} and {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}
+     * You can find example in {@link org.terasology.engine.telemetry.metrics.ModulesMetric}
+     * and {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}
      * @param schema the snowplow event register schema.
      * @param mapSentToServer the map that contains the data sent to the server.
      * @return Null option if the mapSentToServer doesn't contain data.
@@ -168,7 +157,8 @@ public abstract class Metric {
 
     /**
      * Add the new metric to {@link org.terasology.engine.telemetry.Metrics} instance.
-     * This method will only be used when a metric constructor needs some specific arguments other than {@link org.terasology.engine.context.Context}.
+     * This method will only be used when a metric constructor needs some specific arguments
+     * other than {@link org.terasology.engine.context.Context}.
      * @param metrics the metrics class instance in the game context.
      */
     public void addToMetrics(Metrics metrics) {

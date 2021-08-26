@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.updating;
 
@@ -10,10 +10,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.math.TeraMath;
-import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.components.ParticleEmitterComponent;
@@ -26,6 +23,9 @@ import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.math.TeraMath;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
-    private final HashSet<ParticlePool> updatedParticlePools = new HashSet<>();
+    private final Set<ParticlePool> updatedParticlePools = new HashSet<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;
