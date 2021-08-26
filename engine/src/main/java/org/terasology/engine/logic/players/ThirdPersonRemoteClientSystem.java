@@ -9,7 +9,6 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -29,6 +28,7 @@ import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.logic.VisualComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Iterator;
 import java.util.Set;

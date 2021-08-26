@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
 /**
  * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.
@@ -10,5 +10,5 @@ import org.terasology.engine.entitySystem.Component;
  * <p>
  * It can be used to stock the ping information of users in future.
  */
-public class PingSubscriberComponent implements Component {
+public class PingSubscriberComponent extends EmptyComponent<PingSubscriberComponent> {
 }

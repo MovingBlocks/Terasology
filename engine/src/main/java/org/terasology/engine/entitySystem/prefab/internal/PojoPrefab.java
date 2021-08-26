@@ -5,11 +5,11 @@ package org.terasology.engine.entitySystem.prefab.internal;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collections;
 import java.util.List;
