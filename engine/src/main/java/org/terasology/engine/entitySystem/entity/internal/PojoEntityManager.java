@@ -16,7 +16,6 @@ import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -31,6 +30,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.util.ArrayList;
