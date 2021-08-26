@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 public class IntegerRange implements Iterable<Integer> {
-    private Map<Integer, Integer> ranges = new TreeMap<>();
+    private final Map<Integer, Integer> ranges = new TreeMap<>();
 
     public void addNumbers(int from, int to) {
         if (from > to) {
@@ -19,6 +19,14 @@ public class IntegerRange implements Iterable<Integer> {
         if (oldTo == null || oldTo < to) {
             ranges.put(from, to);
         }
+    }
+
+    public IntegerRange copy() {
+        IntegerRange newRange = new IntegerRange();
+        for (Map.Entry<Integer, Integer> entry : ranges.entrySet()) {
+            newRange.addNumbers(entry.getKey(), entry.getValue());
+        }
+        return newRange;
     }
 
     @Override

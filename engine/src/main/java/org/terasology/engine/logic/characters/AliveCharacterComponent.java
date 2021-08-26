@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.characters;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
 /**
  * This is only attached to the <b>alive character</b> entities. <br/>
@@ -15,5 +15,5 @@ import org.terasology.engine.network.Replicate;
  * or respawn after a while.
  */
 @Replicate
-public class AliveCharacterComponent implements Component {
+public class AliveCharacterComponent extends EmptyComponent<AliveCharacterComponent> {
 }

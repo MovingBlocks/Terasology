@@ -3,13 +3,19 @@
 package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 
-public class OwnedCollectionComponent implements Component {
+public class OwnedCollectionComponent implements Component<OwnedCollectionComponent> {
     @Owns
     public List<EntityRef> items = Lists.newArrayList();
+
+
+    @Override
+    public void copyFrom(OwnedCollectionComponent other) {
+        this.items = Lists.newArrayList(other.items);
+    }
 }
