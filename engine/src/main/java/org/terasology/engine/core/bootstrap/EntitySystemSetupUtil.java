@@ -6,7 +6,6 @@ package org.terasology.engine.core.bootstrap;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -39,6 +38,7 @@ import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.recording.RecordingEventSystemDecorator;
 import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.OneOfProviderFactory;
@@ -48,6 +48,7 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,7 +170,9 @@ public final class EntitySystemSetupUtil {
 
     static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null
+                    && !componentType.isInterface()
+                    && !Modifier.isAbstract(componentType.getModifiers())) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
                 Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType),
                         "Could not find module for %s %s", componentName, componentType);

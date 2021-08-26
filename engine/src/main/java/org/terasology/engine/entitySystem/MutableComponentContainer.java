@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
+import org.terasology.gestalt.entitysystem.component.Component;
+
 import java.util.Optional;
 import java.util.function.Function;
 

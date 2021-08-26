@@ -4,9 +4,9 @@ package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Iterator;
 import java.util.Map;

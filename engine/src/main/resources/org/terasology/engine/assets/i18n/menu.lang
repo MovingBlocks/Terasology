@@ -20,6 +20,7 @@
     "behavior-editor-new": "behavior-editor-new",
     "behavior-editor-paste": "behavior-editor-paste",
     "behavior-editor-remove": "behavior-editor-remove",
+    "billboard-limit": "billboard-limit",
     "binding-attack": "binding-attack",
     "binding-backwards": "binding-backwards",
     "binding-behavior-editor": "binding-behavior-editor",

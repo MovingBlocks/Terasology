@@ -232,6 +232,14 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#billboard-limit}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "billboardLimit"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#framerate-limit}: "
                                 },
                                 {
