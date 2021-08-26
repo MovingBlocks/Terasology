@@ -3,12 +3,12 @@
 package org.terasology.engine.persistence;
 
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.engine.persistence.serializers.WorldSerializer;
 import org.terasology.engine.persistence.serializers.WorldSerializerImpl;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedWriter;

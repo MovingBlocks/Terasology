@@ -4,7 +4,7 @@ package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
 import java.util.Set;
