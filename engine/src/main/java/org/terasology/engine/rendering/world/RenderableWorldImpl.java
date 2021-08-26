@@ -46,7 +46,6 @@ import java.util.PriorityQueue;
 class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
-    private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS =
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
@@ -218,9 +217,9 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext();) {
-                        chunk = it.next();
-                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
+                    while (nearbyChunks.hasNext()) {
+                        chunk = nearbyChunks.next();
+                        if (chunk.getPosition().equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
                             break;
@@ -327,6 +326,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
+        int billboardLimit = (int) renderingConfig.getBillboardLimit();
 
         List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
         allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
@@ -362,7 +362,8 @@ class RenderableWorldImpl implements RenderableWorld {
                         statIgnoredPhases++;
                     }
 
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && chunkCounter < MAX_BILLBOARD_CHUNKS) {
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0
+                            && (billboardLimit == 0 || chunkCounter < billboardLimit)) {
                         renderQueues.chunksAlphaReject.add(chunk);
                     } else {
                         statIgnoredPhases++;
@@ -370,11 +371,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                     statVisibleChunks++;
 
-                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
-                        chunk.setAnimated(true);
-                    } else {
-                        chunk.setAnimated(false);
-                    }
+                    chunk.setAnimated(statVisibleChunks < MAX_ANIMATED_CHUNKS);
                 }
 
                 if (isChunkVisibleReflection(chunk)) {
@@ -516,13 +513,7 @@ class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (distance1 == distance2) {
-                return 0;
-            } else if (distance2 > distance1) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return Double.compare(distance2, distance1);
         }
     }
 
