@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.selection;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
-public final class OnItemActivateSelectionComponent implements Component {
+public final class OnItemActivateSelectionComponent extends EmptyComponent<OnItemActivateSelectionComponent> {
 
 }

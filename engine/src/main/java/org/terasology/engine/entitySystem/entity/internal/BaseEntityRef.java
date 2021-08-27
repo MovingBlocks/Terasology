@@ -4,7 +4,6 @@ package org.terasology.engine.entitySystem.entity.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.engine.entitySystem.event.Event;
@@ -13,6 +12,7 @@ import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
