@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics;
 
-import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.physics.engine.CharacterCollider;
 import org.terasology.joml.geom.AABBf;
-import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.entity.EntityRef;
 
 import java.util.List;
 import java.util.Set;
@@ -102,7 +101,7 @@ public interface Physics {
      * CharacterCollider if non exists and return that one.
      *
      * @param entity
-     * @return true if the given entity has a CharacterCollider associated to it.
+     * @return {@link CharacterCollider} if the given entity has a CharacterCollider associated to it.
      */
     CharacterCollider getCharacterCollider(EntityRef entity);
 
@@ -123,6 +122,4 @@ public interface Physics {
      *         false otherwise.
      */
     boolean removeCharacterCollider(EntityRef entity);
-
-
 }

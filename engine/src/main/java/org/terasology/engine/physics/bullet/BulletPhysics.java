@@ -760,13 +760,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         return CollisionGroup.combineGroups(collidesWithGroup);
     }
 
-
-
-//    @Override
-    public boolean hasTrigger(EntityRef entity) {
-        return entityTriggers.containsKey(entity);
-    }
-
     @Override
     public boolean removeCharacterCollider(EntityRef entity) {
         BulletCharacterMoverCollider toRemove = entityColliders.remove(entity);

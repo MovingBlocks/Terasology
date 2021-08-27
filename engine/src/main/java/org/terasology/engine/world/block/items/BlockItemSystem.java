@@ -43,13 +43,13 @@ public class BlockItemSystem extends BaseComponentSystem {
     private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.04f;
 
     @In
-    private WorldProvider worldProvider;
+    protected WorldProvider worldProvider;
 
     @In
-    private BlockEntityRegistry blockEntityRegistry;
+    protected BlockEntityRegistry blockEntityRegistry;
 
     @In
-    private NetworkSystem networkSystem;
+    protected NetworkSystem networkSystem;
 
     @In
     protected Physics physics;
