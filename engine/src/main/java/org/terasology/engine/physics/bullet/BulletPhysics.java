@@ -933,10 +933,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     private final class BulletCharacterMoverCollider implements CharacterCollider {
         boolean pending = true;
 
-        //private final Transform temp = new Transform();
-        private final Vector3f tempPos = new Vector3f();
-
-
         //If a class can figure out that its Collider is a BulletCollider, it
         //is allowed to gain direct access to the bullet body:
         private final btPairCachingGhostObject collider;
