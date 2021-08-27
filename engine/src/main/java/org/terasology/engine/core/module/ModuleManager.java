@@ -30,6 +30,7 @@ import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.gestalt.module.sandbox.PermissionProvider;
 import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
+import org.terasology.gestalt.module.sandbox.PermissionSet;
 import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.gestalt.naming.Name;
@@ -99,7 +100,7 @@ public class ModuleManager {
 
     protected static boolean isLoadingClasspathModules() {
         return Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
-    };
+    }
 
     /** Create a ModuleFactory configured for Terasology modules. */
     private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
@@ -148,8 +149,8 @@ public class ModuleManager {
     }
 
     private void loadModulesFromClassPath() {
-        ClasspathCompromisingModuleFactory moduleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
-        for (String metadataName : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
+        ClasspathCompromisingModuleFactory ccModuleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
+        for (String metadataName : ccModuleFactory.getModuleMetadataLoaderMap().keySet()) {
             Enumeration<URL> urls;
             try {
                 urls = ClassLoader.getSystemResources(metadataName);
@@ -159,10 +160,10 @@ public class ModuleManager {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.debug("Probably a module in U:{}", url);
-                Path path = moduleFactory.canonicalModuleLocation(metadataName, url);
+                Path path = ccModuleFactory.canonicalModuleLocation(metadataName, url);
                 Module module;
                 try {
-                    module = moduleFactory.createModule(path.toFile());
+                    module = ccModuleFactory.createModule(path.toFile());
                 } catch (IOException e) {
                     logger.warn("Failed to create module from {}", path, e);
                     continue;
@@ -242,24 +243,23 @@ public class ModuleManager {
     }
 
     private void setupSandbox() {
-        ExternalApiWhitelist.CLASSES.stream().forEach(clazz ->
-                permissionProviderFactory.getBasePermissionSet().addAPIClass(clazz));
-        ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
-                permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
+        PermissionSet permissionSet = permissionProviderFactory.getBasePermissionSet();
+        ExternalApiWhitelist.CLASSES.forEach(permissionSet::addAPIClass);
+        ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
         registry.stream().map(Module::getModuleManifest).forEach(apiScanner::scan);
 
-        permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
-        permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
+        permissionSet.grantPermission("com.google.gson", ReflectPermission.class);
+        permissionSet.grantPermission("com.google.gson.internal", ReflectPermission.class);
 
         // reactor property permission
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
+        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());
