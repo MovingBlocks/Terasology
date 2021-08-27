@@ -82,25 +82,25 @@ public final class Terasology implements Callable<Integer> {
 
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
-    @Option(names = "--max-data-size",
-            description = "Set maximum process data size [Linux only]",
-            paramLabel = "<size>",
-            converter = DataSizeConverter.class
-    )
-    Long maxDataSize;
-
-    @Option(names = "--oom-score",
-            description = "Adjust out-of-memory score [Linux only]",
-            paramLabel = "<score>"
-    )
-    Integer outOfMemoryScore;
-
     @SuppressWarnings("unused")
     @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "Show help")
     private boolean helpRequested;
 
     @Option(names = "--headless", description = "Start headless (no graphics)")
     private boolean isHeadless;
+
+    @Option(names = "--max-data-size",
+            description = "Set maximum process data size [Linux only]",
+            paramLabel = "<size>",
+            converter = DataSizeConverter.class
+    )
+    private Long maxDataSize;
+
+    @Option(names = "--oom-score",
+            description = "Adjust out-of-memory score [Linux only]",
+            paramLabel = "<score>"
+    )
+    private Integer outOfMemoryScore;
 
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
