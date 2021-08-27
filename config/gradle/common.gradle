@@ -89,7 +89,7 @@ jacocoTestReport {
 // Solo module builds in Jenkins get a copy of the config dir from the engine harness so it still lives at root/config
 // TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
 checkstyle {
-    ignoreFailures = true
+    ignoreFailures = false
     configFile = new File(rootDir, 'config/metrics/checkstyle/checkstyle.xml')
     configProperties.samedir = checkstyle.configFile.parentFile
 }
