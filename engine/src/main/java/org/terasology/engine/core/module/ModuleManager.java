@@ -253,13 +253,19 @@ public class ModuleManager {
         permissionSet.grantPermission("com.google.gson", ReflectPermission.class);
         permissionSet.grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-        // reactor property permission
-        permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
-        permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
-        permissionSet.grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
-        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
-        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
-        permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
+        //noinspection ConstantConditions - this reference is to help find this if this method gets separated from the reactor dependency
+        if (reactor.core.scheduler.Scheduler.class != null) {  //lgtm [java/useless-null-check]
+            // In theory, PropertyPermission has wildcard matching and "reactor.*" should be sufficient to grant read access to all
+            // reactor configuration properties.
+            permissionSet.grantPermission(new PropertyPermission("reactor.*", "read"));
+            // In practice, the permission checks fail unless these are each named explicitly.
+            permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
+        }
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());
