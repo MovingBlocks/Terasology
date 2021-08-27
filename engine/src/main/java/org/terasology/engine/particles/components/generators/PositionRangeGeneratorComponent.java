@@ -3,12 +3,12 @@
 package org.terasology.engine.particles.components.generators;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.sandbox.API;
 
 
 @API
-public class PositionRangeGeneratorComponent implements Component {
+public class PositionRangeGeneratorComponent implements Component<PositionRangeGeneratorComponent> {
 
     public Vector3f minPosition;
     public Vector3f maxPosition;
@@ -21,5 +21,11 @@ public class PositionRangeGeneratorComponent implements Component {
     public PositionRangeGeneratorComponent() {
         minPosition = new Vector3f();
         maxPosition = new Vector3f();
+    }
+
+    @Override
+    public void copyFrom(PositionRangeGeneratorComponent other) {
+        this.minPosition = new Vector3f(other.minPosition);
+        this.maxPosition = new Vector3f(other.maxPosition);
     }
 }

@@ -4,8 +4,8 @@ package org.terasology.engine.entitySystem.entity;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 public interface EntityPool {
 

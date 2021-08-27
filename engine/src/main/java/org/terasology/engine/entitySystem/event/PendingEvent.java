@@ -3,8 +3,8 @@
 
 package org.terasology.engine.entitySystem.event;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 public class PendingEvent {
     private EntityRef entity;

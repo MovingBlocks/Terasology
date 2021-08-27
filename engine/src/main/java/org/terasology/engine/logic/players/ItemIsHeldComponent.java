@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.players;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
 /**
  * This is used on the client side to track and clean up items that are no longer held,  but are still location linked
  */
-public class ItemIsHeldComponent implements Component {
+public class ItemIsHeldComponent extends EmptyComponent<ItemIsHeldComponent> {
 }
