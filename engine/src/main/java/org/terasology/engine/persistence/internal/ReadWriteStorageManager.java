@@ -16,7 +16,6 @@ import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
@@ -50,6 +49,7 @@ import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -67,7 +67,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
+public final class ReadWriteStorageManager extends AbstractStorageManager
+        implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -113,7 +114,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
                                    ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
-                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
+                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus)
+            throws IOException {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }

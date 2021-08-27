@@ -21,7 +21,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
@@ -49,6 +48,7 @@ import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
@@ -441,7 +441,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
             EntityRef currentEntity = networkSystem.getEntity(updateMessage.getNetId());
             if (networkSystem.getOwner(currentEntity) == this) {
-                entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(), new ServerComponentFieldCheck(false, true));
+                entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(),
+                        new ServerComponentFieldCheck(false, true));
             }
         }
     }
@@ -455,7 +456,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 logger.error("Sending non-existent entity update for netId {}", netId);
             }
             boolean isOwner = networkSystem.getOwner(entity) == this;
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId), dirtyComponents.get(netId), removedComponents.get(netId),
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId),
+                    dirtyComponents.get(netId), removedComponents.get(netId),
                     new ServerComponentFieldCheck(isOwner, false));
             if (entityData != null) {
                 message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
@@ -488,7 +490,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             }
             // Note: Send owner->server fields on initial create
             Client owner = networkSystem.getOwner(entity);
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(owner == this, true)).build();
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true,
+                    new ServerComponentFieldCheck(owner == this, true)).build();
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {

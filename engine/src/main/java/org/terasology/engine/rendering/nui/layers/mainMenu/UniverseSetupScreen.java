@@ -173,7 +173,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
                 logger.error("Can't configure the world! due to {}", e.getMessage());
@@ -184,8 +185,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
             //      modules may do
             if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
-                        "HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("HeightMap not supported",
+                                "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
             } else {
                 addNewWorld(worldGenerator.getSelection());
                 worldsDropdown.setOptions(worldNames());
@@ -193,7 +195,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
+            final WorldPreGenerationScreen worldPreGenerationScreen =
+                    getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             if (!worlds.isEmpty()) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
@@ -201,7 +204,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     if (result != null && result) {
                         triggerForwardAnimation(worldPreGenerationScreen);
                     } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't load world pre generation screen! Please, try again!");
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                .setMessage("Error", "Can't load world pre generation screen! Please, try again!");
                     }
                 });
                 loadPopup.startOperation(() -> {
@@ -213,8 +217,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     return true;
                 }, true);
             } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
-                        "Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }
         });
 

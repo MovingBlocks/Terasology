@@ -3,7 +3,8 @@
 package org.terasology.engine.rendering.gltf.model;
 
 /**
- * Describes the location and length of a byte buffer. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-buffer for details
+ * Describes the location and length of a byte buffer.
+ * See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-buffer for details
  */
 public class GLTFBuffer {
     private String uri = "";

@@ -16,9 +16,12 @@ public enum MeshAttributeSemantic {
     Position("POSITION", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT),
     Texcoord_0("TEXCOORD_0", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT),
     Texcoord_1("TEXCOORD_1", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT),
-    Color_0("COLOR_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.FLOAT}),
-    Joints_0("JOINTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.UNSIGNED_BYTE, GLTFComponentType.UNSIGNED_SHORT}),
-    Weights_0("WEIGHTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.FLOAT});
+    Color_0("COLOR_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.FLOAT}),
+    Joints_0("JOINTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.UNSIGNED_BYTE, GLTFComponentType.UNSIGNED_SHORT}),
+    Weights_0("WEIGHTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.FLOAT});
 
     private final String name;
     private final Set<GLTFAttributeType> supportedAccessorTypes;

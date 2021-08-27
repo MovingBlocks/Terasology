@@ -68,6 +68,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private Mesh billboard;
 
     private Material textureMat;
+    private Material fillMaterial;
 
     private final FontMeshBuilder fontMeshBuilder;
 
@@ -91,11 +92,18 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private Matrix4f projMatrix = new Matrix4f();
 
     public LwjglCanvasRenderer(Context context) {
+
         // TODO use context to get assets instead of static methods
         this.textureMat = Assets.getMaterial("engine:UITexture").orElseThrow(
                 // Extra attention to how this is reported because it's often the first texture
                 // engine tries to load; the build is probably broken.
                 () -> new RuntimeException("Failing to find engine textures"));
+
+        this.fillMaterial = Assets.getMaterial("engine:white").orElseThrow(
+                // Extra attention to how this is reported because it's often the first texture
+                // engine tries to load; the build is probably broken.
+                () -> new RuntimeException("Failing to find engine textures"));
+
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
         this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline",
                 Material.class).get());
@@ -209,8 +217,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public org.joml.Vector2i getTargetSize() {
-        return new org.joml.Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
+    public Vector2i getTargetSize() {
+        return new Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
     }
 
     @Override
@@ -228,6 +236,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
     @Override
     public void drawLine(int sx, int sy, int ex, int ey, Colorc color) {
+        fillMaterial.setMatrix4("projectionMatrix", projMatrix);
+        fillMaterial.setMatrix4("modelViewMatrix", modelMatrixStack);
+        fillMaterial.enable();
         LineRenderer.draw(sx, sy, ex, ey, 2, color, color, 0);
     }
 
@@ -320,7 +331,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
 
         textureMat.setMatrix4("projectionMatrix", projMatrix);
@@ -488,7 +499,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 textureArea.minY + uy * textureArea.lengthY());
         textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", 1, 1, 1, alpha);
         textureMat.bindTextures();
         mesh.render();

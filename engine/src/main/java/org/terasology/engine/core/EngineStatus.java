@@ -3,8 +3,8 @@
 package org.terasology.engine.core;
 
 /**
- * Engine Status provides the current status of the engine - what it is doing, at a higher granularity than just running. This can be used by external and internal observers
- * to report on the state of the engine, such as splash screens/loading screens.
+ * Engine Status provides the current status of the engine - what it is doing, at a higher granularity than just running.
+ * This can be used by external and internal observers to report on the state of the engine, such as splash screens/loading screens.
  */
 public interface EngineStatus {
 

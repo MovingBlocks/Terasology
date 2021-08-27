@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.recording;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 

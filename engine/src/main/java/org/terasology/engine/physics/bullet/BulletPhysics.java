@@ -32,9 +32,9 @@ import com.badlogic.gdx.physics.bullet.collision.btVector3i;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
-import com.google.api.client.util.Maps;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -552,7 +552,8 @@ public class BulletPhysics implements PhysicsEngine {
                 return true;
             }
         } else {
-            logger.warn("Trying to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent. Entity: {}", entity);
+            logger.warn("Trying to create trigger for entity without ShapeComponent or without LocationComponent " +
+                    "or without TriggerComponent. Entity: {}", entity);
             return false;
         }
     }

@@ -96,7 +96,9 @@ public class BlockShapeImpl extends BlockShape {
     }
 
     private Rotation applySymmetry(Rotation rot) {
-        return Rotation.rotate(yawSymmetric ? Yaw.NONE : rot.getYaw(), pitchSymmetric ? Pitch.NONE : rot.getPitch(), rollSymmetric ? Roll.NONE : rot.getRoll());
+        return Rotation.rotate(yawSymmetric ? Yaw.NONE : rot.getYaw(),
+                pitchSymmetric ? Pitch.NONE : rot.getPitch(),
+                rollSymmetric ? Roll.NONE : rot.getRoll());
     }
 
 }

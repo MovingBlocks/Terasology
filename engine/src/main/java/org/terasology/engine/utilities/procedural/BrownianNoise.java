@@ -44,6 +44,13 @@ public class BrownianNoise extends AbstractNoise {
         setOctaves(octaves);
     }
 
+    /**
+     * 1/sum of all weights
+     * @return the scale
+     */
+    public double getScale() {
+        return scale;
+    }
 
     /**
      * Returns Fractional Brownian Motion at the given position.

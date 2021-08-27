@@ -19,6 +19,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -183,6 +184,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setObject(data::setTint, jsonObject, "tint", Vector3f.class, context);
 
             readBlockPartMap(jsonObject, "tile", "tiles", data::getBlockTiles, BlockTile.class, context);
+            readBlockPartMap(jsonObject, "colorSource", "colorSources", data::getColorSources, DefaultColorSource.class, context);
+            readBlockPartMap(jsonObject, "colorOffset", "colorOffsets", data::getColorOffsets, Vector4f.class, context);
 
             setFloat(data::setMass, jsonObject, "mass");
             setBoolean(data::setDebrisOnDestroy, jsonObject, "debrisOnDestroy");
@@ -208,7 +211,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
 
         private <T> void readBlockPartMap(JsonObject jsonObject, String singleName,
-                                          String partsName, Supplier<EnumMap<BlockPart, T>> supplier, Class<T> type, JsonDeserializationContext context) {
+                                          String partsName, Supplier<EnumMap<BlockPart, T>> supplier, Class<T> type,
+                                          JsonDeserializationContext context) {
             if (jsonObject.has(singleName)) {
                 T value = context.deserialize(jsonObject.get(singleName), type);
                 for (BlockPart blockPart : BlockPart.values()) {
@@ -225,7 +229,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 }
                 if (partsObject.has("sides")) {
                     T value = context.deserialize(partsObject.get("sides"), type);
-                    for (BlockPart blockPart : BlockPart.horizontalSides()) {
+                    for (BlockPart blockPart : BlockPart.allHorizontalParts()) {
                         supplier.get().put(blockPart, value);
                     }
                 }
@@ -312,7 +316,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
 
         @Override
-        public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
 
             BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
             return library.getBlockFamily(json.getAsString());

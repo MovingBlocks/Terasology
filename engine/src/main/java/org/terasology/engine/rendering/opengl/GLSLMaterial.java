@@ -61,6 +61,8 @@ public class GLSLMaterial extends BaseMaterial {
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
     public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data,
                         LwjglGraphicsProcessing graphicsProcessing, GLSLMaterial.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
@@ -73,7 +75,8 @@ public class GLSLMaterial extends BaseMaterial {
         });
     }
 
-    public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing, AssetType<?, MaterialData> assetType, MaterialData data) {
+    public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing,
+                                      AssetType<?, MaterialData> assetType, MaterialData data) {
         return new GLSLMaterial(urn, assetType, data, graphicsProcessing, new DisposalAction(urn, graphicsProcessing));
     }
 
@@ -100,6 +103,7 @@ public class GLSLMaterial extends BaseMaterial {
         for (int slot : textureMap.keys()) {
             Texture texture = textureMap.get(slot);
             if (texture.isDisposed()) {
+                textureMap.remove(slot);
                 logger.error("Attempted to bind disposed texture {}", texture);
             } else {
                 shaderManager.bindTexture(slot, texture);
@@ -481,12 +485,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        value.get(buffer);
+        matrixBuffer.rewind();
+        value.get(matrixBuffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, buffer);
+            GL20.glUniformMatrix3fv(id, false, matrixBuffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -494,7 +498,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, buffer);
+                GL20.glUniformMatrix3fv(id, false, matrixBuffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -529,12 +533,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        value.get(buffer);
+        matrixBuffer.rewind();
+        value.get(matrixBuffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, buffer);
+            GL20.glUniformMatrix4fv(id, false, matrixBuffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -542,7 +546,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, buffer);
+                GL20.glUniformMatrix4fv(id, false, matrixBuffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -600,11 +604,13 @@ public class GLSLMaterial extends BaseMaterial {
     private static final class UniformId {
         private int shaderProgramId;
         private String name;
+        private int hashCode;
 
         // made package-private after Jenkins' suggestion
         UniformId(int shaderProgramId, String name) {
             this.shaderProgramId = shaderProgramId;
             this.name = name;
+            this.hashCode = Objects.hashCode(shaderProgramId, name);
         }
 
         @Override
@@ -621,7 +627,7 @@ public class GLSLMaterial extends BaseMaterial {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(shaderProgramId, name);
+            return this.hashCode;
         }
     }
 

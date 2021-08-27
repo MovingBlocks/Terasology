@@ -12,6 +12,7 @@ import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.math.TeraMath;
+import org.terasology.nui.Colorc;
 
 import java.util.Arrays;
 
@@ -79,7 +80,8 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
+                         ChunkMesh.RenderType renderType, Colorc colorOffset, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
             elements.uv0.put(texCoord);
@@ -89,11 +91,13 @@ public class BlockMeshPart {
         elements.buffer.reserveElements(nextIndex + vertices.length);
         Vector3f pos = new Vector3f();
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
+            elements.color.put(colorOffset);
             elements.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
             elements.normals.put(normals[vIdx]);
             elements.flags.put(flags.getValue());
             elements.frames.put(texFrames - 1);
-            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ, new Vector3f()), normals[vIdx]);
+            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ,
+                    new Vector3f()), normals[vIdx]);
             elements.sunlight.put(lightingData[0]);
             elements.blockLight.put(lightingData[1]);
             elements.ambientOcclusion.put(lightingData[2]);

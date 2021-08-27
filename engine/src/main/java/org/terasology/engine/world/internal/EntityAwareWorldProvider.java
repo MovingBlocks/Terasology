@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.ComponentContainer;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -37,13 +36,14 @@ import org.terasology.engine.logic.common.RetainComponentsComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkComponent;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.OnChangedBlock;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.regions.BlockRegionComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +52,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
+public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
+        implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
         ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
@@ -164,7 +165,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
             temporaryBlockEntities.add(blockEntity);
         }
-        if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
+        if (forceEntityUpdate
+                || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily())
+                && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
             updateBlockEntityComponents(blockEntity, oldType, type, retainComponents);
         }
 
@@ -221,7 +224,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public EntityRef getBlockEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
+            if ((!blockEntity.exists()
+                    || !blockEntity.hasComponent(NetworkComponent.class))
+                    && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
                 Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
                 blockEntity = createBlockEntity(blockPosition, block);
             }

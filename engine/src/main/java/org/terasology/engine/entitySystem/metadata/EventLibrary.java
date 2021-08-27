@@ -25,7 +25,8 @@ public class EventLibrary extends ModuleClassLibrary<Event> {
     }
 
     @Override
-    protected <C extends Event> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
+    protected <C extends Event> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory,
+                                                                   CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
         try {
             return new EventMetadata<>(type, copyStrategies, factory, uri);
         } catch (NoSuchMethodException e) {

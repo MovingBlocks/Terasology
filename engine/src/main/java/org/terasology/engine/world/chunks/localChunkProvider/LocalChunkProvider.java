@@ -14,7 +14,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.EntityStore;
@@ -50,6 +49,7 @@ import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -147,7 +147,9 @@ public class LocalChunkProvider implements ChunkProvider {
         Chunk[] chunks = new Chunk[region.volume()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ()  * (chunkPos.y() - region.minY()));
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX()
+                    * ((chunkPos.z() - region.minZ()) + region.getSizeZ()
+                    * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));

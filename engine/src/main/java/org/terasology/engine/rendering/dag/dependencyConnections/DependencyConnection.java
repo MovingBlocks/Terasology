@@ -64,8 +64,9 @@ public abstract class DependencyConnection<T> {
     }
 
     /**
-     * Setter for a DependencyConnection connection of DependencyConnection.connectedConnection. The idea is that when connecting a toNode's input to another
-     * fromNode's output, you set the OUTPUT connection's connectedConnection to the toNode's DependencyConnection which you connect.
+     * Setter for a DependencyConnection connection of DependencyConnection.connectedConnection.
+     * The idea is that when connecting a toNode's input to another fromNode's output,
+     * you set the OUTPUT connection's connectedConnection to the toNode's DependencyConnection which you connect.
      * @param connectedConnection A DependenyConnection connection of connected node.
      */
     public void setConnectedConnection(DependencyConnection connectedConnection) {

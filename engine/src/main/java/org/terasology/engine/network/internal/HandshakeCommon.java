@@ -26,7 +26,8 @@ public final class HandshakeCommon {
      * @return
      */
     public static byte[] generateMasterSecret(byte[] preMasterSecret, byte[] clientRandom, byte[] serverRandom) {
-        return SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL, Bytes.concat(clientRandom, serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
+        return SecretGenerator.generate(preMasterSecret, SecretGenerator.MASTER_SECRET_LABEL,
+                Bytes.concat(clientRandom, serverRandom), SecretGenerator.MASTER_SECRET_LENGTH);
     }
 
     /**
@@ -39,7 +40,8 @@ public final class HandshakeCommon {
      */
     public static SecretKeySpec generateSymmetricKey(byte[] masterSecret, byte[] clientRandom, byte[] serverRandom) {
         return new SecretKeySpec(SecretGenerator.generate(masterSecret, SecretGenerator.KEY_EXPANSION,
-                Bytes.concat(clientRandom, serverRandom), IdentityConstants.SYMMETRIC_ENCRYPTION_KEY_LENGTH), IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
+                Bytes.concat(clientRandom, serverRandom), IdentityConstants.SYMMETRIC_ENCRYPTION_KEY_LENGTH),
+                IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
     }
 
     /**

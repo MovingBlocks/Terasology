@@ -3,10 +3,10 @@
 package org.terasology.engine.logic.characters;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * The gaze mount point represents a character's "eyes".
@@ -16,7 +16,7 @@ import org.terasology.engine.network.Replicate;
  * The character location usually points to the center of the entity. The gaze mount point translation is relative to
  * that anchor location.
  */
-public class GazeMountPointComponent implements Component {
+public class GazeMountPointComponent implements Component<GazeMountPointComponent> {
     /**
      * Holds an entity that will have its location linked to the character entity.
      * <p>
@@ -33,4 +33,10 @@ public class GazeMountPointComponent implements Component {
      */
     @Replicate
     public Vector3f translate = new Vector3f(0, 0, 0);
+
+    @Override
+    public void copyFrom(GazeMountPointComponent other) {
+        this.gazeEntity = other.gazeEntity;
+        this.translate = new Vector3f(other.translate);
+    }
 }

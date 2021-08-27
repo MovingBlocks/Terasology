@@ -10,12 +10,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
@@ -153,7 +153,8 @@ public class ComponentSerializer {
      * @param context       The module this component is being deserialized from, or null if it isn't within a module
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData, FieldSerializeCheck<Component> fieldCheck, Module context) {
+    public Component deserializeOnto(Component target, EntityData.Component componentData,
+                                     FieldSerializeCheck<Component> fieldCheck, Module context) {
         ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData, context);
         if (componentMetadata != null) {
             return deserializeOnto(target, componentData, componentMetadata, fieldCheck);

@@ -43,14 +43,12 @@ import org.terasology.engine.logic.characters.MovementMode;
 import org.terasology.engine.logic.characters.events.OnItemUseEvent;
 import org.terasology.engine.logic.characters.events.ScaleToRequest;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
-import org.terasology.engine.logic.delay.DelayManager;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.AABBRenderer;
 import org.terasology.engine.rendering.cameras.Camera;
@@ -78,10 +76,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
-    @In
-    private PhysicsEngine physics;
-    @In
-    private DelayManager delayManager;
 
     @In
     private Config config;
@@ -261,6 +255,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
         lookPitchDelta = event.getValue();
         event.consume();
+    }
+
+    @ReceiveEvent(components = CharacterComponent.class)
+    public void setRotation(SetDirectionEvent event, EntityRef entity) {
+        if (localPlayer.getCharacterEntity().equals(entity)) {
+            lookPitch = event.getPitch();
+            lookYaw = event.getYaw();
+        }
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
@@ -472,19 +474,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         return (float) java.lang.Math.sin((double) bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-    @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-
-    }
-
-    @Override
-    public void renderShadows() {
-    }
 
     /**
      * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be

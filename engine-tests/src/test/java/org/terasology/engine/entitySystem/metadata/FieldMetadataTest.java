@@ -18,7 +18,8 @@ public class FieldMetadataTest {
 
     @Test
     public void testOwnsAnnotationProcessed() throws NoSuchMethodException {
-        ComponentMetadata<OwnerComponent> classMetadata = new ComponentMetadata<>(new ResourceUrn("unittest:owner"), OwnerComponent.class, factory, copyStrategyLibrary);
+        ComponentMetadata<OwnerComponent> classMetadata = new ComponentMetadata<>(new ResourceUrn("unittest:owner"),
+                OwnerComponent.class, factory, copyStrategyLibrary);
         ComponentFieldMetadata metadata = classMetadata.getField("child");
         assertTrue(metadata.isOwnedReference());
     }

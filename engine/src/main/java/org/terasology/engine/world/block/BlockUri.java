@@ -12,8 +12,8 @@ import org.terasology.gestalt.naming.Name;
 import java.util.Optional;
 
 /**
- * Identifier for both blocks and block families. It is a combination of the ResourceUrn of a block family definition, the id of a block, and optionally the
- * ResourceUrn of a shape.
+ * Identifier for both blocks and block families. It is a combination of the ResourceUrn of a block family definition,
+ * the id of a block, and optionally the ResourceUrn of a shape.
  * The final pattern is (see {@link BlockUri} for details):
  * [package]:[blockFamily]:[shapePackage]:[shapeName].[blockIdentifier]
  * the third and forth parts are only used for blocks that don't use the engine:cube shape, and which
