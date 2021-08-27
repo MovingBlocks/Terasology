@@ -8,7 +8,7 @@ import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 
 final class RunningThreadsMode extends MetricsMode {
 
-     RunningThreadsMode() {
+    RunningThreadsMode() {
         super("\n- Running Threads -");
     }
 
