@@ -34,7 +34,6 @@ import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -44,34 +43,33 @@ import java.util.PriorityQueue;
  * TODO: write javadoc unless this class gets slated for removal, which might be.
  */
 class RenderableWorldImpl implements RenderableWorld {
+    private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS =
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
 
-    private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
-
     private final int maxChunksForShadows =
             TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
     private final WorldProvider worldProvider;
-    private ChunkProvider chunkProvider;
-    private LodChunkProvider lodChunkProvider;
+    private final ChunkProvider chunkProvider;
+    private final LodChunkProvider lodChunkProvider;
 
-    private ChunkTessellator chunkTessellator;
+    private final ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
-    private RenderQueuesHelper renderQueues;
+    private final RenderQueuesHelper renderQueues;
     private ChunkMeshRenderer chunkMeshRenderer;
 
-    private Camera playerCamera;
+    private final Camera playerCamera;
     private Camera shadowMapCamera;
 
-    private Config config = CoreRegistry.get(Config.class);
-    private RenderingConfig renderingConfig = config.getRendering();
+    private final Config config = CoreRegistry.get(Config.class);
+    private final RenderingConfig renderingConfig = config.getRendering();
 
     private int statDirtyChunks;
     private int statVisibleChunks;
@@ -109,7 +107,7 @@ class RenderableWorldImpl implements RenderableWorld {
             Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
                 if (lodChunkProvider != null) {
                     lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
                 }
@@ -132,7 +130,7 @@ class RenderableWorldImpl implements RenderableWorld {
             Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
             while (iterator.hasNext()) {
                 chunk = iterator.next();
-                if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkCoordinates)) {
+                if (chunk.getPosition().equals(chunkCoordinates)) {
                     chunk.disposeMesh();
                     iterator.remove();
                     break;
@@ -240,7 +238,7 @@ class RenderableWorldImpl implements RenderableWorld {
             }
 
             if (chunksHaveBeenAdded) {
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
             }
             renderableRegion = newRenderableRegion;
             return true;
