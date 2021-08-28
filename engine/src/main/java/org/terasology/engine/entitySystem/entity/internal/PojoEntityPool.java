@@ -8,7 +8,6 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -16,6 +15,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveCom
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Arrays;
 import java.util.Collections;

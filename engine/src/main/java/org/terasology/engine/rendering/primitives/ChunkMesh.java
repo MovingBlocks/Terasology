@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
@@ -25,7 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
  */
-@SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
 
     /**
@@ -38,7 +36,7 @@ public class ChunkMesh {
         BILLBOARD(2),
         WATER_AND_ICE(3);
 
-        private int meshIndex;
+        private final int meshIndex;
 
         RenderType(int index) {
             meshIndex = index;
@@ -125,9 +123,7 @@ public class ChunkMesh {
             GL30.glBindVertexArray(vaoCount[id]);
 
             GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
-            elements.buffer.writeBuffer(buffer -> {
-                GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-            });
+            elements.buffer.writeBuffer(buffer -> GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
             for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
                 GL30.glEnableVertexAttribArray(definition.location);
@@ -154,9 +150,8 @@ public class ChunkMesh {
     }
 
     /**
-     * Save space by removing the data that was used to construct the mesh, but
-     * after discardData is called, the mesh can't be serialized, so it shouldn't
-     * be used in contexts where that might be necessary.
+     * Save space by removing the data that was used to construct the mesh, but after discardData is called, the mesh can't be serialized,
+     * so it shouldn't be used in contexts where that might be necessary.
      */
     public void discardData() {
         vertexElements = null;
@@ -203,9 +198,9 @@ public class ChunkMesh {
     }
 
     /**
-     * Disposes of all the data stored in an instance of this class and
-     * the associated data stored in the GLBufferPool instance provided on construction.
-     *
+     * Disposes of all the data stored in an instance of this class and the associated data stored in the GLBufferPool instance provided on
+     * construction.
+     * <p>
      * ChunkMesh instances cannot be un-disposed.
      */
     public void dispose() {
@@ -213,13 +208,13 @@ public class ChunkMesh {
             for (int i = 0; i < vertexBuffers.length; i++) {
                 int id = vertexBuffers[i];
                 if (id != 0) {
-                    GL15.glDeleteBuffers(id);
+                    GL30.glDeleteBuffers(id);
                     vertexBuffers[i] = 0;
                 }
 
                 id = idxBuffers[i];
                 if (id != 0) {
-                    GL15.glDeleteBuffers(id);
+                    GL30.glDeleteBuffers(id);
                     idxBuffers[i] = 0;
                 }
 
@@ -310,7 +305,7 @@ public class ChunkMesh {
         public final VertexFloatAttributeBinding sunlight;         // this could be changed to a single byte
         public final VertexFloatAttributeBinding blockLight;       // this could be changed to a single byte
         public final VertexFloatAttributeBinding ambientOcclusion; // this could be changed to a single byte
-        public  int vertexCount;
+        public int vertexCount;
 
 
         VertexElements() {

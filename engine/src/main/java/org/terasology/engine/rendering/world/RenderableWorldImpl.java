@@ -39,7 +39,6 @@ import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +53,6 @@ class RenderableWorldImpl implements RenderableWorld {
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
-    private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS =
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
@@ -63,21 +61,21 @@ class RenderableWorldImpl implements RenderableWorld {
             TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
     private final WorldProvider worldProvider;
-    private ChunkProvider chunkProvider;
-    private LodChunkProvider lodChunkProvider;
+    private final ChunkProvider chunkProvider;
+    private final LodChunkProvider lodChunkProvider;
 
     private ChunkTessellator chunkTessellator;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
-    private RenderQueuesHelper renderQueues;
+    private final RenderQueuesHelper renderQueues;
     private ChunkMeshRenderer chunkMeshRenderer;
 
-    private Camera playerCamera;
+    private final Camera playerCamera;
     private Camera shadowMapCamera;
 
-    private Config config = CoreRegistry.get(Config.class);
-    private RenderingConfig renderingConfig = config.getRendering();
+    private final Config config = CoreRegistry.get(Config.class);
+    private final RenderingConfig renderingConfig = config.getRendering();
 
     private int statDirtyChunks;
     private int statVisibleChunks;
@@ -154,7 +152,7 @@ class RenderableWorldImpl implements RenderableWorld {
             Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
                 if (lodChunkProvider != null) {
                     lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
                 }
@@ -264,8 +262,8 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext();) {
-                        chunk = it.next();
+                    while (nearbyChunks.hasNext()) {
+                        chunk = nearbyChunks.next();
                         if (chunk.getPosition().equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
@@ -287,7 +285,7 @@ class RenderableWorldImpl implements RenderableWorld {
             }
 
             if (chunksHaveBeenAdded) {
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
             }
             renderableRegion = newRenderableRegion;
             return true;
@@ -347,6 +345,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
+        int billboardLimit = (int) renderingConfig.getBillboardLimit();
 
         List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
         allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
@@ -382,7 +381,8 @@ class RenderableWorldImpl implements RenderableWorld {
                         statIgnoredPhases++;
                     }
 
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && chunkCounter < MAX_BILLBOARD_CHUNKS) {
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0
+                            && (billboardLimit == 0 || chunkCounter < billboardLimit)) {
                         renderQueues.chunksAlphaReject.add(chunk);
                     } else {
                         statIgnoredPhases++;
@@ -390,11 +390,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                     statVisibleChunks++;
 
-                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
-                        chunk.setAnimated(true);
-                    } else {
-                        chunk.setAnimated(false);
-                    }
+                    chunk.setAnimated(statVisibleChunks < MAX_ANIMATED_CHUNKS);
                 }
 
                 if (isChunkVisibleReflection(chunk)) {
@@ -535,13 +531,7 @@ class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (distance1 == distance2) {
-                return 0;
-            } else if (distance2 > distance1) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return Double.compare(distance2, distance1);
         }
     }
 

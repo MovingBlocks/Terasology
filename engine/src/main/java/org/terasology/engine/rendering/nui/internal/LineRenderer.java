@@ -227,14 +227,14 @@ public final class LineRenderer {
             lineMeshData.position.rewind();
             lineMeshData.color0.rewind();
 
-            lineMeshData.position.put(v1.set( x1 - rx + cx, y1 - ry + cy, 0.0f));
-            lineMeshData.position.put(v1.set( x1 + rx + cx, y1 + ry + cy, 0.0f));
-            lineMeshData.position.put(v1.set( x1 - tx - rx, y1 - ty - ry, 0.0f));
-            lineMeshData.position.put(v1.set( x1 + tx + rx, y1 + ty + ry, 0.0f));
-            lineMeshData.position.put(v1.set( x2 - rx - cx, y2 - ry - cy, 0.0f));
-            lineMeshData.position.put(v1.set( x2 + rx - cx, y2 + ry - cy, 0.0f));
-            lineMeshData.position.put(v1.set( x2 - tx - rx, y2 - ty - ry, 0.0f));
-            lineMeshData.position.put(v1.set( x2 + tx + rx, y2 + ty + ry, 0.0f));
+            lineMeshData.position.put(v1.set(x1 - rx + cx, y1 - ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set(x1 + rx + cx, y1 + ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set(x1 - tx - rx, y1 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set(x1 + tx + rx, y1 + ty + ry, 0.0f));
+            lineMeshData.position.put(v1.set(x2 - rx - cx, y2 - ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set(x2 + rx - cx, y2 + ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set(x2 - tx - rx, y2 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set(x2 + tx + rx, y2 + ty + ry, 0.0f));
 
             if (!alphaBlend) {
                 lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));

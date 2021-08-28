@@ -39,9 +39,7 @@ public final class ChunkTessellator {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 for (int x = 0; x < Chunks.SIZE_X; x++) {
                     Block block = chunkView.getBlock(x, y, z);
-                    if (block != null && block.getMeshGenerator() != null) {
-                        block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
-                    }
+                    block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
                 }
             }
         }

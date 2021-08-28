@@ -3,11 +3,11 @@
 package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Sets;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.metadata.ComponentFieldMetadata;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.Map;
