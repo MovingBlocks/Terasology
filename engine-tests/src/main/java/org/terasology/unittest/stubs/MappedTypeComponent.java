@@ -3,13 +3,19 @@
 
 package org.terasology.unittest.stubs;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.reflection.MappedContainer;
 
-public class MappedTypeComponent implements Component {
+public class MappedTypeComponent implements Component<MappedTypeComponent> {
 
     public InnerType val = new InnerType();
     public Number number = 2;
+
+    @Override
+    public void copyFrom(MappedTypeComponent other) {
+        this.val = other.val;
+        this.number = other.number;
+    }
 
     @MappedContainer
     public static class InnerType {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 

@@ -3,8 +3,8 @@
 package org.terasology.engine.logic.common;
 
 import com.google.common.collect.Sets;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Set;
 
@@ -15,7 +15,12 @@ import java.util.Set;
  * If a block (item) entity has a component that is not part of its prefab, retaining this component results in the block
  * entity still having this component afterwards. If not retained, it is likely to be removed instead.
  */
-public class RetainComponentsComponent implements Component {
+public class RetainComponentsComponent implements Component<RetainComponentsComponent> {
     @Replicate
     public Set<Class<? extends Component>> components = Sets.newHashSet();
+
+    @Override
+    public void copyFrom(RetainComponentsComponent other) {
+        this.components = Sets.newHashSet(other.components); // TODO Investigate, needs to deep-copy or not!
+    }
 }

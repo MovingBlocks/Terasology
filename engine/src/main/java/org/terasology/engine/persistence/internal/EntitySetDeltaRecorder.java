@@ -7,10 +7,10 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.Map;

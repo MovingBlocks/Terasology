@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.subsystem.common.ThreadManager;
 import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,7 +35,6 @@ public class ScreenGrabber {
     private static final String SCREENSHOT_FILENAME_PATTERN = "Terasology-%s-%dx%d.%s";
 
     private RenderingConfig renderingConfig;
-    private ThreadManager threadManager;
     private float currentExposure;
     private boolean isTakingScreenshot;
     private DisplayResolutionDependentFbo displayResolutionDependentFBOs;
@@ -44,7 +45,6 @@ public class ScreenGrabber {
      * @param context
      */
     public ScreenGrabber(Context context) {
-        threadManager = CoreRegistry.get(ThreadManager.class);
         renderingConfig = context.get(Config.class).getRendering();
     }
 
@@ -109,7 +109,7 @@ public class ScreenGrabber {
             task = () -> saveScreenshotTask(buffer, width, height);
         }
 
-        threadManager.submitTask("Write screenshot", task);
+        GameScheduler.scheduleParallel("Write screenshot", task);
         isTakingScreenshot = false;
     }
 
@@ -136,12 +136,16 @@ public class ScreenGrabber {
     }
 
     private void writeImageToFile(BufferedImage image, Path path, String format) {
-        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-            ImageIO.write(image, format, out);
-            logger.info("Screenshot saved to {}! ", path);
-        } catch (IOException e) {
-            logger.warn("Failed to save screenshot!", e);
-        }
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+                ImageIO.write(image, format, out);
+                logger.info("Screenshot saved to {}! ", path);
+            } catch (IOException e) {
+                logger.warn("Failed to save screenshot!", e);
+            }
+            return null;
+        });
+
     }
 
     /**

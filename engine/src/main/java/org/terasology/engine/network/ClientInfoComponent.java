@@ -3,14 +3,14 @@
 
 package org.terasology.engine.network;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * The component that marks an entity as being a Client Info Entity.
  */
 @Replicate
-public final class ClientInfoComponent implements Component {
+public final class ClientInfoComponent implements Component<ClientInfoComponent> {
 
     /**
      * When a client connects, the game searches a client info component for the client id ({@link Client#getId()}).
@@ -27,4 +27,10 @@ public final class ClientInfoComponent implements Component {
      */
     @Replicate
     public EntityRef client = EntityRef.NULL;
+
+    @Override
+    public void copyFrom(ClientInfoComponent other) {
+        this.playerId = other.playerId;
+        this.client = other.client;
+    }
 }
