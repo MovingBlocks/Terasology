@@ -353,7 +353,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         });
     }
 
-    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void updateTrigger(OnChangedComponent event, EntityRef entity, TriggerComponent trigger, LocationComponent location) {
         btPairCachingGhostObject bt = entityTriggers.get(entity);
         if (bt != null) {
