@@ -14,7 +14,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.EntityStore;
@@ -53,6 +52,7 @@ import org.terasology.engine.world.propagation.light.LightMerger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Scheduler;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;

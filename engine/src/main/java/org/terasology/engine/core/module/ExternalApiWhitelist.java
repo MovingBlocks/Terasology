@@ -48,8 +48,13 @@ public final class ExternalApiWhitelist {
             .add(org.terasology.reflection.TypeInfo.class)
             .build();
 
+    private static final Set<String> GESTALT_ECS_PACKAGES = new ImmutableSet.Builder<String>()
+            .add("org.terasology.gestalt.entitysystem.component")
+            .build();
+
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
             .addAll(NUI_PACKAGES)
+            .addAll(GESTALT_ECS_PACKAGES)
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
@@ -109,6 +114,17 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .add("org.joml")
+            .add("reactor.core")
+            .add("reactor.core.publisher")
+            .add("reactor.core.scheduler")
+            .add("reactor.util")
+            .add("reactor.util.annotation")
+            .add("reactor.util.concurrent")
+            .add("reactor.util.context")
+            .add("reactor.util.function")
+            .add("reactor.util.retry")
+            .add("reactor.adapter")
+            .add("java.time")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.engine.entitySystem.entity.internal.EngineSectorManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 public interface LowLevelEntityManager extends EntityManager {
 

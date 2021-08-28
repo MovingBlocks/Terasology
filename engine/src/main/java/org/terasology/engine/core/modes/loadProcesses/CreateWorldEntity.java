@@ -9,7 +9,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.game.GameManifest;
@@ -18,6 +17,7 @@ import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Iterator;
 
