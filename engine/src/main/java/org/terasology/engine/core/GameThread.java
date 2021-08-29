@@ -4,8 +4,6 @@ package org.terasology.engine.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -24,16 +22,6 @@ public final class GameThread {
 
     private static volatile Thread gameThread;
     private static BlockingDeque<Runnable> pendingRunnables = Queues.newLinkedBlockingDeque();
-
-    private static final Scheduler MAIN;
-
-    static {
-        MAIN = Schedulers.fromExecutor(runnable -> pendingRunnables.add(runnable));
-    }
-
-    public static Scheduler main() {
-        return  MAIN;
-    }
 
     private GameThread() {
     }

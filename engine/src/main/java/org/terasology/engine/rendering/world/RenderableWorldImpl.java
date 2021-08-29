@@ -15,7 +15,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameScheduler;
-import org.terasology.engine.core.GameThread;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
 import org.terasology.engine.registry.CoreRegistry;
@@ -37,6 +36,8 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 import reactor.core.publisher.Sinks;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -84,11 +85,6 @@ class RenderableWorldImpl implements RenderableWorld {
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
     private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
 
-    private static class ChunkMeshPayload {
-        Chunk chunk;
-        ChunkMesh mesh;
-    }
-
     RenderableWorldImpl(Context context, Camera playerCamera) {
 
         worldProvider = context.get(WorldProvider.class);
@@ -116,28 +112,25 @@ class RenderableWorldImpl implements RenderableWorld {
                 .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
                 .doOnNext(k -> k.setDirty(false))
                 .parallel(5).runOn(GameScheduler.parallel())
-                .<Optional<ChunkMeshPayload>>map(c -> {
+                .<Optional<Tuple2<Chunk, ChunkMesh>>>map(c -> {
                     ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                     if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
                         ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
                         ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
-                        ChunkMeshPayload payload = new ChunkMeshPayload();
-                        payload.chunk = c;
-                        payload.mesh = newMesh;
-                        return Optional.of(payload);
+                        return Optional.of(Tuples.of(c, newMesh));
                     }
                     return Optional.empty();
                 }).filter(Optional::isPresent).sequential()
-                .publishOn(GameThread.main())
+                .publishOn(GameScheduler.gameMain())
                 .subscribe(payload -> {
                     payload.ifPresent(result -> {
-                        if (chunksInProximityOfCamera.contains(result.chunk)) {
-                            result.mesh.generateVBOs();
-                            result.mesh.discardData();
-                            if (result.chunk.hasMesh()) {
-                                result.chunk.getMesh().dispose();
+                        if (chunksInProximityOfCamera.contains(result.getT1())) {
+                            result.getT2().generateVBOs();
+                            result.getT2().discardData();
+                            if (result.getT1().hasMesh()) {
+                                result.getT1().getMesh().dispose();
                             }
-                            result.chunk.setMesh(result.mesh);
+                            result.getT1().setMesh(result.getT2());
                         }
                     });
 
@@ -338,7 +331,6 @@ class RenderableWorldImpl implements RenderableWorld {
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
 
-        int processedChunks = 0;
         int chunkCounter = 0;
 
         renderQueues.clear();
@@ -423,7 +415,6 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void dispose() {
-//        meshDispose.dispose();
         if (lodChunkProvider != null) {
             lodChunkProvider.shutdown();
         }
