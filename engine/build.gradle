@@ -137,7 +137,7 @@ dependencies {
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
-    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
+    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.2.0'
 
     api(project(":subsystems:TypeHandlerLibrary"))
 }
