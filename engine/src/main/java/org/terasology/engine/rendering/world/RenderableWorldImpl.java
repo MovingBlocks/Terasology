@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
@@ -36,7 +37,6 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 import reactor.core.publisher.Sinks;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -115,7 +115,7 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkMeshPublisher.asFlux()
                 .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
                 .doOnNext(k -> k.setDirty(false))
-                .parallel(5).runOn(Schedulers.parallel())
+                .parallel(5).runOn(GameScheduler.parallel())
                 .<Optional<ChunkMeshPayload>>map(c -> {
                     ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                     if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
@@ -534,5 +534,4 @@ class RenderableWorldImpl implements RenderableWorld {
             return Double.compare(distance2, distance1);
         }
     }
-
 }
