@@ -4,8 +4,6 @@ package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.subjects.SingleSubject;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
@@ -15,7 +13,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.config.UniverseConfig;
 import org.terasology.engine.core.ComponentSystemManager;
-import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
@@ -54,6 +51,8 @@ import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,7 +62,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -88,7 +89,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
     private Config config;
     private SystemConfig systemConfig;
-    Optional<SingleSubject<SaveTransactionResult>> resultSubject = Optional.empty();
+
+    private Optional<CompletableFuture<SaveTransactionResult>> resultSubject = Optional.empty();
 
     /**
      * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
@@ -118,6 +120,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             throws IOException {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
@@ -156,19 +159,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             recordAndReplayUtils.setShutdownRequested(true);
         }
-        resultSubject.ifPresent(Single::blockingGet);
+        resultSubject.ifPresent(CompletableFuture::join);
         checkSaveTransactionAndClearUpIfItIsDone();
     }
 
     private void checkSaveTransactionAndClearUpIfItIsDone() {
-        if (resultSubject.isPresent()) {
-            SaveTransactionResult result = resultSubject.get().getValue();
-            if (result != null) {
+        if (resultSubject.isPresent() && resultSubject.get().isDone()) {
+            try {
+                SaveTransactionResult result = resultSubject.get().get();
                 Throwable t = result.getCatchedThrowable();
                 if (t != null) {
                     throw new RuntimeException("Saving failed", t);
                 }
                 resultSubject = Optional.empty();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Saving failed", e);
             }
             unloadedAndSavingChunkMap.clear();
         }
@@ -249,7 +254,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
             recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         }
-        resultSubject.ifPresent(Single::blockingGet);
+        resultSubject.ifPresent(CompletableFuture::join);
         checkSaveTransactionAndClearUpIfItIsDone();
     }
 
@@ -412,13 +417,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         }
 
         saveRequested = false;
-        resultSubject = Optional.of(SingleSubject.create());
-        Single.just(createSaveTransaction())
-                .subscribeOn(GameThread.io())
-                .map(saveTransaction -> {
-                    saveTransaction.run();
-                    return saveTransaction.getResult();
-                }).subscribe(resultSubject.get());
+        resultSubject = Optional.of(Mono.just(createSaveTransaction())
+                .publishOn(Schedulers.boundedElastic())
+                .map(result -> {
+                    result.run();
+                    return result.getResult();
+                }).toFuture());
 
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
             saveGamePreviewImage();
@@ -440,14 +444,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             sys.preAutoSave();
         }
 
-
-        resultSubject = Optional.of(SingleSubject.create());
-        Single.just(createSaveTransaction())
-                .subscribeOn(GameThread.io())
-                .map(saveTransaction -> {
-                    saveTransaction.run();
-                    return saveTransaction.getResult();
-                }).subscribe(resultSubject.get());
+        resultSubject = Optional.of(Mono.just(createSaveTransaction())
+                .publishOn(Schedulers.boundedElastic())
+                .map(result -> {
+                    result.run();
+                    return result.getResult();
+                }).toFuture());
 
         for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postAutoSave();
@@ -492,7 +494,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
     @Override
     public boolean isSaving() {
-        return resultSubject.isPresent() && !resultSubject.get().hasValue();
+        return resultSubject.isPresent() && !resultSubject.get().isDone();
     }
 
     @Override
