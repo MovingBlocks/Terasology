@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.delay;
 
-import org.terasology.engine.entitySystem.Component;
+import com.google.common.collect.Maps;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.Set;
  * Not for public use. Use DelayManager instead.
  */
 @ForceBlockActive
-public final class DelayedActionComponent implements Component {
+public final class DelayedActionComponent implements Component<DelayedActionComponent> {
     private Map<String, Long> actionIdsWakeUp = new HashMap<>();
     private long lowestWakeUp = Long.MAX_VALUE;
 
@@ -67,5 +68,11 @@ public final class DelayedActionComponent implements Component {
             result = Math.min(result, value);
         }
         return result;
+    }
+
+    @Override
+    public void copyFrom(DelayedActionComponent other) {
+        this.actionIdsWakeUp = Maps.newHashMap(other.actionIdsWakeUp);
+        this.lowestWakeUp = other.lowestWakeUp;
     }
 }

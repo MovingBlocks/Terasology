@@ -13,6 +13,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.utilities.Jvm;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -29,6 +30,7 @@ import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.gestalt.module.sandbox.PermissionProvider;
 import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
+import org.terasology.gestalt.module.sandbox.PermissionSet;
 import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.gestalt.naming.Name;
@@ -44,6 +46,7 @@ import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +78,9 @@ public class ModuleManager {
         engineModule = loadAndConfigureEngineModule(moduleFactory, classesOnClasspathsToAddToEngine);
         registry.add(engineModule);
 
+        if (isLoadingClasspathModules()) {
+            loadModulesFromClassPath();
+        }
         loadModulesFromApplicationPath(PathManager.getInstance());
 
         ensureModulesDependOnEngine();
@@ -92,11 +98,16 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
+    protected static boolean isLoadingClasspathModules() {
+        return Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+    }
+
     /** Create a ModuleFactory configured for Terasology modules. */
     private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
         final ModuleFactory moduleFactory;
-        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+        if (isLoadingClasspathModules()) {
             moduleFactory = new ClasspathCompromisingModuleFactory();
+            Jvm.logClasspath(logger);
         } else {
             moduleFactory = new ModuleFactory();
         }
@@ -135,6 +146,35 @@ public class ModuleManager {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
         scanner.scan(registry, paths);
+    }
+
+    private void loadModulesFromClassPath() {
+        ClasspathCompromisingModuleFactory ccModuleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
+        for (String metadataName : ccModuleFactory.getModuleMetadataLoaderMap().keySet()) {
+            Enumeration<URL> urls;
+            try {
+                urls = ClassLoader.getSystemResources(metadataName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                logger.debug("Probably a module in U:{}", url);
+                Path path = ccModuleFactory.canonicalModuleLocation(metadataName, url);
+                Module module;
+                try {
+                    module = ccModuleFactory.createModule(path.toFile());
+                } catch (IOException e) {
+                    logger.warn("Failed to create module from {}", path, e);
+                    continue;
+                }
+                if (registry.add(module)) {
+                    logger.info("Loaded {} from {}", module.getId(), path);
+                } else {
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                }
+            }
+        }
     }
 
     /**
@@ -203,32 +243,29 @@ public class ModuleManager {
     }
 
     private void setupSandbox() {
-        ExternalApiWhitelist.CLASSES.stream().forEach(clazz ->
-                permissionProviderFactory.getBasePermissionSet().addAPIClass(clazz));
-        ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
-                permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
+        PermissionSet permissionSet = permissionProviderFactory.getBasePermissionSet();
+        ExternalApiWhitelist.CLASSES.forEach(permissionSet::addAPIClass);
+        ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
         registry.stream().map(Module::getModuleManifest).forEach(apiScanner::scan);
 
-        permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
-        permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
+        permissionSet.grantPermission("com.google.gson", ReflectPermission.class);
+        permissionSet.grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-        // reactive x property permission
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-keep-alive-time", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-scheduled-release", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-threads", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.newthread-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.single-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-enabled", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-period-seconds", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.use-nanotime", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance-unit", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.buffer-size", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("jctools.spsc.max.lookahead.step", "read"));
+        //noinspection ConstantConditions - this reference is to help find this if this method gets separated from the reactor dependency
+        if (reactor.core.scheduler.Scheduler.class != null) {  //lgtm [java/useless-null-check]
+            // In theory, PropertyPermission has wildcard matching and "reactor.*" should be sufficient to grant read access to all
+            // reactor configuration properties.
+            permissionSet.grantPermission(new PropertyPermission("reactor.*", "read"));
+            // In practice, the permission checks fail unless these are each named explicitly.
+            permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
+            permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
+        }
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());

@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
@@ -17,13 +16,14 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttribu
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
  */
-@SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
 
     /**
@@ -36,7 +36,7 @@ public class ChunkMesh {
         BILLBOARD(2),
         WATER_AND_ICE(3);
 
-        private int meshIndex;
+        private final int meshIndex;
 
         RenderType(int index) {
             meshIndex = index;
@@ -69,7 +69,7 @@ public class ChunkMesh {
     private boolean disposed;
 
     /* CONCURRENCY */
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     /* MEASUREMENTS */
     private int timeToGenerateBlockVertices;
@@ -126,16 +126,14 @@ public class ChunkMesh {
         VertexElements elements = vertexElements[type.ordinal()];
         int id = type.getIndex();
         if (!disposed && elements.buffer.elements() > 0) {
-            vertexBuffers[id] = GL15.glGenBuffers();
-            idxBuffers[id] = GL15.glGenBuffers();
+            vertexBuffers[id] = GL30.glGenBuffers();
+            idxBuffers[id] = GL30.glGenBuffers();
             vaoCount[id] = GL30.glGenVertexArrays();
 
             GL30.glBindVertexArray(vaoCount[id]);
 
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
-            elements.buffer.writeBuffer(buffer -> {
-                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-            });
+            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
+            elements.buffer.writeBuffer(buffer -> GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
             for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
                 GL30.glEnableVertexAttribArray(definition.location);
@@ -229,13 +227,13 @@ public class ChunkMesh {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
                     if (id != 0) {
-                        GL15.glDeleteBuffers(id);
+                        GL30.glDeleteBuffers(id);
                         vertexBuffers[i] = 0;
                     }
 
                     id = idxBuffers[i];
                     if (id != 0) {
-                        GL15.glDeleteBuffers(id);
+                        GL30.glDeleteBuffers(id);
                         idxBuffers[i] = 0;
                     }
 
@@ -312,6 +310,8 @@ public class ChunkMesh {
         public static final int BLOCK_INDEX = 6; // float
         public static final int AMBIENT_OCCLUSION_INDEX = 7; // float
 
+        public static final int COLOR_INDEX = 8; // vec4
+
         public final VertexResource buffer;
         public final IndexResource indices = new IndexResource();
 
@@ -319,8 +319,7 @@ public class ChunkMesh {
         public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
         public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
 
-        // color data is unused something to consider later
-        // public final VertexAttributeBinding<Colorc, Color> color;
+        public final VertexAttributeBinding<Colorc, Color> color;
 
         public final VertexIntegerAttributeBinding flags;
         public final VertexIntegerAttributeBinding frames;
@@ -343,6 +342,8 @@ public class ChunkMesh {
             sunlight = builder.add(SUNLIGHT_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
             blockLight = builder.add(BLOCK_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
             ambientOcclusion = builder.add(AMBIENT_OCCLUSION_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+
+            color = builder.add(COLOR_INDEX, GLAttributes.COLOR_4_F_VERTEX_ATTRIBUTE);
 
             buffer = builder.build();
         }

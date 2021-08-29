@@ -19,10 +19,11 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Setup an empty Terasology environment
- *
+ * Set up an empty Terasology environment.
+ * <p>
+ * Not for use outside {@code engine-tests}. Modules should use ModuleTestingEnvironment.
  */
-public class Environment {
+class Environment {
 
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
 
@@ -33,7 +34,7 @@ public class Environment {
      *
      * @param moduleNames a list of module names
      */
-    public Environment(Name... moduleNames) {
+    Environment(Name... moduleNames) {
         try {
             reset(Sets.newHashSet(moduleNames));
         } catch (Exception e) {

@@ -18,7 +18,6 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.input.binds.interaction.AttackButton;
-import org.terasology.engine.input.cameraTarget.PlayerTargetSystem;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
 import org.terasology.engine.logic.characters.events.ActivationRequestDenied;
 import org.terasology.engine.logic.characters.events.AttackEvent;
@@ -30,6 +29,7 @@ import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.common.RangeComponent;
 import org.terasology.engine.logic.health.BeforeDestroyEvent;
 import org.terasology.engine.logic.health.DestroyEvent;
 import org.terasology.engine.logic.health.EngineDamageTypes;
@@ -47,12 +47,10 @@ import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.registry.In;
-import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
-
 
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -74,12 +72,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Time time;
-
-    @In
-    private PlayerTargetSystem targetSystem;
-
-    @In
-    private BlockEntityRegistry blockRegistry;
 
     @In
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
@@ -352,7 +344,17 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character),
+            //FIXME This is the same code as in LocalPlayer#activateTargetOrOwnedEntity to derive the actual interaction range from the
+            //      player's character component and the used item's range component...
+            float interactionRange;
+            if (event.isOwnedEntityUsage() && event.getUsedOwnedEntity().hasComponent(RangeComponent.class)) {
+                interactionRange = Math.max(event.getUsedOwnedEntity().getComponent(RangeComponent.class).range,
+                        characterComponent.interactionRange);
+            } else {
+                interactionRange = characterComponent.interactionRange;
+            }
+
+            HitResult result = physics.rayTrace(originPos, direction, interactionRange, Sets.newHashSet(character),
                     DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
@@ -383,8 +385,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
-            if (!(event.getHitPosition().equals(originPos, 0.0001f))) {
-                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
+            if (event.getHitPosition() != null) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit position";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+            if (event.getHitNormal() != null) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit delta";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }

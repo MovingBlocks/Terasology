@@ -28,7 +28,6 @@ import org.terasology.engine.core.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.core.subsystem.common.TelemetrySubSystem;
 import org.terasology.engine.core.subsystem.common.TimeSubsystem;
 import org.terasology.engine.core.subsystem.common.WorldGenerationSubsystem;
-import org.terasology.engine.core.subsystem.rendering.ModuleRenderingSubsystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.i18n.I18nSubsystem;
@@ -173,7 +172,6 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
-        this.allSubsystems.add(new ModuleRenderingSubsystem());
 
         // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
         allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
@@ -584,6 +582,7 @@ public class TerasologyEngine implements GameEngine {
         if (currentState != null) {
             currentState.dispose();
         }
+        CoreRegistry.setContext(newState.getContext());
         currentState = newState;
         LoggingContext.setGameState(newState);
         newState.init(this);

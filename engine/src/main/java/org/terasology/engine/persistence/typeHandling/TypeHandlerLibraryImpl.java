@@ -13,13 +13,11 @@ import org.joml.Vector4fc;
 import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.math.IntegerRange;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ChunkMeshTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorcTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.NameTypeHandler;
-import org.terasology.engine.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
@@ -53,11 +51,11 @@ import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBi;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.UITextureRegion;
@@ -148,7 +146,6 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
         serializationLibrary.addTypeHandler(Quaternionfc.class, new QuaternionfcTypeHandler());
 
-        serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
     }
 

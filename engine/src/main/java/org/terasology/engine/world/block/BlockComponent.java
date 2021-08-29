@@ -4,13 +4,13 @@ package org.terasology.engine.world.block;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Used for entities representing a block in the world
  */
-public final class BlockComponent implements Component {
+public final class BlockComponent implements Component<BlockComponent> {
     @Replicate
     protected Vector3i position = new Vector3i();
     @Replicate
@@ -53,5 +53,11 @@ public final class BlockComponent implements Component {
     public Vector3i getPosition(Vector3i dest) {
         dest.set(position);
         return dest;
+    }
+
+    @Override
+    public void copyFrom(BlockComponent other) {
+        this.position = new Vector3i(other.position);
+        this.block = other.block;
     }
 }
