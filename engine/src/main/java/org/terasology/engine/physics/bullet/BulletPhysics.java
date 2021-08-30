@@ -326,7 +326,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     }
 
 
-    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void newTrigger(OnActivatedComponent event, EntityRef entity, LocationComponent location, TriggerComponent trigger) {
         entityTriggers.computeIfAbsent(entity, e -> {
             btCollisionShape shape = getShapeFor(entity);
