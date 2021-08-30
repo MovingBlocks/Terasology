@@ -6,7 +6,7 @@ apply plugin: 'ivy-publish'
 group 'org.terasology.cli'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 // Important note: These need to be in sync with the @Grab entries in the Groovy scripts if both have to work
