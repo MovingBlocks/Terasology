@@ -31,7 +31,7 @@ class RestoreCommand implements Runnable {
             snapshot.modules().each { snapshotModule ->
                 ModuleItem item = snapshotModule.module
                 if (!item.validModule()) {
-                    println CommandLine.Help.Ansi.AUTO.string("@|green Init module ${item.name()}|@")
+                    println CommandLine.Help.Ansi.AUTO.string("@|green Fetch module ${item.name()}|@")
                     Git.cloneRepository()
                         .setURI(snapshotModule.getRemote())
                         .setDirectory(item.getDirectory())

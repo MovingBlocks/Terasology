@@ -36,24 +36,24 @@ class GetCommand implements Runnable {
     }
 
     private static List<String> modulesAtModuleDir() {
-        def list = []
-        list << "engine"
+        def moduleDirs = []
+        moduleDirs << "engine"
         Constants.ModuleDirectory.eachFile(FileType.DIRECTORIES) { file ->
-            list << file.getName()
+            moduleDirs << file.getName()
         }
-        return list as List<String>
+        return moduleDirs as List<String>
     }
 
     private List<String> gatherAllDependencies(List<String> items) {
-        List<String> list = availableModules()
+        List<String> moduleNames = availableModules()
                 .findAll { it.id in items }
                 .collect { it.dependencies*.id }
                 .flatten()
 
-        if (list.empty) {
+        if (moduleNames.empty) {
             return items;
         } else {
-            return items + list + gatherAllDependencies(list)
+            return items + moduleNames + gatherAllDependencies(moduleNames)
         }
     }
 
