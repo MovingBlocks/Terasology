@@ -30,7 +30,7 @@ import picocli.CommandLine.HelpCommand
     description = "Utility system for interacting with a Terasology developer workspace")
 class GooeyCLI extends BaseCommandType {
     static void main(String[] args) {
-        AnsiConsole.systemInstall() // enable colors on Windows - TODO: Test on not-so-Windows systems, should those not run this?
+        AnsiConsole.systemInstall() // enable colors on Windows (doesn't hurt on Linux)
         CommandLine cmd = new CommandLine(new GooeyCLI())
         if (args.length == 0) {
             cmd.usage(System.out)
