@@ -4,10 +4,10 @@ package org.terasology.engine.entitySystem.prefab.internal;
 
 import com.google.common.base.Strings;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.HashSet;

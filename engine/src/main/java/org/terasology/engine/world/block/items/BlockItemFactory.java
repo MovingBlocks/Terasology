@@ -4,7 +4,6 @@ package org.terasology.engine.world.block.items;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.SignedBytes;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.ComponentContainer;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -12,8 +11,9 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.common.RetainComponentsComponent;
 import org.terasology.engine.logic.inventory.ItemComponent;
-import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.rendering.logic.LightComponent;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collections;
 import java.util.Optional;

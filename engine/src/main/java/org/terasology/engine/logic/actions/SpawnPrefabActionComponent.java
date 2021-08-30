@@ -3,9 +3,15 @@
 
 package org.terasology.engine.logic.actions;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-public class SpawnPrefabActionComponent implements Component {
+public class SpawnPrefabActionComponent implements Component<SpawnPrefabActionComponent> {
     public String prefab;
     public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
+
+    @Override
+    public void copyFrom(SpawnPrefabActionComponent other) {
+        this.prefab = other.prefab;
+        this.spawnLocationRelativeTo = other.spawnLocationRelativeTo;
+    }
 }

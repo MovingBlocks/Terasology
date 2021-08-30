@@ -3,8 +3,8 @@
 
 package org.terasology.engine.persistence.serializers;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 public class PersistenceComponentSerializeCheck implements ComponentSerializeCheck {
     @Override

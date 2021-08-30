@@ -4,7 +4,7 @@ package org.terasology.engine.logic.actions;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.audio.StaticSound;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * When activated, plays a random sound
  *
  */
-public class PlaySoundActionComponent implements Component {
+public class PlaySoundActionComponent implements Component<PlaySoundActionComponent> {
     public List<StaticSound> sounds = Lists.newArrayList();
     public float volume = 1.0f;
     public ActionTarget relativeTo = ActionTarget.Instigator;
@@ -27,5 +27,12 @@ public class PlaySoundActionComponent implements Component {
      */
     public PlaySoundActionComponent(StaticSound... sounds) {
         this.sounds.addAll(Arrays.asList(sounds));
+    }
+
+    @Override
+    public void copyFrom(PlaySoundActionComponent other) {
+        this.sounds = Lists.newArrayList(other.sounds);
+        this.volume = other.volume;
+        this.relativeTo = other.relativeTo;
     }
 }
