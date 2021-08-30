@@ -22,7 +22,7 @@ class ExecuteCommand implements Runnable{
     @Parameters(paramLabel = "cmd", arity = "0", description = "execute system command within module")
     String cmd
 
-    @Parameters(paramLabel = "items", arity = "1..*", description = "Target item(s) to get")
+    @Parameters(paramLabel = "items", arity = "1..*", description = "Target item(s) to execute against")
     List<String> modules = []
 
     @Override
