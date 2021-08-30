@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
@@ -23,6 +25,8 @@ import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.math.TeraMath;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.util.Map;
 import java.util.Optional;
@@ -62,6 +66,9 @@ public final class Block {
     private boolean waving;
     private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
+    private Map<BlockPart, BlockColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Colorc> colorOffsets = Maps.newEnumMap(BlockPart.class);
+
 
     // Collision related
     private boolean penetrable;
@@ -92,6 +99,16 @@ public final class Block {
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
     private AABBf bounds = new AABBf();
+
+    /**
+     * Init. a new block with default properties in place.
+     */
+    public Block() {
+        for (BlockPart part : BlockPart.values()) {
+            colorSource.put(part, DefaultColorSource.DEFAULT);
+            colorOffsets.put(part, Color.white);
+        }
+    }
 
     public short getId() {
         return id;
@@ -219,6 +236,7 @@ public final class Block {
      *                      If meshGenerator is null then this block is invisible.
      */
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
+        Preconditions.checkNotNull(meshGenerator);
         this.meshGenerator = meshGenerator;
     }
 
@@ -478,6 +496,33 @@ public final class Block {
         this.primaryAppearance = appearence;
     }
 
+    public BlockColorSource getColorSource(BlockPart part) {
+        return colorSource.get(part);
+    }
+
+    public void setColorSource(BlockColorSource colorSource) {
+        for (BlockPart part : BlockPart.values()) {
+            this.colorSource.put(part, colorSource);
+        }
+    }
+
+    public void setColorSource(BlockPart part, BlockColorSource value) {
+        this.colorSource.put(part, value);
+    }
+
+    public Colorc getColorOffset(BlockPart part) {
+        return colorOffsets.get(part);
+    }
+
+    public void setColorOffset(BlockPart part, Colorc color) {
+        colorOffsets.put(part, color);
+    }
+
+    public void setColorOffsets(Colorc color) {
+        for (BlockPart part : BlockPart.values()) {
+            colorOffsets.put(part, color);
+        }
+    }
 
     /**
      * @return Standalone mesh

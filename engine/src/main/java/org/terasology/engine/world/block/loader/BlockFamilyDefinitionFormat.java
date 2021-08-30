@@ -19,6 +19,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -183,6 +184,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setObject(data::setTint, jsonObject, "tint", Vector3f.class, context);
 
             readBlockPartMap(jsonObject, "tile", "tiles", data::getBlockTiles, BlockTile.class, context);
+            readBlockPartMap(jsonObject, "colorSource", "colorSources", data::getColorSources, DefaultColorSource.class, context);
+            readBlockPartMap(jsonObject, "colorOffset", "colorOffsets", data::getColorOffsets, Vector4f.class, context);
 
             setFloat(data::setMass, jsonObject, "mass");
             setBoolean(data::setDebrisOnDestroy, jsonObject, "debrisOnDestroy");
@@ -226,7 +229,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 }
                 if (partsObject.has("sides")) {
                     T value = context.deserialize(partsObject.get("sides"), type);
-                    for (BlockPart blockPart : BlockPart.horizontalSides()) {
+                    for (BlockPart blockPart : BlockPart.allHorizontalParts()) {
                         supplier.get().put(blockPart, value);
                     }
                 }

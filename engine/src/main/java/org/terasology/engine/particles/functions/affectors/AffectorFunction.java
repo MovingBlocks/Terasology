@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.functions.affectors;
 
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.ParticleData;
 import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.functions.ParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * A affector function is called on a particle's data when it is updated to set its fields (Ex. Apply a force to a particle).

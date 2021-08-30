@@ -64,11 +64,11 @@ open class RunTerasology : JavaExec() {
         classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
         dependsOn(project.configurations.named("modules"))
 
-        args("-homedir")
+        args("--homedir=.")
         maxHeapSize = DEFAULT_MAX_HEAP_SIZE
 
         if (isMacOS()) {
-            args("-noSplash")
+            args("--no-splash")
             jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
         }
     }

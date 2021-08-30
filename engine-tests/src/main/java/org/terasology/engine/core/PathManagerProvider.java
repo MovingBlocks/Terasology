@@ -32,7 +32,7 @@ public final class PathManagerProvider implements ParameterResolver {
     private PathManagerProvider() { };
 
     /** Set a new global PathManager, returning the old one. */
-    static PathManager setPathManager(PathManager pathManager) {
+    public static PathManager setPathManager(PathManager pathManager) {
         return PathManager.setInstance(pathManager);
     }
 
@@ -54,11 +54,11 @@ public final class PathManagerProvider implements ParameterResolver {
     }
 
     /** Make sure the PathManager is reset to its original value at the end of the test. */
-    static class Cleaner implements ExtensionContext.Store.CloseableResource {
+    public static class Cleaner implements ExtensionContext.Store.CloseableResource {
         final PathManager originalPathManager;
         final PathManager tempPathManager;
 
-        Cleaner(PathManager originalPathManager, PathManager tempPathManager) {
+        public Cleaner(PathManager originalPathManager, PathManager tempPathManager) {
             this.originalPathManager = originalPathManager;
             this.tempPathManager = tempPathManager;
         }
