@@ -10,10 +10,9 @@ package org.terasology.cli
 
 import org.fusesource.jansi.AnsiConsole
 import org.terasology.cli.commands.BaseCommandType
-import org.terasology.cli.commands.BashCompletitionCommand
+import org.terasology.cli.commands.BashCompletionCommand
 import org.terasology.cli.commands.module.ModuleCommand
 import org.terasology.cli.commands.workspace.WorkspaceCommand
-import org.terasology.cli.commands.workspace.snapshot.SnapshotCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
@@ -25,7 +24,7 @@ import picocli.CommandLine.HelpCommand
         HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
         ModuleCommand.class,
         WorkspaceCommand.class,
-        BashCompletitionCommand.class,
+        BashCompletionCommand.class,
     ], // Note that these Groovy classes *must* start with a capital letter for some reason
     description = "Utility system for interacting with a Terasology developer workspace")
 class GooeyCLI extends BaseCommandType {

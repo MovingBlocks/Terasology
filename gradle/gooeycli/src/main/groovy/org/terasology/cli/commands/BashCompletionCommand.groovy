@@ -58,7 +58,7 @@ All completion scripts in the ~/bash_completion.d directory will now be availabl
 
 Source the generated completion script or launch a new terminal to start using this completion script.
 '''])
-class BashCompletitionCommand extends BaseCommandType implements Runnable {
+class BashCompletionCommand extends BaseCommandType implements Runnable {
 
     public static final String COMMAND_NAME = "gw"
 

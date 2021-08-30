@@ -49,14 +49,14 @@ class ExecuteCommand implements Runnable{
             }
 
             println "'${cmd}' executed in ${it.getDirectory().toString()}"
-            Process pr = cmd.execute([], it.directory)
-            while (!pr.waitFor(1, TimeUnit.SECONDS)) {
-                pr.getInputStream().transferTo(System.out)
-                pr.getErrorStream().transferTo(System.out)
+            Process process = cmd.execute([], it.directory)
+            while (!process.waitFor(1, TimeUnit.SECONDS)) {
+                process.getInputStream().transferTo(System.out)
+                process.getErrorStream().transferTo(System.out)
             }
-            pr.getInputStream().transferTo(System.out)
-            pr.getErrorStream().transferTo(System.out)
-            println "exited with ${pr.waitFor()}"
+            process.getInputStream().transferTo(System.out)
+            process.getErrorStream().transferTo(System.out)
+            println "exited with ${process.waitFor()}"
         }
     }
 }
