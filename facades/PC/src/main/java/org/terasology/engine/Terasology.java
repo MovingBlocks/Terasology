@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
@@ -18,7 +19,6 @@ import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.common.ConfigurationSubsystem;
-import org.terasology.engine.core.subsystem.common.ThreadManager;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.core.subsystem.config.BindsSubsystem;
 import org.terasology.engine.core.subsystem.headless.HeadlessAudio;
@@ -94,13 +94,13 @@ public final class Terasology implements Callable<Integer> {
             paramLabel = "<size>",
             converter = DataSizeConverter.class
     )
-    Long maxDataSize;
+    private Long maxDataSize;
 
     @Option(names = "--oom-score",
             description = "Adjust out-of-memory score [Linux only]",
             paramLabel = "<score>"
     )
-    Integer outOfMemoryScore;
+    private Integer outOfMemoryScore;
 
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
@@ -181,7 +181,7 @@ public final class Terasology implements Callable<Integer> {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                GameScheduler.scheduleParallel("loadGame", () -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
@@ -190,7 +190,7 @@ public final class Terasology implements Callable<Integer> {
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
+                    GameScheduler.scheduleParallel("createLastGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
@@ -232,7 +232,7 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private void handleLaunchArguments() throws IOException {
-        if (outOfMemoryScore!= null) {
+        if (outOfMemoryScore != null) {
             adjustOutOfMemoryScore(outOfMemoryScore);
         }
         if (maxDataSize != null) {
@@ -347,12 +347,13 @@ public final class Terasology implements Callable<Integer> {
      * On Windows, you may be able to set a limit using one of these external tools:
      * <ul>
      *     <li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier">Application Verifier
-     *         (<code>AppVerif.exe</code>)</a>, available from the Windows SDK
+     *         (<code>AppVerif.exe</code>)</a>, available from the Windows SDK</li>
      *     <li><a href="https://github.com/lowleveldesign/process-governor">Process Governor (<code>procgov</code>)</a>,
      *         an open source third-party tool
      *
      * @param bytes maximum allowed size
-     * @see <a href="https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE">Java command-line options</a>
+     * @see <a href="https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE"
+     *          >Java command-line options</a>
      * @see <a href="https://man7.org/linux/man-pages/man2/setrlimit.2.html">setrlimit(2)</a>
      */
     private static void setMemoryLimit(long bytes) {

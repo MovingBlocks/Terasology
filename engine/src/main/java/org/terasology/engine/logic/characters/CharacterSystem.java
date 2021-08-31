@@ -18,7 +18,6 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.input.binds.interaction.AttackButton;
-import org.terasology.engine.input.cameraTarget.PlayerTargetSystem;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
 import org.terasology.engine.logic.characters.events.ActivationRequestDenied;
 import org.terasology.engine.logic.characters.events.AttackEvent;
@@ -47,12 +46,10 @@ import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.registry.In;
-import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
-
 
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -71,12 +68,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Time time;
-
-    @In
-    private PlayerTargetSystem targetSystem;
-
-    @In
-    private BlockEntityRegistry blockRegistry;
 
     @In
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;

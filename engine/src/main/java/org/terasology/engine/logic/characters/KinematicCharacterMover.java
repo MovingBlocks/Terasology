@@ -7,8 +7,6 @@ import org.joml.Quaternionf;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.events.FootstepEvent;
 import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
@@ -17,13 +15,13 @@ import org.terasology.engine.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.engine.logic.characters.events.SwimStrokeEvent;
 import org.terasology.engine.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.math.TeraMath;
 import org.terasology.engine.physics.engine.CharacterCollider;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.physics.events.MovedEvent;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
+import org.terasology.math.TeraMath;
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
@@ -66,7 +64,6 @@ public class KinematicCharacterMover implements CharacterMover {
     public static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
-    private static final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
     private boolean stepped;
 
     // Processing state variables

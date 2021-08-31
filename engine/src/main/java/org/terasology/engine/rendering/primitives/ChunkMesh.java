@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
@@ -25,7 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
  */
-@SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
 
     /**
@@ -38,7 +36,7 @@ public class ChunkMesh {
         BILLBOARD(2),
         WATER_AND_ICE(3);
 
-        private int meshIndex;
+        private final int meshIndex;
 
         RenderType(int index) {
             meshIndex = index;
@@ -71,7 +69,7 @@ public class ChunkMesh {
     private boolean disposed;
 
     /* CONCURRENCY */
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     /* MEASUREMENTS */
     private int timeToGenerateBlockVertices;
@@ -128,16 +126,14 @@ public class ChunkMesh {
         VertexElements elements = vertexElements[type.ordinal()];
         int id = type.getIndex();
         if (!disposed && elements.buffer.elements() > 0) {
-            vertexBuffers[id] = GL15.glGenBuffers();
-            idxBuffers[id] = GL15.glGenBuffers();
+            vertexBuffers[id] = GL30.glGenBuffers();
+            idxBuffers[id] = GL30.glGenBuffers();
             vaoCount[id] = GL30.glGenVertexArrays();
 
             GL30.glBindVertexArray(vaoCount[id]);
 
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
-            elements.buffer.writeBuffer(buffer -> {
-                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-            });
+            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
+            elements.buffer.writeBuffer(buffer -> GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
             for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
                 GL30.glEnableVertexAttribArray(definition.location);
@@ -231,13 +227,13 @@ public class ChunkMesh {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
                     if (id != 0) {
-                        GL15.glDeleteBuffers(id);
+                        GL30.glDeleteBuffers(id);
                         vertexBuffers[i] = 0;
                     }
 
                     id = idxBuffers[i];
                     if (id != 0) {
-                        GL15.glDeleteBuffers(id);
+                        GL30.glDeleteBuffers(id);
                         idxBuffers[i] = 0;
                     }
 
