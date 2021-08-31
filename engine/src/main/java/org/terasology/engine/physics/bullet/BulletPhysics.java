@@ -219,7 +219,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
 
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void updateRigidBody(OnChangedComponent event, EntityRef entity, RigidBodyComponent body, LocationComponent location) {
         btRigidBody rigidBody = entityRigidBodies.get(entity);
         if (rigidBody != null) {
