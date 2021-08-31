@@ -41,7 +41,6 @@ import org.terasology.engine.world.chunks.event.OnChunkGenerated;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 import org.terasology.engine.world.chunks.event.PurgeWorldEvent;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
-import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.engine.world.generation.impl.EntityBufferImpl;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.ChunkViewCore;
@@ -90,6 +89,8 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
+    private static final int NUM_CHUNK_THREADS = 2;
+    private static final int CHUNKS_AT_ONCE = 16;
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
@@ -415,7 +416,8 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     public void notifyRelevanceChanged() {
-        nextChunks(16);
+        updateList();
+        nextChunks(CHUNKS_AT_ONCE);
     }
 
     private void updateList() {
@@ -424,24 +426,6 @@ public class LocalChunkProvider implements ChunkProvider {
                 .filter(pos -> !chunksInRange.contains(pos))
                 .forEach(chunksInRange::add);
         chunksInRange.sort(relevanceSystem.createChunkPosComparator().reversed());
-    }
-
-    private boolean checkForUpdate() {
-        Collection<ChunkRelevanceRegion> regions = relevanceSystem.getRegions();
-        if (lastRegions == null || regions.size() != lastRegions.length) {
-            lastRegions = regions.stream().map(ChunkRelevanceRegion::getCurrentRegion).toArray(BlockRegion[]::new);
-            return true;
-        }
-        int i = 0;
-        boolean anyChanged = false;
-        for (ChunkRelevanceRegion region : regions) {
-            if (!lastRegions[i].equals(region.getCurrentRegion())) {
-                lastRegions[i].set(region.getCurrentRegion());
-                anyChanged = true;
-            }
-            i++;
-        }
-        return anyChanged;
     }
 
     /**
@@ -467,12 +451,8 @@ public class LocalChunkProvider implements ChunkProvider {
      * Computes the next `numChunks` chunks to generate.
      * This must be synchronized.
      */
-    private synchronized List<Vector3ic> chunksToGenerate(int numChunks) {
+    private List<Vector3ic> chunksToGenerate(int numChunks) {
         List<Vector3ic> chunks = new ArrayList<>(numChunks);
-
-        if (checkForUpdate()) {
-            updateList();
-        }
 
         while (chunks.size() < numChunks && !chunksInRange.isEmpty()) {
             Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
@@ -488,7 +468,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     /**
-     * Tells the ChunkProcessingPipeline that no more chunks are coming after what's currently queued.
+     * Tells the LocalChunkProvider that no more chunks are coming after what's currently queued.
      * Intended for use in tests.
      */
     protected void markComplete() {
@@ -513,7 +493,7 @@ public class LocalChunkProvider implements ChunkProvider {
             chunkSink = sink;
             sink.onRequest(this::nextChunks);
         })
-                .parallel(2, 16)
+                .parallel(NUM_CHUNK_THREADS, CHUNKS_AT_ONCE)
                 .runOn(scheduler, 2)
                 .map(this::genChunk)
                 .map(x -> {
