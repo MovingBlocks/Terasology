@@ -62,7 +62,8 @@ class BashCompletionCommand extends BaseCommandType implements Runnable {
 
     public static final String COMMAND_NAME = "gw"
 
-    @CommandLine.Spec CommandLine.Model.CommandSpec spec
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec
 
     @Override
     void run() {

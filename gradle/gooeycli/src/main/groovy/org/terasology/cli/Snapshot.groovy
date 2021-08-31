@@ -15,7 +15,7 @@ class Snapshot {
     public static final String SnapshotFolder = "snapshots"
     public static final File SnapshotDirectory
 
-    int index = 0;
+    int index = 0
     private List<SnapshotModule> modules = []
     File file
     Instant captured = Instant.now().truncatedTo(ChronoUnit.SECONDS)
@@ -86,6 +86,7 @@ class Snapshot {
 
     static List<Snapshot> currentSnapshots() {
         List<Snapshot> result = []
+
         SnapshotDirectory.eachFile({ file ->
             result << new Snapshot(file)
         })

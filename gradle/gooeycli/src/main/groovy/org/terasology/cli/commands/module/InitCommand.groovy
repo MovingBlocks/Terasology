@@ -4,9 +4,9 @@ package org.terasology.cli.commands.module
 
 import org.terasology.cli.commands.BaseCommandType
 import org.terasology.cli.options.GitOptions
-import picocli.CommandLine.Mixin
 import picocli.CommandLine.Command
 import picocli.CommandLine.Help.Ansi
+import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 
 // Is in use, IDE may think the Groovy-supplied is in use below and mark this unused

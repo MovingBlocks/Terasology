@@ -3,9 +3,10 @@
 
 package org.terasology.cli.commands.module
 
-import org.eclipse.jgit.api.Git
+
 import org.eclipse.jgit.diff.DiffEntry
-import org.terasology.cli.ModuleItem
+import org.terasology.cli.module.ModuleItem
+import org.terasology.cli.module.Modules
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
@@ -14,7 +15,7 @@ import picocli.CommandLine.Parameters
 import java.util.concurrent.TimeUnit
 
 @Command(name = "cmd", description = "execute command against all module")
-class ExecuteCommand implements Runnable{
+class ExecuteCommand implements Runnable {
 
     @Option(names = ["-only-modified"], description = "only execute the command on modules that were modified")
     boolean modified
@@ -27,29 +28,28 @@ class ExecuteCommand implements Runnable{
 
     @Override
     void run() {
-        List<ModuleItem> targetModules = []
-        if(modules.size() > 0) {
-            targetModules = modules.collect({it -> new ModuleItem(it)})
+        List<ModuleItem> targetModules
+        if (modules.size() > 0) {
+            targetModules = Modules.resolveModules(modules)
         } else {
-            targetModules = ModuleItem.downloadedModules()
+            targetModules = Modules.downloadedModules()
         }
 
         targetModules.each { it ->
-            if(!it.validModule()) {
-                println CommandLine.Help.Ansi.AUTO.string("@|yellow Module not downloaded ${it.name()} - skipping|@")
+            if (it.remote) {
+                println CommandLine.Help.Ansi.AUTO.string("@|yellow Module not downloaded ${it.name} - skipping|@")
                 return
             }
 
-            if(modified) {
-                List<DiffEntry> result = Git.open(it.getDirectory())
-                    .diff().call()
-                if(result.size() == 0) {
+            if (modified) {
+                List<DiffEntry> result = it.diff()
+                if (result.size() == 0) {
                     return
                 }
             }
 
-            println "'${cmd}' executed in ${it.getDirectory().toString()}"
-            Process process = cmd.execute([], it.directory)
+            println "'${cmd}' executed in ${it.dir.toString()}"
+            Process process = cmd.execute([], it.dir)
             while (!process.waitFor(1, TimeUnit.SECONDS)) {
                 process.getInputStream().transferTo(System.out)
                 process.getErrorStream().transferTo(System.out)

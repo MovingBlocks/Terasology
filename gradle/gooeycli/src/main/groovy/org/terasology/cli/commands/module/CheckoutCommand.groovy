@@ -6,7 +6,7 @@ package org.terasology.cli.commands.module
 import picocli.CommandLine.Command
 
 @Command(name = "checkout", description = "checkout specific branch")
-class CheckoutCommand implements Runnable{
+class CheckoutCommand implements Runnable {
 
     @Override
     void run() {
