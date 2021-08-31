@@ -56,9 +56,9 @@ public class LightMerger {
         Preconditions.checkArgument(Arrays.stream(localChunks).noneMatch(Objects::isNull), "Parameter [localChunks] " +
                 "must not contains nulls");
 
-        Arrays.sort(localChunks, Comparator.<Chunk>comparingInt(c -> c.getPosition(new Vector3i()).x)
-                .thenComparingInt(c -> c.getPosition(new Vector3i()).y)
-                .thenComparing(c -> c.getPosition(new Vector3i()).z));
+        Arrays.sort(localChunks, Comparator.<Chunk>comparingInt(c -> c.getPosition().x())
+                .thenComparingInt(c -> c.getPosition().y())
+                .thenComparingInt(c -> c.getPosition().z()));
         Chunk chunk = localChunks[CENTER_INDEX];
 
         List<BatchPropagator> propagators = Lists.newArrayList();
