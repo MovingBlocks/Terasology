@@ -219,7 +219,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
 
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void updateRigidBody(OnChangedComponent event, EntityRef entity, RigidBodyComponent body, LocationComponent location) {
         btRigidBody rigidBody = entityRigidBodies.get(entity);
         if (rigidBody != null) {
@@ -326,7 +326,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     }
 
 
-    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void newTrigger(OnActivatedComponent event, EntityRef entity, LocationComponent location, TriggerComponent trigger) {
         entityTriggers.computeIfAbsent(entity, e -> {
             btCollisionShape shape = getShapeFor(entity);
@@ -353,7 +353,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         });
     }
 
-    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    @ReceiveEvent
     public void updateTrigger(OnChangedComponent event, EntityRef entity, TriggerComponent trigger, LocationComponent location) {
         btPairCachingGhostObject bt = entityTriggers.get(entity);
         if (bt != null) {
