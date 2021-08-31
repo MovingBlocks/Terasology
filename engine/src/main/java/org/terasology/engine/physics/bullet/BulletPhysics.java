@@ -32,6 +32,7 @@ import com.badlogic.gdx.physics.bullet.collision.btVector3i;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -93,7 +94,6 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -137,14 +137,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     @In
     protected WorldProvider worldProvider;
 
-    /**
-     * Creates a Collider for the given entity based on the LocationComponent and CharacterMovementComponent. All
-     * collision flags are set right for a character movement component.
-     *
-     * @param owner the entity to create the collider for.
-     * @return
-     */
-    private ArrayList<btConvexShape> shapes = Lists.newArrayList();
 
     @Override
     public void initialise() {
@@ -170,54 +162,50 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     public void newRigidBody(OnActivatedComponent event, EntityRef entity, RigidBodyComponent rigidBody, LocationComponent location) {
         entityRigidBodies.computeIfAbsent(entity, e -> {
             btCollisionShape shape = getShapeFor(e);
-            if (location != null && rigidBody != null && shape != null) {
-                float scale = location.getWorldScale();
-
-                if (rigidBody.mass < 1) {
-                    logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, " +
-                            "such as the objects moving through walls. " +
-                            "Entity: {}", e);
-                }
-                Vector3f inertia = new Vector3f();
-                shape.calculateLocalInertia(rigidBody.mass, inertia);
-                shape.setLocalScaling(new Vector3f(scale, scale, scale));
-
-                btRigidBody.btRigidBodyConstructionInfo info =
-                        new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass,
-                                new EntityMotionState(e),
-                                shape,
-                                inertia);
-                btRigidBody bt = new btRigidBody(info);
-                info.dispose();
-
-                Vector3f temp = new Vector3f();
-                bt.setAngularFactor(temp.set(rigidBody.angularFactor));
-                bt.setLinearFactor(temp.set(rigidBody.linearFactor));
-                bt.setFriction(rigidBody.friction);
-
-                bt.setAngularVelocity(rigidBody.angularVelocity);
-                bt.setLinearVelocity(rigidBody.velocity);
-                bt.userData = e;
-
-                bt.setWorldTransform(
-                        new Matrix4f()
-                                .translationRotateScale(
-                                        location.getWorldPosition(new Vector3f()),
-                                        location.getWorldRotation(new Quaternionf()),
-                                        1.0f));
-
-                discreteDynamicsWorld.addRigidBody(bt,
-                        CollisionGroup.combineGroups(rigidBody.collisionGroup),
-                        CollisionGroup.combineGroups(rigidBody.collidesWith));
-                return bt;
-            } else if (shape != null) {
-                shape.dispose();
+            if (shape == null) {
+                return null;
             }
-            return null;
+            float scale = location.getWorldScale();
+
+            if (rigidBody.mass < 1) {
+                logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, " +
+                        "such as the objects moving through walls. " +
+                        "Entity: {}", e);
+            }
+            Vector3f inertia = new Vector3f();
+            shape.calculateLocalInertia(rigidBody.mass, inertia);
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+
+            btRigidBody.btRigidBodyConstructionInfo info =
+                    new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass,
+                            new EntityMotionState(e),
+                            shape,
+                            inertia);
+            btRigidBody bt = new btRigidBody(info);
+            info.dispose();
+
+            Vector3f temp = new Vector3f();
+            bt.setAngularFactor(temp.set(rigidBody.angularFactor));
+            bt.setLinearFactor(temp.set(rigidBody.linearFactor));
+            bt.setFriction(rigidBody.friction);
+
+            bt.setAngularVelocity(rigidBody.angularVelocity);
+            bt.setLinearVelocity(rigidBody.velocity);
+            bt.userData = e;
+
+            bt.setWorldTransform(
+                    new Matrix4f()
+                            .translationRotateScale(
+                                    location.getWorldPosition(new Vector3f()),
+                                    location.getWorldRotation(new Quaternionf()),
+                                    1.0f));
+
+            discreteDynamicsWorld.addRigidBody(bt,
+                    CollisionGroup.combineGroups(rigidBody.collisionGroup),
+                    CollisionGroup.combineGroups(rigidBody.collidesWith));
+            return bt;
         });
     }
-
-
 
     @ReceiveEvent
     public void updateRigidBody(OnChangedComponent event, EntityRef entity, RigidBodyComponent body, LocationComponent location) {
@@ -244,7 +232,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {RigidBodyComponent.class})
     public void removeRigidBody(BeforeDeactivateComponent event, EntityRef entity) {
         entityRigidBodies.computeIfPresent(entity, (entityRef, rb) -> {
             Matrix4f m = new Matrix4f();
@@ -326,32 +314,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     }
 
 
-    @ReceiveEvent
-    public void newTrigger(OnActivatedComponent event, EntityRef entity, LocationComponent location, TriggerComponent trigger) {
-        entityTriggers.computeIfAbsent(entity, e -> {
-            btCollisionShape shape = getShapeFor(entity);
-            if (shape != null && location != null && trigger != null) {
-                float scale = location.getWorldScale();
-                shape.setLocalScaling(new Vector3f(scale, scale, scale));
-
-                btPairCachingGhostObject result = new btPairCachingGhostObject();
-                Matrix4f startTransform = new Matrix4f().translation(location.getWorldPosition(new Vector3f()));
-                result.setWorldTransform(startTransform);
-                result.setCollisionShape(shape);
-                result.setCollisionFlags(btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
-                result.userData = e;
-
-                discreteDynamicsWorld.addCollisionObject(result,
-                        trigger.collisionGroup.getFlag(),
-                        CollisionGroup.combineGroups(trigger.detectGroups));
-
-                return result;
-            } else if(shape != null) {
-                shape.dispose();
-            }
-            return null;
-        });
-    }
 
     @ReceiveEvent
     public void updateTrigger(OnChangedComponent event, EntityRef entity, TriggerComponent trigger, LocationComponent location) {
@@ -367,6 +329,33 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         } else {
             newTrigger(null, entity, location, trigger);
         }
+    }
+
+    @ReceiveEvent
+    public void newTrigger(OnActivatedComponent event, EntityRef entity, LocationComponent location, TriggerComponent trigger) {
+        Preconditions.checkNotNull(location);
+        Preconditions.checkNotNull(trigger);
+        entityTriggers.computeIfAbsent(entity, e -> {
+            btCollisionShape shape = getShapeFor(entity);
+            if (shape == null) {
+                return null;
+            }
+            float scale = location.getWorldScale();
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+
+            btPairCachingGhostObject result = new btPairCachingGhostObject();
+            Matrix4f startTransform = new Matrix4f().translation(location.getWorldPosition(new Vector3f()));
+            result.setWorldTransform(startTransform);
+            result.setCollisionShape(shape);
+            result.setCollisionFlags(btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+            result.userData = e;
+
+            discreteDynamicsWorld.addCollisionObject(result,
+                    trigger.collisionGroup.getFlag(),
+                    CollisionGroup.combineGroups(trigger.detectGroups));
+
+            return result;
+        });
     }
 
 
@@ -561,6 +550,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
     private void updateRigidBodies(float delta) {
         Matrix4f transform = new Matrix4f();
+        Vector3f tempLocation = new Vector3f();
         entityRigidBodies.forEach((entity, rigidBody) -> {
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
             TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
@@ -577,7 +567,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
                 rigidBody.getWorldTransform(transform);
 
-                Vector3f vLocation = transform.getTranslation(new Vector3f());
+                Vector3f vLocation = transform.getTranslation(tempLocation);
 
                 Vector3f vDirection = new Vector3f(comp.velocity);
                 float fDistanceThisFrame = vDirection.length();
@@ -817,7 +807,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
         final float width = movementComp.radius * worldScale;
         btConvexShape shape = new btCapsuleShape(width, height);
-        shapes.add(shape);
         shape.setMargin(0.1f);
         return createCustomCollider(pos, shape, movementComp.collisionGroup.getFlag(),
                 CollisionGroup.combineGroups(movementComp.collidesWith),
@@ -924,7 +913,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
     /**
      * INTERNAL class use at your own risk.
-     * @return
+     * @return {@link btDiscreteDynamicsWorld}
      */
     public btDiscreteDynamicsWorld getDiscreteDynamicsWorld() {
         return this.discreteDynamicsWorld;
@@ -984,5 +973,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                     callback, allowedPenetration);
             return callback;
         }
+
     }
 }
