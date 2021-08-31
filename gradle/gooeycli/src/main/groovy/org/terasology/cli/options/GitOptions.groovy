@@ -20,7 +20,7 @@ class GitOptions {
             return origin
         }
         if (Constants.ProjectProperties.hasProperty("alternativeGithubHome")) {
-            return Constants.ProjectProperties.getProperty("alternativeGithubHome");
+            return Constants.ProjectProperties.getProperty("alternativeGithubHome")
         }
         return Constants.DefaultModuleGithubOrg
     }

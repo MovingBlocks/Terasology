@@ -1,22 +1,22 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.util
+package org.terasology.cli.module
 
 import groovy.json.JsonSlurper
-
-import java.nio.charset.StandardCharsets
+import org.terasology.cli.util.Constants
 
 @Singleton
 class ModuleIndex {
     JsonSlurper slurper = new JsonSlurper()
-    Object[] cache;
+    Object[] cache
 
-    Object[] getData(){
+    Object[] getData() {
         // TODO: implement ETAG at meta.terasology.org and use it there
-        if(cache == null) {
-            if(Constants.ModuleCacheFile.exists()){
-                cache = slurper.parse(Constants.ModuleCacheFile,"UTF8")
+        if (cache == null) {
+            if (Constants.ModuleCacheFile.exists()
+                    && Constants.ModuleCacheFile.lastModified() + Constants.ModuleCacheValidTime < System.currentTimeSeconds()) {
+                cache = slurper.parse(Constants.ModuleCacheFile, "UTF8")
             } else {
 
                 URL modules = new URL(Constants.ModuleIndexUrl)
@@ -26,7 +26,7 @@ class ModuleIndex {
                 cache = slurper.parse(content.toCharArray())
             }
         }
-        return cache;
+        return cache
     }
 
 }

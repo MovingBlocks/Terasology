@@ -3,12 +3,11 @@
 
 package org.terasology.cli.commands.module
 
-import groovy.io.FileType
-import org.eclipse.jgit.api.Git
-import org.terasology.cli.ModuleItem
+
+import org.terasology.cli.module.ModuleIndex
+import org.terasology.cli.module.ModuleItem
+import org.terasology.cli.module.Modules
 import org.terasology.cli.options.GitOptions
-import org.terasology.cli.util.Constants
-import org.terasology.cli.util.ModuleIndex
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Mixin
@@ -27,68 +26,53 @@ class GetCommand implements Runnable {
     @Parameters(paramLabel = "items", arity = "1", description = "Target item(s) to get")
     List<String> items = []
 
-    private static List<String> availableModuleIds() {
-        return availableModules()*.id
-    }
+    @Override
+    void run() {
+        String origin = gitOptions.resolveOrigin()
 
-    private static List<Object> availableModules() {
-        return ModuleIndex.instance.getData()
-    }
+        def modulesCandidatesToReceive = Modules.resolveModules(availableModules()*.id) - Modules.downloadedModules()
 
-    private static List<String> modulesAtModuleDir() {
-        def moduleDirs = []
-        moduleDirs << "engine"
-        Constants.ModuleDirectory.eachFile(FileType.DIRECTORIES) { file ->
-            moduleDirs << file.getName()
+        def requestedModules
+        if (recurse) {
+            requestedModules = gatherAllDependencies(Modules.resolveModules(items)).unique()
+        } else {
+            requestedModules = Modules.resolveModules(items)
         }
-        return moduleDirs as List<String>
+
+        println requestedModules
+        def needsToReceive = requestedModules.intersect(modulesCandidatesToReceive)
+
+        needsToReceive
+                .parallelStream()
+                .forEach { module ->
+                    def targetUrl = "https://github.com/${origin}/${module.name}"
+                    try {
+                        module.clone(targetUrl)
+                        println CommandLine.Help.Ansi.AUTO.string("@|green Retrieving module ${module.name} from ${targetUrl}|@")
+                        module.copyInGradleTemplate()
+                    } catch (Exception ex) {
+                        println CommandLine.Help.Ansi.AUTO.string("@|red Unable to clone ${module.name}, Skipping: ${ex.getMessage()} |@")
+                    }
+                }
     }
 
-    private List<String> gatherAllDependencies(List<String> items) {
-        List<String> moduleNames = availableModules()
+    private List<ModuleItem> gatherAllDependencies(List<ModuleItem> items) {
+        List<ModuleItem> moduleNames = availableModules()
                 .findAll { it.id in items }
                 .collect { it.dependencies*.id }
                 .flatten()
+                .collect { Modules.resolveModule(it) }
 
         if (moduleNames.empty) {
-            return items;
+            return items
         } else {
             return items + moduleNames + gatherAllDependencies(moduleNames)
         }
     }
 
-    @Override
-    void run() {
-        String origin = gitOptions.resolveOrigin()
 
-        def modulesCandidatesToReceive = availableModuleIds() - modulesAtModuleDir()
-        def requestedModules
-
-        if (recurse) {
-            requestedModules = gatherAllDependencies(items).unique()
-        } else {
-            requestedModules = items
-        }
-
-        def needsToReceive = requestedModules.intersect(modulesCandidatesToReceive)
-
-        needsToReceive.collect {
-            k -> new ModuleItem(k)
-        }.parallelStream()
-                .forEach { module ->
-                    def targetUrl = "https://github.com/${origin}/${module.name()}"
-                    try {
-
-                        Git.cloneRepository()
-                                .setURI(targetUrl)
-                                .setDirectory(module.getDirectory())
-                                .call()
-                        println CommandLine.Help.Ansi.AUTO.string("@|green Retrieving module ${module.name()} from ${targetUrl}|@")
-
-                        ModuleItem.copyInTemplates(module)
-                    } catch (Exception ex) {
-                        println CommandLine.Help.Ansi.AUTO.string("@|red Unable to clone ${module.name()}, Skipping: ${ex.getMessage()} |@");
-                    }
-                }
+    private static List<Object> availableModules() {
+        return ModuleIndex.instance.getData()
     }
+
 }

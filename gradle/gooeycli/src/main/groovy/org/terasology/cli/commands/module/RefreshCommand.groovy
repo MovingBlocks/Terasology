@@ -3,22 +3,21 @@
 
 package org.terasology.cli.commands.module
 
-import org.terasology.cli.ModuleItem
+
+import org.terasology.cli.module.Modules
 import picocli.CommandLine.Command
 
 @Command(name = "refresh", description = "Refreshes all build.gradle files in module directories")
 class RefreshCommand implements Runnable {
     @Override
     void run() {
-        ModuleItem.downloadedModules().each { it ->
-            if (!new File(it.getDirectory(), ModuleItem.ModuleCfg).exists()) {
-                println "${it.name()} has no module.txt, it must not want a fresh build.gradle"
+        Modules.downloadedModules().each { it ->
+            if (!it.moduleCfgExists()) {
+                println "${it.name} has no module.txt, it must not want a fresh build.gradle"
                 return
             }
-            println "In refreshGradle for module ${it.getDirectory()} - copying in a fresh build.gradle"
-            File targetBuildGradle = new File(it.getDirectory(), 'build.gradle')
-            targetBuildGradle.delete()
-            targetBuildGradle << new File('templates/build.gradle').text
+            println "In refreshGradle for module ${it.dir} - copying in a fresh build.gradle"
+            it.copyInGradleTemplate()
         }
     }
 }

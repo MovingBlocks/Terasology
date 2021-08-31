@@ -4,12 +4,11 @@
 package org.terasology.cli.commands.workspace.snapshot
 
 import org.terasology.cli.Snapshot
-import picocli.CommandLine.Parameters
 import picocli.CommandLine.Command
-
+import picocli.CommandLine.Parameters
 
 @Command(name = "load", description = "load snapshot")
-class LoadCommand implements Runnable{
+class LoadCommand implements Runnable {
 
     @Parameters(paramLabel = "items", arity = "1", description = "restore snapshot")
     String target
@@ -21,7 +20,7 @@ class LoadCommand implements Runnable{
             return
         }
         Snapshot snapshot = new Snapshot(file)
-        snapshot.file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.epochSecond}.snapshot")
+        snapshot.file = new File(Snapshot.SnapshotDirectory, "${snapshot.captured.epochSecond}.snapshot")
         snapshot.save()
 
     }

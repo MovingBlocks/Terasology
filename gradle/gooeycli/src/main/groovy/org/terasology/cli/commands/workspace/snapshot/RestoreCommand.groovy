@@ -3,9 +3,10 @@
 
 package org.terasology.cli.commands.workspace.snapshot
 
-import org.eclipse.jgit.api.Git
-import org.terasology.cli.ModuleItem
+
 import org.terasology.cli.Snapshot
+import org.terasology.cli.module.ModuleItem
+import org.terasology.cli.module.Modules
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
@@ -15,11 +16,11 @@ import picocli.CommandLine.Parameters
 class RestoreCommand implements Runnable {
 
     @Option(names = ["-remove-modules"],
-        description = "remove modules that are unmatched from the snapshot")
+            description = "remove modules that are unmatched from the snapshot")
     boolean removeModule
 
     @Option(names = ["-exact"],
-        description = "match commit exactly from snapshot else will use branch from snapshot")
+            description = "match commit exactly from snapshot else will use branch from snapshot")
     boolean exact
 
     @Parameters(paramLabel = "items", arity = "1", description = "restore snapshot")
@@ -30,36 +31,25 @@ class RestoreCommand implements Runnable {
         Snapshot.find(name).ifPresentOrElse({ snapshot ->
             snapshot.modules().each { snapshotModule ->
                 ModuleItem item = snapshotModule.module
-                if (!item.validModule()) {
-                    println CommandLine.Help.Ansi.AUTO.string("@|green Fetch module ${item.name()}|@")
-                    Git.cloneRepository()
-                        .setURI(snapshotModule.getRemote())
-                        .setDirectory(item.getDirectory())
-                        .call()
-                    ModuleItem.copyInTemplates(item)
-
+                if (item.remote) {
+                    println CommandLine.Help.Ansi.AUTO.string("@|green Fetch module ${item.name}|@")
+                    item.clone(snapshotModule.getRemote())
+                            .copyInGradleTemplate()
                 }
 
                 if (exact) {
-                    println CommandLine.Help.Ansi.AUTO.string("@|green Checkout module ${item.name()} commit ${snapshotModule.getCommit()}|@")
-                    Git.open(item.getDirectory())
-                        .checkout()
-                        .setName(snapshotModule.getCommit())
-                        .call()
-
+                    println CommandLine.Help.Ansi.AUTO.string("@|green Checkout module ${item.name} commit ${snapshotModule.getCommit()}|@")
+                    item.checkout(snapshotModule.getCommit())
                 } else {
-                    println CommandLine.Help.Ansi.AUTO.string("@|green Checkout module ${item.name()} branch ${snapshotModule.getBranch()}|@")
-                    Git.open(item.getDirectory())
-                        .checkout()
-                        .setName(snapshotModule.getBranch())
-                        .call()
+                    println CommandLine.Help.Ansi.AUTO.string("@|green Checkout module ${item.name} branch ${snapshotModule.getBranch()}|@")
+                    item.checkout(snapshotModule.getBranch())
                 }
-
             }
+
             if (removeModule) {
                 Set<ModuleItem> current = snapshot.modules().collect { m -> m.module }
-                (ModuleItem.downloadedModules() - current).each { removeModules ->
-                    removeModules.getDirectory().delete()
+                (Modules.downloadedModules() - current).each { removeModules ->
+                    removeModules.dir.delete()
                 }
             }
 

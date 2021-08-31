@@ -16,8 +16,8 @@ class OpenCommand implements Runnable {
 
     @Override
     void run() {
-        Desktop desktop = Desktop.getDesktop();
-        Snapshot.find(name).ifPresentOrElse({it ->
+        Desktop desktop = Desktop.getDesktop()
+        Snapshot.find(name).ifPresentOrElse({ it ->
             desktop.open(it.file)
         }, {
             println "failed to resolve snapshot: ${name}"

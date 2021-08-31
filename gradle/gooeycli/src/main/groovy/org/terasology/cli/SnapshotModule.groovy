@@ -3,14 +3,14 @@
 
 package org.terasology.cli
 
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.Repository
+
+import org.terasology.cli.module.ModuleItem
 
 class SnapshotModule {
     private ModuleItem module
     private String commit
     private String branch
-    private String remote;
+    private String remote
 
     /**
      * captures the current snapshot of the module
@@ -18,10 +18,11 @@ class SnapshotModule {
      */
     SnapshotModule(ModuleItem module) {
         this.module = module
-        Repository repository = Git.open(this.module.getDirectory()).getRepository()
-        this.commit = repository.getRefDatabase().findRef("HEAD").objectId.getName()
-        this.branch = repository.getBranch()
-        this.remote = repository.getConfig().getString("remote", "origin", "url")
+        module.open().withCloseable {
+            this.commit = it.getRepository().getRefDatabase().findRef("HEAD").objectId.getName()
+            this.branch = it.getRepository().getBranch()
+            this.remote = it.getRepository().getConfig().getString("remote", "origin", "url")
+        }
     }
 
     SnapshotModule(Object data, int version) {
@@ -53,12 +54,12 @@ class SnapshotModule {
 
     Map encode() {
         return [
-            module: [
-                name: module.name()
-            ],
-            remote: remote,
-            commit: commit,
-            branch: branch
+                module: [
+                        name: module.name
+                ],
+                remote: remote,
+                commit: commit,
+                branch: branch
         ]
     }
 }
