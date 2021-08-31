@@ -16,6 +16,6 @@ import picocli.CommandLine.HelpCommand
                 RestoreCommand.class,
                 LoadCommand.class
         ],
-        description = "snapshot command")
+        description = "Snapshots allows to share workspace between devs. Useful for multi-repo PRs testing")
 class SnapshotCommand extends BaseCommandType {
 }
