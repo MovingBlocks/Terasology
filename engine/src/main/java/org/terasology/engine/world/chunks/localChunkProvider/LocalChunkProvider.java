@@ -14,6 +14,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.EntityStore;
@@ -40,19 +41,16 @@ import org.terasology.engine.world.chunks.event.OnChunkGenerated;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 import org.terasology.engine.world.chunks.event.PurgeWorldEvent;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
-import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.engine.world.generation.impl.EntityBufferImpl;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
+import org.terasology.gestalt.entitysystem.component.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Scheduler;
-import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,11 +58,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -92,6 +89,8 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
+    private static final int NUM_CHUNK_THREADS = 2;
+    private static final int CHUNKS_AT_ONCE = 16;
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
@@ -103,7 +102,6 @@ public class LocalChunkProvider implements ChunkProvider {
     private final WorldGenerator generator;
     private final BlockManager blockManager;
     private final ExtraBlockDataManager extraDataManager;
-    private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
     private EntityRef worldEntity = EntityRef.NULL;
     private BlockEntityRegistry registry;
@@ -112,8 +110,9 @@ public class LocalChunkProvider implements ChunkProvider {
     private final List<Vector3ic> chunksInRange = new ArrayList<>();
     private BlockRegion[] lastRegions;
 
-    private volatile boolean shouldComplete = false;
     private final Set<Vector3ic> currentlyProcessing = new HashSet<>();
+    private final Set<Vector3ic> needsLightMerging = Sets.newHashSet();
+    private FluxSink<Vector3ic> chunkSink;
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, ExtraBlockDataManager extraDataManager,
@@ -150,14 +149,29 @@ public class LocalChunkProvider implements ChunkProvider {
         this.worldEntity = worldEntity;
     }
 
+    private void tryLightMerging(Vector3ic chunkPos) {
+        Chunk[] chunks = StreamSupport.stream(new BlockRegion(chunkPos).expand(1, 1, 1).spliterator(), false)
+                .map(chunkCache::get)
+                .filter(Objects::nonNull)
+                .toArray(Chunk[]::new);
+        if (chunks.length == 27) {
+            new LightMerger().merge(chunks);
+            needsLightMerging.remove(chunkPos);
+        }
+    }
 
     private void processReadyChunk(final Chunk chunk) {
         Vector3ic chunkPos = chunk.getPosition();
         if (chunkCache.get(chunkPos) != null) {
+            logger.warn("Duplicate chunk");
             return; // TODO move it in pipeline;
         }
         chunkCache.put(new Vector3i(chunkPos), chunk);
         chunk.markReady();
+        GameScheduler.scheduleParallel("light merging",
+                () -> StreamSupport.stream(new BlockRegion(chunkPos).expand(1, 1, 1).spliterator(), false)
+                        .filter(needsLightMerging::contains)
+                        .forEach(this::tryLightMerging));
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         ChunkStore store = this.storageManager.loadChunkStore(chunkPos);
@@ -246,9 +260,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private void checkForUnload() {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
-        Iterator<Vector3ic> iterator = Iterators.concat(
-            Iterators.transform(chunkCache.keySet().iterator(), v -> new Vector3i(v.x(), v.y(), v.z())),
-            loadingPipeline.getProcessingPositions().iterator());
+        Iterator<Vector3ic> iterator = Iterators.transform(chunkCache.keySet().iterator(), v -> new Vector3i(v.x(), v.y(), v.z()));
         while (iterator.hasNext()) {
             Vector3ic pos = iterator.next();
             boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
@@ -267,11 +279,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     private boolean unloadChunkInternal(Vector3ic pos) {
-        if (loadingPipeline.isPositionProcessing(pos)) {
-            // Chunk hasn't been finished or changed, so just drop it.
-            loadingPipeline.stopProcessingAt(pos);
-            return false;
-        }
+        needsLightMerging.remove(pos);
         Chunk chunk = chunkCache.get(pos);
         if (chunk == null) {
             return false;
@@ -337,13 +345,12 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public void restart() {
-        loadingPipeline.restart();
         unloadRequestTaskMaster.restart();
     }
 
     @Override
     public void shutdown() {
-        loadingPipeline.shutdown();
+        chunkSink.complete();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
     }
 
@@ -380,7 +387,7 @@ public class LocalChunkProvider implements ChunkProvider {
     @Override
     public void purgeWorld() {
         ChunkMonitor.fireChunkProviderDisposed(this);
-        loadingPipeline.shutdown();
+        chunkSink.complete();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         getAllChunks().stream().filter(Chunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
@@ -409,7 +416,8 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     public void notifyRelevanceChanged() {
-        loadingPipeline.notifyUpdate();
+        updateList();
+        nextChunks(CHUNKS_AT_ONCE);
     }
 
     private void updateList() {
@@ -418,24 +426,6 @@ public class LocalChunkProvider implements ChunkProvider {
                 .filter(pos -> !chunksInRange.contains(pos))
                 .forEach(chunksInRange::add);
         chunksInRange.sort(relevanceSystem.createChunkPosComparator().reversed());
-    }
-
-    private boolean checkForUpdate() {
-        Collection<ChunkRelevanceRegion> regions = relevanceSystem.getRegions();
-        if (lastRegions == null || regions.size() != lastRegions.length) {
-            lastRegions = regions.stream().map(ChunkRelevanceRegion::getCurrentRegion).toArray(BlockRegion[]::new);
-            return true;
-        }
-        int i = 0;
-        boolean anyChanged = false;
-        for (ChunkRelevanceRegion region : regions) {
-            if (!lastRegions[i].equals(region.getCurrentRegion())) {
-                lastRegions[i].set(region.getCurrentRegion());
-                anyChanged = true;
-            }
-            i++;
-        }
-        return anyChanged;
     }
 
     /**
@@ -461,16 +451,12 @@ public class LocalChunkProvider implements ChunkProvider {
      * Computes the next `numChunks` chunks to generate.
      * This must be synchronized.
      */
-    private synchronized List<Vector3ic> chunksToGenerate(int numChunks) {
+    private List<Vector3ic> chunksToGenerate(int numChunks) {
         List<Vector3ic> chunks = new ArrayList<>(numChunks);
-
-        if (checkForUpdate()) {
-            updateList();
-        }
 
         while (chunks.size() < numChunks && !chunksInRange.isEmpty()) {
             Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
-            if (currentlyProcessing.contains(pos) || loadingPipeline.isPositionProcessing(pos)) {
+            if (currentlyProcessing.contains(pos)) {
                 continue;
             }
 
@@ -482,63 +468,39 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     /**
-     * This method runs once per chunk processing thread to set up the request callback.
-     */
-    private void onSubscribe(FluxSink<Chunk> sink) {
-        sink.onRequest(numChunks -> {
-            List<Vector3ic> positionsPending = chunksToGenerate((int) numChunks);
-
-            // Generating the actual chunks can be done completely asynchronously
-            for (Vector3ic pos : positionsPending) {
-                currentlyProcessing.remove(pos);
-                // The first time the onRequest lambda is called, when it submits its last chunk, this call to next() won't return
-                // because Reactor puts the event loop logic inside the next() function and the pipeline keeps requesting more chunks.
-                // So removing the position from currentlyProcessing and anything else that needs to happen must come before this call.
-                sink.next(genChunk(pos));
-            }
-            if (shouldComplete && chunksInRange.isEmpty()) {
-                sink.complete();
-            }
-        });
-    }
-
-    /**
-     * Tells the ChunkProcessingPipeline that no more chunks are coming after what's currently queued.
+     * Tells the LocalChunkProvider that no more chunks are coming after what's currently queued.
      * Intended for use in tests.
      */
     protected void markComplete() {
-        shouldComplete = true;
-        loadingPipeline.notifyUpdate();
+        chunkSink.complete();
     }
 
     public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
-        setRelevanceSystem(relevanceSystem, null);
+        setRelevanceSystem(relevanceSystem, GameScheduler.parallel());
+    }
+
+    private void nextChunks(long numChunks) {
+        List<Vector3ic> positionsPending = chunksToGenerate((int) numChunks);
+        for (Vector3ic p : positionsPending) {
+            chunkSink.next(p);
+        }
     }
 
     // TODO: move loadingPipeline initialization into constructor.
     public void setRelevanceSystem(RelevanceSystem relevanceSystem, Scheduler scheduler) {
-        if (loadingPipeline != null) {
-            loadingPipeline.shutdown();
-        }
         this.relevanceSystem = relevanceSystem;
-        if (scheduler != null) {
-            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(this::onSubscribe), scheduler);
-        } else {
-            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(this::onSubscribe));
-        }
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localChunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toCollection(Sets::newLinkedHashSet))
-            ))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+        Flux.<Vector3ic>create(sink -> {
+            chunkSink = sink;
+            sink.onRequest(this::nextChunks);
+        })
+                .parallel(NUM_CHUNK_THREADS, CHUNKS_AT_ONCE)
+                .runOn(scheduler, 2)
+                .map(this::genChunk)
+                .map(x -> {
+                    InternalLightProcessor.generateInternalLighting(x);
+                    x.deflate();
+                    return x;
+                })
+                .subscribe(readyChunks::add);
     }
 }
