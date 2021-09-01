@@ -8,7 +8,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public enum Side {
     public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
     public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
 
-    private static final ImmutableList<Side> ALL_SIDES = ImmutableList.of(TOP ,BOTTOM ,LEFT ,RIGHT ,FRONT ,BACK);
+    private static final ImmutableList<Side> ALL_SIDES = ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK);
     private final Vector3ic direction;
 
     Side(Vector3i vector3i) {

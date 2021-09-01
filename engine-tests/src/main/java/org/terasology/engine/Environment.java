@@ -34,7 +34,7 @@ class Environment {
      *
      * @param moduleNames a list of module names
      */
-    public Environment(Name... moduleNames) {
+    Environment(Name... moduleNames) {
         try {
             reset(Sets.newHashSet(moduleNames));
         } catch (Exception e) {

@@ -26,7 +26,11 @@ public final class CharacterMovementComponent implements Component<CharacterMove
     @Range(min = 0, max = 5)
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
-    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR, StandardCollisionGroup.CHARACTER);
+    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(
+            StandardCollisionGroup.WORLD,
+            StandardCollisionGroup.SENSOR,
+            StandardCollisionGroup.CHARACTER
+    );
     @Range(min = 0, max = 5)
     public float pickupRadius = 1.5f;
 
