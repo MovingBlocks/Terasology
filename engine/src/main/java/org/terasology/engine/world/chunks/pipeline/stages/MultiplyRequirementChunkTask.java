@@ -7,7 +7,7 @@ import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -17,10 +17,10 @@ public class MultiplyRequirementChunkTask implements ChunkTask {
     private final String name;
     private final Vector3ic position;
     private final Function<Collection<Chunk>, Chunk> function;
-    private final Set<Vector3ic> requirements;
+    private final List<Vector3ic> requirements;
 
     public MultiplyRequirementChunkTask(String name, Vector3ic position, Function<Collection<Chunk>, Chunk> function,
-                                        Set<Vector3ic> requirements) {
+                                        List<Vector3ic> requirements) {
         this.name = name;
         this.position = position;
         this.function = function;
@@ -28,7 +28,7 @@ public class MultiplyRequirementChunkTask implements ChunkTask {
     }
 
     @Override
-    public Set<Vector3ic> getRequirements() {
+    public List<Vector3ic> getRequirements() {
         return requirements;
     }
 
