@@ -19,8 +19,6 @@ import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
  */

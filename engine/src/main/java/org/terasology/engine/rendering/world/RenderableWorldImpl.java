@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.world;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.joml.Math;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -34,7 +35,6 @@ import org.terasology.engine.world.chunks.RenderableChunk;
 import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.TeraMath;
 import reactor.core.publisher.Sinks;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -58,14 +58,13 @@ class RenderableWorldImpl implements RenderableWorld {
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
 
-    private final int maxChunksForShadows =
-            TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
+    private final int maxChunksForShadows;
 
     private final WorldProvider worldProvider;
     private final ChunkProvider chunkProvider;
     private final LodChunkProvider lodChunkProvider;
 
-    private ChunkTessellator chunkTessellator;
+    private final ChunkTessellator chunkTessellator;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
@@ -75,21 +74,25 @@ class RenderableWorldImpl implements RenderableWorld {
     private final Camera playerCamera;
     private Camera shadowMapCamera;
 
-    private final Config config = CoreRegistry.get(Config.class);
-    private final RenderingConfig renderingConfig = config.getRendering();
+    private final Config config;
+    private final RenderingConfig renderingConfig;
 
     private int statDirtyChunks;
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
-    private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
+    private final Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
 
     RenderableWorldImpl(Context context, Camera playerCamera) {
 
-        worldProvider = context.get(WorldProvider.class);
-        chunkProvider = context.get(ChunkProvider.class);
-        chunkTessellator = context.get(ChunkTessellator.class);
+        this.worldProvider = context.get(WorldProvider.class);
+        this.chunkProvider = context.get(ChunkProvider.class);
+        this.chunkTessellator = context.get(ChunkTessellator.class);
+        this.config = context.get(Config.class);
+
+        this.renderingConfig = config.getRendering();
+        this.maxChunksForShadows = Math.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
         this.playerCamera = playerCamera;
         WorldGenerator worldGenerator = context.get(WorldGenerator.class);
