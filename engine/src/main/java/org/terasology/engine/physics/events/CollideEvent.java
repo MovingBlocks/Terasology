@@ -4,6 +4,7 @@
 package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 
@@ -18,7 +19,7 @@ public class CollideEvent extends AbstractConsumableEvent {
     private float penetration = 0.0f;
     private Vector3f normal = new Vector3f();
 
-    public CollideEvent(EntityRef other, Vector3f entityContactPoint, Vector3f otherEntityContactPoint, float penetration, Vector3f normal) {
+    public CollideEvent(EntityRef other, Vector3fc entityContactPoint, Vector3fc otherEntityContactPoint, float penetration, Vector3fc normal) {
         this.otherEntity = other;
         this.normal.set(normal);
         this.entityContactPoint.set(entityContactPoint);

@@ -525,8 +525,15 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
     @Override
     public void update(float delta) {
-        try {
+        Matrix4f tempTransform = new Matrix4f();
+        Vector3f tempPosition = new Vector3f();
+        Quaternionf tempRotation = new Quaternionf();
 
+        Vector3f a1 = new Vector3f();
+        Vector3f a2 = new Vector3f();
+        Vector3f a3 = new Vector3f();
+        
+        try {
             PerformanceMonitor.startActivity("Step Simulation");
             if (discreteDynamicsWorld.stepSimulation(delta, 10) != 0) {
                 for (BulletCharacterMoverCollider collider : entityColliders.values()) {
@@ -539,18 +546,79 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
 
         PerformanceMonitor.startActivity("Physics Update");
-        updateCollisionPairs();
-        updateRigidBodies(delta);
-        if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
-            sendSyncMessages();
-            lastNetsync = time.getGameTimeInMs();
-        }
-        PerformanceMonitor.endActivity();
-    }
 
-    private void updateRigidBodies(float delta) {
-        Matrix4f transform = new Matrix4f();
-        Vector3f tempLocation = new Vector3f();
+        // update collision pairs
+        discreteDynamicsWorld.getCollisionWorld().performDiscreteCollisionDetection();
+        for (btPairCachingGhostObject trigger : entityTriggers.values()) {
+            EntityRef entity = (EntityRef) trigger.userData;
+            btBroadphasePairArray pairs = trigger.getOverlappingPairCache().getOverlappingPairArray();
+            for (int x = 0; x < pairs.size(); x++) {
+                btBroadphasePair initialPair = pairs.at(x);
+                EntityRef otherEntity = null;
+                btBroadphaseProxy p0 = btBroadphaseProxy.obtain(initialPair.getPProxy0().getCPointer(), false);
+                btBroadphaseProxy p1 = btBroadphaseProxy.obtain(initialPair.getPProxy1().getCPointer(), false);
+
+                if (p0.getClientObject() == trigger.getCPointer()) {
+
+                    btCollisionObject other = btCollisionObject.getInstance(p1.getClientObject());
+                    if (other.userData instanceof EntityRef) {
+                        otherEntity = (EntityRef) other.userData;
+                    }
+                } else {
+                    btCollisionObject other = btCollisionObject.getInstance(p0.getClientObject());
+                    if (other.userData instanceof EntityRef) {
+                        otherEntity = (EntityRef) other.userData;
+                    }
+                }
+                if (otherEntity == null || otherEntity == EntityRef.NULL) {
+                    continue;
+                }
+                btBroadphasePair pair = discreteDynamicsWorld.getPairCache().findPair(p0, p1);
+                if (pair == null) {
+                    continue;
+                }
+
+                manifolds.clear();
+                if (pair.getAlgorithm() != null) {
+                    pair.getAlgorithm().getAllContactManifolds(manifolds);
+                }
+                for (int y = 0; y < manifolds.size(); y++) {
+                    btPersistentManifold manifold = manifolds.atConst(y);
+                    for (int point = 0; point < manifold.getNumContacts(); ++point) {
+                        btManifoldPoint manifoldPoint = manifold.getContactPoint(point);
+                        if (manifoldPoint.getDistance() < 0.f) {
+                            manifoldPoint.getPositionWorldOnA(a1);
+                            manifoldPoint.getPositionWorldOnB(a2);
+                            manifoldPoint.getNormalWorldOnB(a3);
+
+                            if (otherEntity.exists()) {
+                                short bCollisionGroup = getCollisionGroupFlag(otherEntity);
+                                short aCollidesWith = getCollidesWithGroupFlag(entity);
+                                if ((bCollisionGroup & aCollidesWith) != 0
+                                        || (otherEntity.hasComponent(BlockComponent.class) && !entity.hasComponent(BlockComponent.class))) {
+                                    entity.send(new CollideEvent(otherEntity, a1, a2, manifoldPoint.getDistance(), a3));
+                                }
+                            }
+                            if (entity.exists()) {
+                                short aCollisionGroup = getCollisionGroupFlag(entity);
+                                short bCollidesWith = getCollidesWithGroupFlag(otherEntity);
+                                if ((aCollisionGroup & bCollidesWith) != 0
+                                        || (entity.hasComponent(BlockComponent.class) && !otherEntity.hasComponent(BlockComponent.class))) {
+                                    otherEntity.send(new CollideEvent(entity, a2, a1, manifoldPoint.getDistance(),
+                                            a3.mul(-1.0f)));
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                btBroadphaseProxy.free(p0);
+                btBroadphaseProxy.free(p1);
+
+            }
+        }
+
+        // update rigid bodies
         entityRigidBodies.forEach((entity, rigidBody) -> {
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
             TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
@@ -565,9 +633,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                 comp.velocity.set(rigidBody.getLinearVelocity());
                 comp.angularVelocity.set(rigidBody.getAngularVelocity());
 
-                rigidBody.getWorldTransform(transform);
-
-                Vector3f vLocation = transform.getTranslation(tempLocation);
+                rigidBody.getWorldTransform(tempTransform);
+                Vector3f vLocation = tempTransform.getTranslation(tempPosition);
 
                 Vector3f vDirection = new Vector3f(comp.velocity);
                 float fDistanceThisFrame = vDirection.length();
@@ -608,103 +675,22 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                 }
             }
         });
-    }
 
-    private void updateCollisionPairs() {
-        discreteDynamicsWorld.getCollisionWorld().performDiscreteCollisionDetection();
-
-        for (btPairCachingGhostObject trigger : entityTriggers.values()) {
-            EntityRef entity = (EntityRef) trigger.userData;
-            btBroadphasePairArray pairs = trigger.getOverlappingPairCache().getOverlappingPairArray();
-            for (int x = 0; x < pairs.size(); x++) {
-                btBroadphasePair initialPair = pairs.at(x);
-                EntityRef otherEntity = null;
-                btBroadphaseProxy p0 = btBroadphaseProxy.obtain(initialPair.getPProxy0().getCPointer(), false);
-                btBroadphaseProxy p1 = btBroadphaseProxy.obtain(initialPair.getPProxy1().getCPointer(), false);
-
-                if (p0.getClientObject() == trigger.getCPointer()) {
-
-                    btCollisionObject other = btCollisionObject.getInstance(p1.getClientObject());
-                    if (other.userData instanceof EntityRef) {
-                        otherEntity = (EntityRef) other.userData;
-                    }
-                } else {
-                    btCollisionObject other = btCollisionObject.getInstance(p0.getClientObject());
-                    if (other.userData instanceof EntityRef) {
-                        otherEntity = (EntityRef) other.userData;
+        if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+            entityRigidBodies.forEach((entity, body) -> {
+                if (entity.hasComponent(NetworkComponent.class)) {
+                    //TODO after implementing rigidbody interface
+                    if (body.isActive()) {
+                        body.getWorldTransform(tempTransform);
+                        entity.send(new LocationResynchEvent(tempTransform.getTranslation(tempPosition),
+                                tempRotation.setFromUnnormalized(tempTransform)));
+                        entity.send(new PhysicsResynchEvent(body.getLinearVelocity(), body.getAngularVelocity()));
                     }
                 }
-                if (otherEntity == null || otherEntity == EntityRef.NULL) {
-                    continue;
-                }
-                btBroadphasePair pair = discreteDynamicsWorld.getPairCache().findPair(p0, p1);
-                if (pair == null) {
-                    continue;
-                }
-
-                manifolds.clear();
-                if (pair.getAlgorithm() != null) {
-                    pair.getAlgorithm().getAllContactManifolds(manifolds);
-                }
-                for (int y = 0; y < manifolds.size(); y++) {
-
-                    btPersistentManifold manifold = manifolds.atConst(y);
-                    for (int point = 0; point < manifold.getNumContacts(); ++point) {
-                        btManifoldPoint manifoldPoint = manifold.getContactPoint(point);
-                        if (manifoldPoint.getDistance() < 0.f) {
-                            Vector3f a1 = new Vector3f();
-                            manifoldPoint.getPositionWorldOnA(a1);
-
-                            Vector3f a2 = new Vector3f();
-                            manifoldPoint.getPositionWorldOnB(a2);
-                            int l = manifoldPoint.getLifeTime();
-
-                            Vector3f a3 = new Vector3f();
-                            manifoldPoint.getNormalWorldOnB(a3);
-
-
-                            if (otherEntity.exists()) {
-                                short bCollisionGroup = getCollisionGroupFlag(otherEntity);
-                                short aCollidesWith = getCollidesWithGroupFlag(entity);
-                                if ((bCollisionGroup & aCollidesWith) != 0
-                                        || (otherEntity.hasComponent(BlockComponent.class) && !entity.hasComponent(BlockComponent.class))) {
-                                    entity.send(new CollideEvent(otherEntity, a1, a2, manifoldPoint.getDistance(), a3));
-                                }
-                            }
-                            if (entity.exists()) {
-                                short aCollisionGroup = getCollisionGroupFlag(entity);
-                                short bCollidesWith = getCollidesWithGroupFlag(otherEntity);
-                                if ((aCollisionGroup & bCollidesWith) != 0
-                                        || (entity.hasComponent(BlockComponent.class) && !otherEntity.hasComponent(BlockComponent.class))) {
-                                    otherEntity.send(new CollideEvent(entity, a2, a1, manifoldPoint.getDistance(),
-                                            new Vector3f(a3).mul(-1.0f)));
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                btBroadphaseProxy.free(p0);
-                btBroadphaseProxy.free(p1);
-
-            }
+            });
+            lastNetsync = time.getGameTimeInMs();
         }
-    }
-
-    private void sendSyncMessages() {
-        Vector3f tempPosition = new Vector3f();
-        Quaternionf tempRotation = new Quaternionf();
-        entityRigidBodies.forEach((entity, body) -> {
-            if (entity.hasComponent(NetworkComponent.class)) {
-                //TODO after implementing rigidbody interface
-                if (body.isActive()) {
-                    Matrix4f transform = body.getWorldTransform();
-
-                    entity.send(new LocationResynchEvent( transform.getTranslation(tempPosition), tempRotation.setFromUnnormalized(transform)));
-                    entity.send(new PhysicsResynchEvent(body.getLinearVelocity(), body.getAngularVelocity()));
-                }
-            }
-        });
+        PerformanceMonitor.endActivity();
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
