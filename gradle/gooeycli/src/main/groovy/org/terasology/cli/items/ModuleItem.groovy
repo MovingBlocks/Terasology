@@ -1,24 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.module
+package org.terasology.cli.items
 
 import groovy.json.JsonSlurper
-import org.terasology.cli.traits.Gitable
-import org.terasology.cli.util.Constants
+import org.terasology.cli.module.Modules
+import org.terasology.cli.config.Config
+import org.terasology.cli.config.GradleAwareConfig
 
-class ModuleItem implements Gitable<ModuleItem> {
+class ModuleItem extends Item implements GitItem<ModuleItem>, GradleItem<GradleAwareConfig> {
     public static String ModuleCfg = "module.txt"
 
-    ModuleItem() {
-        parentDir = Constants.ModuleDirectory
-    }
 
     ModuleItem(String module) {
-        this()
-        this.name = module
-        this.dir = new File(parentDir, module)
-        remote = !dir.exists()
+        super(module, new File(Config.MODULE.directory, module) )
+
     }
 
     boolean moduleCfgExists() {
@@ -31,11 +27,16 @@ class ModuleItem implements Gitable<ModuleItem> {
         def slurper = new JsonSlurper()
         def moduleConfig = slurper.parseText(moduleFile.text)
         for (dependency in moduleConfig.dependencies) {
-            if (!(respectExcludedItems && Constants.ExcludeModule.contains(dependency.id))) {
+            if (!(respectExcludedItems && Config.ExcludeModule.contains(dependency.id))) {
                 dependencies << Modules.resolveModules(dependency.id)
             }
         }
         return dependencies
+    }
+
+    @Override
+    GradleAwareConfig getConfig() {
+        return Config.MODULE
     }
 
     ModuleItem copyInGradleTemplate() {
@@ -59,7 +60,7 @@ class ModuleItem implements Gitable<ModuleItem> {
         if (obj instanceof ModuleItem) {
             return obj.name == this.name
         }
-        return super.equals(obj)
+        return Object.equals(obj)
     }
 
     @Override

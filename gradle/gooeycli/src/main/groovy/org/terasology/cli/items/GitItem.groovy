@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.traits
+package org.terasology.cli.items
 
 import groovy.transform.CompileStatic
 import org.eclipse.jgit.api.CloneCommand.Callback
@@ -14,9 +14,15 @@ import org.eclipse.jgit.lib.ObjectId
 import picocli.CommandLine
 
 @CompileStatic
-trait Gitable<T> extends Item {
+trait GitItem<T> {
 
-    boolean remote
+    abstract String getName()
+    abstract File getDir()
+
+    boolean isRemote() {
+        !dir.exists()
+    }
+
 
     T clone(String url, Callback callback = null) {
         if (remote) {
@@ -25,7 +31,6 @@ trait Gitable<T> extends Item {
                     .setDirectory(dir)
                     .setCallback(callback)
                     .call()
-            remote = false
         } else {
             //TODO log error
         }
@@ -34,6 +39,7 @@ trait Gitable<T> extends Item {
 
     Git open() {
         if (remote) {
+
             // TODO log error
         } else {
             return Git.open(dir)

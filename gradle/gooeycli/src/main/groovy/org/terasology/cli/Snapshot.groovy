@@ -5,7 +5,7 @@ package org.terasology.cli
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.terasology.cli.util.Constants
+import org.terasology.cli.config.Config
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -94,6 +94,6 @@ class Snapshot {
     }
 
     static {
-        SnapshotDirectory = new File(Constants.ConfigurationPath.toFile(), SnapshotFolder)
+        SnapshotDirectory = new File(Config.ConfigurationPath.toFile(), SnapshotFolder)
     }
 }

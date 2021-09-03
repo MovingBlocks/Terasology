@@ -1,25 +1,44 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.cli.util
+package org.terasology.cli.config
+
+import groovy.transform.CompileStatic
 
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
-class Constants {
+@CompileStatic
+class Config {
 
-    public static final File ModuleDirectory
+    public static final GradleAwareConfig MODULE = new GradleAwareConfig().tap {
+        directory = new File("modules")
+        defaultBranch = "develop"
+        defaultOrg = "Terasology"
+        gradleTemplatePath = new File("templates/build.gradle")
+    }
 
-    public static final String ExcludeModule = ["engine", "Index", "out", "build"]
+    public static final CommonConfig META = new CommonConfig().tap {
+        directory = new File("metas")
+        defaultBranch = "master"
+        defaultOrg = "MetaTerasology"
+    }
 
-    public static final String DefaultModuleGithubOrg = "Terasology"
+    public static final CommonConfig LIB = new  CommonConfig().tap {
+        directory = new File("libs")
+        defaultBranch = "develop"
+        defaultOrg = "MovingBlocks"
+    }
 
-    public static final String DefaultOrigin = "develop"
+    public static final GradleAwareConfig FACADE = new GradleAwareConfig().tap {
+        directory = new File("facades")
+        defaultBranch = "develop"
+        defaultOrg = "MovingBlocks"
+        gradleTemplatePath = new File("templates/facades.gradle")
+        excludes = ["PC","TeraEd"]
+    }
 
-    public static final File FacadeDirectory
-
-    public static final String ExcludeFacades = ["PC", "TeraEd"]
 
     public static final File GradlePropertyFile
 
@@ -38,8 +57,6 @@ class Constants {
     static {
         ConfigurationPath = Paths.get(System.getProperty("user.home")).resolve(".terasology")
         GradlePropertyFile = new File("gradle.properties")
-        FacadeDirectory = new File("facade")
-        ModuleDirectory = new File("modules")
 
         ModuleCacheFile = new File(".moduleCache")
 

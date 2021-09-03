@@ -4,7 +4,7 @@
 package org.terasology.cli.module
 
 import groovy.json.JsonSlurper
-import org.terasology.cli.util.Constants
+import org.terasology.cli.config.Config
 
 @Singleton
 class ModuleIndex {
@@ -14,15 +14,15 @@ class ModuleIndex {
     Object[] getData() {
         // TODO: implement ETAG at meta.terasology.org and use it there
         if (cache == null) {
-            if (Constants.ModuleCacheFile.exists()
-                    && Constants.ModuleCacheFile.lastModified() + Constants.ModuleCacheValidTime < System.currentTimeSeconds()) {
-                cache = slurper.parse(Constants.ModuleCacheFile, "UTF8")
+            if (Config.ModuleCacheFile.exists()
+                    && Config.ModuleCacheFile.lastModified() + Config.ModuleCacheValidTime < System.currentTimeSeconds()) {
+                cache = slurper.parse(Config.ModuleCacheFile, "UTF8")
             } else {
 
-                URL modules = new URL(Constants.ModuleIndexUrl)
+                URL modules = new URL(Config.ModuleIndexUrl)
 
                 String content = modules.text
-                Constants.ModuleCacheFile.write(content, "UTF8")
+                Config.ModuleCacheFile.write(content, "UTF8")
                 cache = slurper.parse(content.toCharArray())
             }
         }
