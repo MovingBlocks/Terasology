@@ -3,22 +3,20 @@
 
 package org.terasology.cli.commands.module
 
-
+import org.terasology.cli.commands.items.ItemCommand
 import org.terasology.cli.module.ModuleIndex
-import org.terasology.cli.module.ModuleItem
+import org.terasology.cli.items.ModuleItem
 import org.terasology.cli.module.Modules
-import org.terasology.cli.options.GitOptions
 import picocli.CommandLine
 import picocli.CommandLine.Command
-import picocli.CommandLine.Mixin
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
 
 @Command(name = "get", description = "get module ")
 class GetCommand implements Runnable {
 
-    @Mixin
-    GitOptions gitOptions
+    @CommandLine.ParentCommand
+    ItemCommand<ModuleItem> parent
 
     @Option(names = ["-r", "-recurse"], description = "recursively fetch modules")
     boolean recurse
@@ -28,9 +26,9 @@ class GetCommand implements Runnable {
 
     @Override
     void run() {
-        String origin = gitOptions.resolveOrigin()
+        String origin = parent.resolveOrigin()
 
-        def modulesCandidatesToReceive = Modules.resolveModules(availableModules()*.id) - Modules.downloadedModules()
+        def modulesCandidatesToReceive = Modules.resolveModules(availableModules()*.id) - parent.listLocal()
 
         def requestedModules
         if (recurse) {

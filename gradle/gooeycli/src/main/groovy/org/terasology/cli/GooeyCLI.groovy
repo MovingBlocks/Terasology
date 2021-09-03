@@ -11,7 +11,10 @@ package org.terasology.cli
 import org.fusesource.jansi.AnsiConsole
 import org.terasology.cli.commands.BaseCommandType
 import org.terasology.cli.commands.BashCompletionCommand
-import org.terasology.cli.commands.module.ModuleCommand
+import org.terasology.cli.commands.items.FacadeCommand
+import org.terasology.cli.commands.items.MetaCommand
+import org.terasology.cli.commands.items.LibCommand
+import org.terasology.cli.commands.items.ModuleCommand
 import org.terasology.cli.commands.workspace.WorkspaceCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -23,6 +26,9 @@ import picocli.CommandLine.HelpCommand
         subcommands = [
                 HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
                 ModuleCommand.class,
+                MetaCommand.class,
+                FacadeCommand.class,
+                LibCommand.class,
                 WorkspaceCommand.class,
                 BashCompletionCommand.class,
         ], // Note that these Groovy classes *must* start with a capital letter for some reason

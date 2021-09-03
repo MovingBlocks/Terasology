@@ -1,8 +1,15 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli.commands.module
+package org.terasology.cli.commands.items
 
-import org.terasology.cli.commands.BaseCommandType
+
+import org.terasology.cli.items.ModuleItem
+import org.terasology.cli.commands.common.ExecuteCommand
+import org.terasology.cli.commands.module.GetCommand
+import org.terasology.cli.commands.module.InitCommand
+import org.terasology.cli.commands.common.RefreshCommand
+import org.terasology.cli.commands.common.UpdateAllCommand
+import org.terasology.cli.config.Config
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
 
@@ -17,6 +24,14 @@ import picocli.CommandLine.HelpCommand
                 UpdateAllCommand.class,
         ], // Note that these Groovy classes *must* start with a capital letter for some reason
         description = "Sub command for interacting with modules")
-class ModuleCommand extends BaseCommandType {
+class ModuleCommand extends ItemCommand<ModuleItem> {
 
+        ModuleCommand() {
+                super(Config.MODULE)
+        }
+
+        @Override
+        ModuleItem create(String name) {
+                return new ModuleItem(name)
+        }
 }

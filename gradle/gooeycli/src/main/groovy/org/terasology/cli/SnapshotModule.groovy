@@ -4,7 +4,7 @@
 package org.terasology.cli
 
 
-import org.terasology.cli.module.ModuleItem
+import org.terasology.cli.items.ModuleItem
 
 class SnapshotModule {
     private ModuleItem module

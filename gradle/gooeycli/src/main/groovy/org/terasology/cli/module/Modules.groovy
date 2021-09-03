@@ -3,14 +3,15 @@
 
 package org.terasology.cli.module
 
-import org.terasology.cli.util.Constants
+import org.terasology.cli.items.ModuleItem
+import org.terasology.cli.config.Config
 import picocli.CommandLine
 
 class Modules {
 
     static List<ModuleItem> downloadedModules() {
         List<ModuleItem> result = []
-        Constants.ModuleDirectory.eachDir({ dir ->
+        Config.MODULE.directory.eachDir({ dir ->
             result << resolveModule(dir.getName())
         })
         return result
