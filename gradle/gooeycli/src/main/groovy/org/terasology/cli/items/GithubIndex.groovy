@@ -10,16 +10,29 @@ trait GithubIndex<T> implements RemoteIndex<T> {
     abstract String resolveOrigin()
 
     JsonSlurper slurper = new JsonSlurper()
-    Object[] cache
+    List<Object> cache
 
     List<ModuleItem> listRemote() {
         String origin = resolveOrigin()
 
         if (cache == null) {
-            URL modules = new URL("https://api.github.com/users/$origin/repos?per_page=999")
-            String content = modules.text
-            cache = slurper.parse(content.toCharArray())
+            cache = []
+            int i = 1
+            boolean keepGoing = true // Groovy haven't  do ... while T_T
+            while (keepGoing) {
+                URL modules = new URL("https://api.github.com/users/$origin/repos?per_page=999?page=$i")
+                String content = modules.text
+                List<Object> parsed = slurper.parse(content.toCharArray())
+                if(parsed.size() == 0) {
+                    keepGoing = false
+                }
+                cache << parsed
+                i++
+            }
+
         }
-        return cache[0].collect { new ModuleItem(it.name as String) }
+
+
+        return cache.collect { new ModuleItem(it.name as String) }
     }
 }
