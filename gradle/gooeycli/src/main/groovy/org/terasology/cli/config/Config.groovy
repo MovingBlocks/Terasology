@@ -52,7 +52,7 @@ class Config {
 
     public static final long ModuleCacheValidTime = TimeUnit.DAYS.toSeconds(10)
 
-    public static final String ModuleIndexUrl = 'http://meta.terasology.org/modules/list/latest'
+    public static final String MetaModuleIndexUrl = 'http://meta.terasology.org/modules/list/latest'
 
     static {
         ConfigurationPath = Paths.get(System.getProperty("user.home")).resolve(".terasology")
