@@ -4,8 +4,8 @@
 package org.terasology.cli.commands.items
 
 import org.terasology.cli.commands.common.*
-import org.terasology.cli.items.LibItem
 import org.terasology.cli.config.Config
+import org.terasology.cli.items.LibItem
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
 
@@ -30,5 +30,10 @@ class LibCommand extends ItemCommand<LibItem> {
     @Override
     LibItem create(String name) {
         return new LibItem(name)
+    }
+
+    @Override
+    List listRemote() {
+        return null
     }
 }

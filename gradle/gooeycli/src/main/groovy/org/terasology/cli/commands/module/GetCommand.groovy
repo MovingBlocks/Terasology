@@ -4,8 +4,8 @@
 package org.terasology.cli.commands.module
 
 import org.terasology.cli.commands.items.ItemCommand
-import org.terasology.cli.module.ModuleIndex
 import org.terasology.cli.items.ModuleItem
+import org.terasology.cli.module.ModuleIndex
 import org.terasology.cli.module.Modules
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -26,6 +26,9 @@ class GetCommand implements Runnable {
 
     @Override
     void run() {
+        if (!parent.validItems(items)) {
+            return
+        }
         String origin = parent.resolveOrigin()
 
         def modulesCandidatesToReceive = Modules.resolveModules(availableModules()*.id) - parent.listLocal()
