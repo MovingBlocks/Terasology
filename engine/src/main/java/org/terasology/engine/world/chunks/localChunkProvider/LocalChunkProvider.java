@@ -126,7 +126,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 if (chunkStore == null) {
                     chunk = new ChunkImpl(pos, blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
-                    generateQueuedEntities.put(chunk.getPosition(new Vector3i()), buffer.getAll());
+                    generateQueuedEntities.put(chunk.getPosition(), buffer.getAll());
                 } else {
                     chunk = chunkStore.getChunk();
                 }
@@ -390,7 +390,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         getAllChunks().stream().filter(Chunk::isReady).forEach(chunk -> {
-            worldEntity.send(new BeforeChunkUnload(chunk.getPosition(new Vector3i())));
+            worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();
         });

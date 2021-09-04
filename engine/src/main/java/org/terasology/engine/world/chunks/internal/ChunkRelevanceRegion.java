@@ -128,7 +128,7 @@ public class ChunkRelevanceRegion {
 
     private void sendChunkRelevant(Chunk chunk) {
         if (listener != null) {
-            listener.onChunkRelevant(chunk.getPosition(new org.joml.Vector3i()), chunk);
+            listener.onChunkRelevant(chunk.getPosition(), chunk);
         }
     }
 
@@ -166,8 +166,8 @@ public class ChunkRelevanceRegion {
      * chunks as relevant even when no light calculation has been performed yet.
      */
     public void checkIfChunkIsRelevant(Chunk chunk) {
-        if (currentRegion.contains(chunk.getPosition(new Vector3i())) && !relevantChunks.contains(chunk.getPosition(new Vector3i()))) {
-            relevantChunks.add(chunk.getPosition(new Vector3i()));
+        if (currentRegion.contains(chunk.getPosition()) && !relevantChunks.contains(chunk.getPosition())) {
+            relevantChunks.add(chunk.getPosition());
             sendChunkRelevant(chunk);
         }
     }

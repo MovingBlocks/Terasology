@@ -97,7 +97,7 @@ public class LodChunkProvider {
                 InternalLightProcessor.generateInternalLighting(chunk, 1 << scale);
                 //tintChunk(chunk);
                 ChunkView view = new ChunkViewCoreImpl(new Chunk[]{chunk},
-                        new BlockRegion(chunk.getPosition(new Vector3i())), new Vector3i(), unloaded);
+                        new BlockRegion(chunk.getPosition()), new Vector3i(), unloaded);
                 ChunkMesh mesh = tessellator.generateMesh(view, 1 << scale, 1);
                 readyChunks.add(new LodChunk(pos, mesh, scale));
             }

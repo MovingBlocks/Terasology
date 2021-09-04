@@ -145,7 +145,7 @@ public final class ChunkMeshUpdateManager {
         @Override
         public void run() {
             ChunkMesh newMesh;
-            ChunkView chunkView = worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i()));
+            ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
             if (chunkView != null) {
                 /*
                  * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we
@@ -156,7 +156,7 @@ public final class ChunkMeshUpdateManager {
                     newMesh = tessellator.generateMesh(chunkView);
 
                     c.setPendingMesh(newMesh);
-                    ChunkMonitor.fireChunkTessellated(c.getPosition(new org.joml.Vector3i()), newMesh);
+                    ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
                 }
 
             }

@@ -19,7 +19,7 @@ public class TestChunkStore implements ChunkStore {
 
     @Override
     public Vector3i getChunkPosition() {
-        return chunk.getPosition(new Vector3i());
+        return new Vector3i(chunk.getPosition());
     }
 
     @Override

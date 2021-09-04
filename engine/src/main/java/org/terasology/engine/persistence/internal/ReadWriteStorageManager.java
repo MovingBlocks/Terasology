@@ -224,7 +224,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
         chunkProvider.getAllChunks().stream().filter(Chunk::isReady).forEach(chunk -> {
             // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
-            unloadedAndSavingChunkMap.remove(chunk.getPosition(new Vector3i()));
+            unloadedAndSavingChunkMap.remove(chunk.getPosition());
             ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
             saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
         });
@@ -321,7 +321,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
         ChunkImpl chunkImpl = (ChunkImpl) chunk; // storage manager only works with ChunkImpl
-        unloadedAndUnsavedChunkMap.put(chunk.getPosition(new Vector3i()), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
                 entitiesOfChunk, true));
 
         entitiesOfChunk.forEach(this::deactivateOrDestroyEntityRecursive);

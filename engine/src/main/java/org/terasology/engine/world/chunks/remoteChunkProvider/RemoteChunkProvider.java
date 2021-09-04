@@ -99,15 +99,15 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
         Chunk chunk;
         while ((chunk = readyChunks.poll()) != null) {
-            Chunk oldChunk = chunkCache.put(chunk.getPosition(new Vector3i()), chunk);
+            Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
             if (oldChunk != null) {
                 oldChunk.dispose();
             }
             chunk.markReady();
             if (listener != null) {
-                listener.onChunkReady(chunk.getPosition(new Vector3i()));
+                listener.onChunkReady(chunk.getPosition());
             }
-            worldEntity.send(new OnChunkLoaded(chunk.getPosition(new Vector3i())));
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         }
     }
 
