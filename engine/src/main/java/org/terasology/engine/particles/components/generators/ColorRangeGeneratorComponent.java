@@ -3,12 +3,12 @@
 package org.terasology.engine.particles.components.generators;
 
 import org.joml.Vector4f;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.sandbox.API;
 
 
 @API
-public class ColorRangeGeneratorComponent implements Component {
+public class ColorRangeGeneratorComponent implements Component<ColorRangeGeneratorComponent> {
 
     public Vector4f minColorComponents;
     public Vector4f maxColorComponents;
@@ -21,5 +21,11 @@ public class ColorRangeGeneratorComponent implements Component {
     public ColorRangeGeneratorComponent() {
         minColorComponents = new Vector4f();
         maxColorComponents = new Vector4f();
+    }
+
+    @Override
+    public void copyFrom(ColorRangeGeneratorComponent other) {
+        this.minColorComponents = new Vector4f(other.minColorComponents);
+        this.maxColorComponents = new Vector4f(other.maxColorComponents);
     }
 }

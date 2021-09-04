@@ -22,13 +22,20 @@ import java.util.concurrent.Callable;
 
 /** Schedulers to asynchronously run tasks on other threads. */
 @API
-public class GameScheduler {
+public final class GameScheduler {
 
     private static final Scheduler MAIN;
     private static ThreadAwareScheduler graphicsScheduler;
 
     static {
-        MAIN = Schedulers.fromExecutor(runnable -> GameThread.asynch(runnable));
+        MAIN = Schedulers.fromExecutor(GameThread::asynch);
+
+        // Calling Reactor scheduler once to make sure it's initialized.
+        // doPriviledged in case this class isn't initialized before the security policy is installed.
+        AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
+    }
+
+    private GameScheduler() {
     }
 
     /**
@@ -64,7 +71,7 @@ public class GameScheduler {
      * @see <a href="https://projectreactor.io/docs/core/release/reference/#core-features">Reactor Core Features</a>
      */
     public static Scheduler parallel() {
-        return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
+        return Schedulers.parallel();
     }
 
     /**

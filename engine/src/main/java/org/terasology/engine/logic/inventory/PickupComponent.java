@@ -3,11 +3,17 @@
 
 package org.terasology.engine.logic.inventory;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 
-public class PickupComponent implements Component {
+public class PickupComponent implements Component<PickupComponent> {
     public long timeToPickUp;
 
     public long timeDropped;
+
+    @Override
+    public void copyFrom(PickupComponent other) {
+        this.timeToPickUp = other.timeToPickUp;
+        this.timeDropped = other.timeDropped;
+    }
 }

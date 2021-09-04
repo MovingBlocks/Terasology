@@ -3,9 +3,9 @@
 
 package org.terasology.engine.network.serialization;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.persistence.serializers.ComponentSerializeCheck;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Determines which components should be serialized over the network - only replicated components.
