@@ -46,13 +46,25 @@ public class VertexResourceTest {
             assertEquals(15.0f, buffer.getFloat((index++) * Float.BYTES), 0.001f);
             assertEquals(10.0f, buffer.getFloat((index++) * Float.BYTES), 0.001f);
             assertEquals(10.0f, buffer.getFloat((index++) * Float.BYTES), 0.001f);
-
         });
     }
 
+    @Test
+    public void testAllocation() {
+        VertexResourceBuilder builder = new VertexResourceBuilder();
+        VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+        VertexIntegerAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        VertexResource resource = builder.build();
+        a1.allocate(10);
+        int stride = (Float.BYTES * 3) + Byte.BYTES;
+        resource.writeBuffer(buffer -> {
+            assertEquals(buffer.limit(), stride * 10);
+            assertEquals(buffer.capacity(), stride * 10);
+        });
+    }
 
     @Test
-    public void testInterleave1() {
+    public void testInterleave() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
         VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
         VertexIntegerAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
@@ -82,7 +94,7 @@ public class VertexResourceTest {
     }
 
     @Test
-    public void testAndRewind() {
+    public void testRewind() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
         VertexIntegerAttributeBinding a1 = builder.add(0, GLAttributes.INT_1_VERTEX_ATTRIBUTE);
         VertexResource resource = builder.build();
