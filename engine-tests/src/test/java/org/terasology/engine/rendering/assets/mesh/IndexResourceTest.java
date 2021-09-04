@@ -6,9 +6,6 @@ package org.terasology.engine.rendering.assets.mesh;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
 
-import java.nio.ByteBuffer;
-import java.util.function.Consumer;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IndexResourceTest {
