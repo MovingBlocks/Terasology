@@ -3,6 +3,7 @@
 package org.terasology.engine.world.block.items;
 
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.terasology.engine.audio.AudioManager;
@@ -101,7 +102,7 @@ public class BlockItemSystem extends BaseComponentSystem {
     }
 
     private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
-        org.joml.Vector3f targetPosition = event.getTargetLocation();
+        Vector3f targetPosition = event.getTargetLocation();
         if (event.getHitPosition() != null && targetPosition != null) {
             return getSideHitPosition(event.getHitPosition(), targetPosition);
         } else {
@@ -123,7 +124,7 @@ public class BlockItemSystem extends BaseComponentSystem {
      */
     private Vector2f getSideHitPosition(Vector3fc hitPosition, Vector3fc blockPosition) {
         float epsilon = 0.0001f;
-        org.joml.Vector3f relativeHitPosition = new org.joml.Vector3f(hitPosition).sub(blockPosition);
+        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
 
         if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
             return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
