@@ -29,8 +29,12 @@ public class LightMerger {
     private static final int LOCAL_CHUNKS_ARRAY_LENGTH =
             LOCAL_CHUNKS_SIDE_LENGTH * LOCAL_CHUNKS_SIDE_LENGTH * LOCAL_CHUNKS_SIDE_LENGTH;
 
-    private static final LightPropagationRules lightRules = new LightPropagationRules();
-    private static final SunlightRegenPropagationRules sunlightRegenRules = new SunlightRegenPropagationRules();
+    private static final LightPropagationRules LIGHT_RULES = new LightPropagationRules();
+    private static final SunlightRegenPropagationRules SUNLIGHT_REGEN_RULES = new SunlightRegenPropagationRules();
+
+    private LightMerger() {
+
+    }
 
     public static List<Vector3ic> requiredChunks(Vector3ic pos) {
         List<Vector3ic> positions = Lists.newArrayListWithCapacity(3 * 3 * 3);
@@ -76,12 +80,12 @@ public class LightMerger {
 
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks,
-                lightRules)));
-        PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, sunlightRegenRules);
+                LIGHT_RULES)));
+        PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, SUNLIGHT_REGEN_RULES);
         PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
         PropagatorWorldView sunlightWorldView = new LocalChunkView(localChunks, sunlightRules);
         BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
-        propagators.add(new SunlightRegenBatchPropagator(sunlightRegenRules, regenWorldView, sunlightPropagator,
+        propagators.add(new SunlightRegenBatchPropagator(SUNLIGHT_REGEN_RULES, regenWorldView, sunlightPropagator,
                 sunlightWorldView));
         propagators.add(sunlightPropagator);
 

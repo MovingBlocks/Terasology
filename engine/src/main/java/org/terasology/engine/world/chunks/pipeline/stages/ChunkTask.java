@@ -7,11 +7,8 @@ import com.google.common.collect.Lists;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 /**

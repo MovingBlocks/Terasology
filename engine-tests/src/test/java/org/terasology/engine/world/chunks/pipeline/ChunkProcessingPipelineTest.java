@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.BlockManager;
@@ -23,11 +22,10 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.gestalt.assets.management.AssetManager;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -250,7 +248,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     }
 
     private List<Vector3ic> getNearChunkPositions(Vector3ic p, int distance) {
-        List<Vector3ic> requirements = Lists.newArrayListWithCapacity((distance + distance + 1) * (distance + distance + 1) );
+        List<Vector3ic> requirements = Lists.newArrayListWithCapacity((distance + distance + 1) * (distance + distance + 1));
         for (int x = -distance; x <= distance; x++) {
             for (int y = -distance; y <= distance; y++) {
                 requirements.add(new Vector3i(p.x() + x, p.y() + y, p.z()));
