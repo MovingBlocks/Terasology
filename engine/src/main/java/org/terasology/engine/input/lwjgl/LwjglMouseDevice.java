@@ -97,7 +97,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     public void setGrabbed(boolean newGrabbed) {
         if (newGrabbed != mouseGrabbed) {
             mouseGrabbed = newGrabbed;
-            GameScheduler.runBlockingGraphics("",()-> {
+            GameScheduler.runBlockingGraphics("", () -> {
                 GLFW.glfwSetInputMode(GLFW.glfwGetCurrentContext(), GLFW.GLFW_CURSOR,
                         newGrabbed ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
             });

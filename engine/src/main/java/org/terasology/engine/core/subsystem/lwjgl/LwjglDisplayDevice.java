@@ -54,12 +54,12 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     @Override
     public boolean isCloseRequested() {
         return
-                GameScheduler.runBlockingGraphics("isCloseRequested",()-> GLFW.glfwWindowShouldClose(GLFW.glfwGetCurrentContext()));
+                GameScheduler.runBlockingGraphics("isCloseRequested", () -> GLFW.glfwWindowShouldClose(GLFW.glfwGetCurrentContext()));
     }
 
     @Override
     public boolean isFullscreen() {
-        return  GameScheduler.runBlockingGraphics("isFullscreen",()-> MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext()));
+        return GameScheduler.runBlockingGraphics("isFullscreen", () -> MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext()));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting, boolean resize) {
-        GameScheduler.runBlockingGraphics("setDisplayModeSetting", ()-> {
+        GameScheduler.runBlockingGraphics("setDisplayModeSetting", () -> {
             long window = GLFW.glfwGetCurrentContext();
             switch (displayModeSetting) {
                 case FULLSCREEN:
@@ -153,7 +153,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     private void updateWindow() {
         if (isWindowDirty) {
-            GameScheduler.runBlockingGraphics("updateWindowBounds",()-> {
+            GameScheduler.runBlockingGraphics("updateWindowBounds", () -> {
                 int[] windowWidth = new int[1];
                 int[] windowHeight = new int[1];
                 GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
@@ -188,7 +188,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     @Override
     public void prepareToRender() {
         GameScheduler.runBlockingGraphics("prepareToRender",
-                ()-> glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+                () -> glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     }
 
@@ -243,7 +243,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private static Supplier<GLFWVidMode> createDesktopResolutionSupplier() {
         return Suppliers.memoize(() ->
                 GameScheduler.runBlockingGraphics("isFullscreen",
-                        ()-> GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())));
+                        () -> GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())));
     }
 
     private Optional<GLFWVidMode> getGLFWVidMode(LwjglResolution resolution) {

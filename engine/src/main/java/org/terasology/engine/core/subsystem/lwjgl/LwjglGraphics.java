@@ -76,18 +76,18 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         GameScheduler.runBlockingGraphics("Lwjgl post-update", () -> {
-                    currentState.render();
-                    lwjglDisplay.update();
+            currentState.render();
+            lwjglDisplay.update();
 
-                    //TODO. needs there, or not?
-                    int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
-                    if (frameLimit > 0) {
-                        Lwjgl2Sync.sync(frameLimit);
-                    }
-                    if (lwjglDisplay.isCloseRequested()) {
-                        engine.shutdown();
-                    }
-                });
+            //TODO. needs there, or not?
+            int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
+            if (frameLimit > 0) {
+                Lwjgl2Sync.sync(frameLimit);
+            }
+            if (lwjglDisplay.isCloseRequested()) {
+                engine.shutdown();
+            }
+        });
     }
 
     @Override
