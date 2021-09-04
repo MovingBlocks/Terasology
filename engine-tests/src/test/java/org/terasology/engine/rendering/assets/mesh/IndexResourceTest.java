@@ -20,15 +20,12 @@ public class IndexResourceTest {
         in.put(15);
 
         assertEquals(3, in.indices());
-        in.writeBuffer(new Consumer<ByteBuffer>() {
-            @Override
-            public void accept(ByteBuffer buffer) {
-                assertEquals(3 * Integer.BYTES, buffer.limit());
+        in.writeBuffer(buffer -> {
+            assertEquals(3 * Integer.BYTES, buffer.limit());
 
-                assertEquals(10, buffer.getInt(0));
-                assertEquals(11, buffer.getInt(1 * Integer.BYTES));
-                assertEquals(15, buffer.getInt(2 * Integer.BYTES));
-            }
+            assertEquals(10, buffer.getInt(0));
+            assertEquals(11, buffer.getInt(1 * Integer.BYTES));
+            assertEquals(15, buffer.getInt(2 * Integer.BYTES));
         });
     }
 
