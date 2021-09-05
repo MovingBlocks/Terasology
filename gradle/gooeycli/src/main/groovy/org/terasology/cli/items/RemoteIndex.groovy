@@ -4,6 +4,5 @@
 package org.terasology.cli.items
 
 interface RemoteIndex<T> {
-
     List<T> listRemote()
 }

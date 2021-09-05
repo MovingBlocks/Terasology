@@ -3,13 +3,13 @@
 
 package org.terasology.cli.commands.workspace
 
-
 import org.fusesource.jansi.Ansi
 import org.terasology.cli.commands.BaseCommandType
 import org.terasology.cli.module.Modules
 import picocli.CommandLine
+import picocli.CommandLine.Command
 
-@CommandLine.Command(name = "status", description = "show current state of workspace")
+@Command(name = "status", description = "show current state of workspace")
 class StatusCommand extends BaseCommandType implements Runnable {
 
     static class Row {

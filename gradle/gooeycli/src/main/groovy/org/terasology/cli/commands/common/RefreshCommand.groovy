@@ -5,13 +5,13 @@ package org.terasology.cli.commands.common
 
 import org.terasology.cli.commands.items.ItemCommand
 import org.terasology.cli.items.GradleItem
-import picocli.CommandLine
 import picocli.CommandLine.Command
+import picocli.CommandLine.ParentCommand
 
 @Command(name = "refresh", description = "Refreshes all build.gradle files in item's directories")
 class RefreshCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<GradleItem> parent
 
     @Override

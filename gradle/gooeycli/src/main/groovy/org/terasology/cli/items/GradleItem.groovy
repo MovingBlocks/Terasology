@@ -4,7 +4,6 @@
 package org.terasology.cli.items
 
 import org.terasology.cli.config.GradleAwareConfig
-import org.terasology.cli.config.GradleTemplateConfig
 
 trait GradleItem<T extends GradleAwareConfig> {
 

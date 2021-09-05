@@ -8,11 +8,12 @@ import org.terasology.cli.items.GitItem
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
+import picocli.CommandLine.ParentCommand
 
 @Command(name = "get", description = "get item")
 class GetCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<GitItem> parent
 
     @Parameters(paramLabel = "items", arity = "1", description = "Target item(s) to get")

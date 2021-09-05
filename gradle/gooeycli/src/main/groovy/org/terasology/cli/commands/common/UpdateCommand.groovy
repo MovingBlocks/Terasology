@@ -27,7 +27,7 @@ class UpdateCommand implements Runnable {
     @Override
     void run() {
         items.collect { parent.create(it) }
-                .findAll {!it.remote } // TODO notify about invalid item
+                .findAll { !it.remote } // TODO notify about invalid item
                 .each { it.update() }
     }
 }

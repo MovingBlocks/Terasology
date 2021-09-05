@@ -3,7 +3,11 @@
 
 package org.terasology.cli.commands.items
 
-import org.terasology.cli.commands.common.*
+import org.terasology.cli.commands.common.CheckoutCommand
+import org.terasology.cli.commands.common.ExecuteCommand
+import org.terasology.cli.commands.common.GetCommand
+import org.terasology.cli.commands.common.UpdateAllCommand
+import org.terasology.cli.commands.common.UpdateCommand
 import org.terasology.cli.config.Config
 import org.terasology.cli.items.GithubIndex
 import org.terasology.cli.items.MetaItem

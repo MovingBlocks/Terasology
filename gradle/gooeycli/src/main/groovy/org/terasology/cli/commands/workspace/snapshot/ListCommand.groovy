@@ -3,7 +3,7 @@
 
 package org.terasology.cli.commands.workspace.snapshot
 
-import org.terasology.cli.Snapshot
+import org.terasology.cli.items.Snapshot
 import picocli.CommandLine.Command
 
 @Command(name = "list", description = "list all snapshots")

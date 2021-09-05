@@ -26,12 +26,12 @@ import picocli.CommandLine.HelpCommand
         description = "Sub command for interacting with modules")
 class ModuleCommand extends ItemCommand<ModuleItem> implements GithubIndex<ModuleItem> {
 
-        ModuleCommand() {
-                super(Config.MODULE)
-        }
+    ModuleCommand() {
+        super(Config.MODULE)
+    }
 
-        @Override
-        ModuleItem create(String name) {
-                return new ModuleItem(name)
-        }
+    @Override
+    ModuleItem create(String name) {
+        return new ModuleItem(name)
+    }
 }
