@@ -36,6 +36,7 @@ import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import reactor.core.publisher.Sinks;
+import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -125,21 +126,17 @@ class RenderableWorldImpl implements RenderableWorld {
                     return Optional.empty();
                 }).filter(Optional::isPresent).sequential()
                 .publishOn(GameScheduler.gameMain())
-                .subscribe(payload -> {
-                    payload.ifPresent(result -> {
-                        if (chunksInProximityOfCamera.contains(result.getT1())) {
-                            result.getT2().generateVBOs();
-                            result.getT2().discardData();
-                            if (result.getT1().hasMesh()) {
-                                result.getT1().getMesh().dispose();
-                            }
-                            result.getT1().setMesh(result.getT2());
+                .subscribe(result -> result.ifPresent(TupleUtils.consumer((chunk, chunkMesh) -> {
+                    if (chunksInProximityOfCamera.contains(chunk)) {
+                        chunkMesh.generateVBOs();
+                        chunkMesh.discardData();
+                        if (chunk.hasMesh()) {
+                            chunk.getMesh().dispose();
                         }
-                    });
+                        chunk.setMesh(chunkMesh);
+                    }
 
-                }, throwable -> {
-                    logger.error("Failed to build mesh {}", throwable);
-                });
+                })), throwable -> logger.error("Failed to build mesh {}", throwable));
     }
 
     @Override
