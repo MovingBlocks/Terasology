@@ -49,7 +49,7 @@ public class OpenALManager implements AudioManager {
 
     protected Map<String, SoundPool<? extends Sound<?>, ?>> pools = Maps.newHashMap();
 
-    private final org.joml.Vector3f listenerPosition = new org.joml.Vector3f();
+    private final Vector3f listenerPosition = new Vector3f();
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
@@ -268,7 +268,7 @@ public class OpenALManager implements AudioManager {
     }
 
     protected boolean checkDistance(Vector3fc soundPosition) {
-        org.joml.Vector3f distance = new org.joml.Vector3f(soundPosition)
+        Vector3f distance = new Vector3f(soundPosition)
                 .sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;

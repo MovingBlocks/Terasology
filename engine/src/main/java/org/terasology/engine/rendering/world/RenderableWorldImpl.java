@@ -319,7 +319,7 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        org.joml.Vector3f cameraCoordinates = playerCamera.getPosition();
+        Vector3f cameraCoordinates = playerCamera.getPosition();
         return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
 

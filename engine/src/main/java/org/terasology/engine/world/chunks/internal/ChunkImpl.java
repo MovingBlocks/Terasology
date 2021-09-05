@@ -101,7 +101,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
+    public Vector3i getPosition(Vector3i dest) {
         return dest.set(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 

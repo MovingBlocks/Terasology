@@ -128,7 +128,7 @@ public class ChunkRelevanceRegion {
 
     private void sendChunkRelevant(Chunk chunk) {
         if (listener != null) {
-            listener.onChunkRelevant(chunk.getPosition(new org.joml.Vector3i()), chunk);
+            listener.onChunkRelevant(chunk.getPosition(new Vector3i()), chunk);
         }
     }
 
