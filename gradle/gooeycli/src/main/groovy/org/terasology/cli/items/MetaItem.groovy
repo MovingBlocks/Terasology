@@ -3,7 +3,6 @@
 
 package org.terasology.cli.items
 
-
 import org.terasology.cli.config.Config
 
 class MetaItem extends Item implements GitItem<MetaItem>{

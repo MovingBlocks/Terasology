@@ -10,6 +10,7 @@ import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
+import picocli.CommandLine.ParentCommand
 
 import java.util.concurrent.TimeUnit
 
@@ -18,10 +19,10 @@ import java.util.concurrent.TimeUnit
 @Command(name = "cmd", description = "execute command against all item")
 class ExecuteCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<GitItem> parent
 
-    @Option(names = ["-only-modified"], description = "only execute the command on modules that were modified")
+    @Option(names = ["--only-modified"], description = "only execute the command on modules that were modified")
     boolean modified
 
     @Parameters(paramLabel = "cmd", arity = "1", description = "execute system command within module")

@@ -3,8 +3,7 @@
 
 package org.terasology.cli.commands.workspace.snapshot
 
-
-import org.terasology.cli.Snapshot
+import org.terasology.cli.items.Snapshot
 import org.terasology.cli.items.ModuleItem
 import org.terasology.cli.module.Modules
 import picocli.CommandLine

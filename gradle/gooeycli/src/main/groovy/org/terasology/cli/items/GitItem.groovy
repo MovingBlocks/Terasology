@@ -23,7 +23,6 @@ trait GitItem<T> {
         !dir.exists()
     }
 
-
     T clone(String url, Callback callback = null) {
         if (remote) {
             Git.cloneRepository()

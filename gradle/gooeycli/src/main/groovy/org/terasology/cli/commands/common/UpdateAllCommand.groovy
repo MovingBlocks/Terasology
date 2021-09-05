@@ -5,13 +5,13 @@ package org.terasology.cli.commands.common
 
 import org.terasology.cli.commands.items.ItemCommand
 import org.terasology.cli.items.GitItem
-import picocli.CommandLine
 import picocli.CommandLine.Command
+import picocli.CommandLine.ParentCommand
 
 @Command(name = "update-all", description = "update all dependenices")
 class UpdateAllCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<GitItem> parent
 
     @Override

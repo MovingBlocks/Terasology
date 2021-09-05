@@ -11,11 +11,12 @@ import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
+import picocli.CommandLine.ParentCommand
 
 @Command(name = "get", description = "get module ")
 class GetCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<ModuleItem> parent
 
     @Option(names = ["-r", "-recurse"], description = "recursively fetch modules")

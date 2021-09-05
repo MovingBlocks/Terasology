@@ -5,19 +5,20 @@ package org.terasology.cli.commands.common
 
 import org.terasology.cli.commands.items.ItemCommand
 import org.terasology.cli.items.GitItem
-import picocli.CommandLine
 import picocli.CommandLine.Command
+import picocli.CommandLine.Parameters
+import picocli.CommandLine.ParentCommand
 
 @Command(name = "checkout", description = "checkout specific branch")
 class CheckoutCommand implements Runnable {
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     ItemCommand<GitItem> parent
 
-    @CommandLine.Parameters(paramLabel = "branch", description = "target branch")
+    @Parameters(paramLabel = "branch", description = "target branch")
     String branch
 
-    @CommandLine.Parameters(paramLabel = "items", arity = "1..*", description = "Target item(s) to execute against")
+    @Parameters(paramLabel = "items", arity = "1..*", description = "Target item(s) to execute against")
     List<String> items = []
 
 
