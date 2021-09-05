@@ -4,6 +4,7 @@
 package org.terasology.engine.logic.inventory;
 
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
@@ -86,7 +87,7 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         }
 
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof btBoxShape) {
-            org.joml.Vector3f extents = ((btBoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin();
+            Vector3f extents = ((btBoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin();
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
