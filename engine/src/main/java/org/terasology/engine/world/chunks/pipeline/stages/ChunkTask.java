@@ -3,12 +3,12 @@
 
 package org.terasology.engine.world.chunks.pipeline.stages;
 
+import com.google.common.collect.Lists;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -34,7 +34,7 @@ public interface ChunkTask extends Function<Collection<Chunk>, Chunk> {
      *
      * @return required positions for processing.
      */
-    default Set<Vector3ic> getRequirements() {
-        return Collections.singleton(getPosition());
+    default List<Vector3ic> getRequirements() {
+        return Lists.newArrayList(getPosition());
     }
 }

@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.SettableFuture;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +20,6 @@ import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionService;
@@ -35,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Manages execution of chunk processing.
@@ -146,18 +142,30 @@ public class ChunkProcessingPipeline {
     }
 
     private void processChunkTasks() {
-        chunkProcessingInfoMap.values().stream()
-                .filter(chunkProcessingInfo -> chunkProcessingInfo.getChunkTask() != null && chunkProcessingInfo.getCurrentFuture() == null)
-                .forEach(chunkProcessingInfo -> {
-                    org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
-                    Set<Chunk> providedChunks = chunkTask.getRequirements().stream()
-                            .map(pos -> getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos))
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toSet());
-                    if (providedChunks.size() == chunkTask.getRequirements().size()) {
-                        chunkProcessingInfo.setCurrentFuture(runTask(chunkTask, providedChunks));
-                    }
-                });
+        for (ChunkProcessingInfo info : chunkProcessingInfoMap.values()) {
+            processChunkInfo(info);
+        }
+    }
+
+    private void processChunkInfo(ChunkProcessingInfo info) {
+        if (info.getChunkTask() == null) {
+            return;
+        }
+        if (info.getCurrentFuture() != null) {
+            return;
+        }
+        ChunkTask chunkTask = info.getChunkTask();
+        List<Vector3ic> requirements = chunkTask.getRequirements();
+        List<Chunk> requiredChunks = Lists.newArrayListWithCapacity(requirements.size());
+        for (Vector3ic pos : requirements) {
+            Chunk chunk = getChunkBy(info.getChunkTaskProvider(), pos);
+            if (chunk != null) {
+                requiredChunks.add(chunk);
+            } else {
+                return;
+            }
+        }
+        info.setCurrentFuture(runTask(chunkTask, requiredChunks));
     }
 
     private Chunk getChunkBy(ChunkTaskProvider requiredStage, Vector3ic position) {
@@ -175,7 +183,7 @@ public class ChunkProcessingPipeline {
         return chunk;
     }
 
-    private Future<Chunk> runTask(ChunkTask task, Set<Chunk> chunks) {
+    private Future<Chunk> runTask(ChunkTask task, List<Chunk> chunks) {
         return chunkProcessor.submit(new PositionalCallable(() -> {
             try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
                 return task.apply(chunks);
@@ -213,7 +221,7 @@ public class ChunkProcessingPipeline {
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      * @return Future of chunk processing.
      */
-    public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
+    public Future<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
         Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must to have at least one stage");
         ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(position);
         if (chunkProcessingInfo != null) {
@@ -235,7 +243,7 @@ public class ChunkProcessingPipeline {
      * @param chunk chunk to process.
      */
     public Future<Chunk> invokePipeline(Chunk chunk) {
-        return invokeGeneratorTask(chunk.getPosition(new Vector3i()), () -> chunk);
+        return invokeGeneratorTask(chunk.getPosition(), () -> chunk);
     }
 
     public void shutdown() {
