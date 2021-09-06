@@ -19,7 +19,7 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     public static final String HUD_HIDDEN = "hudHidden";
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
-    public static final String RENDER_ENTITY_COLLIDERS = "renderEntityColliders";
+    public static final String RENDER_ENTITY_BOUNDING_BOXES = "renderEntityBoundingBoxes";
   
     private static final Logger logger = LoggerFactory.getLogger(RenderingDebugConfig.class);
 
@@ -35,16 +35,15 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
         subscribe(this);
     }
 
-    public boolean isRenderingEntityColliders() {
+    public boolean isRenderEntityBoundingBoxes() {
         return renderEntityColliders;
     }
 
-    public void setRenderEntityColliders(boolean colliders) {
+    public void setRenderEntityBoundingBoxes(boolean colliders) {
         boolean oldValue = this.renderEntityColliders;
         this.renderEntityColliders = colliders;
-        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_COLLIDERS, oldValue, this.renderEntityColliders);
+        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_BOUNDING_BOXES, oldValue, this.renderEntityColliders);
     }
-
 
     public boolean isWireframe() {
         return wireframe;

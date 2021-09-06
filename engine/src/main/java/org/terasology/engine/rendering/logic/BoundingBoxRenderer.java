@@ -32,7 +32,7 @@ import org.terasology.joml.geom.AABBf;
 import org.terasology.nui.Color;
 
 /**
- * Renders the bounding boxes of entities when the debug setting "renderEntityColliders" is active.
+ * Renders the bounding boxes of entities when the debug setting "renderEntityBoundingBoxes" is active.
  * <p>
  * The entity must have a {@link LocationComponent} and at least one of the following shape components:
  * <ul>
@@ -72,7 +72,7 @@ public class BoundingBoxRenderer extends BaseComponentSystem implements RenderSy
 
     @Override
     public void renderOverlay() {
-        if (config.getRendering().getDebug().isRenderingEntityColliders()) {
+        if (config.getRendering().getDebug().isRenderEntityBoundingBoxes()) {
             GL33.glDepthFunc(GL33.GL_ALWAYS);
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
