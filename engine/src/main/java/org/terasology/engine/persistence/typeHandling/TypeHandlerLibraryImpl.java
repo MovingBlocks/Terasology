@@ -5,11 +5,17 @@ package org.terasology.engine.persistence.typeHandling;
 
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.joml.Vector4i;
 import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.terasology.engine.core.module.ModuleManager;
@@ -116,22 +122,22 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Colorc.class, new ColorcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.addTypeHandler(Vector4fc.class, new Vector4fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.addTypeHandler(Vector3fc.class, new Vector3fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.addTypeHandler(Vector2fc.class, new Vector2fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(Vector3ic.class, new Vector3icTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
         serializationLibrary.addTypeHandler(Vector2ic.class, new Vector2icTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector4i.class, new Vector4iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4i.class, new Vector4iTypeHandler());
         serializationLibrary.addTypeHandler(Vector4ic.class, new Vector4icTypeHandler());
 
         serializationLibrary.addTypeHandler(Rectanglei.class, new RectangleiTypeHandler());

@@ -466,7 +466,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
         // safely above ground.
         Optional.ofNullable(entity.getComponent(LocationComponent.class))
-                .map(k -> k.getWorldPosition(new org.joml.Vector3f()))
+                .map(k -> k.getWorldPosition(new Vector3f()))
                 .map(location -> location.add(0, (event.getNewValue() - event.getOldValue()) / 2f, 0))
                 .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
