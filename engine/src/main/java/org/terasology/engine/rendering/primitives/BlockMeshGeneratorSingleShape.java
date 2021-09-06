@@ -10,11 +10,13 @@ import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
 public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
-    private Block block;
+    private final Block block;
+    private final ResourceUrn baseUrn = new ResourceUrn("engine", "blockmesh");
 
     public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
@@ -24,6 +26,12 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
     public Block getBlock() {
         return block;
     }
+
+    @Override
+    public ResourceUrn baseUrn() {
+        return this.baseUrn;
+    }
+
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {

@@ -12,16 +12,16 @@ import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 
-import java.util.Optional;
-
 public abstract class BlockMeshShapeGenerator implements BlockMeshGenerator {
-    protected Optional<Mesh> mesh = Optional.empty();
+    protected Mesh mesh = null;
 
     public abstract Block getBlock();
 
+    public abstract ResourceUrn baseUrn();
+
     @Override
     public Mesh getStandaloneMesh() {
-        if (!mesh.isPresent()) {
+        if (mesh == null || mesh.isDisposed()) {
             Block block = getBlock();
             StandardMeshData meshData = new StandardMeshData();
             int nextIndex = 0;
@@ -47,9 +47,10 @@ public abstract class BlockMeshShapeGenerator implements BlockMeshGenerator {
                     nextIndex += part.size();
                 }
             }
-            mesh = Optional.of(Assets.generateAsset(new ResourceUrn("engine", "blockmesh", block.getURI().toString()), meshData,
-                    Mesh.class));
+            mesh = Assets.generateAsset(
+                    new ResourceUrn(baseUrn(), block.getURI().toString()), meshData,
+                    Mesh.class);
         }
-        return mesh.get();
+        return mesh;
     }
 }
