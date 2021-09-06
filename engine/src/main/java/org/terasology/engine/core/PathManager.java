@@ -3,6 +3,7 @@
 
 package org.terasology.engine.core;
 
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
@@ -14,8 +15,8 @@ import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -61,43 +62,27 @@ public final class PathManager {
     private Path configsPath;
 
     private PathManager() {
-        // By default, the path should be the code location (where terasology.jar is)
-        try {
-            URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
-
-            // TODO: Probably remove this after a while, confirming via logs that this is no longer needed
-            Path codeLocation = Paths.get(urlToSource.toURI());
-            System.out.println("PathManager being initialized. Initial code location is " + codeLocation.toAbsolutePath());
-
-            // Theory that whatever reason we needed to get the path that way isn't needed anymore - try just current dir ...
-            codeLocation = Paths.get("").toAbsolutePath();
-            System.out.println("Switched it to expected working dir: " + codeLocation.toAbsolutePath());
-
-            // If that fails in some situations a different approach could test for the following in the path:
-            // if (codeLocation.toString().contains(".gradle") || codeLocation.toString().contains(".m2")) {
-
-            if (Files.isRegularFile(codeLocation)) {
-                installPath = findNativesHome(codeLocation.getParent(), 5);
-                if (installPath == null) {
-                    System.out.println("Failed to find the natives dir - unable to launch!");
-                    throw new RuntimeException("Failed to find natives from .jar launch");
-                }
-            }
-        } catch (URISyntaxException e) {
-            // Can't use logger, because logger not set up when PathManager is used.
-            System.out.println("Failed to convert code location to uri");
-        }
-        // We might be running from an IDE which can cause the installPath to be null. Try current working directory.
-        if (installPath == null) {
-            installPath = Paths.get("").toAbsolutePath();
-            System.out.println("installPath was null, running from IDE or headless server? Setting to: " + installPath);
-            installPath = findNativesHome(installPath, 5);
-            if (installPath == null) {
-                System.out.println("Failed to find the natives dir - unable to launch!");
-                throw new RuntimeException("Failed to find natives from likely IDE launch");
-            }
-        }
+        installPath = findInstallPath();
         homePath = installPath;
+    }
+
+    private static Path findInstallPath() {
+        Path codeLocation;  // By default, the path should be the code location (where terasology.jar is)
+        try {
+            URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+            codeLocation = Paths.get(urlToSource);
+            // Not using logger because it's usually initialized after PathManager.
+            System.out.println("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
+        } catch (URISyntaxException e) {
+            System.err.println("PathManager: Failed to convert code location to path.");
+            e.printStackTrace();
+            codeLocation = Paths.get("").toAbsolutePath();
+            System.out.println("PathManager: Using working dir " + codeLocation);
+        }
+
+        return Verify.verifyNotNull(findNativesHome(codeLocation.getParent(), 5),
+                "Unable to find the natives directory from %s, unable to launch!",
+                codeLocation);
     }
 
     /**
@@ -107,25 +92,24 @@ public final class PathManager {
      * @param maxDepth  max directory levels to search
      * @return the adjusted path containing the natives directory or null if not found
      */
-    private Path findNativesHome(Path startPath, int maxDepth) {
+    private static Path findNativesHome(Path startPath, int maxDepth) {
         int levelsToSearch = maxDepth;
         Path checkedPath = startPath;
         while (levelsToSearch > 0) {
             File dirToTest = new File(checkedPath.toFile(), NATIVES_DIR);
             if (dirToTest.exists()) {
-                System.out.println("Found the natives dir: " + dirToTest);
                 return checkedPath;
             }
 
             checkedPath = checkedPath.getParent();
             if (checkedPath.equals(startPath.getRoot())) {
-                System.out.println("Uh oh, reached the root path, giving up");
+                System.err.println("Uh oh, reached the root path, giving up");
                 return null;
             }
             levelsToSearch--;
         }
 
-        System.out.println("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
+        System.err.println("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
         return null;
     }
 
