@@ -337,7 +337,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 body.getLinearVelocity(comp.velocity);
                 body.getAngularVelocity(comp.angularVelocity);
 
-                Vector3f vLocation = body.getLocation(new org.joml.Vector3f());
+                Vector3f vLocation = body.getLocation(new Vector3f());
 
                 Vector3f vDirection = new Vector3f(comp.velocity);
                 float fDistanceThisFrame = vDirection.length();

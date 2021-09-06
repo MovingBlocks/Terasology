@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.rendering.world.WorldRendererImpl;
 import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
+import org.terasology.gestalt.module.sandbox.API;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 @API
 public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
@@ -20,7 +20,9 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
     public static final String RENDER_ENTITY_COLLIDERS = "renderEntityColliders";
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
+    public static final String RENDER_ENTITY_BOUNDING_BOXES = "renderEntityBoundingBoxes";
+  
+    private static final Logger logger = LoggerFactory.getLogger(RenderingDebugConfig.class);
 
     private boolean enabled;
     private boolean firstPersonElementsHidden;
@@ -34,16 +36,15 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
         subscribe(this);
     }
 
-    public boolean isRenderingEntityColliders() {
+    public boolean isRenderEntityBoundingBoxes() {
         return renderEntityColliders;
     }
 
-    public void setRenderEntityColliders(boolean colliders) {
+    public void setRenderEntityBoundingBoxes(boolean colliders) {
         boolean oldValue = this.renderEntityColliders;
         this.renderEntityColliders = colliders;
-        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_COLLIDERS, oldValue, this.renderEntityColliders);
+        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_BOUNDING_BOXES, oldValue, this.renderEntityColliders);
     }
-
 
     public boolean isWireframe() {
         return wireframe;

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.metadata;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.reflection.copy.strategy.EntityCopyStrategy;
 import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;

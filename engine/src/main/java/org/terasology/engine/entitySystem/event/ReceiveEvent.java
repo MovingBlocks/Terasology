@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.event;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

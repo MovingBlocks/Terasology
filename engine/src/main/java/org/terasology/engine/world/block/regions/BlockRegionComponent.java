@@ -3,12 +3,12 @@
 
 package org.terasology.engine.world.block.regions;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 
-public class BlockRegionComponent implements Component {
+public class BlockRegionComponent implements Component<BlockRegionComponent> {
     /**
      * May be null.
      */
@@ -19,6 +19,11 @@ public class BlockRegionComponent implements Component {
     }
 
     public BlockRegionComponent(BlockRegion region) {
+        this.region = new BlockRegion(region);
+    }
+
+    @Override
+    public void copyFrom(BlockRegionComponent other) {
         this.region = new BlockRegion(region);
     }
 }

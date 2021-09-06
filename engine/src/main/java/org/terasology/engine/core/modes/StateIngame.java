@@ -125,7 +125,7 @@ public class StateIngame implements GameState {
         assetTypeManager.getAssetType(Prefab.class).ifPresent(AssetType::disposeAll);
 
         boolean save = networkSystem.getMode().isAuthority();
-        if (save) {
+        if (save && storageManager != null) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
 

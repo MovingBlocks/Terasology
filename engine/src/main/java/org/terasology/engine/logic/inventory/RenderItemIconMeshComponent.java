@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.inventory;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
-public class RenderItemIconMeshComponent implements Component {
+public class RenderItemIconMeshComponent extends EmptyComponent<RenderItemIconMeshComponent> {
 }
