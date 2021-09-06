@@ -33,7 +33,7 @@ class InitCommand extends BaseCommandType implements Runnable {
 
             if (property.containsKey("extraModules")) {
                 String modules = property.get("extraModules")
-                GetCommand cmd = new GetCommand()
+                org.terasology.cli.commands.module.GetCommand cmd = new org.terasology.cli.commands.module.GetCommand()
                 cmd.recurse = true
                 cmd.parent = parent
                 cmd.items = modules.split(",").toList()
