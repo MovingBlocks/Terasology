@@ -16,13 +16,13 @@ public class RenderingDebugCommands extends BaseComponentSystem {
     @In
     private Config config;
 
-    @Command(shortDescription = "Toggle rendering of entity colliders / bounding boxes.",
-            value = "debug:renderEntityColliders",
+    @Command(shortDescription = "Toggle rendering of entity bounding boxes.",
+            value = "debug:renderEntityBoundingBoxes",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String toggleRenderEntityColliders() {
-        boolean wasEnabled = config.getRendering().getDebug().isRenderingEntityColliders();
-        config.getRendering().getDebug().setRenderEntityColliders(!wasEnabled);
-        return "config.rendering.debug.renderEntityColliders is now " + (wasEnabled ? "disabled" : "enabled");
+        boolean wasEnabled = config.getRendering().getDebug().isRenderEntityBoundingBoxes();
+        config.getRendering().getDebug().setRenderEntityBoundingBoxes(!wasEnabled);
+        return "config.rendering.debug.renderEntityBoundingBoxes is now " + (wasEnabled ? "disabled" : "enabled");
     }
 
     @Command(shortDescription = "Toggle rendering of chunk bounding boxes.",
