@@ -17,6 +17,7 @@ class Config {
         defaultBranch = "develop"
         defaultOrg = "Terasology"
         gradleTemplatePath = new File("templates/build.gradle")
+        excludes = ["engine", "Index", "out", "build"]
     }
 
     public static final CommonConfig META = new CommonConfig().tap {

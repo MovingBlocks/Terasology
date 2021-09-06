@@ -3,17 +3,19 @@
 
 package org.terasology.cli.items
 
+
 import groovy.json.JsonSlurper
-import org.terasology.cli.module.Modules
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.terasology.cli.config.Config
 import org.terasology.cli.config.GradleAwareConfig
 
+@CompileStatic
 class ModuleItem extends Item implements GitItem<ModuleItem>, GradleItem<GradleAwareConfig> {
     public static String ModuleCfg = "module.txt"
 
-
     ModuleItem(String module) {
-        super(module, new File(Config.MODULE.directory, module) )
+        super(module, new File(Config.MODULE.directory, module))
 
     }
 
@@ -21,17 +23,24 @@ class ModuleItem extends Item implements GitItem<ModuleItem>, GradleItem<GradleA
         return new File(dir, ModuleItem.ModuleCfg).exists()
     }
 
-    ModuleItem[] dependencies(boolean respectExcludedItems = true) {
+    @CompileDynamic
+    List<String> dependencies(boolean respectExcludedItems = true) {
         def dependencies = []
-        File moduleFile = new File(this.dir, ModuleCfg)
-        def slurper = new JsonSlurper()
-        def moduleConfig = slurper.parseText(moduleFile.text)
+        Object moduleConfig = getModuleJson()
         for (dependency in moduleConfig.dependencies) {
-            if (!(respectExcludedItems && Config.ExcludeModule.contains(dependency.id))) {
-                dependencies << Modules.resolveModules(dependency.id)
+            if (!(respectExcludedItems && config.excludes.contains(dependency.id))) {
+                dependencies << dependency.id
             }
         }
         return dependencies
+    }
+
+
+    private Object getModuleJson() {
+        File moduleFile = new File(this.dir, ModuleCfg)
+
+        def moduleConfig = new JsonSlurper().parseText(moduleFile.text)
+        moduleConfig
     }
 
     @Override
@@ -40,7 +49,9 @@ class ModuleItem extends Item implements GitItem<ModuleItem>, GradleItem<GradleA
     }
 
     ModuleItem copyInGradleTemplate() {
-        new File(dir, 'build.gradle').bytes = new File('templates/build.gradle').bytes
+        def target = new File(dir, 'build.gradle')
+        def source = new File('templates/build.gradle')
+        target.write source.text
         return this
     }
 
@@ -56,6 +67,7 @@ class ModuleItem extends Item implements GitItem<ModuleItem>, GradleItem<GradleA
     }
 
     @Override
+    @CompileDynamic
     boolean equals(Object obj) {
         if (obj instanceof ModuleItem) {
             return obj.name == this.name

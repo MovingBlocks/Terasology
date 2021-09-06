@@ -3,8 +3,8 @@
 
 package org.terasology.cli.module
 
-import org.terasology.cli.items.ModuleItem
 import org.terasology.cli.config.Config
+import org.terasology.cli.items.ModuleItem
 import picocli.CommandLine
 
 class Modules {
@@ -25,10 +25,6 @@ class Modules {
         return moduleNames.collect {
             resolveModule(it)
         }
-    }
-
-    static List<ModuleItem> availableModules() {
-        ModuleIndex.instance.getData() // TODO
     }
 
     static void copyInTemplates(ModuleItem target) {
