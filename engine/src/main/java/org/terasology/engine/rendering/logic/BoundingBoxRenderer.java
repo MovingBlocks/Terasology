@@ -42,10 +42,7 @@ import org.terasology.nui.Color;
  *     <li>{@link SphereShapeComponent}</li>
  * </ul>
  *
- * @see BoxShapeComponent
- * @see CapsuleShapeComponent
- * @see CylinderShapeComponent
- * @see SphereShapeComponent
+ * @see SkeletonRenderer another debug renderer for the skeletal mesh of an entity
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BoundingBoxRenderer extends BaseComponentSystem implements RenderSystem {

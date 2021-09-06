@@ -51,7 +51,7 @@ import java.util.Random;
  * <p>
  * The entities must have a {@link SkeletalMeshComponent} and a {@link LocationComponent}.
  *
- * @see SkeletalMeshComponent
+ * @see BoundingBoxRenderer another debug renderer for bounding boxes defined by shape components
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class SkeletonRenderer extends BaseComponentSystem implements RenderSystem, UpdateSubscriberSystem {
