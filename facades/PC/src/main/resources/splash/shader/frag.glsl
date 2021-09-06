@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 
 varying vec4 vertexColor;
 varying vec2 textureCoord;
