@@ -396,7 +396,10 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Chunk chunk : chunksInProximityOfCamera) {
                 if (isChunkValidForRender(chunk) && chunk.isDirty()) {
                     statDirtyChunks++;
-                    chunkMeshPublisher.tryEmitNext(chunk);
+                    Sinks.EmitResult result = chunkMeshPublisher.tryEmitNext(chunk);
+                    if (result.isFailure()) {
+                        logger.error("failed to process chunk {} : {}", chunk, result);
+                    }
                 }
             }
         }
