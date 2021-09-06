@@ -17,11 +17,6 @@ import picocli.CommandLine.HelpCommand
         synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
         subcommands = [
                 HelpCommand.class,
-                GetCommand.class,
-                CheckoutCommand.class,
-                ExecuteCommand.class,
-                UpdateAllCommand.class,
-                UpdateCommand.class
         ],
         description = "Sub command for interacting with modules")
 class MetaCommand extends ItemCommand<MetaItem> {
