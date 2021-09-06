@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -64,6 +65,8 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     private Time time;
     @In
     private NetworkSystem networkSystem;
+    @In
+    private EntityManager entityManager;
     @In
     private PhysicsEngine physics;
     @In
