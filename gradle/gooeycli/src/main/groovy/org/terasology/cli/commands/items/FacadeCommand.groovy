@@ -11,7 +11,6 @@ import org.terasology.cli.commands.common.UpdateCommand;
 import org.terasology.cli.commands.common.RefreshCommand;
 import org.terasology.cli.config.Config
 import org.terasology.cli.items.FacadeItem
-import org.terasology.cli.items.GithubIndex
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
 
@@ -27,7 +26,7 @@ import picocli.CommandLine.HelpCommand
                 RefreshCommand.class
         ],
         description = "Sub command for interacting with modules")
-class FacadeCommand extends ItemCommand<FacadeItem> implements GithubIndex {
+class FacadeCommand extends ItemCommand<FacadeItem> {
 
     FacadeCommand() {
         super(Config.FACADE)

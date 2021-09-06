@@ -19,7 +19,7 @@ class ModuleIndex {
                 cache = slurper.parse(Config.ModuleCacheFile, "UTF8")
             } else {
 
-                URL modules = new URL(Config.MetaModuleIndexUrl)
+                URL modules = new URL(Config.ModuleIndexUrl)
 
                 String content = modules.text
                 Config.ModuleCacheFile.write(content, "UTF8")
