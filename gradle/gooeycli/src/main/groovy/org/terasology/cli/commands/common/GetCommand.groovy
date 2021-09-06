@@ -21,14 +21,11 @@ class GetCommand implements Runnable {
 
     @Override
     void run() {
-        if (!parent.validItems(items)) {
-            return
-        }
         String origin = parent.resolveOrigin()
 
-        items.collect {
-            parent.create(it)
-        }
+       items.collect {
+           parent.create(it)
+       }
                 .parallelStream()
                 .forEach { item ->
                     def targetUrl = "https://github.com/${origin}/${item.name}"

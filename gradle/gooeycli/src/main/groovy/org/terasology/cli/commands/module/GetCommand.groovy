@@ -27,9 +27,6 @@ class GetCommand implements Runnable {
 
     @Override
     void run() {
-        if (!parent.validItems(items)) {
-            return
-        }
         String origin = parent.resolveOrigin()
 
         def modulesCandidatesToReceive = Modules.resolveModules(availableModules()*.id) - parent.listLocal()

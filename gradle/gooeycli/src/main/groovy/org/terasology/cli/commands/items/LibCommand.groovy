@@ -37,9 +37,4 @@ class LibCommand extends ItemCommand<LibItem> {
     LibItem create(String name) {
         return new LibItem(name)
     }
-
-    @Override
-    List listRemote() {
-        return null
-    }
 }

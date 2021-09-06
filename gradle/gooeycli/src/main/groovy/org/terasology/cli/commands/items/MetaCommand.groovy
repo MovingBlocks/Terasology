@@ -9,7 +9,6 @@ import org.terasology.cli.commands.common.GetCommand
 import org.terasology.cli.commands.common.UpdateAllCommand
 import org.terasology.cli.commands.common.UpdateCommand
 import org.terasology.cli.config.Config
-import org.terasology.cli.items.GithubIndex
 import org.terasology.cli.items.MetaItem
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
@@ -25,7 +24,7 @@ import picocli.CommandLine.HelpCommand
                 UpdateCommand.class
         ],
         description = "Sub command for interacting with modules")
-class MetaCommand extends ItemCommand<MetaItem> implements GithubIndex {
+class MetaCommand extends ItemCommand<MetaItem> {
 
     MetaCommand() {
         super(Config.META)
