@@ -61,7 +61,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         public void onMouseOver(NUIMouseOverEvent event) {
             mouseWorldPosition = screenToWorld(event.getRelativeMousePosition());
             if (newNode != null) {
-                org.joml.Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
+                Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
                 newNode.move(diff);
             }
         }
@@ -252,7 +252,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         List<RenderableNode> renderables = createRenderables(nodeCopy);
         if (renderables.size() > 0) {
             newNode = renderables.get(0);
-            org.joml.Vector2f oldPos = new org.joml.Vector2f(newNode.getPosition());
+            Vector2f oldPos = new Vector2f(newNode.getPosition());
             layout(newNode);
             oldPos.sub(newNode.getPosition());
             newNode.move(oldPos);
