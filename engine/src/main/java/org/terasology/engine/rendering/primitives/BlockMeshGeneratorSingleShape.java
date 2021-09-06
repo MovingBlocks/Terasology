@@ -4,26 +4,25 @@ package org.terasology.engine.rendering.primitives;
 
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
-import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
-public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
-
+public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
     private Block block;
-    private Mesh mesh;
 
     public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
+    }
+
+    @Override
+    public Block getBlock() {
+        return block;
     }
 
     @Override
@@ -169,40 +168,4 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     }
 
-    @Override
-    public Mesh getStandaloneMesh() {
-        if (mesh == null || mesh.isDisposed()) {
-            mesh = generateMesh();
-        }
-        return mesh;
-    }
-
-    private Mesh generateMesh() {
-        StandardMeshData meshData = new StandardMeshData();
-        int nextIndex = 0;
-        for (BlockPart dir : BlockPart.allParts()) {
-            BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
-            if (part != null) {
-                for (int i = 0; i < part.size(); i++) {
-                    meshData.position.put(part.getVertex(i));
-                    meshData.color0.put(Color.white);
-                    meshData.normal.put(part.getNormal(i));
-                    meshData.uv0.put(part.getTexCoord(i));
-                }
-                for (int i = 0; i < part.indicesSize(); ++i) {
-                    meshData.indices.put(nextIndex + part.getIndex(i));
-                }
-                if (block.isDoubleSided()) {
-                    for (int i = 0; i < part.indicesSize(); i += 3) {
-                        meshData.indices.put(nextIndex + part.getIndex(i + 1));
-                        meshData.indices.put(nextIndex + part.getIndex(i));
-                        meshData.indices.put(nextIndex + part.getIndex(i + 2));
-                    }
-                }
-                nextIndex += part.size();
-
-            }
-        }
-        return Assets.generateAsset(new ResourceUrn("engine", "blockmesh", block.getURI().toString()), meshData, Mesh.class);
-    }
 }
