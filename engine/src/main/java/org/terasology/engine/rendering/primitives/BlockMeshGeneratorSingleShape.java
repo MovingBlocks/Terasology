@@ -5,6 +5,8 @@ package org.terasology.engine.rendering.primitives;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockAppearance;
@@ -170,23 +172,34 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     @Override
     public Mesh getStandaloneMesh() {
         if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
+            mesh = generateMesh();
         }
         return mesh;
     }
 
-    private void generateMesh() {
-        Tessellator tessellator = new Tessellator();
-        for (BlockPart dir : BlockPart.values()) {
+    private Mesh generateMesh() {
+        StandardMeshData meshData = new StandardMeshData();
+        int nextIndex = 0;
+        for (BlockPart dir : BlockPart.allParts()) {
             BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
             if (part != null) {
-                if (block.isDoubleSided()) {
-                    tessellator.addMeshPartDoubleSided(part);
-                } else {
-                    tessellator.addMeshPart(part);
+                for (int i = 0; i < part.size(); i++) {
+                    meshData.position.put(part.getVertex(i));
+                    meshData.normal.put(part.getNormal(i));
+                    meshData.uv0.put(part.getTexCoord(i));
+                    meshData.indices.put(nextIndex + part.getIndex(i));
                 }
+                if (block.isDoubleSided()) {
+                    for (int i = 0; i < part.indicesSize(); i += 3) {
+                        meshData.indices.put(nextIndex + part.getIndex(i + 1));
+                        meshData.indices.put(nextIndex + part.getIndex(i));
+                        meshData.indices.put(nextIndex + part.getIndex(i + 2));
+                    }
+                }
+                nextIndex += part.size();
+
             }
         }
-        mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
+        return Assets.generateAsset(new ResourceUrn("engine", "blockmesh", block.getURI().toString()), meshData, Mesh.class);
     }
 }
