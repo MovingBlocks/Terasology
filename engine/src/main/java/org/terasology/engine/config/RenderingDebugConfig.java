@@ -19,6 +19,8 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     public static final String HUD_HIDDEN = "hudHidden";
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
+    public static final String RENDER_ENTITY_BOUNDING_BOXES = "renderEntityBoundingBoxes";
+  
     private static final Logger logger = LoggerFactory.getLogger(RenderingDebugConfig.class);
 
     private boolean enabled;
@@ -27,9 +29,20 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     private boolean wireframe;
     private boolean renderChunkBoundingBoxes;
     private boolean renderSkeletons;
+    private boolean renderEntityColliders;
 
     public RenderingDebugConfig() {
         subscribe(this);
+    }
+
+    public boolean isRenderEntityBoundingBoxes() {
+        return renderEntityColliders;
+    }
+
+    public void setRenderEntityBoundingBoxes(boolean colliders) {
+        boolean oldValue = this.renderEntityColliders;
+        this.renderEntityColliders = colliders;
+        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_BOUNDING_BOXES, oldValue, this.renderEntityColliders);
     }
 
     public boolean isWireframe() {
