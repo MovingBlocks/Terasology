@@ -185,8 +185,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             if (part != null) {
                 for (int i = 0; i < part.size(); i++) {
                     meshData.position.put(part.getVertex(i));
+                    meshData.color0.put(Color.white);
                     meshData.normal.put(part.getNormal(i));
                     meshData.uv0.put(part.getTexCoord(i));
+                }
+                for (int i = 0; i < part.indicesSize(); ++i) {
                     meshData.indices.put(nextIndex + part.getIndex(i));
                 }
                 if (block.isDoubleSided()) {
