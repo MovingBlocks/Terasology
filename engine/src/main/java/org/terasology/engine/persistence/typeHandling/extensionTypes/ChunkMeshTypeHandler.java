@@ -5,12 +5,12 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.ChunkMeshImpl;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,19 +44,13 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
             directBuffer.rewind();
             asBuffers.add(directBuffer);
         }
-        ChunkMesh result = new ChunkMesh();
+        ChunkMesh result = new ChunkMeshImpl();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
             result.getVertexElements(renderType).buffer.copyBuffer(asBuffers.remove(0));
             result.getVertexElements(renderType).indices.copyBuffer(asBuffers.remove(0));
         }
-        result.generateVBOs();
+        result.updateMesh();
         return Optional.of(result);
     }
 
-    private ByteBuffer asByteBuffer(IntBuffer in) {
-        ByteBuffer result = ByteBuffer.allocate(in.limit() * 4);
-        in.rewind();
-        result.asIntBuffer().put(in);
-        return result;
-    }
 }

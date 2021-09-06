@@ -144,8 +144,7 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f",
-                            ChunkTessellator.getVertexArrayUpdateCount(),
+                    return String.format("World Time: %.3f, Time Dilation: %.1f",
                             worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
                             time.getGameTimeDilation());
                 }
