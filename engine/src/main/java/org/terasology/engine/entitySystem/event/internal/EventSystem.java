@@ -3,10 +3,10 @@
 package org.terasology.engine.entitySystem.event.internal;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Event system propagates events to registered handlers

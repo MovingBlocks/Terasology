@@ -4,10 +4,10 @@
 package org.terasology.engine.network;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
-import org.terasology.nui.Color;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.chunks.ChunkRegionListener;
+import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.nui.Color;
 
 /**
  * A client is the connection between a player (local or remote) and the game.

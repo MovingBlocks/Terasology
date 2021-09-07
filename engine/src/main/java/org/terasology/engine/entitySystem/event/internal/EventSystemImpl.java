@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.entitySystem.event.ConsumableEvent;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
@@ -28,6 +27,7 @@ import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

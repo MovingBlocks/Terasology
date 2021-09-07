@@ -7,11 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.engine.context.internal.ContextImpl;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
@@ -19,12 +17,14 @@ import org.terasology.engine.entitySystem.event.internal.EventSystemImpl;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.unittest.stubs.IntegerComponent;
-import org.terasology.unittest.stubs.StringComponent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.unittest.stubs.IntegerComponent;
+import org.terasology.unittest.stubs.StringComponent;
 
 import java.util.List;
 
