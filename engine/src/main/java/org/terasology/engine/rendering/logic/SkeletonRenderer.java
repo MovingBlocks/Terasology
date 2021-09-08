@@ -46,6 +46,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Renders the skeletal mesh of entities when the debug setting "renderSkeletons" is active.
+ * <p>
+ * The entities must have a {@link SkeletalMeshComponent} and a {@link LocationComponent}.
+ *
+ * @see BoundingBoxRenderer another debug renderer for bounding boxes defined by shape components
+ */
 @RegisterSystem(RegisterMode.CLIENT)
 public class SkeletonRenderer extends BaseComponentSystem implements RenderSystem, UpdateSubscriberSystem {
 
