@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.event;
 
-import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.lang.annotation.ElementType;
@@ -24,8 +23,6 @@ public @interface ReceiveEvent {
      * What components that the entity must have for this method to be invoked
      */
     Class<? extends Component>[] components() default {};
-
-    RegisterMode netFilter() default RegisterMode.ALWAYS;
 
     int priority() default EventPriority.PRIORITY_NORMAL;
 

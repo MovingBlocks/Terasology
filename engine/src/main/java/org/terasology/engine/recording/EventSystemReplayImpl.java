@@ -30,6 +30,7 @@ import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
 import org.terasology.engine.entitySystem.metadata.EventMetadata;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.BroadcastEvent;
 import org.terasology.engine.network.Client;
@@ -307,7 +308,8 @@ public class EventSystemReplayImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
+                NetFilterEvent netFilterAnnotation =  method.getAnnotation(NetFilterEvent.class);
+                if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
                     continue;
                 }
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();

@@ -4,20 +4,21 @@ package org.terasology.engine.logic.characters.interactions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.characters.events.ActivationPredicted;
 import org.terasology.engine.logic.characters.events.ActivationRequestDenied;
+import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 @RegisterSystem(RegisterMode.ALWAYS)
 public class InteractionSystem extends BaseComponentSystem {
@@ -26,7 +27,8 @@ public class InteractionSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
-    @ReceiveEvent(components = InteractionTargetComponent.class, netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = InteractionTargetComponent.class)
     public void onActivate(ActivateEvent event, EntityRef target) {
         EntityRef instigator = event.getInstigator();
 
@@ -64,12 +66,14 @@ public class InteractionSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = CharacterComponent.class, netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onActivationRequestDenied(ActivationRequestDenied event, EntityRef character) {
         character.send(new InteractionEndEvent(event.getActivationId()));
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent
     public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
         InteractionUtil.cancelInteractionAsServer(instigator);
     }

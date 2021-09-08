@@ -10,6 +10,7 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 
@@ -117,7 +118,8 @@ public class Location extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent
     public void onResyncLocation(LocationResynchEvent event, EntityRef entityRef, LocationComponent locationComponent) {
         locationComponent.setWorldPosition(event.getPosition());
         locationComponent.setWorldRotation(event.getRotation());

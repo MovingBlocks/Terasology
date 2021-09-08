@@ -16,6 +16,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedCompon
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
@@ -301,14 +302,16 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
         logger.debug("Received resynch event");
         RigidBody body = physics.getRigidBody(entity);
         body.setVelocity(event.getVelocity(), event.getAngularVelocity());
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
         logger.debug("Received location resynch event");
         RigidBody body = physics.getRigidBody(entity);

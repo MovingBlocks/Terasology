@@ -12,6 +12,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedCompon
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.registry.In;
@@ -46,7 +47,8 @@ public class NetworkEntitySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL, netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void onAddNetworkComponent(OnActivatedComponent event, EntityRef entity) {
         if (networkSystem.getMode().isServer()) {
             networkSystem.registerNetworkEntity(entity);

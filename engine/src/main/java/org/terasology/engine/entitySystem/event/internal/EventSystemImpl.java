@@ -24,6 +24,7 @@ import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
@@ -99,7 +100,8 @@ public class EventSystemImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!receiveEventAnnotation.netFilter().isValidFor(isAutority, false)) {
+                NetFilterEvent netFilterAnnotation =  method.getAnnotation(NetFilterEvent.class);
+                if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(isAutority, false)) {
                     continue;
                 }
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
