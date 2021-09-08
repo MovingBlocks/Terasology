@@ -330,6 +330,13 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
+            Matrix4f relMat = new Matrix4f();
+            Matrix4f relFinal = new Matrix4f();
+            Matrix4f entityTransform = new Matrix4f();
+
+            Matrix4f result = new Matrix4f();
+            Vector3f currentPos = new Vector3f();
+
             int index = 0;
             for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
                 SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
@@ -340,7 +347,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
                 Vector3f location = locationComponent.getWorldPosition(new Vector3f());
                 Quaternionf rotation = locationComponent.getWorldRotation(new Quaternionf());
-                Matrix4f transform = new Matrix4f().translationRotateScale(location, rotation, 1.0f);
+                entityTransform.translationRotateScale(location, rotation, 1.0f);
 
                 for (Bone bone : skeletalMesh.mesh.getBones()) {
                     Bone parentBone = bone.getParent();
@@ -354,27 +361,22 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     LocationComponent locCompA = boneEntity.getComponent(LocationComponent.class);
                     LocationComponent locCompB = boneParentEntity.getComponent(LocationComponent.class);
 
-                    Matrix4f m1 = new Matrix4f();
-                    Matrix4f m2 = new Matrix4f();
 
-                    locCompA.getRelativeTransform(m1, entity);
-                    locCompB.getRelativeTransform(m2, entity);
+                    locCompA.getRelativeTransform(relMat.identity(), entity);
+                    result.set(entityTransform)
+                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(relMat))
+                            .transformPosition(currentPos.zero());
+                    meshData.position.put(currentPos);
 
 
-                    Vector3f worldPosA = new Matrix4f(transform)
-                            .mul(new Matrix4f().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(m1))
-                            .transformPosition(new Vector3f());
-
-                    Vector3f worldPosB =
-                            new Matrix4f(transform)
-                                    .mul(new Matrix4f().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(m2))
-                                    .transformPosition(new Vector3f());
+                    locCompB.getRelativeTransform(relMat.identity(), entity);
+                            result.set(entityTransform)
+                                    .mul(relFinal.identity().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(relMat))
+                                    .transformPosition(currentPos.zero());
+                    meshData.position.put(currentPos);
 
                     meshData.color0.put(Color.white);
                     meshData.color0.put(Color.white);
-
-                    meshData.position.put(worldPosA);
-                    meshData.position.put(worldPosB);
 
                     meshData.indices.putAll(new int[]{
                             index, index + 1
