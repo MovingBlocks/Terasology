@@ -59,11 +59,11 @@ public final class ChunkProcessingInfo {
         this.currentFuture = currentFuture;
     }
 
-    public org.terasology.engine.world.chunks.pipeline.stages.ChunkTask getChunkTask() {
+    public ChunkTask getChunkTask() {
         return chunkTask;
     }
 
-    public void setChunkTask(org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask) {
+    public void setChunkTask(ChunkTask chunkTask) {
         this.chunkTask = chunkTask;
     }
 
