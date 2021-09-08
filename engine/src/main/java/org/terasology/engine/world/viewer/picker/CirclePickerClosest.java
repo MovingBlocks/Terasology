@@ -3,6 +3,7 @@
 
 package org.terasology.engine.world.viewer.picker;
 
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 
 import java.util.Collections;
@@ -35,7 +36,7 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
      * @param radiusFunc the radius function for each of the tested elements
      */
     public CirclePickerClosest(Vector2fc target, Function<? super T, ? extends Number> radiusFunc) {
-        this.cursor = new org.joml.Vector2f(target);
+        this.cursor = new Vector2f(target);
         this.radiusFunc = radiusFunc;
     }
 
