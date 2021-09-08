@@ -156,7 +156,7 @@ public final class ChunkMeshUpdateManager {
                     newMesh = tessellator.generateMesh(chunkView);
 
                     c.setPendingMesh(newMesh);
-                    ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                    ChunkMonitor.fireChunkTessellated(c, newMesh);
                 }
 
             }

@@ -4,6 +4,7 @@ package org.terasology.engine.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.chunks.ChunkProvider;
 
@@ -31,14 +32,14 @@ public abstract class ChunkMonitorEvent {
 
     public static class BasicChunkEvent extends ChunkMonitorEvent {
 
-        protected final Vector3i position;
+        protected final Vector3ic position;
 
-        public BasicChunkEvent(Vector3i position) {
+        public BasicChunkEvent(Vector3ic position) {
             Preconditions.checkNotNull(position, "The parameter 'chunk' must not be null");
             this.position = position;
         }
 
-        public final Vector3i getPosition() {
+        public final Vector3ic getPosition() {
             return position;
         }
     }
@@ -58,13 +59,13 @@ public abstract class ChunkMonitorEvent {
     }
 
     public static class Revived extends BasicChunkEvent {
-        public Revived(Vector3i position) {
+        public Revived(Vector3ic position) {
             super(position);
         }
     }
 
     public static class Disposed extends BasicChunkEvent {
-        public Disposed(Vector3i position) {
+        public Disposed(Vector3ic position) {
             super(position);
         }
     }
@@ -74,7 +75,7 @@ public abstract class ChunkMonitorEvent {
         public final int oldSize;
         public final int newSize;
 
-        public Deflated(Vector3i position, int oldSize, int newSize) {
+        public Deflated(Vector3ic position, int oldSize, int newSize) {
             super(position);
             this.oldSize = oldSize;
             this.newSize = newSize;
@@ -85,7 +86,7 @@ public abstract class ChunkMonitorEvent {
 
         public final ChunkMeshInfo meshInfo;
 
-        public Tessellated(Vector3i position, ChunkMesh mesh) {
+        public Tessellated(Vector3ic position, ChunkMesh mesh) {
             super(position);
             this.meshInfo = new ChunkMeshInfo(mesh);
         }
