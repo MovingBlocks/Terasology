@@ -11,13 +11,13 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComp
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This system handles a number of events relevant to the Network System:

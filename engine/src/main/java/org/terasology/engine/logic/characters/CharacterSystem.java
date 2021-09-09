@@ -12,7 +12,6 @@ import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
@@ -51,6 +50,7 @@ import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.regions.ActAsBlockComponent;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.Optional;
 

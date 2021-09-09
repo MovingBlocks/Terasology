@@ -6,7 +6,6 @@ package org.terasology.engine.logic.players;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -25,6 +24,7 @@ import org.terasology.engine.rendering.nui.layers.ingame.DeathScreen;
 import org.terasology.engine.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.input.ButtonState;
 
 

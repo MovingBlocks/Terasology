@@ -8,7 +8,6 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -23,6 +22,7 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.events.MovedEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.input.Keyboard;
 
 @RegisterSystem(RegisterMode.CLIENT)

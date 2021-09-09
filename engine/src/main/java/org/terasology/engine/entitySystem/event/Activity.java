@@ -3,6 +3,8 @@
 
 package org.terasology.engine.entitySystem.event;
 
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
+
 /**
  * Additional for {@link ReceiveEvent}.
  * Activate performance monitoring for Event Handler.

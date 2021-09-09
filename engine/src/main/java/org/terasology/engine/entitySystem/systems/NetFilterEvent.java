@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks event handlers condition. when should be registered. {@link RegisterMode}
- * Using with {@link org.terasology.engine.entitySystem.event.ReceiveEvent}
+ * Using with {@link org.terasology.gestalt.entitysystem.event.ReceiveEvent}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

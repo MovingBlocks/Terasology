@@ -3,6 +3,8 @@
 
 package org.terasology.engine.entitySystem.event;
 
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

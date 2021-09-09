@@ -15,7 +15,6 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComp
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -44,6 +43,7 @@ import org.terasology.engine.world.OnChangedBlock;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.Iterator;
 import java.util.List;

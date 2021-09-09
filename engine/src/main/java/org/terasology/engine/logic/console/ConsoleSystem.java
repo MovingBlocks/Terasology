@@ -5,7 +5,6 @@ package org.terasology.engine.logic.console;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -16,6 +15,7 @@ import org.terasology.engine.logic.console.ui.NotificationOverlay;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.input.ButtonState;
 
 @RegisterSystem

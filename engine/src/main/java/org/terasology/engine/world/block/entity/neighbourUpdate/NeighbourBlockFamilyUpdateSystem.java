@@ -8,7 +8,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -23,6 +22,7 @@ import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.family.UpdatesWithNeighboursFamily;
 import org.terasology.engine.world.block.items.OnBlockItemPlaced;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.Set;
 

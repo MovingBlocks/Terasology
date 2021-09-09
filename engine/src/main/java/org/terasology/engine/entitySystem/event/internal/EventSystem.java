@@ -28,7 +28,7 @@ public interface EventSystem {
     void registerEvent(ResourceUrn uri, Class<? extends Event> eventType);
 
     /**
-     * Registers an object as an event handler - all methods with the {@link org.terasology.engine.entitySystem.event.ReceiveEvent}
+     * Registers an object as an event handler - all methods with the {@link org.terasology.gestalt.entitysystem.event.ReceiveEvent}
      * annotation will be registered
      *
      * @param handler

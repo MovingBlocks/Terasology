@@ -26,7 +26,6 @@ import org.terasology.engine.entitySystem.event.ConsumableEvent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
 import org.terasology.engine.entitySystem.event.Priority;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
@@ -46,6 +45,7 @@ import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;

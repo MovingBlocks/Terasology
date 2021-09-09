@@ -18,7 +18,6 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveCom
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -39,6 +38,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.unittest.stubs.ForceBlockActiveComponent;
 import org.terasology.unittest.stubs.IntegerComponent;
 import org.terasology.unittest.stubs.RetainedOnBlockChangeComponent;
