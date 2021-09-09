@@ -167,7 +167,7 @@ public class StateLoading implements GameState {
 
     private void initHost() {
         loadProcesses.add(new RegisterMods(context, gameManifest));
-        if(netMode.hasLocalClient()) {
+        if (netMode.hasLocalClient()) {
             loadProcesses.add(new InitialiseRendering(context));
         }
         loadProcesses.add(new InitialiseEntitySystem(context));
