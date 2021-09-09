@@ -123,14 +123,20 @@ pipeline {
                     // TODO: does this also work for PRs with different base branch?
                     discoverGitReferenceBuild(defaultBranch: 'develop')
                     recordIssues skipBlames: true, enabledForFailure: true,
-                        tools: [
-                            checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
-                            spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
-                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                        tool: [
+                            checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
                         ],
                         qualityGates: [
-                            [threshold: 0, type: 'TOTAL_HIGH', unstable: false],  // mark stage "failed" on high findings
-                            [threshold: 0, type: 'TOTAL_NORMAL', unstable: true]  // mark stage "unstable" on normal findings
+                            [threshold: 0, type: 'NEW_HIGH', unstable: false],      // mark stage "failed" on new high findings
+                            [threshold: 0, type: 'NEW_NORMAL', unstable: false],    // mark stage "failed" on new normal findings
+                            [threshold: 0, type: 'TOTAL_HIGH', unstable: true],     // mark stage "unstable" on existing high findings
+                            [threshold: 0, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
+                        ]
+                    
+                    recordIssues skipBlames: true, enabledForFailure: true,
+                        tools [
+                            spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
+                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
                         ]
 
                     recordIssues skipBlames: true, enabledForFailure: true,
