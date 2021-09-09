@@ -129,8 +129,8 @@ pipeline {
                             pmdParser(pattern: '**/build/reports/pmd/*.xml')
                         ],
                         qualityGates: [
-                            [threshold: 0, type: 'HIGH', unstable: false],  // mark stage "failed" on high findings
-                            [threshold: 0, type: 'NORMAL', unstable: true]  // mark stage "unstable" on normal findings
+                            [threshold: 0, type: 'TOTAL_HIGH', unstable: false],  // mark stage "failed" on high findings
+                            [threshold: 0, type: 'TOTAL_NORMAL', unstable: true]  // mark stage "unstable" on normal findings
                         ]
 
                     recordIssues skipBlames: true, enabledForFailure: true,
