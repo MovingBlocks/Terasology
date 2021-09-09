@@ -122,11 +122,15 @@ pipeline {
                     // this is wrong in our case, so explicitly set `develop` as default
                     // TODO: does this also work for PRs with different base branch?
                     discoverGitReferenceBuild(defaultBranch: 'develop')
-                    recordIssues skipBlames: true, enabledForFailure: true, minimumSeverity: 'NORMAL',
+                    recordIssues skipBlames: true, enabledForFailure: true
                         tools: [
                             checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
                             spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
                             pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                        ],
+                        qualityGates: [
+                            [threshold: 0, type: 'HIGH', unstable: false],  // mark stage "failed" on high findings
+                            [threshold: 0, type: 'NORMAL', unstable: true]  // mark stage "unstable" on normal findings
                         ]
 
                     recordIssues skipBlames: true, enabledForFailure: true,
