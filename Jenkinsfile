@@ -123,9 +123,7 @@ pipeline {
                     // TODO: does this also work for PRs with different base branch?
                     discoverGitReferenceBuild(defaultBranch: 'develop')
                     recordIssues skipBlames: true, enabledForFailure: true,
-                        tool: [
-                            checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
-                        ],
+                        tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
                         qualityGates: [
                             [threshold: 0, type: 'NEW_HIGH', unstable: false],      // mark stage "failed" on new high findings
                             [threshold: 0, type: 'NEW_NORMAL', unstable: false],    // mark stage "failed" on new normal findings
