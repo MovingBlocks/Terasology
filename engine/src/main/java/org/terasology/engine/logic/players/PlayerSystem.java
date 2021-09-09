@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -21,12 +22,12 @@ import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.AliveCharacterComponent;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterTeleportEvent;
+import org.terasology.engine.logic.health.BeforeDestroyEvent;
 import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.logic.players.event.RespawnRequestEvent;
-import org.terasology.engine.logic.health.BeforeDestroyEvent;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
@@ -202,7 +203,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = ClientComponent.class)
+    @Priority(EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
         EntityRef character = clientComponent.character;
@@ -220,7 +222,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         character.saveComponent(loc);
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = ClientComponent.class)
+    @Priority(EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition(new Vector3f());
 

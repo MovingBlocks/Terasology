@@ -14,10 +14,10 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindButtonSubscriber;
 import org.terasology.engine.input.BindableButton;
-import org.terasology.input.Keyboard;
 import org.terasology.engine.input.internal.BindableButtonImpl;
 import org.terasology.engine.logic.console.ui.ConsoleScreen;
 import org.terasology.engine.registry.In;
+import org.terasology.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -11,6 +11,7 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
 import org.terasology.engine.entitySystem.event.internal.EventSystemImpl;
@@ -250,7 +251,8 @@ public class PojoEventSystemTests {
 
         List<Received> receivedList = Lists.newArrayList();
 
-        @ReceiveEvent(components = StringComponent.class, priority = EventPriority.PRIORITY_HIGH)
+        @Priority(EventPriority.PRIORITY_HIGH)
+        @ReceiveEvent(components = StringComponent.class)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
             if (cancel) {
@@ -258,7 +260,8 @@ public class PojoEventSystemTests {
             }
         }
 
-        @ReceiveEvent(components = IntegerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+        @Priority(EventPriority.PRIORITY_HIGH)
+        @ReceiveEvent(components = IntegerComponent.class)
         public void handleIntegerEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
         }

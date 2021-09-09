@@ -24,7 +24,5 @@ public @interface ReceiveEvent {
      */
     Class<? extends Component>[] components() default {};
 
-    int priority() default EventPriority.PRIORITY_NORMAL;
-
     String activity() default "";
 }

@@ -13,6 +13,7 @@ import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -20,10 +21,6 @@ import org.terasology.engine.logic.health.DoDestroyEvent;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
 import org.terasology.engine.logic.inventory.events.GiveItemEvent;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.world.block.entity.damage.BlockDamageModifierComponent;
-import org.terasology.engine.world.block.regions.ActAsBlockComponent;
-import org.terasology.engine.world.block.regions.BlockRegionComponent;
-import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.physics.events.ImpulseEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.random.FastRandom;
@@ -32,8 +29,12 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.engine.world.block.items.OnBlockToItem;
+import org.terasology.engine.world.block.regions.ActAsBlockComponent;
+import org.terasology.engine.world.block.regions.BlockRegionComponent;
+import org.terasology.engine.world.block.sounds.BlockSounds;
 
 
 /**
@@ -64,26 +65,30 @@ public class BlockEntitySystem extends BaseComponentSystem {
         random = new FastRandom();
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    @Priority(EventPriority.PRIORITY_LOW)
+    @ReceiveEvent
     public void doDestroy(DoDestroyEvent event, EntityRef entity, ActAsBlockComponent blockComponent) {
         if (blockComponent.block != null) {
             commonDestroyed(event, entity, blockComponent.block.getArchetypeBlock());
         }
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    @Priority(EventPriority.PRIORITY_LOW)
+    @ReceiveEvent
     public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
         commonDestroyed(event, entity, blockComponent.getBlock());
         worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    @Priority(EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, BlockComponent blockComponent) {
         Vector3ic location = blockComponent.getPosition();
         commonDefaultDropsHandling(event, entity, location, blockComponent.getBlock());
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    @Priority(EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent) {
         if (blockComponent.block != null) {
             if (entity.hasComponent(BlockRegionComponent.class)) {

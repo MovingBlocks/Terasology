@@ -4,15 +4,16 @@ package org.terasology.engine.rendering.nui.editor.systems;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.editor.binds.NUIEditorButton;
 import org.terasology.engine.rendering.nui.editor.layers.NUIEditorScreen;
+import org.terasology.input.ButtonState;
 
 /**
  * The back-end system for the NUI screen editor.
@@ -25,8 +26,8 @@ public class NUIEditorSystem extends AbstractEditorSystem {
 
     private boolean editorActive;
 
-    @ReceiveEvent(components = ClientComponent.class,
-                  priority = EventPriority.PRIORITY_CRITICAL)
+    @Priority(EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void showEditor(NUIEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             toggleEditor();

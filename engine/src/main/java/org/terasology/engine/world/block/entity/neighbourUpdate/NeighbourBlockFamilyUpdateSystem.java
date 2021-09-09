@@ -15,13 +15,13 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.registry.In;
-import org.terasology.engine.world.block.family.BlockFamily;
-import org.terasology.engine.world.block.family.UpdatesWithNeighboursFamily;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.OnChangedBlock;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.family.UpdatesWithNeighboursFamily;
 import org.terasology.engine.world.block.items.OnBlockItemPlaced;
 
 import java.util.Set;

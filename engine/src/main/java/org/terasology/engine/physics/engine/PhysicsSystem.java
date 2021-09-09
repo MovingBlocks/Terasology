@@ -14,6 +14,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivat
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
@@ -80,7 +81,8 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         lastNetsync = 0;
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @Priority(EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
         //getter also creates the rigid body
         physics.getRigidBody(entity);

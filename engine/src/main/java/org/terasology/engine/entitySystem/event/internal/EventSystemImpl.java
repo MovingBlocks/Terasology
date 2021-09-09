@@ -22,6 +22,7 @@ import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.entitySystem.event.ConsumableEvent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
@@ -100,10 +101,21 @@ public class EventSystemImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
+
                 NetFilterEvent netFilterAnnotation =  method.getAnnotation(NetFilterEvent.class);
                 if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(isAutority, false)) {
                     continue;
                 }
+
+                int priority;
+                Priority priorityAnnotation = method.getAnnotation(Priority.class);
+                if (priorityAnnotation != null) {
+                    priority = priorityAnnotation.value();
+                } else {
+                    priority = EventPriority.PRIORITY_NORMAL;
+                }
+
+
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
@@ -125,9 +137,8 @@ public class EventSystemImpl implements EventSystem {
                     requiredComponents.add((Class<? extends Component>) types[i]);
                     componentParams.add((Class<? extends Component>) types[i]);
                 }
-
                 ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method,
-                        receiveEventAnnotation.priority(),
+                        priority,
                         receiveEventAnnotation.activity(), requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }

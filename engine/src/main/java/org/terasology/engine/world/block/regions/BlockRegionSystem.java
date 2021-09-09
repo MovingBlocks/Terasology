@@ -5,6 +5,7 @@ package org.terasology.engine.world.block.regions;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -24,7 +25,8 @@ public class BlockRegionSystem extends BaseComponentSystem {
     private BlockManager blockManager;
 
     // trivial priority so that all other logic can happen to the region before erasing the blocks in the region
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    @Priority(EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent
     public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockRegionComponent blockRegion) {
         for (Vector3ic blockPosition : blockRegion.region) {
             worldProvider.setBlock(blockPosition, blockManager.getBlock(BlockManager.AIR_ID));

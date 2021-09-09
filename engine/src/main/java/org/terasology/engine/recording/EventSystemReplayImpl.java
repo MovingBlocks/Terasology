@@ -24,6 +24,7 @@ import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.entitySystem.event.ConsumableEvent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
@@ -312,6 +313,15 @@ public class EventSystemReplayImpl implements EventSystem {
                 if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
                     continue;
                 }
+
+                int priority;
+                Priority priorityAnnotation = method.getAnnotation(Priority.class);
+                if (priorityAnnotation != null) {
+                    priority = priorityAnnotation.value();
+                } else {
+                    priority = EventPriority.PRIORITY_NORMAL;
+                }
+
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
@@ -334,7 +344,7 @@ public class EventSystemReplayImpl implements EventSystem {
                 }
 
                 EventSystemReplayImpl.ByteCodeEventHandlerInfo handlerInfo =
-                        new EventSystemReplayImpl.ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
+                        new EventSystemReplayImpl.ByteCodeEventHandlerInfo(handler, method, priority,
                                 receiveEventAnnotation.activity(), requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }

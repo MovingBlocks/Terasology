@@ -22,6 +22,7 @@ import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.i18n.TranslationSystem;
@@ -651,7 +652,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
       have first pick of input
     */
 
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void mouseAxisEvent(MouseAxisEvent event, EntityRef entity) {
         if (isReleasingMouse()) {
             event.consume();
@@ -659,7 +661,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //mouse button events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (!mouse.isVisible()) {
             return;
@@ -687,7 +690,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //mouse wheel events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (!mouse.isVisible()) {
             return;
@@ -712,7 +716,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //text input events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void charEvent(CharEvent ev, EntityRef entity) {
         NUICharEvent nuiEvent = new NUICharEvent(mouse, keyboard, ev.getCharacter());
         if (focus != null) {
@@ -738,7 +743,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //raw input events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
         NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getState());
         if (focus != null) {
@@ -765,7 +771,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event
     // hasn't consumed the event)
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard,
                 new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(),

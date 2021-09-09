@@ -13,10 +13,6 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.world.block.entity.placement.PlaceBlocks;
-import org.terasology.engine.world.block.family.BlockFamily;
-import org.terasology.engine.world.block.family.BlockPlacementData;
-import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.logic.characters.KinematicCharacterMover;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.inventory.ItemComponent;
@@ -32,6 +28,10 @@ import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.entity.placement.PlaceBlocks;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.family.BlockPlacementData;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.Map;
 
