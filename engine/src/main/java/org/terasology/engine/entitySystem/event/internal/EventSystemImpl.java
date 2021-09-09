@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.engine.entitySystem.event.Activity;
 import org.terasology.engine.entitySystem.event.ConsumableEvent;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
@@ -31,6 +32,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -115,6 +117,11 @@ public class EventSystemImpl implements EventSystem {
                     priority = EventPriority.PRIORITY_NORMAL;
                 }
 
+                String activity = null;
+                Activity activityAnnotation = method.getAnnotation(Activity.class);
+                if (activityAnnotation != null) {
+                    activity = activityAnnotation.value();
+                }
 
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
                 method.setAccessible(true);
@@ -139,7 +146,7 @@ public class EventSystemImpl implements EventSystem {
                 }
                 ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method,
                         priority,
-                        receiveEventAnnotation.activity(), requiredComponents, componentParams);
+                        activity, requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }
         }
@@ -346,7 +353,7 @@ public class EventSystemImpl implements EventSystem {
         ByteCodeEventHandlerInfo(ComponentSystem handler,
                                  Method method,
                                  int priority,
-                                 String activity,
+                                 @Nullable String activity,
                                  Collection<Class<? extends Component>> filterComponents,
                                  Collection<Class<? extends Component>> componentParams) {
 
@@ -385,13 +392,13 @@ public class EventSystemImpl implements EventSystem {
             }
 
 
-            if (!activity.isEmpty()) {
+            if (activity != null) {
                 PerformanceMonitor.startActivity(activity);
             }
             try {
                 methodAccess.invoke(handler, methodIndex, params);
             } finally {
-                if (!activity.isEmpty()) {
+                if (activity != null) {
                     PerformanceMonitor.endActivity();
                 }
             }
