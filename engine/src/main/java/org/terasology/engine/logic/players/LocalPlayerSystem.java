@@ -9,7 +9,6 @@ import org.joml.Vector3f;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
@@ -17,7 +16,6 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.binds.interaction.FrobButton;
 import org.terasology.engine.input.binds.inventory.UseItemButton;
 import org.terasology.engine.logic.characters.CharacterComponent;
@@ -64,11 +62,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Config config;
     @In
     private PlayerConfig playerConfig;
-    @In
-    private InputSystem inputSystem;
-
-    @In
-    private BindsManager bindsManager;
 
     @In
     private EntityManager entityManager;
@@ -81,7 +74,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private AABBf aabb = new AABBf();
+    private final AABBf aabb = new AABBf();
     private boolean hasTarget = false;
 
     public void setPlayerCamera(Camera camera) {
@@ -95,7 +88,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
 
         for (EntityRef entity : entityManager.getEntitiesWith(CharacterMovementComponent.class, LocalPlayerComponent.class)) {
-            updateCamera(entity.getComponent(CharacterMovementComponent.class), localPlayer.getViewPosition(new Vector3f()), localPlayer.getViewRotation(new Quaternionf()));
+            updateCamera(entity.getComponent(CharacterMovementComponent.class), localPlayer.getViewPosition(new Vector3f()),
+                    localPlayer.getViewRotation(new Quaternionf()));
         }
     }
 
@@ -104,7 +98,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         LocalPlayerControlComponent controlComponent = entity.getComponent(LocalPlayerControlComponent.class);
         controlComponent.lookYaw = (float) ((controlComponent.lookYaw - controlComponent.lookYawDelta) % 360);
         controlComponent.lookYawDelta = 0f;
-        controlComponent.lookPitch = (float) Math.clamp(-89, 89,controlComponent.lookPitch + controlComponent.lookPitchDelta);
+        controlComponent.lookPitch = (float) Math.clamp(-89, 89, controlComponent.lookPitch + controlComponent.lookPitchDelta);
         controlComponent.lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(controlComponent.relativeMovement);
@@ -152,14 +146,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         // update character height as given in player settings
         ScaleToRequest scaleRequest = new ScaleToRequest(playerConfig.height.get());
         localPlayer.getCharacterEntity().send(scaleRequest);
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onPlayerSpawnedOrRestored(OnPlayerSpawnedOrRestoredEvent event, EntityRef character) {
         character.send(new LocalPlayerInitializedEvent());
 
@@ -223,7 +217,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (playerCamera.isBobbingAllowed()) {
             if (config.getRendering().isCameraBobbing()) {
                 ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f,
+                        0.025f, 3f));
             } else {
                 ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(0.0f);
                 ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(0.0f);
@@ -289,8 +284,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
 
     /**
-     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be
-     * needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be needed in special cases
+     * where the local player isn't fully available (TODO: May be a bug?)
      *
      * @return the EntityRef that the networking system says is the client associated with this player
      */

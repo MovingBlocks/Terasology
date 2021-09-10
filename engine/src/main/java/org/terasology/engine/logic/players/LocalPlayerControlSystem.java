@@ -6,7 +6,6 @@ package org.terasology.engine.logic.players;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.input.InputSystem;
@@ -42,14 +41,13 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
 
     private boolean isAutoMove;
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onLocalPlayerInit(LocalPlayerInitializedEvent event, EntityRef entity) {
         entity.addComponent(new LocalPlayerControlComponent());
     }
 
     @ReceiveEvent(components = LocalPlayerControlComponent.class)
-    public void onMouseMove(MouseAxisEvent event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    public void onMouseMove(MouseAxisEvent event, EntityRef entity, LocalPlayerControlComponent control) {
         MouseAxisEvent.MouseAxis axis = event.getMouseAxis();
         if (axis == MouseAxisEvent.MouseAxis.X) {
             control.lookYawDelta = event.getValue();
@@ -59,23 +57,20 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void updateRotationYaw(RotationYawAxis event, EntityRef entity, LocalPlayerControlComponent control) {
         control.lookYawDelta = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void updateRotationPitch(RotationPitchAxis event, EntityRef entity, LocalPlayerControlComponent control) {
         control.lookPitchDelta = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {LocalPlayerControlComponent.class, CharacterMovementComponent.class})
-    public void onJump(JumpButton event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    public void onJump(JumpButton event, EntityRef entity, LocalPlayerControlComponent control) {
         if (event.getState() == ButtonState.DOWN) {
             control.jump = true;
             event.consume();
@@ -84,16 +79,15 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerControlComponent.class)
+    @ReceiveEvent
     public void setRotation(SetDirectionEvent event, EntityRef entity, LocalPlayerControlComponent control) {
         control.lookPitch = event.getPitch();
         control.lookYaw = event.getYaw();
     }
 
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity, LocalPlayerControlComponent control) {
         control.relativeMovement.z = (float) event.getValue();
         if (control.relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
@@ -101,61 +95,55 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
-        control.relativeMovement.x =  (float)event.getValue();
+    @ReceiveEvent
+    public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity, LocalPlayerControlComponent control) {
+        control.relativeMovement.x =  (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity, LocalPlayerControlComponent control) {
         control.relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
-    public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
-        control.relativeMovement.z =  (float)event.getValue();
+    @ReceiveEvent
+    public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity, LocalPlayerControlComponent control) {
+        control.relativeMovement.z =  (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
+    @ReceiveEvent(components = LocalPlayerControlComponent.class)
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
         LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
         control.relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class})
+    @ReceiveEvent(components = LocalPlayerControlComponent.class)
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
         LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
-        control.relativeMovement.y =  (float)event.getValue();
+        control.relativeMovement.y =  (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity, LocalPlayerControlComponent control) {
         boolean toggle = event.isDown();
         control.run = control.runPerDefault ^ toggle;
         event.consume();
     }
 
     // Crouches if button is pressed. Stands if button is released.
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void onCrouchTemporarily(CrouchButton event, EntityRef entity, LocalPlayerControlComponent control) {
         boolean toggle = event.isDown();
         control.crouch = control.crouchPerDefault ^ toggle;
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onCrouchMode(CrouchModeButton event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent
+    public void onCrouchMode(CrouchModeButton event, EntityRef entity, LocalPlayerControlComponent control) {
         if (event.isDown()) {
             control.crouchPerDefault = !control.crouchPerDefault;
             control.crouch = !control.crouch;
@@ -184,7 +172,6 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
             inputSystem.cancelSimulatedKeyStroke(forwardKey);
             isAutoMove = false;
         }
-
     }
 
     /**
@@ -202,7 +189,7 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = LocalPlayerControlComponent.class)
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
         if (event.isDown()) {
             if (!isAutoMove) {
@@ -214,9 +201,8 @@ public class LocalPlayerControlSystem extends BaseComponentSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {LocalPlayerControlComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onToggleSpeedPermanently(ToggleSpeedPermanentlyButton event, EntityRef entity) {
-        LocalPlayerControlComponent control = entity.getComponent(LocalPlayerControlComponent.class);
+    @ReceiveEvent(components = LocalPlayerControlComponent.class)
+    public void onToggleSpeedPermanently(ToggleSpeedPermanentlyButton event, EntityRef entity, LocalPlayerControlComponent control) {
         if (event.isDown()) {
             control.runPerDefault = !control.runPerDefault;
             control.run = !control.run;
