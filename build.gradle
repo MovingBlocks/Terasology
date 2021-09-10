@@ -4,9 +4,8 @@
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
-        // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
-        jcenter()
         mavenCentral()
+        google()
         gradlePluginPortal()
 
         maven {
@@ -18,15 +17,14 @@ buildscript {
     }
 
     dependencies {
-        // Needed for caching reflected data during builds
-        classpath 'org.terasology:reflections:0.9.12-MB'
-        classpath 'dom4j:dom4j:1.6.1'
-
         //Spotbugs
         classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
 
         // SonarQube / Cloud scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+
+        // Protobuf plugin
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
 
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
@@ -45,6 +43,8 @@ plugins {
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
+
+    id("terasology-repositories")
 }
 
 
@@ -73,19 +73,6 @@ ext {
     LwjglVersion = '3.2.3'
 }
 
-// Declare remote repositories we're interested in - library files will be fetched from here
-repositories {
-    // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
-    jcenter()
-    mavenCentral()
-
-    // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
-    maven {
-        name "Terasology Artifactory"
-        url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
-        allowInsecureProtocol true  // 😱
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Natives - Handles pulling in and extracting native libraries for LWJGL                                            //
@@ -111,7 +98,7 @@ dependencies {
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.6.0', ext: 'zip'
+    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.6.3', ext: 'zip'
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
@@ -195,18 +182,6 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so"
 }
 
-task protobufCompileWindows(type: Exec) {
-    description = "Run 'Protobuf Compiler' (Windows)"
-    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
-}
-
-task protobufCompileLinux(type: Exec) {
-    description = "Run 'Protobuf Compiler' (Linux)"
-    commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java', "engine/src/main/protobuf/EntityData.proto", "engine/src/main/protobuf/NetMessage.proto"
-}
-
-
-
 // Magic for replace remote dependency on local project (source)
 // for Engine
 allprojects {
@@ -281,7 +256,7 @@ idea {
 
     project.settings.delegateActions {
         delegateBuildRunToGradle = false
-        testRunner = ActionDelegationConfig.TestRunner.PLATFORM
+        testRunner = ActionDelegationConfig.TestRunner.CHOOSE_PER_TEST
     }
 }
 

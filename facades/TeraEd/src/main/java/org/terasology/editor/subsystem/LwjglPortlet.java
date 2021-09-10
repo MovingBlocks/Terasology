@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.editor.subsystem;
 
@@ -11,7 +11,7 @@ import org.lwjgl.opengl.awt.GLData;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
@@ -99,9 +99,10 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
         display.update();
         int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
-        if (frameLimit > 0) {
+        // TODO: do we still need this?
+//        if (frameLimit > 0) {
 //            Lwjgl2Sync.sync(frameLimit);
-        }
+//        }
         if (display.isCloseRequested()) {
             engine.shutdown();
         }

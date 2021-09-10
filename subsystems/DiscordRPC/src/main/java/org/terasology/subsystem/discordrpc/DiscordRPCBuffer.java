@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.subsystem.discordrpc;
@@ -6,8 +6,9 @@ package org.terasology.subsystem.discordrpc;
 import java.time.OffsetDateTime;
 
 /**
- * A threaded-safe shared buffer used to store information for {@link DiscordRPCThread} to be processed as {@link com.jagrosh.discordipc.entities.RichPresence}
- *
+ * A threaded-safe shared buffer used to store information for {@link DiscordRPCThread} to be processed as {@link
+ * com.jagrosh.discordipc.entities.RichPresence}
+ * <p>
  * It helps avoiding allocating unnecessary objects for the rich presence.
  */
 public final class DiscordRPCBuffer {

@@ -1,26 +1,24 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
+import com.sun.jna.Platform;
+import com.sun.jna.platform.unix.LibC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.LoggingContext;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.common.ConfigurationSubsystem;
-import org.terasology.engine.core.subsystem.common.ThreadManager;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.core.subsystem.config.BindsSubsystem;
 import org.terasology.engine.core.subsystem.headless.HeadlessAudio;
@@ -41,79 +39,110 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvid
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
 import org.terasology.subsystem.discordrpc.DiscordRPCSubSystem;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
- * <br><br>
+ * <p>
  * Through the following launch arguments default locations to store logs and game saves can be overridden, by using the
  * current directory or a specified one as the home directory. Furthermore, Terasology can be launched headless, to save
  * resources while acting as a server or to run in an environment with no graphics, audio or input support. Additional
  * arguments are available to reload the latest game on startup and to disable crash reporting.
- * <br><br>
- * Available launch arguments:
- * <br><br>
- * <table summary="Launch arguments">
- * <tbody>
- * <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
- * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
- * <tr><td>-headless</td><td>Start headless.</td></tr>
- * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
- * <tr><td>-createlastgame</td><td>Recreates the world of the latest game with a new save file on startup.</td></tr>
- * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
- * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
- * <tr><td>-noSound</td><td>Disable sound.</td></tr>
- * <tr><td>-noSplash</td><td>Disable splash screen.</td></tr>
- * <tr><td>-serverPort=xxxxx</td><td>Change the server port.</td></tr>
- * </tbody>
- * </table>
- * <br><br>
+ * <p>
  * When used via command line an usage help and some examples can be obtained via:
- * <br><br>
- * terasology -help    or    terasology /?
- * <br><br>
+ * <p>
+ * terasology --help    or    terasology /?
+ *
  */
 
-public final class Terasology {
-
-    private static final String[] PRINT_USAGE_FLAGS = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"};
-    private static final String USE_CURRENT_DIR_AS_HOME = "-homedir";
-    private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
-    private static final String START_HEADLESS = "-headless";
-    private static final String LOAD_LAST_GAME = "-loadlastgame";
-    private static final String CREATE_LAST_GAME = "-createlastgame";
-    private static final String NO_CRASH_REPORT = "-noCrashReport";
-    private static final String NO_SAVE_GAMES = "-noSaveGames";
-    private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
-    private static final String NO_SOUND = "-noSound";
-    private static final String NO_SPLASH = "-noSplash";
-    private static final String SERVER_PORT = "-serverPort=";
-    private static final String OVERRIDE_DEFAULT_CONFIG = "-overrideDefaultConfig=";
+@CommandLine.Command(
+        name = "terasology",
+        usageHelpAutoWidth = true,
+        footer = "%n" +
+                "For details, see%n" +
+                " https://github.com/MovingBlocks/Terasology/wiki/Advanced-Options%n" +
+                "%n" +
+                "Alternatively use our standalone Launcher from%n" +
+                " https://github.com/MovingBlocks/TerasologyLauncher/releases"
+)
+public final class Terasology implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
 
+    @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
-    private static boolean isHeadless;
-    private static boolean crashReportEnabled = true;
-    private static boolean soundEnabled = true;
-    private static boolean splashEnabled = true;
-    private static boolean loadLastGame;
-    private static boolean createLastGame;
+    @SuppressWarnings("unused")
+    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "Show help")
+    private boolean helpRequested;
 
+    @Option(names = "--headless", description = "Start headless (no graphics)")
+    private boolean isHeadless;
+
+    @Option(names = "--max-data-size",
+            description = "Set maximum process data size [Linux only]",
+            paramLabel = "<size>",
+            converter = DataSizeConverter.class
+    )
+    private Long maxDataSize;
+
+    @Option(names = "--oom-score",
+            description = "Adjust out-of-memory score [Linux only]",
+            paramLabel = "<score>"
+    )
+    private Integer outOfMemoryScore;
+
+    @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
+    private boolean crashReportEnabled;
+
+    @Option(names = "--sound", defaultValue = "true", negatable = true, description = "Enable sound")
+    private boolean soundEnabled;
+
+    @Option(names = "--splash", defaultValue = "true", negatable = true, description = "Enable splash screen")
+    private boolean splashEnabled;
+
+    @Option(names = "--load-last-game", description = "Load the latest game on startup")
+    private boolean loadLastGame;
+
+    @Option(names = "--create-last-game", description = "Recreates the world of the latest game with a new save file on startup")
+    private boolean createLastGame;
+
+    @Option(names = "--permissive-security")
+    private boolean permissiveSecurity;
+
+    @Option(names = "--save-games", defaultValue = "true", negatable = true, description = "Enable new save games")
+    private boolean saveGamesEnabled;
+
+    @Option(names = "--server-port", description = "Change the server port")
+    private Integer serverPort;
+
+    @Option(names = "--override-default-config", description = "Override default config")
+    private Path overrideConfigPath;
+
+    @Option(names = "--homedir", description = "Path to home directory")
+    private Path homeDir;
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
+        new CommandLine(new Terasology()).execute(args);
+    }
 
-        handlePrintUsageRequest(args);
-        handleLaunchArguments(args);
+    @Override
+    public Integer call() throws IOException {
+        handleLaunchArguments();
+        setupLogging();
 
         SplashScreen splashScreen;
         if (splashEnabled) {
@@ -124,6 +153,7 @@ public final class Terasology {
             thread.start();
             try {
                 // wait splash initialize... we will lose some post messages otherwise.
+                //noinspection ResultOfMethodCallIgnored
                 splashInitLatch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 // ignore
@@ -133,8 +163,6 @@ public final class Terasology {
             splashScreen = SplashScreenBuilder.createStub();
         }
         splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
-
-        setupLogging();
 
         try {
             TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
@@ -153,7 +181,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                GameScheduler.scheduleParallel("loadGame", () -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
@@ -162,7 +190,7 @@ public final class Terasology {
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
+                    GameScheduler.scheduleParallel("createLastGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
@@ -183,6 +211,8 @@ public final class Terasology {
             splashScreen.close();
             reportException(e);
         }
+
+        return 0;
     }
 
     private static String getNewTitle(String title) {
@@ -201,153 +231,42 @@ public final class Terasology {
         LoggingContext.initialize(path);
     }
 
-    private static void handlePrintUsageRequest(String[] args) {
-        for (String arg : args) {
-            for (String usageArg : PRINT_USAGE_FLAGS) {
-                if (usageArg.equalsIgnoreCase(arg)) {
-                    printUsageAndExit();
-                }
-            }
+    private void handleLaunchArguments() throws IOException {
+        if (outOfMemoryScore != null) {
+            adjustOutOfMemoryScore(outOfMemoryScore);
+        }
+        if (maxDataSize != null) {
+            setMemoryLimit(maxDataSize);
+        }
+
+        if (homeDir != null) {
+            logger.info("homeDir is {}", homeDir);
+            PathManager.getInstance().useOverrideHomePath(homeDir);
+            // TODO: what is this?
+            //   PathManager.getInstance().chooseHomePathManually();
+        } else {
+            PathManager.getInstance().useDefaultHomePath();
+        }
+
+        if (isHeadless) {
+            crashReportEnabled = false;
+            splashEnabled = false;
+        }
+        if (!saveGamesEnabled) {
+            System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
+        }
+        if (permissiveSecurity) {
+            System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY, "true");
+        }
+        if (serverPort != null) {
+            System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, serverPort.toString());
+        }
+        if (overrideConfigPath != null) {
+            System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, overrideConfigPath.toString());
         }
     }
 
-    private static void printUsageAndExit() {
-
-        String printUsageFlags = Joiner.on("|").join(PRINT_USAGE_FLAGS);
-
-        List<String> opts = ImmutableList.of(
-                printUsageFlags,
-                USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>",
-                START_HEADLESS,
-                LOAD_LAST_GAME,
-                CREATE_LAST_GAME,
-                NO_CRASH_REPORT,
-                NO_SAVE_GAMES,
-                PERMISSIVE_SECURITY,
-                NO_SOUND,
-                NO_SPLASH,
-                OVERRIDE_DEFAULT_CONFIG + "<path>",
-                SERVER_PORT + "<port>");
-
-        StringBuilder optText = new StringBuilder();
-
-        for (String opt : opts) {
-            optText.append(" [").append(opt).append("]");
-        }
-
-        System.out.println("Usage:");
-        System.out.println();
-        System.out.println("    terasology" + optText.toString());
-        System.out.println();
-        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
-        System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
-        System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
-        System.out.println();
-        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "        Use the current directory as the home directory.");
-        System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.");
-        System.out.println();
-        System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.");
-        System.out.println("For this purpose use the " + START_HEADLESS + " launch argument.");
-        System.out.println();
-        System.out.println("To automatically load the latest game on startup,");
-        System.out.println("use the " + LOAD_LAST_GAME + " launch argument.");
-        System.out.println();
-        System.out.println("To automatically recreate the last game played with a new save file,");
-        System.out.println("use the " + CREATE_LAST_GAME + "launch argument");
-        System.out.println();
-        System.out.println("By default Crash Reporting is enabled.");
-        System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
-        System.out.println();
-        System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
-        System.out.println();
-        System.out.println("To disable the splash screen use the " + NO_SPLASH + " launch argument.");
-        System.out.println();
-        System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
-        System.out.println();
-        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
-        System.out.println();
-        System.out.println("Examples:");
-        System.out.println();
-        System.out.println("    Use the current directory as the home directory:");
-        System.out.println("    terasology " + USE_CURRENT_DIR_AS_HOME);
-        System.out.println();
-        System.out.println("    Use \"myPath\" as the home directory:");
-        System.out.println("    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath");
-        System.out.println();
-        System.out.println("    Start terasology in headless mode (no graphics) and enforce using the default port:");
-        System.out.println("    terasology " + START_HEADLESS + " " + SERVER_PORT + TerasologyConstants.DEFAULT_PORT);
-        System.out.println();
-        System.out.println("    Load the latest game on startup and disable crash reporting");
-        System.out.println("    terasology " + LOAD_LAST_GAME + " " + NO_CRASH_REPORT);
-        System.out.println();
-        System.out.println("    Don't start Terasology, just print this help:");
-        System.out.println("    terasology " + PRINT_USAGE_FLAGS[1]);
-        System.out.println();
-        System.out.println("Alternatively use our standalone Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases");
-        System.out.println();
-
-        System.exit(0);
-    }
-
-    private static void handleLaunchArguments(String[] args) {
-
-        Path homePath = null;
-
-        for (String arg : args) {
-            boolean recognized = true;
-
-            if (arg.startsWith(USE_SPECIFIED_DIR_AS_HOME)) {
-                homePath = Paths.get(arg.substring(USE_SPECIFIED_DIR_AS_HOME.length()));
-            } else if (arg.equals(USE_CURRENT_DIR_AS_HOME)) {
-                homePath = Paths.get("");
-            } else if (arg.equals(START_HEADLESS)) {
-                isHeadless = true;
-                crashReportEnabled = false;
-                splashEnabled = false;
-            } else if (arg.equals(NO_SAVE_GAMES)) {
-                System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
-            } else if (arg.equals(PERMISSIVE_SECURITY)) {
-                System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY, "true");
-            } else if (arg.equals(NO_CRASH_REPORT)) {
-                crashReportEnabled = false;
-            } else if (arg.equals(NO_SOUND)) {
-                soundEnabled = false;
-            } else if (arg.equals(NO_SPLASH)) {
-                splashEnabled = false;
-            } else if (arg.equals(LOAD_LAST_GAME)) {
-                loadLastGame = true;
-            } else if (arg.equals(CREATE_LAST_GAME)) {
-                createLastGame = true;
-            } else if (arg.startsWith(SERVER_PORT)) {
-                System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
-            } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
-                System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, arg.substring(OVERRIDE_DEFAULT_CONFIG.length()));
-            } else {
-                recognized = false;
-            }
-
-            System.out.println((recognized ? "Recognized" : "Invalid") + " argument: " + arg);
-        }
-
-        try {
-            if (homePath != null) {
-                PathManager.getInstance().useOverrideHomePath(homePath);
-            } else {
-                PathManager.getInstance().useDefaultHomePath();
-            }
-
-        } catch (IOException e) {
-            logger.warn("The game cannot detect default home directory");
-            try {
-                PathManager.getInstance().chooseHomePathManually();
-            } catch (IOException ex) {
-                reportException(ex);
-                System.exit(0);
-            }
-        }
-    }
-
-    private static void populateSubsystems(TerasologyEngineBuilder builder) {
+    private void populateSubsystems(TerasologyEngineBuilder builder) {
         if (isHeadless) {
             builder.add(new HeadlessGraphics())
                     .add(new HeadlessTimer())
@@ -366,7 +285,7 @@ public final class Terasology {
         builder.add(new HibernationSubsystem());
     }
 
-    private static void reportException(Throwable throwable) {
+    private void reportException(Throwable throwable) {
         Path logPath = LoggingContext.getLoggingPath();
 
         if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
@@ -413,4 +332,71 @@ public final class Terasology {
         return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
+    /**
+     * Limit the amount of memory the operating system will allow this program.
+     * <p>
+     * Enforced by the operating system instead of the Java Virtual Machine, this limits memory usage
+     * in a different way than setting Java's maximum heap size (the <code>-Xmx</code> java option).
+     * Use this to prevent Terasology from gobbling all your system memory if it has a memory leak.
+     * <p>
+     * Set this limit to a number larger than the maximum java heap size. It is normal for a process to
+     * need <em>some</em> additional memory outside the java heap.
+     * <p>
+     * This is currently only implemented on Linux.
+     * <p>
+     * On Windows, you may be able to set a limit using one of these external tools:
+     * <ul>
+     *     <li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier">Application Verifier
+     *         (<code>AppVerif.exe</code>)</a>, available from the Windows SDK</li>
+     *     <li><a href="https://github.com/lowleveldesign/process-governor">Process Governor (<code>procgov</code>)</a>,
+     *         an open source third-party tool
+     *
+     * @param bytes maximum allowed size
+     * @see <a href="https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE"
+     *          >Java command-line options</a>
+     * @see <a href="https://man7.org/linux/man-pages/man2/setrlimit.2.html">setrlimit(2)</a>
+     */
+    private static void setMemoryLimit(long bytes) {
+        // Memory-limiting techniques are highly platform-specific.
+        if (Platform.isLinux()) {
+            final LibC.Rlimit dataLimit = new LibC.Rlimit();
+            dataLimit.rlim_cur = bytes;
+            dataLimit.rlim_max = bytes;
+            // Under Linux ≥ 4.7, we can limit the maximum size of the process's data segment, which includes its
+            // heap. Note we cannot directly limit its resident set size, see setrlimit(2).
+            LibC.INSTANCE.setrlimit(LibC.RLIMIT_DATA, dataLimit);
+        } else {
+            // OS X does have setrlimit(), but as far as we can tell, it is not enforced for RLIMIT_DATA:
+            //   https://stackoverflow.com/questions/3274385/
+            // There is an API that might have a similar effect on Windows:
+            //   https://docs.microsoft.com/en-us/windows/win32/procthread/job-objects
+            logger.warn("--max-data-size is not supported on platform {}", Platform.RESOURCE_PREFIX);
+        }
+    }
+
+    /**
+     * Make the Linux Out-of-Memory killer more likely to pick Terasology.
+     * <p>
+     * When a Linux system runs out of available memory, it invokes the Out of Memory killer (aka <i>OOM killer</i>) to
+     * choose a process to terminate to free up some memory.
+     * <p>
+     * Add to this score if you want to make Terasology a bigger target. Why? If you'd rather the game process be the
+     * thing that gets killed instead of some other memory-hungry program, like your browser or IDE. A score of 1000 is
+     * equivalent to saying “this process is taking <em>all</em> the memory.”
+     * <p>
+     * This out-of-memory score is a Linux-specific mechanism.
+     *
+     * @param adjustment how much worse to make the score, 0–1000
+     *
+     * @see <a href="https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=/proc/%5Bpid%5D/-,oom_score_adj,-(since">proc(5)</a>
+     */
+    private static void adjustOutOfMemoryScore(int adjustment) {
+        Path procFile = Paths.get("/proc", "self", "oom_score_adj");
+        try {
+            Files.write(procFile, String.valueOf(adjustment).getBytes(),
+                    StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Failed to adjust out-of-memory score.", e);
+        }
+    }
 }

@@ -27,7 +27,7 @@ public class FutureTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary =
             Mockito.spy(new TypeHandlerLibrary(reflections));
 
-    private static class RecursiveType<T> {
+    private static final class RecursiveType<T> {
         final T data;
         final List<RecursiveType<T>> children;
 
@@ -56,16 +56,16 @@ public class FutureTypeHandlerTest {
         ResultCaptor<Optional<TypeHandler<RecursiveType<Integer>>>> resultCaptor = new ResultCaptor<>();
 
         doAnswer(resultCaptor).when(typeHandlerLibrary).getTypeHandler(
-                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType())
+                eq(new TypeInfo<RecursiveType<Integer>>() { }.getType())
         );
 
         TypeHandler<RecursiveType<Integer>> typeHandler =
                 typeHandlerLibrary.getTypeHandler(
-                        new TypeInfo<RecursiveType<Integer>>() {}
+                        new TypeInfo<RecursiveType<Integer>>() { }
                 ).get();
         
         verify(typeHandlerLibrary, times(1)).getTypeHandler(
-                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType())
+                eq(new TypeInfo<RecursiveType<Integer>>() { }.getType())
         );
 
         // Optional#get() can throw NoSuchElementException

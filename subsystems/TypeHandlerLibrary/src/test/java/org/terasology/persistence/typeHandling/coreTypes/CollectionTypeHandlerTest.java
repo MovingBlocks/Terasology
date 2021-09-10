@@ -30,7 +30,7 @@ class CollectionTypeHandlerTest {
     void testSerialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
-        CollectionCopyConstructor<Queue<Integer>,Integer> constructor = Queues::newArrayDeque;
+        CollectionCopyConstructor<Queue<Integer>, Integer> constructor = Queues::newArrayDeque;
 
         CollectionTypeHandler<Integer> typeHandler = new CollectionTypeHandler<>(
                 elementTypeHandler,

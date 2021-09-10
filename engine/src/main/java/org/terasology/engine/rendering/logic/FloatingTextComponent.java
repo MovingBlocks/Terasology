@@ -1,0 +1,25 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.logic;
+
+import org.terasology.nui.Color;
+
+/**
+ * Makes the game render the specified text at the current location of the enitity.
+ */
+public class FloatingTextComponent implements VisualComponent<FloatingTextComponent> {
+    public String text;
+    public Color textColor = Color.WHITE;
+    public Color textShadowColor = Color.BLACK;
+    public float scale = 1f;
+    public boolean isOverlay;
+
+    @Override
+    public void copyFrom(FloatingTextComponent other) {
+        this.text = other.text;
+        this.textColor = new Color(other.textColor);
+        this.textShadowColor = new Color(other.textShadowColor);
+        this.scale = other.scale;
+        this.isOverlay = other.isOverlay;
+    }
+}

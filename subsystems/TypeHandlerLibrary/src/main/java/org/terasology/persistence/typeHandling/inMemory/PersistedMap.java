@@ -9,8 +9,6 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class PersistedMap extends AbstractPersistedData implements PersistedDataMap {
     private Map<String, PersistedData> map;
 
