@@ -96,9 +96,9 @@ public class StandardMeshDataTest {
         VectorAssert.assertEquals(m1.position.get(0, new Vector3f()), new Vector3f(10f, 10f, 10f), .001f);
         VectorAssert.assertEquals(m1.position.get(1, new Vector3f()), new Vector3f(15f, 20f, 10f), .001f);
         VectorAssert.assertEquals(m1.position.get(2, new Vector3f()), new Vector3f(10f, 30f, 10f), .001f);
-        assertEquals(m1.color0.get(0, new Color()), new Color(Color.black));
-        assertEquals(m1.color0.get(1, new Color()), new Color(Color.black));
-        assertEquals(m1.color0.get(2, new Color()), new Color(Color.black));
+        assertEquals(m1.color0.get(0, new Color()), new Color(Color.transparent));
+        assertEquals(m1.color0.get(1, new Color()), new Color(Color.transparent));
+        assertEquals(m1.color0.get(2, new Color()), new Color(Color.transparent));
 
         VectorAssert.assertEquals(m1.position.get(3, new Vector3f()), new Vector3f(10f, 10f, 10f), .001f);
         VectorAssert.assertEquals(m1.position.get(4, new Vector3f()), new Vector3f(15f, 20f, 10f), .001f);
