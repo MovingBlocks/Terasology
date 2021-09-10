@@ -3,7 +3,6 @@
 
 package org.terasology.engine.core;
 
-import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
@@ -20,6 +19,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,22 +67,43 @@ public final class PathManager {
     }
 
     private static Path findInstallPath() {
-        Path codeLocation;  // By default, the path should be the code location (where terasology.jar is)
+        List<Path> installationSearchPaths = new ArrayList<>(2);
+
         try {
+            // In a normal workspace or distribution, the jar with this code is somewhere near the natives directory.
             URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-            codeLocation = Paths.get(urlToSource);
+            Path codeLocation = Paths.get(urlToSource);
+            installationSearchPaths.add(codeLocation);
             // Not using logger because it's usually initialized after PathManager.
             System.out.println("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
         } catch (URISyntaxException e) {
             System.err.println("PathManager: Failed to convert code location to path.");
             e.printStackTrace();
-            codeLocation = Paths.get("").toAbsolutePath();
-            System.out.println("PathManager: Using working dir " + codeLocation);
         }
 
-        return Verify.verifyNotNull(findNativesHome(codeLocation.getParent(), 5),
-                "Unable to find the natives directory from %s, unable to launch!",
-                codeLocation);
+        // But that's not always true. This jar may be loaded from somewhere else on the classpath.
+        // For example: CI runs module unit tests in a smaller workspace, and gradle gets engine.jar
+        // the same as all its other dependencies, disconnected from the natives directory.
+        //
+        // Use the current directory as a fallback.
+        Path currentDirectory = Paths.get("").toAbsolutePath();
+        installationSearchPaths.add(currentDirectory);
+        System.out.println("PathManager: Working directory is " + currentDirectory);
+
+        for (Path startPath : installationSearchPaths) {
+            Path installationPath = findNativesHome(startPath, 5);
+            if (installationPath != null) {
+                return installationPath;
+            }
+        }
+
+        System.err.println(
+                "Native library installation directory not found. %n" +
+                "Things will almost certainly crash as a result, %n" +
+                "unless something else installed everything to java.library.path. %n" +
+                "Searched: %n" + installationSearchPaths
+        );
+        return currentDirectory;
     }
 
     /**
@@ -103,13 +124,10 @@ public final class PathManager {
 
             checkedPath = checkedPath.getParent();
             if (checkedPath.equals(startPath.getRoot())) {
-                System.err.println("Uh oh, reached the root path, giving up");
-                return null;
+                break;  // Uh oh, reached the root path, giving up.
             }
             levelsToSearch--;
         }
-
-        System.err.println("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
         return null;
     }
 

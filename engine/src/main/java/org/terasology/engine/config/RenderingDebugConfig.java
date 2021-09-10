@@ -19,6 +19,7 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     public static final String HUD_HIDDEN = "hudHidden";
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
+    public static final String RENDER_ENTITY_COLLIDERS = "renderEntityColliders";
     public static final String RENDER_ENTITY_BOUNDING_BOXES = "renderEntityBoundingBoxes";
   
     private static final Logger logger = LoggerFactory.getLogger(RenderingDebugConfig.class);
