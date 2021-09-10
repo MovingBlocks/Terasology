@@ -72,7 +72,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component<FirstPe
         trackingDataReceived = true;
         Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
         translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
-        org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
+        Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
         if (rotationQuaternion == null) {
             rotationQuaternion = new Quat4f(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
         } else {
