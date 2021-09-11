@@ -133,7 +133,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
+                playerCamera = new OpenVRStereoCamera(vrProvider);
                 /*
                  * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
                  * such that the ground plane of the rendering system and the ground plane of the room the VR user is
@@ -143,7 +143,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                         GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera( renderingConfig, context.get(DisplayDevice.class));
+                playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {

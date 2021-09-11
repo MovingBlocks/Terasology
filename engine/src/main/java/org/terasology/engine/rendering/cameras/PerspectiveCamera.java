@@ -7,7 +7,6 @@ import org.joml.Vector4f;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
-import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.math.TeraMath;
 

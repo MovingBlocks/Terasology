@@ -46,7 +46,7 @@ public class OpenVRStereoCamera extends Camera {
     private final Matrix4f viewTranslationRightEye = new Matrix4f();
     private final OpenVRProvider vrProvider;
 
-    public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    public OpenVRStereoCamera(OpenVRProvider provider) {
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;
