@@ -49,7 +49,7 @@ public class VertexAttributeBinding<T, I extends T> extends VertexBinding {
      *
      * @param values the values to commit
      */
-    public void putAll(T... values) {
+    public void put(T[] values) {
         resource.ensureElements(this.vertexIndex + values.length);
         for (T value : values) {
             attribute.configuration.write(value, this.vertexIndex, this.offset, resource);

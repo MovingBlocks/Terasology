@@ -34,7 +34,7 @@ public class VertexFloatAttributeBinding extends VertexBinding {
      *
      * @param values the values to commit
      */
-    public void putAll(float... values) {
+    public void put(float[] values) {
         resource.ensureElements(this.vertexIndex + values.length);
         for (float value : values) {
             attribute.configuration.write(value, this.vertexIndex, this.offset, resource);
