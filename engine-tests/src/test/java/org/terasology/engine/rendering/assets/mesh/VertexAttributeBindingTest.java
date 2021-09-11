@@ -8,7 +8,6 @@ import org.joml.Vector3fc;
 import org.junit.Test;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
-import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.joml.test.VectorAssert;
 
@@ -17,7 +16,7 @@ public class VertexAttributeBindingTest {
     public void testPutAllBinding() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
         VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
-        VertexResource resource = builder.build();
+        builder.build();
 
         a1.putAll(new Vector3f[]{
                 new Vector3f(10, 5, 2),
