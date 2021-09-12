@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
+import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -61,7 +62,7 @@ public final class GLAttributes {
         public void write(int value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
-            buffer.put(bufferStart, (byte) value);
+            buffer.put(bufferStart, ((byte) Math.clamp(0, 255, value)));
         }
 
         @Override
@@ -194,7 +195,7 @@ public final class GLAttributes {
         }
 
     }, TypeMapping.ATTR_FLOAT, 2);
-    
+
     private GLAttributes() {
     }
 }
