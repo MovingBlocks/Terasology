@@ -33,7 +33,8 @@ public final class IconMeshFactory {
                 return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
                         urn.getResourceName()), Mesh.class).get();
             } else {
-                Name fragName = new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
+                Name fragName =
+                        new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
                 return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
                         fragName), Mesh.class).get();
             }
@@ -71,8 +72,8 @@ public final class IconMeshFactory {
 
         // top
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add( sizeHalf, sizeHalf, sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add( sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
         mesh.normal.put(norm.set(0, 1.0f, 0));
         mesh.normal.put(norm.set(0, 1.0f, 0));
@@ -82,8 +83,8 @@ public final class IconMeshFactory {
         // left
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf,  sizeHalf, sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf,  sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
         mesh.normal.put(norm.set(-1.0f, 0, 0));
         mesh.normal.put(norm.set(-1.0f, 0, 0));
         mesh.normal.put(norm.set(-1.0f, 0, 0));
@@ -100,9 +101,9 @@ public final class IconMeshFactory {
         mesh.normal.put(norm.set(1.0f, 0, 0));
 
         // back
-        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf,  sizeHalf, -sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add( sizeHalf,  sizeHalf, -sizeHalf));
-        mesh.position.put(pos.set(position, 0.0f).add( sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
         mesh.normal.put(norm.set(0, 0, -1.0f));
         mesh.normal.put(norm.set(0, 0, -1.0f));
@@ -167,9 +168,9 @@ public final class IconMeshFactory {
 
                 if (a > alphaLimit) {
                     color.setRed(r)
-                        .setGreen(g)
-                        .setBlue(b)
-                        .setAlpha(a);
+                            .setGreen(g)
+                            .setBlue(b)
+                            .setAlpha(a);
                     pos.set(2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f);
                     addPixel(mesh, pos, 2f / textureSize, color);
 
