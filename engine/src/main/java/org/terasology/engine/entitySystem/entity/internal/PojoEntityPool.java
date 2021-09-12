@@ -287,8 +287,14 @@ public class PojoEntityPool implements EngineEntityPool {
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
         return () -> entityStore.keySet().stream()
                 //Keep entities which have all of the required components
-                .filter(id -> Arrays.stream(componentClasses)
-                        .allMatch(component -> componentStore.get(id, component) != null))
+                .filter(id -> {
+                    for (Class<? extends Component> component : componentClasses) {
+                        if (componentStore.get(id, component) == null) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .map(id -> getEntity(id))
                 .iterator();
     }
