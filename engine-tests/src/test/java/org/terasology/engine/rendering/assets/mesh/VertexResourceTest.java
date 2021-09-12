@@ -38,7 +38,7 @@ public class VertexResourceTest {
 
         resource.put(buffer);
         resource.put(buffer);
-        
+
         assertEquals(4, a1.elements());
 
         VectorAssert.assertEquals(new Vector3f(12.0f, 20.0f, 50.0f), a1.get(0, new Vector3f()), .0001f);

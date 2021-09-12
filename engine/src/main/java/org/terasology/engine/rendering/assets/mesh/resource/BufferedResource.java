@@ -64,6 +64,9 @@ public abstract class BufferedResource {
      * <p>
      * make sure the data is structured in a way that the buffer expects.
      *
+     * All {@link BufferedResource} are all in native order. data will
+     * be garbage if the order of the buffer is different from the endianness system.
+     *
      * @param copyBuffer the buffer to replace the contents with
      */
     public void put(ByteBuffer copyBuffer) {
@@ -82,6 +85,7 @@ public abstract class BufferedResource {
 
     /**
      * append the buffer to the current BufferedResource
+     *
      * <p>
      * make sure the data is structured in a way that the buffer expects.
      *
@@ -106,6 +110,9 @@ public abstract class BufferedResource {
      * replace this resource directory with the contents from another buffer
      * <p>
      * make sure the data is structured in a way that the buffer expects.
+     *
+     * All {@link BufferedResource} are all in native order. data will
+     * be garbage if the order of the buffer is different from the endianness system.
      *
      * @param copyBuffer the buffer to replace the contents with
      */
@@ -201,7 +208,7 @@ public abstract class BufferedResource {
     }
 
     /**
-     * shrink the buffer capacity to match the {@link #inSize()}
+     * shrink the buffer capacity to match {@link #inSize()}
      */
     public void squeeze() {
         if (this.inSize != buffer.capacity()) {
