@@ -22,12 +22,12 @@ public class VertexAttributeBindingTest {
         VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
         builder.build();
 
-        a1.putAll(
+        a1.put(new Vector3fc[]{
                 new Vector3f(10, 5, 2),
                 new Vector3f(2, 15, 2),
                 new Vector3f(1, 5, 13),
                 new Vector3f(1, 1, 1)
-        );
+        });
 
         VectorAssert.assertEquals(new Vector3f(10, 5, 2), a1.get(0, new Vector3f()), 0.001f);
         VectorAssert.assertEquals(new Vector3f(2, 15, 2), a1.get(1, new Vector3f()), 0.001f);
@@ -41,7 +41,7 @@ public class VertexAttributeBindingTest {
         VertexFloatAttributeBinding a1 = builder.add(0, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
         builder.build();
 
-        a1.putAll(10f, .5f, 12.5f, 13.5f);
+        a1.put(new float[]{10f, .5f, 12.5f, 13.5f});
 
         assertEquals(10f, a1.get(0), 0.001f);
         assertEquals(.5f, a1.get(1), 0.001f);
@@ -55,7 +55,7 @@ public class VertexAttributeBindingTest {
         VertexIntegerAttributeBinding a1 = builder.add(0, GLAttributes.INT_1_VERTEX_ATTRIBUTE);
         builder.build();
 
-        a1.putAll(10, 2, 1, 1);
+        a1.put(new int[]{10, 2, 1, 1});
 
         assertEquals(10, a1.get(0));
         assertEquals(2, a1.get(1));
