@@ -8,7 +8,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.logic.players.LocalPlayerSystem;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.cameras.Camera;
@@ -48,8 +47,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public HeadlessWorldRenderer(Context context) {
         this.worldProvider = context.get(WorldProvider.class);
         this.chunkProvider = context.get(ChunkProvider.class);
-        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
-        localPlayerSystem.setPlayerCamera(noCamera);
+//        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
+//        localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
     }
 

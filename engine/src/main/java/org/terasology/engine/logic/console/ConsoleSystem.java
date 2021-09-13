@@ -8,13 +8,13 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.input.binds.general.ConsoleButton;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.engine.logic.console.ui.NotificationOverlay;
-import org.terasology.input.ButtonState;
-import org.terasology.engine.input.binds.general.ConsoleButton;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.input.ButtonState;
 
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
@@ -29,16 +29,18 @@ public class ConsoleSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
-        console.subscribe((Message message) -> {
-            if (!nuiManager.isOpen("engine:console")) {
-                // make sure the message isn't already shown in the chat overlay
-                if (message.getType() != CoreMessageType.CHAT && message.getType() != CoreMessageType.NOTIFICATION
-                        || !nuiManager.isOpen("engine:chat")) {
-                    overlay.setVisible(true);
+        if(nuiManager != null) {
+            overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
+            console.subscribe((Message message) -> {
+                if (!nuiManager.isOpen("engine:console")) {
+                    // make sure the message isn't already shown in the chat overlay
+                    if (message.getType() != CoreMessageType.CHAT && message.getType() != CoreMessageType.NOTIFICATION
+                            || !nuiManager.isOpen("engine:chat")) {
+                        overlay.setVisible(true);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)

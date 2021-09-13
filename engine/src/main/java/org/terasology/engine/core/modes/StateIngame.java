@@ -83,20 +83,24 @@ public class StateIngame implements GameState {
         componentSystemManager = context.get(ComponentSystemManager.class);
         entityManager = context.get(EngineEntityManager.class);
         cameraTargetSystem = context.get(CameraTargetSystem.class);
-        inputSystem = context.get(InputSystem.class);
-        eventSystem.registerEventHandler(nuiManager);
+        if (nuiManager != null) {
+            inputSystem = context.get(InputSystem.class);
+            eventSystem.registerEventHandler(nuiManager);
+        }
         networkSystem = context.get(NetworkSystem.class);
         storageManager = context.get(StorageManager.class);
         storageServiceWorker = context.get(StorageServiceWorker.class);
         console = context.get(Console.class);
 
-        // Show or hide the HUD according to the settings
-        nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
-            @Override
-            public Boolean get() {
-                return !context.get(Config.class).getRendering().getDebug().isHudHidden();
-            }
-        });
+        if (nuiManager != null) {
+            // Show or hide the HUD according to the settings
+            nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return !context.get(Config.class).getRendering().getDebug().isHudHidden();
+                }
+            });
+        }
 
         if (networkSystem.getMode() == NetworkMode.CLIENT) {
             String motd = networkSystem.getServer().getInfo().getMOTD();
@@ -133,7 +137,9 @@ public class StateIngame implements GameState {
         // TODO: Shutdown background threads
         eventSystem.process();
         GameThread.processWaitingProcesses();
-        nuiManager.clear();
+        if (nuiManager != null) {
+            nuiManager.clear();
+        }
 
         context.get(AudioManager.class).stopAllSounds();
 
@@ -162,11 +168,13 @@ public class StateIngame implements GameState {
         console.dispose();
         GameThread.clearWaitingProcesses();
 
-        /*
-         * Clear the binding as otherwise the complete ingame state would be
-         * referenced.
-         */
-        nuiManager.getHUD().clearVisibleBinding();
+        if (nuiManager != null) {
+            /*
+             * Clear the binding as otherwise the complete ingame state would be
+             * referenced.
+             */
+            nuiManager.getHUD().clearVisibleBinding();
+        }
     }
 
     @Override
@@ -187,8 +195,9 @@ public class StateIngame implements GameState {
             storageManager.update();
         }
 
-
-        updateUserInterface(delta);
+        if (nuiManager != null) {
+            updateUserInterface(delta);
+        }
 
         storageServiceWorker.flushNotificationsToConsole(console);
     }

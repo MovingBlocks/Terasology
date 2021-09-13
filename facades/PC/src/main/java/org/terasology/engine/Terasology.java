@@ -23,7 +23,6 @@ import org.terasology.engine.core.subsystem.common.hibernation.HibernationSubsys
 import org.terasology.engine.core.subsystem.config.BindsSubsystem;
 import org.terasology.engine.core.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.core.subsystem.headless.HeadlessGraphics;
-import org.terasology.engine.core.subsystem.headless.HeadlessInput;
 import org.terasology.engine.core.subsystem.headless.HeadlessTimer;
 import org.terasology.engine.core.subsystem.headless.mode.HeadlessStateChangeListener;
 import org.terasology.engine.core.subsystem.headless.mode.StateHeadlessSetup;
@@ -270,8 +269,8 @@ public final class Terasology implements Callable<Integer> {
         if (isHeadless) {
             builder.add(new HeadlessGraphics())
                     .add(new HeadlessTimer())
-                    .add(new HeadlessAudio())
-                    .add(new HeadlessInput());
+                    .add(new HeadlessAudio());
+//                    .add(new HeadlessInput());
         } else {
             EngineSubsystem audio = soundEnabled ? new LwjglAudio() : new HeadlessAudio();
             builder.add(audio)
