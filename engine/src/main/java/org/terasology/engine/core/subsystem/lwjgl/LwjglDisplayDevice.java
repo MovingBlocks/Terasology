@@ -211,7 +211,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     protected void updateViewport(int width, int height) {
-        GameScheduler.runBlockingGraphics("isFullscreen", () ->
+        GameScheduler.runBlockingGraphics("updateViewport", () ->
                 glViewport(0, 0, width, height)
         );
 
@@ -242,7 +242,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     private static Supplier<GLFWVidMode> createDesktopResolutionSupplier() {
         return Suppliers.memoize(() ->
-                GameScheduler.runBlockingGraphics("isFullscreen",
+                GameScheduler.runBlockingGraphics("createDesktopResolution",
                         () -> GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())));
     }
 

@@ -91,16 +91,13 @@ public class LwjglGraphicsManager {
 
     public void createTexture3D(ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
                                 int size, Consumer<Integer> idConsumer) {
-        GameScheduler.runOnGraphics("createTexture3D", () -> {
             int id = glGenTextures();
             reloadTexture3D(id, alignedBuffer, wrapMode, filterMode, size);
             idConsumer.accept(id);
-        });
     }
 
     public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode,
                                 Texture.FilterMode filterMode, int size) {
-        GameScheduler.runOnGraphics("createTexture3D", () -> {
             glBindTexture(GL12.GL_TEXTURE_3D, id);
 
             glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
@@ -117,7 +114,6 @@ public class LwjglGraphicsManager {
 
             GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA,
                     GL11.GL_UNSIGNED_BYTE, alignedBuffer);
-        });
     }
 
     public void createTexture2D(ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,

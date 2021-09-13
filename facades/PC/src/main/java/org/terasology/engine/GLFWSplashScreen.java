@@ -59,7 +59,8 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
                 .doOnNext(n -> initWindow())
                 .map((n) -> new Renderer())
                 .doOnNext(Renderer::init)
-                .doOnNext(r -> GL11.glClearColor(0f, 0f, 0f, 0f))
+                .doOnNext(r ->
+                    GL11.glClearColor(0f, 0f, 0f, 0f))
                 .block();
 
         final long contextId = GameScheduler.runBlockingGraphics("steal context", GLFW::glfwGetCurrentContext);
@@ -68,7 +69,7 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
         Flux.interval(Duration.ofMillis(100))
                 .onBackpressureDrop()
                 .map(n -> GLFW.glfwGetTime())
-                .buffer(2)
+                .buffer(2, 1)
                 .map(times -> times.get(1) - times.get(0))
                 .publishOn(GameScheduler.graphics())
                 .takeUntil(dTime -> isClosing || window.isClosing())
