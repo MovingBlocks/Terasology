@@ -55,7 +55,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
 
-    public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
+    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
         this.scale = newScale;
         this.translate = newTranslate;
     }
