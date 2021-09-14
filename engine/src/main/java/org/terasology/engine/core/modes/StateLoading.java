@@ -136,7 +136,7 @@ public class StateLoading implements GameState {
         }
 
         popStep();
-        if (netMode.hasLocalClient()) {
+        if (nuiManager != null) {
             loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
             loadingScreen.updateStatus(current.getMessage(), current.getProgress());
         }
@@ -259,14 +259,14 @@ public class StateLoading implements GameState {
             }
         }
         if (current == null) {
-            if (netMode.hasLocalClient()) {
+            if (nuiManager != null) {
                 nuiManager.closeScreen(loadingScreen);
                 nuiManager.setHUDVisible(true);
             }
             context.get(GameEngine.class).changeState(new StateIngame(gameManifest, context));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
-            if (netMode.hasLocalClient()) {
+            if (nuiManager != null) {
                 loadingScreen.updateStatus(current.getMessage(), progressValue);
                 nuiManager.update(delta);
             }
@@ -290,7 +290,7 @@ public class StateLoading implements GameState {
 
     @Override
     public void render() {
-        if (netMode.hasLocalClient()) {
+        if (nuiManager != null) {
             nuiManager.render();
         }
     }

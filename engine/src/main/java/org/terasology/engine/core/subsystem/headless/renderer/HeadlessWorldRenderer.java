@@ -47,8 +47,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public HeadlessWorldRenderer(Context context) {
         this.worldProvider = context.get(WorldProvider.class);
         this.chunkProvider = context.get(ChunkProvider.class);
-//        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
-//        localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
     }
 

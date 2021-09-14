@@ -29,7 +29,7 @@ public class ConsoleSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        if(nuiManager != null) {
+        if (nuiManager != null) {
             overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
             console.subscribe((Message message) -> {
                 if (!nuiManager.isOpen("engine:console")) {

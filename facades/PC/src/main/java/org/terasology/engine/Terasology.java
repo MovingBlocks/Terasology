@@ -270,7 +270,6 @@ public final class Terasology implements Callable<Integer> {
             builder.add(new HeadlessGraphics())
                     .add(new HeadlessTimer())
                     .add(new HeadlessAudio());
-//                    .add(new HeadlessInput());
         } else {
             EngineSubsystem audio = soundEnabled ? new LwjglAudio() : new HeadlessAudio();
             builder.add(audio)
