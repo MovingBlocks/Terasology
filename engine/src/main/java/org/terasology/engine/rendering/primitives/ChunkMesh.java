@@ -55,9 +55,12 @@ public interface ChunkMesh {
 
 
     /**
-     * this is only used for
+     * Disposal hook used to clean up resource after ChunkMesh has been disposed by
+     * GC.
      *
-     * @return
+     * At the moment this is used for entities that have a {@link org.terasology.engine.rendering.logic.ChunkMeshComponent}
+     *
+     * @return a disposal hook that is used to free the vertex data.
      */
     DisposableHook disposalHook();
 
