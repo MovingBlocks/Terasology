@@ -3,8 +3,6 @@
 
 package org.terasology.engine.rendering.assets.mesh;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.UnsignedBytes;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -19,7 +17,6 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttribute
 import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
-import org.terasology.engine.rendering.assets.mesh.resource.VertexShortAttribute;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexShortAttributeBinding;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
