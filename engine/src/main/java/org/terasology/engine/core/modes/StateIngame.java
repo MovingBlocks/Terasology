@@ -104,7 +104,7 @@ public class StateIngame implements GameState {
 
         if (networkSystem.getMode() == NetworkMode.CLIENT) {
             String motd = networkSystem.getServer().getInfo().getMOTD();
-            if (motd != null && motd.length() != 0) {
+            if (nuiManager != null && motd != null && motd.length() != 0) {
                 nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Server MOTD", motd);
             }
         }
