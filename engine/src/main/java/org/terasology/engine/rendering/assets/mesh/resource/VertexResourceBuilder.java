@@ -46,6 +46,19 @@ public class VertexResourceBuilder {
         return result;
     }
 
+    public VertexByteAttributeBinding add(int location, VertexByteAttribute attribute) {
+        VertexByteAttributeBinding result = new VertexByteAttributeBinding(resource, inStride, attribute);
+        this.definitions.add(new VertexResource.VertexDefinition(location, inStride, attribute));
+        inStride += attribute.mapping.size * attribute.count;
+        return result;
+    }
+
+    public VertexShortAttributeBinding add(int location, VertexShortAttribute attribute) {
+        VertexShortAttributeBinding result = new VertexShortAttributeBinding(resource, inStride, attribute);
+        this.definitions.add(new VertexResource.VertexDefinition(location, inStride, attribute));
+        inStride += attribute.mapping.size * attribute.count;
+        return result;
+    }
 
     public VertexResource build() {
         resource.setDefinitions(definitions.toArray(new VertexResource.VertexDefinition[]{}));
