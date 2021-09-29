@@ -3,12 +3,14 @@
 
 package org.terasology.engine.rendering.assets.mesh;
 
+import com.google.common.primitives.UnsignedBytes;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.junit.Test;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexByteAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
@@ -133,7 +135,7 @@ public class VertexResourceTest {
     public void testAllocation() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
         VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
-        VertexIntegerAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        VertexByteAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
         VertexResource resource = builder.build();
         a1.allocate(10);
         int stride = (Float.BYTES * 3) + Byte.BYTES;
@@ -147,12 +149,12 @@ public class VertexResourceTest {
     public void testInterleave() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
         VertexAttributeBinding<Vector3fc, Vector3f> a1 = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
-        VertexIntegerAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        VertexByteAttributeBinding a2 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
         VertexResource resource = builder.build();
 
         a1.put(new Vector3f(10, 0, -4));
-        a2.put(2);
-        a2.put(10);
+        a2.put(UnsignedBytes.checkedCast(2));
+        a2.put(UnsignedBytes.checkedCast(10));
 
         assertEquals(2, a2.getPosition());
         assertEquals(1, a1.getPosition());
