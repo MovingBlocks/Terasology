@@ -44,7 +44,7 @@ public class StateMainMenu extends AbstractState {
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        initEntityAndComponentManagers();
+        initEntityAndComponentManagers(false);
 
         createLocalPlayer(context);
 
