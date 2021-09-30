@@ -32,6 +32,22 @@ public class VertexIntegerAttributeBinding extends VertexBinding {
         this.resource.mark();
     }
 
+
+    /**
+     * write all value by the index.
+     *
+     * @param values the values to commit
+     */
+    public void put(int[] values) {
+        resource.ensureElements(this.vertexIndex + values.length);
+        for (int value : values) {
+            attribute.configuration.write(value, this.vertexIndex, this.offset, resource);
+            this.vertexIndex++;
+            this.resource.mark();
+        }
+    }
+
+
     public void set(int index, int value) {
         attribute.configuration.write(value, index, this.offset, resource);
         this.resource.mark();
