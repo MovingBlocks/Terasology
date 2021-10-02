@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes;
 
+import com.google.common.base.MoreObjects;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.TelemetryConfig;
@@ -159,5 +160,12 @@ public class StateMainMenu extends AbstractState {
 
     private void updateUserInterface(float delta) {
         nuiManager.update(delta);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("messageOnLoad", messageOnLoad)
+                .toString();
     }
 }
