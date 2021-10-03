@@ -120,7 +120,7 @@ tasks.register<RunTerasology>("permissiveNatives") {
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    args("--headless", "--homedir=$localServerDataPath")
+    args = listOf("--headless", "--homedir=$localServerDataPath")
 }
 
 
