@@ -90,8 +90,10 @@ jacocoTestReport {
 // TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
 checkstyle {
     ignoreFailures = false
-    configFile = new File(rootDir, 'config/metrics/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
+
+    def checkstyleDir = rootProject.file('config/metrics/checkstyle')
+    configDirectory = checkstyleDir
+    configProperties.samedir = checkstyleDir
 }
 
 pmd {

@@ -17,6 +17,7 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.world.RelevanceRegionComponent;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkRegionListener;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
@@ -144,20 +145,22 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * Add entity to relevance system. create region for it. Update distance if region exists already. Create/Load
      * chunks for region.
      *
-     * @param entity entity to add.
-     * @param distance region's distance.
-     * @param listener chunk relevance listener.
+     * @param entity the region will be centered around the LocationComponent of this entity
+     * @param distance the dimensions of the region, in chunks
+     * @param listener notified when relevant chunks become available
+     *
+     * @return the region of chunks deemed relevant
      */
-    public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
+    public BlockRegionc addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
         if (!entity.exists()) {
-            return;
+            return null;  // Futures.immediateFailedFuture(new IllegalArgumentException("Entity does not exist."));
         }
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
                 region.setRelevanceDistance(distance);
-                return;
+                return new BlockRegion(region.getCurrentRegion());  // Future of “when region.currentRegion is no longer dirty”?
             }
         } finally {
             regionLock.readLock().unlock();
@@ -175,16 +178,17 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
         StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
                 .sorted(new PositionRelevanceComparator()) //<-- this is n^2 cost. not sure why this needs to be sorted like this.
-                .forEach(
-                        pos -> {
+                .forEach(pos -> {
                             Chunk chunk = chunkProvider.getChunk(pos);
                             if (chunk != null) {
                                 region.checkIfChunkIsRelevant(chunk);
+                                // return Futures.immediateFuture(chunk);
                             } else {
-                                chunkProvider.createOrLoadChunk(pos);
+                                chunkProvider.createOrLoadChunk(pos); // return this
                             }
                         }
                 );
+        return new BlockRegion(region.getCurrentRegion());  // whenAllComplete
     }
 
     /**
