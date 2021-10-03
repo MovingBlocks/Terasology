@@ -256,7 +256,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             location.getWorldPosition(worldPos);
             float worldScale = location.getWorldScale();
 
-
             aabb = aabb.transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
 
             //Scale bounding box for skeletalMesh.
@@ -329,13 +328,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-            Vector3f worldPos = new Vector3f();
-            Vector3f worldPositionCameraSpace = new Vector3f();
-            worldPos.sub(cameraPosition, worldPositionCameraSpace);
-            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
-            Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-            material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
             Matrix4f relMat = new Matrix4f();
             Matrix4f relFinal = new Matrix4f();
@@ -356,6 +348,17 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Quaternionf rotation = locationComponent.getWorldRotation(new Quaternionf());
                 entityTransform.translationRotateScale(location, rotation, 1.0f);
 
+                Vector3f worldPos = new Vector3f();
+                Vector3f worldPositionCameraSpace = new Vector3f();
+                worldPos.sub(cameraPosition, worldPositionCameraSpace);
+
+                worldPositionCameraSpace.y += skeletalMesh.heightOffset;
+
+                Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
+                Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
+                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
+
                 for (Bone bone : skeletalMesh.mesh.getBones()) {
                     Bone parentBone = bone.getParent();
                     EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
@@ -371,15 +374,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
                     locCompA.getRelativeTransform(relMat.identity(), entity);
                     result.set(entityTransform)
-                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(relMat))
+                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(new Vector3f(skeletalMesh.translate).add(0, skeletalMesh.heightOffset , 0)).mul(relMat))
                             .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
 
                     locCompB.getRelativeTransform(relMat.identity(), entity);
-                            result.set(entityTransform)
-                                    .mul(relFinal.identity().scale(skeletalMesh.scale).translate(skeletalMesh.translate).mul(relMat))
-                                    .transformPosition(currentPos.zero());
+                    result.set(entityTransform)
+                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(new Vector3f(skeletalMesh.translate).add(0, skeletalMesh.heightOffset , 0)).mul(relMat))
+                            .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
                     meshData.color0.put(Color.white);
