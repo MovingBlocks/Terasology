@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.exceptions.HostingFailedException;
 import org.terasology.engine.rendering.nui.NUIManager;
