@@ -15,7 +15,6 @@ import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
-import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -40,11 +39,8 @@ public class StateHeadlessSetup extends AbstractState {
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        initEntityAndComponentManagers();
+        initEntityAndComponentManagers(true);
         createLocalPlayer(context);
-
-        componentSystemManager.register(context.get(InputSystem.class), "engine:InputSystem");
-        componentSystemManager.initialise();
 
         GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
