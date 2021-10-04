@@ -23,11 +23,6 @@ public class IndexResource extends BufferedResource {
         return this.inSize / Integer.BYTES;
     }
 
-    public void copy(IndexResource resource) {
-        copyBuffer(resource);
-        this.inSize = resource.inSize;
-    }
-
     public void reserveElements(int elements) {
         reserve(elements * Integer.BYTES);
     }

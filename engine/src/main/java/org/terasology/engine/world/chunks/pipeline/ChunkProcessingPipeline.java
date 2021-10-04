@@ -6,6 +6,7 @@ package org.terasology.engine.world.chunks.pipeline;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -221,7 +222,7 @@ public class ChunkProcessingPipeline {
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      * @return Future of chunk processing.
      */
-    public Future<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
+    public ListenableFuture<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
         Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must to have at least one stage");
         ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(position);
         if (chunkProcessingInfo != null) {

@@ -14,6 +14,7 @@ import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.input.events.CharEvent;
@@ -61,7 +62,7 @@ import java.util.Queue;
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped to
  * one or more inputs.
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.CLIENT)
 public class InputSystem extends BaseComponentSystem {
 
     @In
