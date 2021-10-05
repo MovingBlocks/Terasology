@@ -4,7 +4,6 @@ package org.terasology.engine.core.subsystem.headless;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
-import org.terasology.engine.input.InputSystem;
 
 public class HeadlessInput implements EngineSubsystem {
 
@@ -19,8 +18,7 @@ public class HeadlessInput implements EngineSubsystem {
     }
 
     private void initControls(Context context) {
-        InputSystem inputSystem = new InputSystem();
-        context.put(InputSystem.class, inputSystem);
+
     }
 
 }
