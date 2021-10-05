@@ -20,7 +20,6 @@ import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
@@ -37,8 +36,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks received from remote source.
@@ -74,11 +71,8 @@ public class RemoteChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
                     Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
+                    return LightMerger.merge(localchunks);
+                }, LightMerger::requiredChunks
             ))
             .addStage(ChunkTaskProvider.create("", readyChunks::add));
 

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
@@ -21,6 +20,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Collection;

@@ -10,7 +10,6 @@ import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.GameManifest;
@@ -23,6 +22,7 @@ import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.utilities.concurrency.AbstractTask;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedOutputStream;

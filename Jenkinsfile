@@ -115,20 +115,24 @@ pipeline {
         stage('Analytics') {
             steps {
                 sh './gradlew --console=plain check -x test'
-                // the default resolution when omitting `defaultBranch` is to `master`
-                // this is wrong in our case, so explicitly set `develop` as default
-                // TODO: does this also work for PRs with different base branch?
-                discoverGitReferenceBuild(defaultBranch: 'develop')
-                recordIssues skipBlames: true,
-                    tools: [
-                        checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
-                        spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
-                        pmdParser(pattern: '**/build/reports/pmd/*.xml')
-                    ]
+            }
+            post {
+                always {
+                    // the default resolution when omitting `defaultBranch` is to `master`
+                    // this is wrong in our case, so explicitly set `develop` as default
+                    // TODO: does this also work for PRs with different base branch?
+                    discoverGitReferenceBuild(defaultBranch: 'develop')
+                    recordIssues skipBlames: true, enabledForFailure: true,
+                        tools: [
+                            checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
+                            spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
+                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                        ]
 
-                recordIssues skipBlames: true,
-                    tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
-                                        lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+                    recordIssues skipBlames: true, enabledForFailure: true,
+                        tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
+                                            lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+                }
             }
         }
 

@@ -4,11 +4,11 @@
 package org.terasology.engine.world.chunks.pipeline.stages;
 
 import org.joml.Vector3ic;
-import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -45,7 +45,7 @@ public class ChunkTaskProvider {
     }
 
     public static ChunkTaskProvider createMulti(String name, Function<Collection<Chunk>, Chunk> processing,
-                                                Function<Vector3ic, Set<Vector3ic>> requirementCalculator) {
+                                                Function<Vector3ic, List<Vector3ic>> requirementCalculator) {
         return new ChunkTaskProvider(
                 name,
                 pos -> new MultiplyRequirementChunkTask(name, pos, processing, requirementCalculator.apply(pos))

@@ -66,15 +66,16 @@ dependencies {
 
     implementation(project(":engine"))
     implementation(project(":subsystems:DiscordRPC"))
+    implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
 
-    implementation(platform("org.junit:junit-bom:5.7.1")) {
+    testImplementation(platform("org.junit:junit-bom:5.7.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
-    implementation("org.junit.jupiter:junit-jupiter-api")
-    implementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     testImplementation("com.google.truth:truth:1.1.2")
@@ -119,7 +120,7 @@ tasks.register<RunTerasology>("permissiveNatives") {
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    args("--headless", "--homedir=$localServerDataPath")
+    args = listOf("--headless", "--homedir=$localServerDataPath")
 }
 
 

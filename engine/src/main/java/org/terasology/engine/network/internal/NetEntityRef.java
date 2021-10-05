@@ -3,11 +3,11 @@
 
 package org.terasology.engine.network.internal;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
 import org.terasology.engine.network.NetworkComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
 

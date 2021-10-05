@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.naming.Name;
 
 import java.util.Collection;
