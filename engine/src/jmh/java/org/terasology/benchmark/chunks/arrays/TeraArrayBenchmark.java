@@ -16,15 +16,15 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.terasology.engine.world.chunks.blockdata.TeraArray;
-import org.terasology.engine.world.chunks.blockdata.TeraArray.SerializationHandler;
 import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.engine.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraOcTree;
 import org.terasology.engine.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -34,24 +34,6 @@ import java.util.function.Supplier;
 @Fork(1)
 @Measurement(iterations = 1)
 public class TeraArrayBenchmark {
-
-    public static final int BUFFER_SIZE = 1024 * 1024;
-
-    private static final byte[][] INFLATED_8_BIT = new byte[256][];
-    private static final byte[] DEFLATED_8_BIT = new byte[256];
-
-    private static final byte[][] INFLATED_4_BIT = new byte[256][];
-    private static final byte[] DEFLATED_4_BIT = new byte[256];
-
-    static {
-        for (int i = 0; i < INFLATED_8_BIT.length; i++) {
-            INFLATED_8_BIT[i] = new byte[256];
-        }
-        for (int i = 0; i < INFLATED_4_BIT.length; i++) {
-            INFLATED_4_BIT[i] = new byte[128];
-        }
-    }
-
 
     @Benchmark
     public int fullyRead(ArrayState state) {
@@ -78,6 +60,27 @@ public class TeraArrayBenchmark {
     }
 
     @Benchmark
+    public int singleWriteEmpty(ArrayState state) {
+        return state.array.set(0, 0, 0, 1);
+    }
+
+    @Benchmark
+    public int singleReadEmpty(ArrayState state) {
+        return state.array.get(0, 0, 0);
+    }
+
+
+    @Benchmark
+    public int singleWrite(ArrayState state, RandomFilledState rnd) {
+        return state.array.set(rnd.x(), rnd.y(), rnd.y(), rnd.index);
+    }
+
+    @Benchmark
+    public int singleRead(ArrayState state, RandomFilledState rnd) {
+        return state.array.get(rnd.x(), rnd.y(), rnd.z());
+    }
+
+    @Benchmark
     public ByteBuffer toByteBuffer(ArrayState state, ByteBufferState bbState) {
         return state.handler.serialize(state.array, bbState.out);
     }
@@ -88,18 +91,19 @@ public class TeraArrayBenchmark {
     }
 
     public enum TeraArrayType {
-        DENCE_4BIT(() -> new TeraDenseArray4Bit(16, 256, 16), TeraDenseArray4Bit.SerializationHandler::new),
-        DENCE_8BIT(() -> new TeraDenseArray8Bit(16, 256, 16), TeraDenseArray8Bit.SerializationHandler::new),
-        DENCE_16BIT(() -> new TeraDenseArray16Bit(16, 256, 16), TeraDenseArray16Bit.SerializationHandler::new),
-        SPARCE_4BIT(() -> new TeraSparseArray4Bit(16, 256, 16, INFLATED_4_BIT, DEFLATED_4_BIT),
+        DENCE_4BIT(() -> new TeraDenseArray4Bit(32, 32, 32), TeraDenseArray4Bit.SerializationHandler::new),
+        DENCE_8BIT(() -> new TeraDenseArray8Bit(32, 32, 32), TeraDenseArray8Bit.SerializationHandler::new),
+        DENCE_16BIT(() -> new TeraDenseArray16Bit(32, 32, 32), TeraDenseArray16Bit.SerializationHandler::new),
+        SPARCE_4BIT(() -> new TeraSparseArray4Bit(32, 32, 32),
                 TeraSparseArray4Bit.SerializationHandler::new),
-        SPARCE_8BIT(() -> new TeraSparseArray8Bit(16, 256, 16, INFLATED_8_BIT, DEFLATED_8_BIT),
-                TeraSparseArray8Bit.SerializationHandler::new);
+        SPARCE_8BIT(() -> new TeraSparseArray8Bit(32, 32, 32),
+                TeraSparseArray8Bit.SerializationHandler::new),
+        OC_TREE(() -> new TeraOcTree((byte) 32), TeraOcTree.SerializationHandler::new);
 
         private final Supplier<TeraArray> creator;
-        private final Supplier<SerializationHandler> handler;
+        private final Supplier<TeraArray.SerializationHandler> handler;
 
-        TeraArrayType(Supplier<TeraArray> creator, Supplier<SerializationHandler> handler) {
+        TeraArrayType(Supplier<TeraArray> creator, Supplier<TeraArray.SerializationHandler> handler) {
             this.creator = creator;
             this.handler = handler;
         }
@@ -108,7 +112,7 @@ public class TeraArrayBenchmark {
             return creator.get();
         }
 
-        public SerializationHandler handler() {
+        public TeraArray.SerializationHandler handler() {
             return handler.get();
         }
     }
@@ -119,10 +123,56 @@ public class TeraArrayBenchmark {
         private ByteBuffer out;
 
         @Setup(Level.Invocation)
-        public void setup() throws IOException {
-            out = ByteBuffer.allocate(BUFFER_SIZE);
+        public void setup(ArrayState arrayState)  {
+            out = ByteBuffer.allocate(arrayState.handler.computeMinimumBufferSize(arrayState.array));
         }
 
+    }
+
+    @State(Scope.Thread)
+    public static class RandomFilledState {
+        public static final int COUNT = 100;
+        int index;
+        int[] x = new int[COUNT];
+        int[] y = new int[COUNT];
+        int[] z = new int[COUNT];
+
+        @Setup(Level.Iteration)
+        public void setupThread(ArrayState arrayState) {
+            Random random = new Random();
+
+            for (int i = 0; i < random.nextInt(1000); i++) {
+                arrayState.array.set(random.nextInt(32),
+                        random.nextInt(32),
+                        random.nextInt(32),
+                        random.nextInt(32)
+                );
+            }
+
+            for (int i = 0; i < COUNT; i++) {
+                x[i] = random.nextInt(32);
+                y[i] = random.nextInt(32);
+                z[i] = random.nextInt(32);
+            }
+        }
+
+        @Setup(Level.Invocation)
+        public void setup() {
+            Random random = new Random();
+            index = random.nextInt(COUNT);
+        }
+
+        public int x() {
+            return x[index];
+        }
+
+        public int y() {
+            return y[index];
+        }
+
+        public int z() {
+            return z[index];
+        }
     }
 
     @State(Scope.Thread)
@@ -131,8 +181,7 @@ public class TeraArrayBenchmark {
 
         @Setup(Level.Invocation)
         public void setup(ArrayState arrayState) {
-            in = ByteBuffer.allocate(BUFFER_SIZE);
-            arrayState.handler.serialize(arrayState.array, in);
+            in = arrayState.handler.serialize(arrayState.array);
             in.rewind();
         }
 
@@ -140,10 +189,10 @@ public class TeraArrayBenchmark {
 
     @State(Scope.Thread)
     public static class ArrayState {
-        @Param({"DENCE_4BIT", "DENCE_8BIT", "DENCE_16BIT", "SPARCE_4BIT", "SPARCE_8BIT"})
+        @Param({"DENCE_4BIT", "DENCE_8BIT", "DENCE_16BIT", "SPARCE_4BIT", "SPARCE_8BIT", "OC_TREE"})
         private static TeraArrayType arrayType;
 
-        private SerializationHandler handler;
+        private TeraArray.SerializationHandler handler;
         private TeraArray array;
 
         @Setup
