@@ -8,14 +8,14 @@ import org.joml.RoundingMode;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public final class Chunks {
     public static final int SIZE_X = 32;
-    public static final int SIZE_Y = 64;
+    public static final int SIZE_Y = 32;
     public static final int SIZE_Z = 32;
 
     public static final int INNER_CHUNK_POS_FILTER_X = Integer.highestOneBit(SIZE_X) - 1;

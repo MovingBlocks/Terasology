@@ -8,15 +8,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.engine.world.chunks.blockdata.TeraArray;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
-import org.terasology.protobuf.EntityData;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -24,8 +16,16 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraOcTree;
 import org.terasology.engine.world.chunks.deflate.TeraDeflator;
 import org.terasology.engine.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
+import org.terasology.protobuf.EntityData;
 
 import java.text.DecimalFormat;
 
@@ -83,9 +83,9 @@ public class ChunkImpl implements Chunk {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(extra);
-        sunlightData = new TeraSparseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightRegenData = new TeraSparseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        lightData = new TeraSparseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightData = new TeraOcTree((byte)getChunkSizeX());
+        sunlightRegenData = new TeraOcTree((byte)getChunkSizeX());
+        lightData = new TeraOcTree((byte)getChunkSizeX());
         dirty = true;
         this.blockManager = blockManager;
         region = new BlockRegion(

@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -220,7 +220,7 @@ public class ExtraBlockDataManager {
     public TeraArray[] makeDataArrays(int sizeX, int sizeY, int sizeZ) {
         TeraArray[] extraData = new TeraArray[slotFactories.length];
         for (int i = 0; i < extraData.length; i++) {
-            extraData[i] = slotFactories[i].create(sizeX, sizeY, sizeZ);
+            extraData[i] = new TeraOcTree((byte) sizeX);
         }
         return extraData;
     }
