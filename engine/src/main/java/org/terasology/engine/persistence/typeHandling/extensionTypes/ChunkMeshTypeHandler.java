@@ -46,8 +46,8 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
         }
         ChunkMesh result = new ChunkMeshImpl();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
-            result.getVertexElements(renderType).buffer.copyBuffer(asBuffers.remove(0));
-            result.getVertexElements(renderType).indices.copyBuffer(asBuffers.remove(0));
+            result.getVertexElements(renderType).buffer.replace(asBuffers.remove(0));
+            result.getVertexElements(renderType).indices.replace(asBuffers.remove(0));
         }
         result.updateMesh();
         return Optional.of(result);

@@ -8,7 +8,6 @@ package org.terasology.engine.rendering.assets.mesh.resource;
  */
 public class VertexResource extends BufferedResource {
     private int inStride = 0;
-    private int version = 0;
     private VertexDefinition[] attributes;
 
     public VertexResource() {
@@ -30,7 +29,7 @@ public class VertexResource extends BufferedResource {
     }
 
     /**
-     * definition information that the end consumer uses to determin the layout of the vertex data
+     * definition information that the end consumer uses to determine the layout of the vertex data
      * @return the definition
      */
     public VertexDefinition[] definitions() {
@@ -43,20 +42,6 @@ public class VertexResource extends BufferedResource {
      */
     public void setDefinitions(VertexDefinition[] attr) {
         this.attributes = attr;
-    }
-
-    /**
-     * copy the contents of a vertex resource over.
-     *
-     * @param resource
-     */
-    public void copy(VertexResource resource) {
-        if (resource.isEmpty()) {
-            return;
-        }
-        copyBuffer(resource);
-        this.inStride = resource.inStride;
-        this.mark();
     }
 
     /**
@@ -106,22 +91,6 @@ public class VertexResource extends BufferedResource {
     public void allocate(int size, int stride) {
         this.allocate(size);
         this.inStride = stride;
-    }
-
-    /**
-     * the version of the buffer is used to determine if the contents has changed.
-     * this should notify the end user of the buffer to sync the data back to the driver
-     * @return the version flag
-     */
-    public int getVersion() {
-        return version;
-    }
-
-    /**
-     * increase version flag for change
-     */
-    public void mark() {
-        version++;
     }
 
     @Override
