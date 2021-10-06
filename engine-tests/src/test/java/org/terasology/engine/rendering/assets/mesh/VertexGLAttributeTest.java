@@ -12,10 +12,12 @@ import org.joml.Vector4fc;
 import org.junit.Test;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexByteAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexShortAttributeBinding;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
@@ -74,13 +76,13 @@ public class VertexGLAttributeTest {
     @Test
     public void testByteBinding() {
         VertexResourceBuilder builder = new VertexResourceBuilder();
-        VertexIntegerAttributeBinding a1 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        VertexByteAttributeBinding a1 = builder.add(0, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
         VertexResource resource = builder.build();
 
-        a1.put(10);
-        a1.put(150);
-        a1.put(300);
-        a1.put(100);
+        a1.put((byte) 10);
+        a1.put((byte) 150);
+        a1.put((byte) 100);
+        a1.put((byte) 100);
 
         assertEquals(4, a1.getPosition());
         resource.writeBuffer(buffer -> {
@@ -88,8 +90,30 @@ public class VertexGLAttributeTest {
 
             assertEquals(10, Byte.toUnsignedInt(buffer.get(Byte.BYTES * 0)));
             assertEquals(150, Byte.toUnsignedInt(buffer.get(Byte.BYTES * 1)));
-            assertEquals(255, Byte.toUnsignedInt(buffer.get(Byte.BYTES * 2)));
+            assertEquals(100, Byte.toUnsignedInt(buffer.get(Byte.BYTES * 2)));
             assertEquals(100, Byte.toUnsignedInt(buffer.get(Byte.BYTES * 3)));
+        });
+    }
+
+    @Test
+    public void testShortBinding() {
+        VertexResourceBuilder builder = new VertexResourceBuilder();
+        VertexShortAttributeBinding a1 = builder.add(0, GLAttributes.SHORT_1_VERTEX_ATTRIBUTE);
+        VertexResource resource = builder.build();
+
+        a1.put((short) 10);
+        a1.put((short) 150);
+        a1.put((short) 100);
+        a1.put((short) 100);
+
+        assertEquals(4, a1.getPosition());
+        resource.writeBuffer(buffer -> {
+            assertEquals(4 * Short.BYTES, buffer.limit());
+
+            assertEquals(10, Short.toUnsignedInt(buffer.getShort(Short.BYTES * 0)));
+            assertEquals(150, Short.toUnsignedInt(buffer.getShort(Short.BYTES * 1)));
+            assertEquals(100, Short.toUnsignedInt(buffer.getShort(Short.BYTES * 2)));
+            assertEquals(100, Short.toUnsignedInt(buffer.getShort(Short.BYTES * 3)));
         });
     }
 
