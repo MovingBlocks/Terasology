@@ -164,7 +164,6 @@ public class ChunkMeshImpl implements ChunkMesh {
     @Override
     public void dispose() {
         if (!disposed) {
-            disposalHook().dispose();
             for (int i = 0; i < vertexBuffers.length; i++) {
                 int id = vertexBuffers[i];
                 if (id != 0) {
@@ -187,43 +186,6 @@ public class ChunkMeshImpl implements ChunkMesh {
 
             disposed = true;
         }
-    }
-
-    @Override
-    public DisposableHook disposalHook() {
-        WeakReference<ChunkMeshImpl> chunkMeshWeakReference = new WeakReference<>(this);
-        return new DisposableHook() {
-            private final int[] hookVertexBuffers = vertexBuffers;
-            private final int[] hookIndexBuffers = idxBuffers;
-            private final int[] hookVertexArrayObjects = vaoCount;
-
-            @Override
-            public void dispose() {
-                for (int i = 0; i < this.hookVertexBuffers.length; i++) {
-                    if (this.hookVertexBuffers[i] != 0) {
-                        GL30.glDeleteBuffers(this.hookVertexBuffers[i]);
-                        this.hookVertexBuffers[i] = 0;
-                    }
-                }
-                for (int i = 0; i < this.hookIndexBuffers.length; i++) {
-                    if (this.hookIndexBuffers[i] != 0) {
-                        GL30.glDeleteBuffers(this.hookIndexBuffers[i]);
-                        this.hookIndexBuffers[i] = 0;
-                    }
-                }
-
-                for (int i = 0; i < this.hookVertexArrayObjects.length; i++) {
-                    if (this.hookVertexArrayObjects[i] != 0) {
-                        GL30.glDeleteVertexArrays(this.hookVertexArrayObjects[i]);
-                        this.hookVertexArrayObjects[i] = 0;
-                    }
-                }
-                ChunkMeshImpl mesh = chunkMeshWeakReference.get();
-                if (mesh != null) {
-                    mesh.disposed = true;
-                }
-            }
-        };
     }
 
     public boolean isDisposed() {
