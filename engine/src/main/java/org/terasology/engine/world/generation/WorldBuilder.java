@@ -237,7 +237,8 @@ public class WorldBuilder extends ProviderStore {
     }
 
     /**
-     * Adds {@code provider} and all its dependencies (calculated by calling {@link #addProviderChain} to {@code orderedProviders} in the proper order.
+     * Adds {@code provider} and all its dependencies (calculated by calling {@link #addProviderChain}
+     * to {@code orderedProviders} in the proper order.
      * Doesn't consider dependencies through {@code providedFacet}, because that's already required by something else.
      */
     private void addRequirements(Class<? extends WorldFacet> providedFacet, FacetProvider provider, boolean scalable,

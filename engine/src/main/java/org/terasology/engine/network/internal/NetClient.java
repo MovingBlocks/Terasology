@@ -388,7 +388,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                 .setPos(NetMessageUtil.convert(pos))
@@ -399,7 +399,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
                 .setIndex(i)

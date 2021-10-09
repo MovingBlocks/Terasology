@@ -129,6 +129,14 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
+
+            // Check if we actually have the NUI Manager available, this would for instance not be the case if starting a headless game server
+            NUIManager nui = CoreRegistry.get(NUIManager.class);
+            if (nui == null) {
+                logger.warn("NUIManager was unavailable, skipping UISkinFormat as not needed. This may or may not be a problem");
+                return;
+            }
+
             if (elements != null) {
                 for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
                     WidgetLibrary library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();

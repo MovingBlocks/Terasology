@@ -66,6 +66,7 @@ dependencies {
 
     implementation(project(":engine"))
     implementation(project(":subsystems:DiscordRPC"))
+    implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
@@ -119,7 +120,7 @@ tasks.register<RunTerasology>("permissiveNatives") {
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    args("--headless", "--homedir=$localServerDataPath")
+    args = listOf("--headless", "--homedir=$localServerDataPath")
 }
 
 

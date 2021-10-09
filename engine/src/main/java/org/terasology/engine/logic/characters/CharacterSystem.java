@@ -18,7 +18,6 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.input.binds.interaction.AttackButton;
-import org.terasology.engine.input.cameraTarget.PlayerTargetSystem;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
 import org.terasology.engine.logic.characters.events.ActivationRequestDenied;
 import org.terasology.engine.logic.characters.events.AttackEvent;
@@ -48,12 +47,10 @@ import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.registry.In;
-import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
-
 
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -75,12 +72,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Time time;
-
-    @In
-    private PlayerTargetSystem targetSystem;
-
-    @In
-    private BlockEntityRegistry blockRegistry;
 
     @In
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
@@ -479,7 +470,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
         // safely above ground.
         Optional.ofNullable(entity.getComponent(LocationComponent.class))
-                .map(k -> k.getWorldPosition(new org.joml.Vector3f()))
+                .map(k -> k.getWorldPosition(new Vector3f()))
                 .map(location -> location.add(0, (event.getNewValue() - event.getOldValue()) / 2f, 0))
                 .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
