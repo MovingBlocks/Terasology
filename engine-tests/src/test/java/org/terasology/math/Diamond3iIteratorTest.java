@@ -21,7 +21,7 @@ public class Diamond3iIteratorTest {
 
     @Test
     public void testZeroDistanceIteration() {
-        Iterator<Vector3ic> iter = Diamond3iIterable.region(new org.joml.Vector3i(), 0).build().iterator();
+        Iterator<Vector3ic> iter = Diamond3iIterable.region(new Vector3i(), 0).build().iterator();
         assertEquals(Lists.newArrayList(new Vector3i()), Lists.newArrayList(iter));
     }
 

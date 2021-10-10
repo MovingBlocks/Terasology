@@ -11,8 +11,8 @@ import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexByteAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttributeBinding;
-import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
@@ -321,8 +321,8 @@ public class ChunkMesh {
 
         public final VertexAttributeBinding<Colorc, Color> color;
 
-        public final VertexIntegerAttributeBinding flags;
-        public final VertexIntegerAttributeBinding frames;
+        public final VertexByteAttributeBinding flags;
+        public final VertexByteAttributeBinding frames;
 
         public final VertexFloatAttributeBinding sunlight;         // this could be changed to a single byte
         public final VertexFloatAttributeBinding blockLight;       // this could be changed to a single byte
