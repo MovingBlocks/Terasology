@@ -5,6 +5,7 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
@@ -55,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -115,7 +115,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    protected Future<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
+    protected ListenableFuture<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
         Vector3i pos = new Vector3i(chunkPos);
         return loadingPipeline.invokeGeneratorTask(
             pos,

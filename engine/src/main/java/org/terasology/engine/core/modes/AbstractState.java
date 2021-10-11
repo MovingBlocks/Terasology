@@ -31,7 +31,7 @@ public abstract class AbstractState implements GameState {
     protected EventSystem eventSystem;
     protected ComponentSystemManager componentSystemManager;
 
-    protected void initEntityAndComponentManagers() {
+    protected void initEntityAndComponentManagers(boolean isHeadless) {
         verifyNotNull(context);
         CoreRegistry.setContext(context);
 
@@ -41,9 +41,10 @@ public abstract class AbstractState implements GameState {
 
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl(context));
-
-        NUIManager nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
+        if (!isHeadless) {
+            NUIManager nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
+            context.put(NUIManager.class, nuiManager);
+        }
 
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
