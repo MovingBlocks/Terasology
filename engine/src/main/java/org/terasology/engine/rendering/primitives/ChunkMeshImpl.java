@@ -158,8 +158,6 @@ public class ChunkMeshImpl implements ChunkMesh {
     /**
      * Disposes of all the data stored in an instance of this class and the associated data stored in the GLBufferPool instance provided on
      * construction.
-     * <p>
-     * ChunkMesh instances cannot be un-disposed.
      */
     @Override
     public void dispose() {

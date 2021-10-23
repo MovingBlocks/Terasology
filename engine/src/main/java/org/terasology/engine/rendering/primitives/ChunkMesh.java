@@ -83,10 +83,6 @@ public interface ChunkMesh {
         Z_PRE_PASS
     }
 
-    interface DisposableHook {
-        void dispose();
-    }
-
     class VertexElements {
 
         public static final int VERTEX_INDEX = 0; // vec3
