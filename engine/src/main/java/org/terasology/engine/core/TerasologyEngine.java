@@ -247,7 +247,6 @@ public class TerasologyEngine implements GameEngine {
         verifyRequiredSystemIsRegistered(Time.class);
         verifyRequiredSystemIsRegistered(DisplayDevice.class);
         verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
-        verifyRequiredSystemIsRegistered(InputSystem.class);
     }
 
     /**
@@ -588,7 +587,9 @@ public class TerasologyEngine implements GameEngine {
         newState.init(this);
         stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
         InputSystem inputSystem = rootContext.get(InputSystem.class);
-        inputSystem.drainQueues();
+        if (inputSystem != null) {
+            inputSystem.drainQueues();
+        }
     }
 
     @Override

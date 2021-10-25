@@ -50,7 +50,9 @@ public class ChatSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
+        if (nuiManager != null) {
+            overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
+        }
     }
 
     @ReceiveEvent(components = ClientComponent.class)

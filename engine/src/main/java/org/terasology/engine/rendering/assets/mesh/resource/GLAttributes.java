@@ -3,7 +3,6 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
-import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -55,18 +54,35 @@ public final class GLAttributes {
         }
     }, TypeMapping.ATTR_INT, 1);
 
-    public static final VertexIntegerAttribute BYTE_1_VERTEX_ATTRIBUTE =
-            new VertexIntegerAttribute(new VertexIntegerAttribute.AttributeConfiguration() {
 
+    public static final VertexShortAttribute SHORT_1_VERTEX_ATTRIBUTE =
+        new VertexShortAttribute(new VertexShortAttribute.AttributeConfiguration() {
+            @Override
+            public void write(short value, int vertIdx, int offset, VertexResource resource) {
+                int bufferStart = vertIdx * resource.inStride() + offset;
+                ByteBuffer buffer = resource.buffer();
+                buffer.putShort(bufferStart, value);
+            }
+
+            @Override
+            public short read(int vertIdx, int offset, VertexResource resource) {
+                int bufferStart = vertIdx * resource.inStride() + offset;
+                ByteBuffer buffer = resource.buffer();
+                return buffer.getShort(bufferStart);
+            }
+        }, TypeMapping.ATTR_SHORT, 1);
+
+    public static final VertexByteAttribute BYTE_1_VERTEX_ATTRIBUTE =
+            new VertexByteAttribute(new VertexByteAttribute.AttributeConfiguration() {
         @Override
-        public void write(int value, int vertIdx, int offset, VertexResource resource) {
+        public void write(byte value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
-            buffer.put(bufferStart, ((byte) Math.clamp(0, 255, value)));
+            buffer.put(bufferStart, value);
         }
 
         @Override
-        public int read(int vertIdx, int offset, VertexResource resource) {
+        public byte read(int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             return buffer.get(bufferStart);
