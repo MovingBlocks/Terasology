@@ -3,15 +3,10 @@
 
 package org.terasology.engine.registry;
 
-import com.google.common.collect.Maps;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
-
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class CoreRegistryTest {
     private Context context;
@@ -31,7 +26,7 @@ public class CoreRegistryTest {
     @Test
     public void testContextChange() {
         CoreRegistry.setContext(new ContextImplementation());
-        assertNotEquals(CoreRegistry.get(Context.class), context);
+        Assertions.assertNotEquals(CoreRegistry.get(Context.class), context);
     }
 
     /**
@@ -41,8 +36,8 @@ public class CoreRegistryTest {
     public void testNullReturnOnMissingContext() {
         CoreRegistry.setContext(null);
 
-        assertEquals(CoreRegistry.put(Integer.class, 10), null);
-        assertEquals(CoreRegistry.get(Integer.class), null);
+        Assertions.assertEquals(CoreRegistry.put(Integer.class, 10), null);
+        Assertions.assertEquals(CoreRegistry.get(Integer.class), null);
     }
 
     /**
@@ -51,9 +46,9 @@ public class CoreRegistryTest {
      */
     @Test
     public void testContextGetIndependenceFromContextInterfaceImplementation() {
-        assertEquals(CoreRegistry.get(Context.class), context);
+        Assertions.assertEquals(CoreRegistry.get(Context.class), context);
 
-        assertEquals(context.get(Context.class), null);
+        Assertions.assertEquals(context.get(Context.class), null);
     }
 
     /**
@@ -64,35 +59,18 @@ public class CoreRegistryTest {
         // Load value in context
         Integer value = 10;
         CoreRegistry.put(Integer.class, value);
-        assertEquals(value, context.get(Integer.class));
-        assertEquals(context.get(Integer.class), CoreRegistry.get(Integer.class));
+        Assertions.assertEquals(value, context.get(Integer.class));
+        Assertions.assertEquals(context.get(Integer.class), CoreRegistry.get(Integer.class));
 
         // Change context
         CoreRegistry.setContext(new ContextImplementation());
-        assertNotEquals(CoreRegistry.get(Context.class), context);
-        assertEquals(CoreRegistry.get(Integer.class), null);
+        Assertions.assertNotEquals(CoreRegistry.get(Context.class), context);
+        Assertions.assertEquals(CoreRegistry.get(Integer.class), null);
 
         // Restore first context
         CoreRegistry.setContext(context);
-        assertEquals(CoreRegistry.get(Integer.class), value);
+        Assertions.assertEquals(CoreRegistry.get(Integer.class), value);
     }
 
 
-    private static class ContextImplementation implements Context {
-        private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
-
-        @Override
-        public <T> T get(Class<? extends T> type) {
-            T result = type.cast(map.get(type));
-            if (result != null) {
-                return result;
-            }
-            return null;
-        }
-
-        @Override
-        public <T, U extends T> void put(Class<T> type, U object) {
-            map.put(type, object);
-        }
-    }
 }

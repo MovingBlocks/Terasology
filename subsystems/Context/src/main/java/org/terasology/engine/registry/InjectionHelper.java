@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.registry;
 
-import org.reflections.ReflectionUtils;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
@@ -16,6 +16,7 @@ import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 public final class InjectionHelper {
     private static final Logger logger = LoggerFactory.getLogger(InjectionHelper.class);
@@ -25,7 +26,7 @@ public final class InjectionHelper {
 
     public static void inject(final Object object, Context context) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+            for (Field field : getAllFields(object.getClass(), In.class)) {
                 Object value = context.get(field.getType());
                 if (value != null) {
                     try {
@@ -43,7 +44,7 @@ public final class InjectionHelper {
 
     public static void inject(final Object object) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+            for (Field field : getAllFields(object.getClass(), In.class)) {
                 Object value = CoreRegistry.get(field.getType());
                 if (value != null) {
                     try {
@@ -64,7 +65,7 @@ public final class InjectionHelper {
 
     public static <T> void inject(final Object object, final Class<? extends Annotation> annotation, final Map<Class<? extends T>, T> source) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(annotation))) {
+            for (Field field : getAllFields(object.getClass(), annotation)) {
                 Object value = source.get(field.getType());
                 if (value != null) {
                     try {
@@ -80,6 +81,20 @@ public final class InjectionHelper {
 
             return null;
         });
+    }
+
+    private static Set<Field> getAllFields(Class<?> clazz, Class<? extends Annotation> annotation) {
+        Set<Field> result = Sets.newLinkedHashSet();
+        Class<?> candidate = clazz;
+        while (candidate != null) {
+            for (Field field : candidate.getDeclaredFields()) {
+                if (field.getAnnotation(annotation) != null) {
+                    result.add(field);
+                }
+            }
+            candidate = candidate.getSuperclass();
+        }
+        return result;
     }
 
     public static void share(Object object) {

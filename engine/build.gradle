@@ -147,6 +147,7 @@ dependencies {
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.2.0'
 
     api(project(":subsystems:TypeHandlerLibrary"))
+    api(project(":subsystems:Context"))
 }
 
 protobuf {
