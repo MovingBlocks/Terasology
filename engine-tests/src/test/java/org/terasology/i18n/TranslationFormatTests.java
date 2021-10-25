@@ -6,7 +6,6 @@ package org.terasology.i18n;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.i18n.assets.TranslationData;
 import org.terasology.engine.i18n.assets.TranslationFormat;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -67,7 +66,7 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        assertEquals(new SimpleUri("engine:menu"), data.getProjectUri());
+        assertEquals(new ResourceUrn("engine:menu"), data.getProjectUri());
         assertEquals(Locale.ROOT, data.getLocale());
     }
 

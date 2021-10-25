@@ -5,7 +5,6 @@ package org.terasology.engine.i18n.assets;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.core.Uri;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
@@ -27,7 +26,7 @@ public class Translation extends Asset<TranslationData> {
 
     private Map<String, String> dictionary = new HashMap<>();
     private Locale locale;
-    private Uri projectUri;
+    private ResourceUrn projectUri;
 
     private final DisposalAction disposalAction;
 
@@ -57,7 +56,7 @@ public class Translation extends Asset<TranslationData> {
     /**
      * @return the uri of the project this instance is part of
      */
-    public Uri getProjectUri() {
+    public ResourceUrn getProjectUri() {
         return projectUri;
     }
     /**

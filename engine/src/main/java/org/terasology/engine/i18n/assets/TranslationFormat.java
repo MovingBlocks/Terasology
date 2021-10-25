@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParseException;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
@@ -91,7 +90,7 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         Locale locale = localeFromFilename(file.getFilename());
         Name projName = basenameFromFilename(file.getFilename());
 
-        SimpleUri projUri = new SimpleUri(urn.getModuleName(), projName);
+        ResourceUrn projUri = new ResourceUrn(urn.getModuleName(), projName);
         TranslationData data = new TranslationData(projUri, locale);
 
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
