@@ -18,6 +18,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -283,7 +284,41 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(Map<String, PersistedData> data) {
-        return null;
+        int entryCount = data.size();
+        int size = 0;
+        List<PersistedData> keys = new ArrayList<>(entryCount);
+        List<PersistedData> values = new ArrayList<>(entryCount);
+        for (Map.Entry<String, PersistedData> entry : data.entrySet()) {
+            PersistedData serialize = serialize(entry.getKey());
+            ByteBuffer keyBuffer = ((ByteBufferPersistedData) serialize).byteBuffer;
+            keyBuffer.position(1); // skip header
+            size += keyBuffer.remaining();
+            keys.add(serialize);
+            size += ((ByteBufferPersistedData) entry.getValue()).byteBuffer.array().length;
+            values.add(entry.getValue());
+        }
+        int refsSize = 8 * entryCount;
+        ByteBuffer buffer = ByteBuffer.allocate(1 + 4 + refsSize + size);
+        buffer.put(BBType.VALUEMAP.getCode());
+        buffer.putInt(entryCount);
+        int dataPosition = 1 + 4 + refsSize;
+        buffer.position(dataPosition);
+        for (int i = 0; i < keys.size(); i++) {
+            ByteBufferPersistedData key = (ByteBufferPersistedData) keys.get(i);
+            int keySize = key.byteBuffer.remaining();
+            buffer.put(key.byteBuffer);
+            buffer.putInt(1 + 4 + i * 8, dataPosition);
+            dataPosition += keySize;
+        }
+        for (int i = 0; i < values.size(); i++) {
+            ByteBufferPersistedData value = (ByteBufferPersistedData) values.get(i);
+            int keySize = value.byteBuffer.array().length;
+            buffer.put(value.byteBuffer.array());
+            buffer.putInt(1 + 4 + i * 8 + 4, dataPosition);
+            dataPosition += keySize;
+        }
+        buffer.rewind();
+        return new ByteBufferPersistedDataMap(buffer);
     }
 
     @Override

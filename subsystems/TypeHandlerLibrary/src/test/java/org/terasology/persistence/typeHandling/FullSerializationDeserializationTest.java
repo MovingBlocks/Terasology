@@ -22,8 +22,11 @@ import org.terasology.persistence.typeHandling.inMemory.InMemoryWriter;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -52,8 +55,16 @@ public class FullSerializationDeserializationTest {
                 value(1D),
                 value('c'),
                 value("string"),
-                value(Locale.ENGLISH)
-
+                value(Locale.ENGLISH),
+                value(new SampleClass(
+                        "className",
+                        -1,
+                        new SampleClass2("child"),
+                        Lists.newArrayList(
+                                new SampleClass2("child1"),
+                                new SampleClass2("child2")
+                        )
+                ))
         );
     }
 
@@ -66,7 +77,17 @@ public class FullSerializationDeserializationTest {
                 Arguments.of(new TypeInfo<EnumSet<SampleEnum>>() {
                 }, EnumSet.of(SampleEnum.ONE)),
                 Arguments.of(new TypeInfo<EnumSet<SampleEnum>>() {
-                }, EnumSet.of(SampleEnum.ONE, SampleEnum.THREE))
+                }, EnumSet.of(SampleEnum.ONE, SampleEnum.THREE)),
+                Arguments.of(new TypeInfo<Map<String, String>>() {
+                }, new HashMap<String, String>() {{
+                    put("key1", "value1");
+                }})
+//                Arguments.arguments(new TypeInfo<Map<String, List<Map<String, SampleEnum>>>>() {
+//                }, new HashMap<String, List<Map<String, SampleEnum>>>() {{
+//                    put("key1", Lists.newArrayList(new HashMap() {{
+//                        put("innerKey", SampleEnum.TWO);
+//                    }}));
+//                }}) Runtime delegate type handler fail it
         );
     }
 
@@ -100,12 +121,6 @@ public class FullSerializationDeserializationTest {
         return Arguments.of(TypeInfo.of(clazz), value);
     }
 
-
-    public enum SampleEnum {
-        ONE,
-        TWO,
-        THREE
-    }
 
     @MethodSource("product")
     @ParameterizedTest(name = "{0} : {1} : {2}")
@@ -230,6 +245,60 @@ public class FullSerializationDeserializationTest {
         Optional<String[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
+    }
+
+    public enum SampleEnum {
+        ONE,
+        TWO,
+        THREE
+    }
+
+    public static class SampleClass {
+        String name;
+        int value1;
+        SampleClass2 child;
+        List<SampleClass2> children;
+
+        public SampleClass(String name, int value1, SampleClass2 child, List<SampleClass2> children) {
+            this.name = name;
+            this.value1 = value1;
+            this.child = child;
+            this.children = children;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SampleClass that = (SampleClass) o;
+            return value1 == that.value1 && Objects.equals(name, that.name) && Objects.equals(child, that.child) && Objects.equals(children, that.children);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value1, child, children);
+        }
+    }
+
+    public static class SampleClass2 {
+        String name;
+
+        public SampleClass2(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SampleClass2 that = (SampleClass2) o;
+            return Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
+        }
     }
 }
 

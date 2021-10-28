@@ -202,7 +202,11 @@ public class ByteBufferPersistedData implements PersistedData {
 
     @Override
     public PersistedDataMap getAsValueMap() {
-        throw new IllegalStateException("Not implemeneted yet");
+        if (!isValueMap()) {
+            throw new IllegalStateException("it is not valuemap");
+        }
+        byteBuffer.position(position);
+        return new ByteBufferPersistedDataMap(byteBuffer);
     }
 
     @Override
