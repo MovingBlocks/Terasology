@@ -268,8 +268,12 @@ public class FullSerializationDeserializationTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SampleClass that = (SampleClass) o;
             return value1 == that.value1 && Objects.equals(name, that.name) && Objects.equals(child, that.child) && Objects.equals(children, that.children);
         }
@@ -289,8 +293,12 @@ public class FullSerializationDeserializationTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SampleClass2 that = (SampleClass2) o;
             return Objects.equals(name, that.name);
         }
