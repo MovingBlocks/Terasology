@@ -21,6 +21,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * ByteBuffer-backed persisted data array representation.
+ * <pre>
+ * 1 byte - BBType
+ * 1 byte - BBArrayType
+ * 4 bytes - size
+ * 0..n bytes - data
+ * </pre>
+ */
 public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implements PersistedDataArray {
 
     private final BBArrayType arrayType;

@@ -12,6 +12,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * ByteBuffer-backed persisted data map representation.
+ * <pre>
+ *     1 byte -  type = 10
+ *     4 byte - size
+ *     8 * size bytes - refmap
+ *     0..n bytes - key and value data.
+ * </pre>
+ * <p>
+ * Use refmap - links to key and value positions. provide almost constant read time.
+ */
 public class ByteBufferPersistedDataMap extends ByteBufferPersistedData implements PersistedDataMap {
 
     public ByteBufferPersistedDataMap(ByteBuffer byteBuffer) {

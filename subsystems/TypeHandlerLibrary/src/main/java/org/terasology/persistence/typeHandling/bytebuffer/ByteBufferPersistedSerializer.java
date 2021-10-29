@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 /**
- * TODO make direct serializer factory.
+ * Provide possible serialize data to ByteBuffer.
  */
 public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 

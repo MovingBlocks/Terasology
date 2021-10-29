@@ -4,7 +4,7 @@
 package org.terasology.persistence.typeHandling.bytebuffer;
 
 /**
- * Type codes for types.
+ * Type codes for array types.
  */
 public enum BBType {
     NULL(0),

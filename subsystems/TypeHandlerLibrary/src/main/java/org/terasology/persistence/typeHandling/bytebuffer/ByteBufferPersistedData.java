@@ -12,23 +12,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * ByteBuffer-backed persisted data.
+ * ByteBuffer-backed persisted data representation.
  * <pre>
- *     Header:
- *     1 byte - header.
- *
- *     Types:
- *      NULL(0) - Null value
- *      BOOLEAN(1) - boolean - not packed. takes 1 byte.
- *      FLOAT(2)
- *      DOUBLE(3)
- *      LONG(4)
- *      INTEGER(5)
- *      STRING(6) - UTF-8. header: 1 int - length
- *      BYTES(7) - header: 1 int - length
- *      BYTEBUFFER(8) - just passthru this bytebuffer //TODO
- *      ARRAY(9) -
- *      VALUEMAP(10) -
+ * 1 byte - BBType
+ * 0..n bytes - data
  * </pre>
  */
 public class ByteBufferPersistedData implements PersistedData {
