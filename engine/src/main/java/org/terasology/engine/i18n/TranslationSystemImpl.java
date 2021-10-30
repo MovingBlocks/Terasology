@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.Uri;
 import org.terasology.engine.i18n.assets.Translation;
 import org.terasology.engine.persistence.TemplateEngine;
 import org.terasology.engine.persistence.TemplateEngineImpl;
@@ -32,7 +30,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     private static final Logger logger = LoggerFactory.getLogger(TranslationSystemImpl.class);
 
     private final List<Consumer<TranslationProject>> changeListeners = new CopyOnWriteArrayList<>();
-    private final Map<Uri, TranslationProject> projects = new HashMap<>();
+    private final Map<ResourceUrn, TranslationProject> projects = new HashMap<>();
 
     private final SystemConfig systemConfig;
 
@@ -55,21 +53,21 @@ public class TranslationSystemImpl implements TranslationSystem {
             Optional<Translation> asset = assetManager.getAsset(urn, Translation.class);
             if (asset.isPresent()) {
                 Translation trans = asset.get();
-                Uri uri = trans.getProjectUri();
-                if (uri.isValid()) {
-                    TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
+                ResourceUrn projectUrn = trans.getProjectUrn();
+                if (!projectUrn.getModuleName().isEmpty() && !projectUrn.getResourceName().isEmpty()) {
+                    TranslationProject proj = projects.computeIfAbsent(projectUrn, e -> new StandardTranslationProject());
                     proj.add(trans);
                     trans.subscribe(this::onAssetChanged);
                     logger.info("Discovered " + trans);
                 } else {
-                    logger.warn("Ignoring invalid project uri: {}", uri);
+                    logger.warn("Ignoring invalid project projectUrn: {}", projectUrn);
                 }
             }
         }
     }
 
     @Override
-    public TranslationProject getProject(Uri name) {
+    public TranslationProject getProject(ResourceUrn name) {
         return projects.get(name);
     }
 
@@ -82,7 +80,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     public String translate(String text, Locale otherLocale) {
         TemplateEngine templateEngine = new TemplateEngineImpl(id -> {
             ResourceUrn uri = new ResourceUrn(id);
-            SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
+            ResourceUrn projectUri = new ResourceUrn(uri.getModuleName(), uri.getResourceName());
             TranslationProject project = getProject(projectUri);
             if (project != null) {
                 Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
@@ -112,7 +110,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     private void onAssetChanged(Translation trans) {
-        Uri uri = trans.getProjectUri();
+        ResourceUrn uri = trans.getProjectUrn();
         TranslationProject project = projects.get(uri);
         if (trans.isDisposed()) {
             project.remove(trans);
