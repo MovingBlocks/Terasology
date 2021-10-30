@@ -58,7 +58,7 @@ public class TranslationData implements AssetData {
     /**
      * @return the project uri this data set belongs to.
      */
-    public ResourceUrn getProjectUri() {
+    public ResourceUrn getProjectUrn() {
         return uri;
     }
 }
