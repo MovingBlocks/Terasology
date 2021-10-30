@@ -26,7 +26,6 @@ import org.terasology.engine.core.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.core.subsystem.common.NetworkSubsystem;
 import org.terasology.engine.core.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.core.subsystem.common.TelemetrySubSystem;
-import org.terasology.engine.core.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.core.subsystem.common.TimeSubsystem;
 import org.terasology.engine.core.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -165,7 +164,6 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new ConfigurationSubsystem());
         this.allSubsystems.add(timeSubsystem);
         this.allSubsystems.addAll(subsystems);
-        this.allSubsystems.add(new ThreadManagerSubsystem());
         this.allSubsystems.add(new MonitoringSubsystem());
         this.allSubsystems.add(new PhysicsSubsystem());
         this.allSubsystems.add(new CommandSubsystem());
@@ -249,7 +247,6 @@ public class TerasologyEngine implements GameEngine {
         verifyRequiredSystemIsRegistered(Time.class);
         verifyRequiredSystemIsRegistered(DisplayDevice.class);
         verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
-        verifyRequiredSystemIsRegistered(InputSystem.class);
     }
 
     /**
@@ -487,6 +484,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+        CoreRegistry.setContext(currentState.getContext());
         rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
@@ -589,7 +587,9 @@ public class TerasologyEngine implements GameEngine {
         newState.init(this);
         stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
         InputSystem inputSystem = rootContext.get(InputSystem.class);
-        inputSystem.drainQueues();
+        if (inputSystem != null) {
+            inputSystem.drainQueues();
+        }
     }
 
     @Override

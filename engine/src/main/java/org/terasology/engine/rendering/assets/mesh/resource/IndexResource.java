@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  */
 public class IndexResource extends BufferedResource {
     public static final Logger logger = LoggerFactory.getLogger(IndexResource.class);
-    private int inIndices = 0;
     private int posIndex = 0;
 
     public IndexResource() {
@@ -21,13 +20,7 @@ public class IndexResource extends BufferedResource {
     }
 
     public int indices() {
-        return inIndices;
-    }
-
-    public void copy(IndexResource resource) {
-        copyBuffer(resource);
-        this.inSize = resource.inSize;
-        this.inIndices = resource.indices();
+        return this.inSize / Integer.BYTES;
     }
 
     public void reserveElements(int elements) {
@@ -36,16 +29,12 @@ public class IndexResource extends BufferedResource {
 
     public void rewind() {
         posIndex = 0;
-        inIndices = 0;
     }
 
     public void put(int value) {
         ensureCapacity((posIndex + 1) * Integer.BYTES);
         buffer.putInt(posIndex * Integer.BYTES, value);
         posIndex++;
-        if (posIndex > inIndices) {
-            inIndices = posIndex;
-        }
     }
 
     public void putAll(int value, int... values) {
@@ -77,10 +66,6 @@ public class IndexResource extends BufferedResource {
 
     @Override
     public boolean isEmpty() {
-        return inIndices == 0;
+        return this.inSize == 0;
     }
-
-
-
-
 }

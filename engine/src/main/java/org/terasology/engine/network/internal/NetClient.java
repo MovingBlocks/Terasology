@@ -21,7 +21,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
@@ -49,6 +48,7 @@ import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
@@ -388,7 +388,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                 .setPos(NetMessageUtil.convert(pos))
@@ -399,7 +399,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
                 .setIndex(i)

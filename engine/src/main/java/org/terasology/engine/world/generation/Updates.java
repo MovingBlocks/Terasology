@@ -11,4 +11,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Updates {
     Facet[] value();
+
+    /**
+     * The priority of this provider. Higher values are run first.
+     */
+    int priority() default UpdatePriority.PRIORITY_NORMAL;
 }

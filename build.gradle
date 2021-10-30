@@ -23,6 +23,9 @@ buildscript {
         // SonarQube / Cloud scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
 
+        // Protobuf plugin
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
+
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
     }
@@ -179,18 +182,6 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so"
 }
 
-task protobufCompileWindows(type: Exec) {
-    description = "Run 'Protobuf Compiler' (Windows)"
-    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
-}
-
-task protobufCompileLinux(type: Exec) {
-    description = "Run 'Protobuf Compiler' (Linux)"
-    commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java', "engine/src/main/protobuf/EntityData.proto", "engine/src/main/protobuf/NetMessage.proto"
-}
-
-
-
 // Magic for replace remote dependency on local project (source)
 // for Engine
 allprojects {
@@ -265,7 +256,7 @@ idea {
 
     project.settings.delegateActions {
         delegateBuildRunToGradle = false
-        testRunner = ActionDelegationConfig.TestRunner.PLATFORM
+        testRunner = ActionDelegationConfig.TestRunner.CHOOSE_PER_TEST
     }
 }
 

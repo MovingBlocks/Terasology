@@ -2,22 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.chunks;
 
-
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegionc;
-import org.terasology.protobuf.EntityData;
 import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.protobuf.EntityData;
 
 /**
- * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons. 
- *
+ * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons.
+ * <p>
  * For example the renderer renders a single mesh for all opaque blocks in a chunk rather
  * than rendering each block as a separate mesh.
- *
+ * <p>
  * For details on dimensions and other chunks characteristics see {@link Chunks}.
  */
 @API
@@ -36,7 +35,7 @@ public interface Chunk extends RenderableChunk {
      * @deprecated use {@link #getPosition()}
      */
     @Deprecated
-    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
+    Vector3i getPosition(Vector3i dest);
 
     /**
      * Returns block at given position relative to the chunk.
