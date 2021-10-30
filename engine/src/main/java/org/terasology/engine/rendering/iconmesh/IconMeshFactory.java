@@ -110,7 +110,7 @@ public final class IconMeshFactory {
         mesh.normal.put(norm.set(0, 0, -1.0f));
         mesh.normal.put(norm.set(0, 0, -1.0f));
 
-        // font
+        // front
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
