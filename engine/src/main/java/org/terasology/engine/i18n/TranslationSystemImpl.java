@@ -53,7 +53,7 @@ public class TranslationSystemImpl implements TranslationSystem {
             Optional<Translation> asset = assetManager.getAsset(urn, Translation.class);
             if (asset.isPresent()) {
                 Translation trans = asset.get();
-                ResourceUrn uri = trans.getProjectUri();
+                ResourceUrn urn = trans.getProjectUrn();
                 if (!uri.getModuleName().isEmpty() && !uri.getResourceName().isEmpty()) {
                     TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
                     proj.add(trans);
