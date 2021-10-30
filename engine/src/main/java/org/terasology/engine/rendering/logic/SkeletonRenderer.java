@@ -352,6 +352,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f worldPositionCameraSpace = new Vector3f();
                 worldPos.sub(cameraPosition, worldPositionCameraSpace);
 
+                // heightOffset is applied to worldPositionCameraSpace from #renderOpaque()
                 worldPositionCameraSpace.y += skeletalMesh.heightOffset;
 
                 Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
@@ -367,21 +368,26 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     }
 
                     EntityRef boneParentEntity = skeletalMesh.boneEntities.get(parentBone.getName());
-
                     LocationComponent locCompA = boneEntity.getComponent(LocationComponent.class);
                     LocationComponent locCompB = boneParentEntity.getComponent(LocationComponent.class);
 
-
                     locCompA.getRelativeTransform(relMat.identity(), entity);
                     result.set(entityTransform)
-                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(new Vector3f(skeletalMesh.translate).add(0, skeletalMesh.heightOffset , 0)).mul(relMat))
+                            .mul(relFinal.identity()
+                                    .scale(skeletalMesh.scale)
+                                    .translate(skeletalMesh.translate)
+                                    .mul(relMat))
                             .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
 
                     locCompB.getRelativeTransform(relMat.identity(), entity);
                     result.set(entityTransform)
-                            .mul(relFinal.identity().scale(skeletalMesh.scale).translate(new Vector3f(skeletalMesh.translate).add(0, skeletalMesh.heightOffset , 0)).mul(relMat))
+                            .mul(relFinal
+                                    .identity()
+                                    .scale(skeletalMesh.scale)
+                                    .translate(skeletalMesh.translate)
+                                    .mul(relMat))
                             .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
