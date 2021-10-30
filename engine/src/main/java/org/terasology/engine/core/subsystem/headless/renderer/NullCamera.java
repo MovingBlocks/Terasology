@@ -2,13 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless.renderer;
 
-import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.rendering.cameras.SubmersibleCamera;
-import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.rendering.cameras.Camera;
 
-public final class NullCamera extends SubmersibleCamera {
-    public NullCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
-        super(worldProvider, renderingConfig);
+public final class NullCamera extends Camera {
+    public NullCamera() {
     }
 
     @Override
