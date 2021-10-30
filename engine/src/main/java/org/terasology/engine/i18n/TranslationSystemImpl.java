@@ -53,14 +53,14 @@ public class TranslationSystemImpl implements TranslationSystem {
             Optional<Translation> asset = assetManager.getAsset(urn, Translation.class);
             if (asset.isPresent()) {
                 Translation trans = asset.get();
-                ResourceUrn uri = trans.getProjectUri();
-                if (!uri.getModuleName().isEmpty() && !uri.getResourceName().isEmpty()) {
-                    TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
+                ResourceUrn projectUrn = trans.getProjectUrn();
+                if (!projectUrn.getModuleName().isEmpty() && !projectUrn.getResourceName().isEmpty()) {
+                    TranslationProject proj = projects.computeIfAbsent(projectUrn, e -> new StandardTranslationProject());
                     proj.add(trans);
                     trans.subscribe(this::onAssetChanged);
                     logger.info("Discovered " + trans);
                 } else {
-                    logger.warn("Ignoring invalid project uri: {}", uri);
+                    logger.warn("Ignoring invalid project projectUrn: {}", projectUrn);
                 }
             }
         }
@@ -110,7 +110,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     private void onAssetChanged(Translation trans) {
-        ResourceUrn uri = trans.getProjectUri();
+        ResourceUrn uri = trans.getProjectUrn();
         TranslationProject project = projects.get(uri);
         if (trans.isDisposed()) {
             project.remove(trans);

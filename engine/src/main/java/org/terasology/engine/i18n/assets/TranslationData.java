@@ -19,17 +19,17 @@ public class TranslationData implements AssetData {
 
     private final Map<String, String> map = new HashMap<>();
     private final Locale locale;
-    private final ResourceUrn uri;
+    private final ResourceUrn urn;
 
     /**
-     * @param uri the id of the data set, never <code>null</code>.
+     * @param urn the id of the data set, never <code>null</code>.
      * @param locale the locale of the data set, never <code>null</code>.
      */
-    public TranslationData(ResourceUrn uri, Locale locale) {
-        Preconditions.checkArgument(uri != null);
+    public TranslationData(ResourceUrn urn, Locale locale) {
+        Preconditions.checkArgument(urn != null);
         Preconditions.checkArgument(locale != null);
 
-        this.uri = uri;
+        this.urn = urn;
         this.locale = locale;
     }
 
@@ -58,7 +58,7 @@ public class TranslationData implements AssetData {
     /**
      * @return the project uri this data set belongs to.
      */
-    public ResourceUrn getProjectUri() {
-        return uri;
+    public ResourceUrn getProjectUrn() {
+        return urn;
     }
 }

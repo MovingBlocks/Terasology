@@ -58,8 +58,8 @@ public class LocaleConstraintWidgetFactory extends ConstraintWidgetFactory<Local
         };
 
         UIDropdownScrollable<Locale> dropdownScrollable = new UIDropdownScrollable<>();
-        ResourceUrn menuUri = new ResourceUrn("engine:menu");
-        TranslationProject menuProject = translationSystem.getProject(menuUri);
+        ResourceUrn menuUrn = new ResourceUrn("engine:menu");
+        TranslationProject menuProject = translationSystem.getProject(menuUrn);
         List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
         for (Locale languageExcluded : languagesExcluded) {
             locales.remove(languageExcluded);

@@ -90,8 +90,8 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         Locale locale = localeFromFilename(file.getFilename());
         Name projName = basenameFromFilename(file.getFilename());
 
-        ResourceUrn projUri = new ResourceUrn(urn.getModuleName(), projName);
-        TranslationData data = new TranslationData(projUri, locale);
+        ResourceUrn projUrn = new ResourceUrn(urn.getModuleName(), projName);
+        TranslationData data = new TranslationData(projUrn, locale);
 
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
             Map<String, String> entry = gson.fromJson(isr, MAP_TOKEN.getType());

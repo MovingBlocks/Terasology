@@ -66,7 +66,7 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        assertEquals(new ResourceUrn("engine:menu"), data.getProjectUri());
+        assertEquals(new ResourceUrn("engine:menu"), data.getProjectUrn());
         assertEquals(Locale.ROOT, data.getLocale());
     }
 
