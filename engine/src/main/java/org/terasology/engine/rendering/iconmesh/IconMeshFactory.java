@@ -75,60 +75,63 @@ public final class IconMeshFactory {
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
-        mesh.normal.put(norm.set(0, 1.0f, 0));
-        mesh.normal.put(norm.set(0, 1.0f, 0));
-        mesh.normal.put(norm.set(0, 1.0f, 0));
-        mesh.normal.put(norm.set(0, 1.0f, 0));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 1.0f, 0));
+            mesh.color0.put(c);
+        }
 
         // left
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
-        mesh.normal.put(norm.set(-1.0f, 0, 0));
-        mesh.normal.put(norm.set(-1.0f, 0, 0));
-        mesh.normal.put(norm.set(-1.0f, 0, 0));
-        mesh.normal.put(norm.set(-1.0f, 0, 0));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(-1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
 
         // right
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
-        mesh.normal.put(norm.set(1.0f, 0, 0));
-        mesh.normal.put(norm.set(1.0f, 0, 0));
-        mesh.normal.put(norm.set(1.0f, 0, 0));
-        mesh.normal.put(norm.set(1.0f, 0, 0));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
 
+        // darkern for sides facing left, right and bottom
+        Color cd = new Color(c.rf() * 0.6f, c.gf() * 0.6f, c.bf() * 0.6f, c.af());
         // back
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
-        mesh.normal.put(norm.set(0, 0, -1.0f));
-        mesh.normal.put(norm.set(0, 0, -1.0f));
-        mesh.normal.put(norm.set(0, 0, -1.0f));
-        mesh.normal.put(norm.set(0, 0, -1.0f));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, -1.0f));
+            mesh.color0.put(cd);
+        }
 
-        // font
+        // front
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
-        mesh.normal.put(norm.set(0, 0, 1.0f));
-        mesh.normal.put(norm.set(0, 0, 1.0f));
-        mesh.normal.put(norm.set(0, 0, 1.0f));
-        mesh.normal.put(norm.set(0, 0, 1.0f));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, 1.0f));
+            mesh.color0.put(cd);
+        }
 
         // bottom
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
         mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
-        mesh.normal.put(norm.set(0, -1.0f, 0));
-        mesh.normal.put(norm.set(0, -1.0f, 0));
-        mesh.normal.put(norm.set(0, -1.0f, 0));
-        mesh.normal.put(norm.set(0, -1.0f, 0));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, -1, 0f));
+            mesh.color0.put(cd);
+        }
+
 
         int lastIndex = mesh.position.getPosition();
         for (int i = firstIndex; i < lastIndex - 2; i += 4) {
@@ -139,9 +142,6 @@ public final class IconMeshFactory {
             mesh.indices.put(i + 2);
             mesh.indices.put(i + 3);
             mesh.indices.put(i);
-        }
-        for (int i = firstIndex; i < lastIndex; i++) {
-            mesh.color0.put(c);
         }
     }
 
