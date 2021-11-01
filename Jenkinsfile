@@ -42,6 +42,7 @@ pipeline {
             steps {
                 echo 'Automatically checked out the things!'
                 sh 'chmod +x gradlew'
+                sh './gradlew --version'
             }
         }
 
