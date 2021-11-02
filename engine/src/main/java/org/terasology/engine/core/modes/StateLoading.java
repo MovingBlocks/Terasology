@@ -26,10 +26,10 @@ import org.terasology.engine.core.modes.loadProcesses.InitialiseGraphics;
 import org.terasology.engine.core.modes.loadProcesses.InitialisePhysics;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseRecordAndReplay;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseRemoteWorld;
+import org.terasology.engine.core.modes.loadProcesses.InitialiseRendering;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseWorld;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseWorldGenerator;
-import org.terasology.engine.core.modes.loadProcesses.InitialiseRendering;
 import org.terasology.engine.core.modes.loadProcesses.JoinServer;
 import org.terasology.engine.core.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.core.modes.loadProcesses.LoadExtraBlockData;
@@ -110,8 +110,10 @@ public class StateLoading implements GameState {
 
         systemConfig = context.get(SystemConfig.class);
 
-        this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
+        if (netMode.hasLocalClient()) {
+            this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
+            context.put(NUIManager.class, nuiManager);
+        }
 
         EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(true);
@@ -134,9 +136,10 @@ public class StateLoading implements GameState {
         }
 
         popStep();
-        loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
-        loadingScreen.updateStatus(current.getMessage(), current.getProgress());
-
+        if (nuiManager != null) {
+            loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
+            loadingScreen.updateStatus(current.getMessage(), current.getProgress());
+        }
         chunkGenerationStarted = false;
     }
 
@@ -172,11 +175,15 @@ public class StateLoading implements GameState {
         }
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new InitialiseGraphics(context));
+        if (netMode.hasLocalClient()) {
+            loadProcesses.add(new InitialiseGraphics(context));
+        }
         loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
-        loadProcesses.add(new RegisterInputSystem(context));
+        if (netMode.hasLocalClient()) {
+            loadProcesses.add(new RegisterInputSystem(context));
+        }
         loadProcesses.add(new RegisterSystems(context, netMode));
         loadProcesses.add(new InitialiseCommandSystem(context));
         loadProcesses.add(new LoadExtraBlockData(context));
@@ -252,14 +259,17 @@ public class StateLoading implements GameState {
             }
         }
         if (current == null) {
-            nuiManager.closeScreen(loadingScreen);
-            nuiManager.setHUDVisible(true);
+            if (nuiManager != null) {
+                nuiManager.closeScreen(loadingScreen);
+                nuiManager.setHUDVisible(true);
+            }
             context.get(GameEngine.class).changeState(new StateIngame(gameManifest, context));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
-            loadingScreen.updateStatus(current.getMessage(), progressValue);
-            nuiManager.update(delta);
-
+            if (nuiManager != null) {
+                loadingScreen.updateStatus(current.getMessage(), progressValue);
+                nuiManager.update(delta);
+            }
             // chunk generation begins at the AwaitCharacterSpawn step
             if (current instanceof AwaitCharacterSpawn && !chunkGenerationStarted) {
                 chunkGenerationStarted = true;
@@ -280,7 +290,9 @@ public class StateLoading implements GameState {
 
     @Override
     public void render() {
-        nuiManager.render();
+        if (nuiManager != null) {
+            nuiManager.render();
+        }
     }
 
     @Override
