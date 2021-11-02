@@ -8,7 +8,6 @@ import org.joml.Vector3f;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.modes.StateLoading;
@@ -281,7 +280,7 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
         Locale locale = Locale.forLanguageTag(langTag);
-        TranslationProject proj = translationSystem.getProject(new SimpleUri("engine:menu"));
+        TranslationProject proj = translationSystem.getProject(new ResourceUrn("engine:menu"));
 
         // Try if language exists
         if (proj.getAvailableLocales().contains(locale)) {
