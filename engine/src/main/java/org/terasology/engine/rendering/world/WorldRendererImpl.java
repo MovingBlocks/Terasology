@@ -25,9 +25,9 @@ import org.terasology.engine.logic.players.LocalPlayerSystem;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
+import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
-import org.terasology.engine.rendering.cameras.SubmersibleCamera;
 import org.terasology.engine.rendering.dag.ModuleRendering;
 import org.terasology.engine.rendering.dag.Node;
 import org.terasology.engine.rendering.dag.RenderGraph;
@@ -79,7 +79,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final SubmersibleCamera playerCamera;
+    private final Camera playerCamera;
 
     private final OpenVRProvider vrProvider;
 
@@ -133,7 +133,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
+                playerCamera = new OpenVRStereoCamera(vrProvider);
                 /*
                  * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
                  * such that the ground plane of the rendering system and the ground plane of the room the VR user is
@@ -143,11 +143,11 @@ public final class WorldRendererImpl implements WorldRenderer {
                         GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
+                playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
+            playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
             currentRenderingStage = RenderingStage.MONO;
         }
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
@@ -437,7 +437,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public SubmersibleCamera getActiveCamera() {
+    public Camera getActiveCamera() {
         return playerCamera;
     }
 
