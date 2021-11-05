@@ -14,23 +14,9 @@ import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
-import org.terasology.input.ControllerDevice;
-import org.terasology.input.ControllerId;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
-import org.terasology.input.MouseInput;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
-import org.terasology.input.device.CharKeyboardAction;
-import org.terasology.input.device.ControllerAction;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.device.MouseAction;
-import org.terasology.input.device.MouseDevice;
-import org.terasology.input.device.RawKeyboardAction;
-import org.terasology.input.device.nulldevices.NullControllerDevice;
-import org.terasology.input.device.nulldevices.NullKeyboardDevice;
-import org.terasology.input.device.nulldevices.NullMouseDevice;
 import org.terasology.engine.input.events.CharEvent;
 import org.terasology.engine.input.events.InputEvent;
 import org.terasology.engine.input.events.KeyDownEvent;
@@ -51,6 +37,21 @@ import org.terasology.engine.input.internal.AbstractBindableAxis;
 import org.terasology.engine.input.internal.BindableRealAxis;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
+import org.terasology.input.ButtonState;
+import org.terasology.input.ControllerDevice;
+import org.terasology.input.ControllerId;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.MouseInput;
+import org.terasology.input.device.CharKeyboardAction;
+import org.terasology.input.device.ControllerAction;
+import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseAction;
+import org.terasology.input.device.MouseDevice;
+import org.terasology.input.device.RawKeyboardAction;
+import org.terasology.input.device.nulldevices.NullControllerDevice;
+import org.terasology.input.device.nulldevices.NullKeyboardDevice;
+import org.terasology.input.device.nulldevices.NullMouseDevice;
 
 import java.util.List;
 import java.util.Queue;
@@ -61,7 +62,7 @@ import java.util.Queue;
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped to
  * one or more inputs.
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.CLIENT)
 public class InputSystem extends BaseComponentSystem {
 
     @In
@@ -231,8 +232,7 @@ public class InputSystem extends BaseComponentSystem {
         int dir = action.getInput().getId();
         if (dir != 0 && action.getTurns() != 0) {
             boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
-            BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() :
-                    bindsManager.getMouseWheelDownBind();
+            BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() : bindsManager.getMouseWheelDownBind();
             if (bind != null) {
                 for (int i = 0; i < action.getTurns(); ++i) {
                     updateBindState(bind, action.getInput(), true, delta, consumed);
@@ -482,16 +482,16 @@ public class InputSystem extends BaseComponentSystem {
             case NONE:
                 return false;
             case MOUSE_LEFT:
-                event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta) :
-                        LeftMouseUpButtonEvent.create(position, delta);
+                event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta)
+                                     : LeftMouseUpButtonEvent.create(position, delta);
                 break;
             case MOUSE_RIGHT:
-                event = (buttonDown) ? RightMouseDownButtonEvent.create(position, delta) :
-                        RightMouseUpButtonEvent.create(position, delta);
+                event = (buttonDown) ? RightMouseDownButtonEvent.create(position, delta)
+                                     : RightMouseUpButtonEvent.create(position, delta);
                 break;
             default:
-                event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta) :
-                        MouseUpButtonEvent.create(button, position, delta);
+                event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta)
+                                     : MouseUpButtonEvent.create(button, position, delta);
                 break;
         }
         boolean consumed = send(event);

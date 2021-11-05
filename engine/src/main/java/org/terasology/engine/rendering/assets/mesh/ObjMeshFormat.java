@@ -3,17 +3,15 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import com.google.common.collect.Lists;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,28 +48,21 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                 throw new IOException("No index data");
             }
 
-            MeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
-
-            if (data.getVertices() == null) {
-                throw new IOException("No vertices define");
-            }
-            if (!data.getNormals().isEmpty() && data.getNormals().size() != data.getVertices().size()) {
-                throw new IOException("The number of normals does not match the number of vertices.");
-            }
-            if (!data.getTexCoord0().isEmpty() && data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
-                throw new IOException("The number of tex coords does not match the number of vertices.");
-            }
-
-            return data;
+            return processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
         }
     }
 
-    private MeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
-        MeshData result = new MeshData();
-        TFloatList vertices = result.getVertices();
-        TFloatList texCoord0 = result.getTexCoord0();
-        TFloatList normals = result.getNormals();
-        TIntList indices = result.getIndices();
+    private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals,
+                                         List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
+        int numIndices = 0;
+        int numVerts = 0;
+        for (int x = 0; x < rawIndices.size(); x++) {
+            numIndices += (rawIndices.get(x).length - 2) * 3;
+            numVerts += rawIndices.get(x).length;
+        }
+
+        StandardMeshData result = new StandardMeshData();
+        result.reserve(numVerts, numIndices);
         int vertCount = 0;
         for (Vector3i[] face : rawIndices) {
             for (Vector3i indexSet : face) {
@@ -79,17 +70,14 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                     throw new IOException("Vertex index out of range: " + indexSet.x);
                 }
                 Vector3f vertex = rawVertices.get(indexSet.x - 1);
-                vertices.add(vertex.x);
-                vertices.add(vertex.y);
-                vertices.add(vertex.z);
+                result.position.put(vertex);
 
                 if (indexSet.y != -1) {
                     if (indexSet.y > rawTexCoords.size()) {
                         throw new IOException("TexCoord index out of range: " + indexSet.y);
                     }
                     Vector2f texCoord = rawTexCoords.get(indexSet.y - 1);
-                    texCoord0.add(texCoord.x);
-                    texCoord0.add(1 - texCoord.y);
+                    result.uv0.put(new Vector2f(texCoord.x, 1 - texCoord.y));
                 }
 
                 if (indexSet.z != -1) {
@@ -97,16 +85,14 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                         throw new IOException("Normal index out of range: " + indexSet.z);
                     }
                     Vector3f normal = rawNormals.get(indexSet.z - 1);
-                    normals.add(normal.x);
-                    normals.add(normal.y);
-                    normals.add(normal.z);
+                    result.normal.put(normal);
                 }
             }
 
             for (int i = 0; i < face.length - 2; ++i) {
-                indices.add(vertCount);
-                indices.add(vertCount + i + 1);
-                indices.add(vertCount + i + 2);
+                result.indices.put(vertCount);
+                result.indices.put(vertCount + i + 1);
+                result.indices.put(vertCount + i + 2);
             }
             vertCount += face.length;
         }

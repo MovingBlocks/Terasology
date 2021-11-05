@@ -8,18 +8,21 @@ import org.joml.Matrix4fc;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.nio.FloatBuffer;
 
-/**
- */
 public abstract class Material extends Asset<MaterialData> {
+
+    protected Material(ResourceUrn urn, AssetType<?, MaterialData> assetType, DisposableResource resource) {
+        super(urn, assetType, resource);
+    }
 
     protected Material(ResourceUrn urn, AssetType<?, MaterialData> assetType) {
         super(urn, assetType);
@@ -323,7 +326,7 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name uniform parameter (mat4)
      * @param matrix the {@link Matrix4fc} to write into uniform
      */
-    public abstract void setMatrix4(String name, Matrix4fc matrix,boolean currentOnly);
+    public abstract void setMatrix4(String name, Matrix4fc matrix, boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)

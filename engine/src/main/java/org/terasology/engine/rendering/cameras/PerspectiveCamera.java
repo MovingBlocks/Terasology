@@ -4,28 +4,23 @@ package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.math.TeraMath;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
-import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.math.TeraMath;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
 
 /**
  * Simple default camera.
  */
-public class PerspectiveCamera extends SubmersibleCamera implements PropertyChangeListener {
+public class PerspectiveCamera extends Camera implements PropertyChangeListener {
     // Values used for smoothing
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
@@ -39,13 +34,13 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
     private final DisplayDevice displayDevice;
+    private final RenderingConfig renderingConfig;
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig,
-                             DisplayDevice displayDevice) {
-        super(worldProvider, renderingConfig);
+    public PerspectiveCamera(RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         this.displayDevice = displayDevice;
+        this.renderingConfig = renderingConfig;
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
@@ -57,25 +52,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public boolean isBobbingAllowed() {
         return true;
-    }
-
-    @Override
-    public void loadProjectionMatrix() {
-        glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
-        glMatrixMode(GL11.GL_MODELVIEW);
-    }
-
-    @Override
-    public void loadModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
-    }
-
-    @Override
-    public void loadNormalizedModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override

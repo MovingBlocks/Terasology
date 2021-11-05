@@ -379,7 +379,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     /**
-     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     * Move this area to the given position {@code (x, y)}. The position is defined by the minimum corner.
      *
      * @param x the new x coordinate of the minimum corner
      * @param y the new y coordinate of the minimum corner
@@ -391,7 +391,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     /**
-     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     * Move this area to the given position {@code (x, y)}. The position is defined by the minimum corner.
      *
      * @param pos the new coordinates of the minimum corner
      * @param dest destination; will hold the result
@@ -519,9 +519,9 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
-    public int hashCode();
+    int hashCode();
 
-    public String toString();
+    String toString();
 }

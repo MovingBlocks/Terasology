@@ -4,7 +4,7 @@
 package org.terasology.engine.core;
 
 import com.google.common.base.Charsets;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -53,13 +53,13 @@ public final class TerasologyConstants {
     /**
      * Name of a module's overrides directory.
      * Overrides replace an entire existing prefab.
-     * More info on Overrides/Deltas: <a href="https://github.com/Terasology/TutorialAssetSystem/wiki/Deltas-and-Overrides">Deltas-and-Overrides</>
+     * More info on Overrides/Deltas: <a href="https://github.com/Terasology/TutorialAssetSystem/wiki/Deltas-and-Overrides">Deltas-and-Overrides</a>
      */
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
     /**
      * Name of a module's deltas directory.
      * Deltas of a prefab replace certain fields in an existing version of that prefab with their own fields.
-     * More info on Overrides/Deltas: <a href="https://github.com/Terasology/TutorialAssetSystem/wiki/Deltas-and-Overrides">Deltas-and-Overrides</>
+     * More info on Overrides/Deltas: <a href="https://github.com/Terasology/TutorialAssetSystem/wiki/Deltas-and-Overrides">Deltas-and-Overrides</a>
      */
     public static final String DELTAS_SUBDIRECTORY = "deltas";
     /**

@@ -2,15 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block;
 
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- */
 public class BlockExplorer {
     private AssetManager assetManager;
 

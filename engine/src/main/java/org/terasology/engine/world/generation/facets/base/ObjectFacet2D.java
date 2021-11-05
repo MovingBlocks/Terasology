@@ -5,8 +5,6 @@ package org.terasology.engine.world.generation.facets.base;
 import org.joml.Vector2ic;
 import org.terasology.engine.world.generation.WorldFacet2D;
 
-/**
- */
 public interface ObjectFacet2D<T> extends WorldFacet2D {
 
     T get(int x, int y);

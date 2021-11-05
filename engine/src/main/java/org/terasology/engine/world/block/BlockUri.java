@@ -4,16 +4,16 @@
 package org.terasology.engine.world.block;
 
 import com.google.common.base.Objects;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidUrnException;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.Uri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Optional;
 
 /**
- * Identifier for both blocks and block families. It is a combination of the ResourceUrn of a block family definition, the id of a block, and optionally the
- * ResourceUrn of a shape.
+ * Identifier for both blocks and block families. It is a combination of the ResourceUrn of a block family definition,
+ * the id of a block, and optionally the ResourceUrn of a shape.
  * The final pattern is (see {@link BlockUri} for details):
  * [package]:[blockFamily]:[shapePackage]:[shapeName].[blockIdentifier]
  * the third and forth parts are only used for blocks that don't use the engine:cube shape, and which
@@ -31,6 +31,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     private final ResourceUrn blockFamilyDefinition;
     private final Optional<ResourceUrn> shape;
     private final Name blockName;
+    private final int hashCode;
 
     public BlockUri(String uri) throws BlockUriParseException {
         try {
@@ -62,6 +63,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         } catch (InvalidUrnException e) {
             throw new BlockUriParseException("Could not parse block uri: '" + uri + "'", e);
         }
+        this.hashCode = hashCode();
+
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition) {
@@ -88,7 +91,10 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         this.blockFamilyDefinition = blockFamilyDefinition;
         this.shape = shape;
         this.blockName = blockName;
+
+        this.hashCode = hashCode();
     }
+
 
     @Override
     public Name getModuleName() {
@@ -156,7 +162,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
+            return this.hashCode == other.hashCode
+                    && Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
                     && Objects.equal(other.blockName, blockName)
                     && Objects.equal(other.shape, shape);
         }

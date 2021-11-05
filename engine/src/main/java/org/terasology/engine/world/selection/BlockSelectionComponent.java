@@ -3,11 +3,11 @@
 package org.terasology.engine.world.selection;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.selection.MovableSelectionStartEvent;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  *         <br><br>
@@ -20,7 +20,7 @@ import org.terasology.engine.world.block.BlockRegion;
  *         <br><br>
  */
 @API
-public class BlockSelectionComponent implements Component {
+public class BlockSelectionComponent implements Component<BlockSelectionComponent> {
     /**
      * Starting point for the block selection.   Used to re-create the currentSelection region when the ending point is changed.
      */
@@ -48,4 +48,13 @@ public class BlockSelectionComponent implements Component {
      * before sending the {@link MovableSelectionStartEvent} using the appropriate entity
      */
     public boolean isMovable = false;
+
+    @Override
+    public void copyFrom(BlockSelectionComponent other) {
+        this.startPosition = new Vector3i(other.startPosition);
+        this.currentSelection = new BlockRegion(other.currentSelection);
+        this.shouldRender = other.shouldRender;
+        this.texture = other.texture;
+        this.isMovable = other.isMovable;
+    }
 }

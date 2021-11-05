@@ -5,10 +5,10 @@ package org.terasology.engine.rendering.world;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -89,7 +89,7 @@ public interface WorldRenderer {
      *
      * @return a SubmersibleCamera object
      */
-    SubmersibleCamera getActiveCamera();
+    Camera getActiveCamera();
 
     /**
      * Called potentially multiple times per frame, this method allows the renderer to trigger the update

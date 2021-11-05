@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.primitives.Ints;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.ServerInfo;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -15,8 +15,6 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.function.Consumer;
 
-/**
- */
 public class AddServerPopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:addServerPopup!instance");

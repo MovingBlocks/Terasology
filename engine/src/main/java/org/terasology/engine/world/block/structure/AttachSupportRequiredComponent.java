@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.structure;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
 /**
  * Component for block entities that are attached to another block and depend on this block allowing to have been
@@ -12,5 +12,5 @@ import org.terasology.engine.entitySystem.Component;
  * (attachment) will be destroyed. The check for which side this block entity is attached to is done via BlockMeshPart.
  *
  */
-public class AttachSupportRequiredComponent implements Component {
+public class AttachSupportRequiredComponent extends EmptyComponent<AttachSupportRequiredComponent> {
 }

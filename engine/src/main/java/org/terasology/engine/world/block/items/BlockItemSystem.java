@@ -3,6 +3,7 @@
 package org.terasology.engine.world.block.items;
 
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.terasology.engine.audio.AudioManager;
@@ -42,7 +43,7 @@ public class BlockItemSystem extends BaseComponentSystem {
      * Margin and other allowed penetration is also 0.03 or 0.04. Since precision is only float it needs to be that
      * high.
      */
-    private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.4f;
+    private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.04f;
 
     @In
     private WorldProvider worldProvider;
@@ -101,7 +102,7 @@ public class BlockItemSystem extends BaseComponentSystem {
     }
 
     private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
-        org.joml.Vector3f targetPosition = event.getTargetLocation();
+        Vector3f targetPosition = event.getTargetLocation();
         if (event.getHitPosition() != null && targetPosition != null) {
             return getSideHitPosition(event.getHitPosition(), targetPosition);
         } else {
@@ -123,7 +124,7 @@ public class BlockItemSystem extends BaseComponentSystem {
      */
     private Vector2f getSideHitPosition(Vector3fc hitPosition, Vector3fc blockPosition) {
         float epsilon = 0.0001f;
-        org.joml.Vector3f relativeHitPosition = new org.joml.Vector3f(hitPosition).sub(blockPosition);
+        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
 
         if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
             return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
@@ -193,13 +194,13 @@ public class BlockItemSystem extends BaseComponentSystem {
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            blockBounds.minX -= ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minY -= ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minZ -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minX += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minY += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minZ += ADDITIONAL_ALLOWED_PENETRATION;
 
-            blockBounds.maxX += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.maxY += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.maxZ += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxX -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxY -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxZ -= ADDITIONAL_ALLOWED_PENETRATION;
 
 
             return physics.scanArea(blockBounds, StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();

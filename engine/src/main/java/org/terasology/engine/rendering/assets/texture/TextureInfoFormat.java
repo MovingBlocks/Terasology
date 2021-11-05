@@ -5,16 +5,14 @@ package org.terasology.engine.rendering.assets.texture;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.terasology.assets.format.AbstractAssetAlterationFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetSupplementalFileFormat;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.gestalt.assets.format.AbstractAssetAlterationFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetSupplementalFileFormat;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- */
 @RegisterAssetSupplementalFileFormat
 public class TextureInfoFormat extends AbstractAssetAlterationFileFormat<TextureData> {
 

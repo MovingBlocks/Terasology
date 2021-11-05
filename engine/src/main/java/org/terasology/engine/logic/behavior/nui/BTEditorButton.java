@@ -8,8 +8,6 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.engine.input.RegisterBindButton;
 
-/**
- */
 @RegisterBindButton(id = "behavior_editor", description = "${engine:menu#binding-behavior-editor}", category = "behavior")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F5)
 public class BTEditorButton extends BindButtonEvent {

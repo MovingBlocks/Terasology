@@ -7,8 +7,6 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-/**
- */
 public class ShaderMetadata {
     List<ShaderParameterMetadata> parameters = Lists.newArrayList();
 

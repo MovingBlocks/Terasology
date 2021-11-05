@@ -28,7 +28,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.NetworkConfig;
 import org.terasology.engine.context.Context;
@@ -37,7 +36,6 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
@@ -72,7 +70,8 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.module.Module;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.Module;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.NetData;
@@ -180,13 +179,20 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
                 // enumerate all network interfaces that listen
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+
                 while (interfaces.hasMoreElements()) {
                     NetworkInterface ifc = interfaces.nextElement();
                     if (!ifc.isLoopback()) {
                         for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
-                            InetAddress adr = ifadr.getAddress();
-                            logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
-                                    ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                            // Exclude interfaces with the following key words to avoid common virtual and otherwise unlikely useful nics
+                            // TODO: Make this configurable via config.cfg?
+                            if (ifc.getDisplayName().contains("VirtualBox") || ifc.getDisplayName().contains("ISATAP")) {
+                                logger.info("Skipping filtered interface name {}", ifc.getDisplayName());
+                            } else {
+                                InetAddress adr = ifadr.getAddress();
+                                logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
+                                        ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                            }
                         }
                     }
                 }
@@ -850,7 +856,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
-                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
+                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity()
+                                .getComponent(NetworkComponent.class)
+                                .getNetworkId())).build());
         clientList.add(client);
         netClientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
@@ -934,7 +942,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
-                    .setName(metadata.getUri().toString());
+                    .setName(metadata.getId().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -951,7 +959,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
-                    .setName(metadata.getUri().toString());
+                    .setName(metadata.getId().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -976,7 +984,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
                     logger.error("Class {} has too many fields (>255), serialization will be incomplete",
-                            metadata.getUri());
+                            metadata.getId());
                     break;
                 }
                 field.setId((byte) fieldId);
@@ -996,7 +1004,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                                                                         ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new ResourceUrn(info.getName()));
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {

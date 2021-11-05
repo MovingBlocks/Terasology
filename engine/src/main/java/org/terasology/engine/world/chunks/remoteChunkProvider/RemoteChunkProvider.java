@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
@@ -36,8 +36,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks received from remote source.
@@ -73,11 +71,8 @@ public class RemoteChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
                     Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
+                    return LightMerger.merge(localchunks);
+                }, LightMerger::requiredChunks
             ))
             .addStage(ChunkTaskProvider.create("", readyChunks::add));
 
@@ -181,34 +176,13 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
-        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, new Vector3i(1, 1, 1));
-        }
-        return null;
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
-        BlockRegion region = Chunks.toChunkRegion(new BlockRegion(blockPos).expand(extent, extent, extent));
-        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
-        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-        }
-        return null;
-    }
-
-    private ChunkViewCore createWorldView(BlockRegion region, Vector3i offset) {
+    public ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset) {
         Chunk[] chunks = new Chunk[region.getSizeX() * region.getSizeY() * region.getSizeZ()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ()  * (chunkPos.y() - region.minY()));
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX()
+                    * ((chunkPos.z() - region.minZ()) + region.getSizeZ()
+                    * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
@@ -219,7 +193,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.worldEntity = entity;
     }
 
-    private class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
+    private final class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
         private final LocalPlayer localPlayer;
 
         private LocalPlayerRelativeChunkComparator(LocalPlayer localPlayer) {
@@ -232,6 +206,10 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
 
         private int score(PositionFuture<?> task) {
+            if (!localPlayer.isValid()) {
+                return 1;
+            }
+
             return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new Vector3i()).distance(task.getPosition());
         }
     }

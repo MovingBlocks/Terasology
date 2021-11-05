@@ -30,7 +30,8 @@ public class FontMeshBuilder {
         this.underlineMaterial = underlineMaterial;
     }
 
-    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean underline) {
+    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment,
+                                              Colorc baseColor, Colorc shadowColor, boolean underline) {
         return new Builder(font, lines, width, alignment, baseColor, shadowColor, underline).invoke();
     }
 
@@ -52,7 +53,8 @@ public class FontMeshBuilder {
         private Deque<Colorc> previousColors = new ArrayDeque<>();
         private Colorc currentColor;
 
-        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean baseUnderline) {
+        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment,
+                Colorc baseColor, Colorc shadowColor, boolean baseUnderline) {
             this.font = font;
             this.lines = lines;
             this.width = width;
@@ -144,9 +146,11 @@ public class FontMeshBuilder {
                 MeshBuilder builder = getBuilderFor(underlineMaterial);
                 if (shadowColor.a() != 0) {
                     addUnderline(builder, underlineStart + SHADOW_HORIZONTAL_OFFSET, underlineEnd + SHADOW_HORIZONTAL_OFFSET,
-                            y + font.getBaseHeight() + SHADOW_VERTICAL_OFFSET + font.getUnderlineOffset(), font.getUnderlineThickness(), shadowColor, SHADOW_DEPTH);
+                            y + font.getBaseHeight() + SHADOW_VERTICAL_OFFSET + font.getUnderlineOffset(), font.getUnderlineThickness(),
+                            shadowColor, SHADOW_DEPTH);
                 }
-                addUnderline(builder, underlineStart, underlineEnd, y + font.getBaseHeight() + font.getUnderlineOffset(), font.getUnderlineThickness(), currentColor, 0);
+                addUnderline(builder, underlineStart, underlineEnd, y + font.getBaseHeight()
+                        + font.getUnderlineOffset(), font.getUnderlineThickness(), currentColor, 0);
             }
             underlineStart = UNKNOWN;
             underlineEnd = UNKNOWN;

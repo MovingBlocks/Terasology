@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.version;
@@ -44,6 +44,8 @@ public final class TerasologyVersion {
         try (InputStream inStream = this.getClass().getResourceAsStream(VERSION_INFO_FILE)) {
             if (inStream != null) {
                 properties.load(inStream);
+            } else {
+                logger.warn("No resource found for {}", VERSION_INFO_FILE);
             }
         } catch (final IOException e) {
             logger.error("Loading {} failed", VERSION_INFO_FILE, e);

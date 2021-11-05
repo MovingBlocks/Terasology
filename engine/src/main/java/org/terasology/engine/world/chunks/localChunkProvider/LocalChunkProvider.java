@@ -5,7 +5,7 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
@@ -14,7 +14,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.EntityStore;
@@ -28,14 +27,12 @@ import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.block.OnActivatedBlocks;
 import org.terasology.engine.world.block.OnAddedBlocks;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkGenerated;
@@ -51,6 +48,7 @@ import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -58,10 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
@@ -120,7 +115,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    protected Future<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
+    protected ListenableFuture<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
         Vector3i pos = new Vector3i(chunkPos);
         return loadingPipeline.invokeGeneratorTask(
             pos,
@@ -144,34 +139,13 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
-        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, new Vector3i(1, 1, 1));
-        }
-        return null;
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
-        BlockRegion region = Chunks.toChunkRegion(new BlockRegion(blockPos).expand(extent, extent, extent));
-        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
-        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-        }
-        return null;
-    }
-
-    private ChunkViewCore createWorldView(BlockRegionc region, Vector3ic offset) {
+    public ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset) {
         Chunk[] chunks = new Chunk[region.volume()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ()  * (chunkPos.y() - region.minY()));
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX()
+                    * ((chunkPos.z() - region.minZ()) + region.getSizeZ()
+                    * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
@@ -184,14 +158,15 @@ public class LocalChunkProvider implements ChunkProvider {
 
 
     private void processReadyChunk(final Chunk chunk) {
-        if (chunkCache.get(chunk.getPosition(new Vector3i())) != null) {
+        Vector3ic chunkPos = chunk.getPosition();
+        if (chunkCache.get(chunkPos) != null) {
             return; // TODO move it in pipeline;
         }
-        chunkCache.put(chunk.getPosition(new Vector3i()), chunk);
+        chunkCache.put(new Vector3i(chunkPos), chunk);
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition(new Vector3i()));
+        ChunkStore store = this.storageManager.loadChunkStore(chunkPos);
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
@@ -205,7 +180,6 @@ public class LocalChunkProvider implements ChunkProvider {
             });
             PerformanceMonitor.endActivity();
 
-
             // send on activate
             PerformanceMonitor.startActivity("Sending OnActivateBlocks");
 
@@ -218,7 +192,7 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
         } else {
             PerformanceMonitor.startActivity("Generating queued Entities");
-            generateQueuedEntities.remove(chunk.getPosition(new Vector3i())).forEach(this::generateQueuedEntities);
+            generateQueuedEntities.remove(chunkPos).forEach(this::generateQueuedEntities);
             PerformanceMonitor.endActivity();
 
             // send on activate
@@ -233,9 +207,9 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
 
 
-            worldEntity.send(new OnChunkGenerated(chunk.getPosition(new Vector3i())));
+            worldEntity.send(new OnChunkGenerated(chunkPos));
         }
-        worldEntity.send(new OnChunkLoaded(chunk.getPosition(new Vector3i())));
+        worldEntity.send(new OnChunkLoaded(chunkPos));
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -384,7 +358,7 @@ public class LocalChunkProvider implements ChunkProvider {
         shutdown();
 
         for (Chunk chunk : getAllChunks()) {
-            unloadChunkInternal(chunk.getPosition(new Vector3i()));
+            unloadChunkInternal(chunk.getPosition());
             chunk.dispose();
         }
         chunkCache.clear();
@@ -431,12 +405,9 @@ public class LocalChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
-                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
+                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
+                    return LightMerger.merge(localChunks);
+                }, LightMerger::requiredChunks
             ))
             .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
@@ -464,18 +435,15 @@ public class LocalChunkProvider implements ChunkProvider {
         this.relevanceSystem = relevanceSystem;
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toCollection(Sets::newLinkedHashSet))
-            ))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+                        ChunkTaskProvider.create("Chunk generate internal lightning",
+                                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
+                .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
+                .addStage(ChunkTaskProvider.createMulti("Light merging",
+                        chunks -> {
+                            Chunk[] localChunks = chunks.toArray(new Chunk[0]);
+                            return LightMerger.merge(localChunks);
+                        }, LightMerger::requiredChunks
+                ))
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }

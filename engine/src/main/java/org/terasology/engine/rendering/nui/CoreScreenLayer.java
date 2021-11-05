@@ -4,7 +4,7 @@
 package org.terasology.engine.rendering.nui;
 
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.input.ButtonState;
@@ -236,7 +236,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 setDepthAuto();
             }
             if (activateBindEvent) {
-                onBindEvent(new NUIBindButtonEvent(null, null, new ResourceUrn("engine:tabbingUI"), ButtonState.DOWN));
+                onBindEvent(new NUIBindButtonEvent(null, null, "engine:tabbingUI", ButtonState.DOWN));
             }
         }
     }

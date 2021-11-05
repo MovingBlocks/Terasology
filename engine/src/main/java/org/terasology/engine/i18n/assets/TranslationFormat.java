@@ -9,21 +9,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParseException;
-
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidAssetFilenameException;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.format.AssetFileFormat;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.engine.core.SimpleUri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.format.AssetFileFormat;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.module.resources.FileReference;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,9 +63,9 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
     private final Gson gson = new GsonBuilder().registerTypeAdapter(String.class, stringArraySerializer).create();
 
     @Override
-    public PathMatcher getFileMatcher() {
+    public Predicate<FileReference> getFileMatcher() {
         return path -> {
-            String name = path.getFileName().toString();
+            String name = path.getName();
             return FILENAME_PATTERN.matcher(name).matches();
         };
     }
@@ -91,8 +90,8 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         Locale locale = localeFromFilename(file.getFilename());
         Name projName = basenameFromFilename(file.getFilename());
 
-        SimpleUri projUri = new SimpleUri(urn.getModuleName(), projName);
-        TranslationData data = new TranslationData(projUri, locale);
+        ResourceUrn projUrn = new ResourceUrn(urn.getModuleName(), projName);
+        TranslationData data = new TranslationData(projUrn, locale);
 
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
             Map<String, String> entry = gson.fromJson(isr, MAP_TOKEN.getType());

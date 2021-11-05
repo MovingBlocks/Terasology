@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
@@ -29,7 +29,8 @@ public class LaunchPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        WidgetUtil.tryBindCheckbox(this, "showLaunchPopup", BindHelper.bindBeanProperty("launchPopupDisabled", config.getTelemetryConfig(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "showLaunchPopup",
+                BindHelper.bindBeanProperty("launchPopupDisabled", config.getTelemetryConfig(), Boolean.TYPE));
 
         WidgetUtil.trySubscribe(this, "yes", (button) -> {
             yesHandler.run();

@@ -44,9 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- */
+
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
@@ -144,12 +142,18 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3ic chunkPos) {
-        return chunkProvider.getLocalView(chunkPos);
+        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
+        return chunkProvider.getSubview(region, new Vector3i(1, 1, 1));
     }
 
     @Override
-    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
-        return chunkProvider.getSubviewAroundChunk(chunk);
+    public ChunkViewCore getWorldViewAround(Vector3ic chunkPos) {
+        return getWorldViewAround(new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS));
+    }
+
+    @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc region) {
+        return chunkProvider.getSubview(region, region.getMin(new Vector3i()).mul(-1));
     }
 
     @Override

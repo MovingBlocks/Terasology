@@ -5,7 +5,6 @@ package org.terasology.engine.persistence.serializers;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
@@ -14,6 +13,7 @@ import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 
@@ -332,7 +332,7 @@ public class EntitySerializer {
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(prefabComponent.getClass());
             if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(metadata)) {
                 // TODO: Use component ids here
-                entity.addRemovedComponent(metadata.getUri().toString());
+                entity.addRemovedComponent(metadata.getId().toString());
             }
         }
         return entity.build();

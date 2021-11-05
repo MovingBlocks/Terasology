@@ -5,7 +5,6 @@ package org.terasology.engine.logic.behavior.actions.conditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.logic.behavior.BehaviorAction;
@@ -13,6 +12,7 @@ import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BaseAction;
 import org.terasology.engine.logic.behavior.core.BehaviorState;
 import org.terasology.engine.registry.In;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 
@@ -55,11 +55,14 @@ public class ConditionAction extends BaseAction {
             }
             return BehaviorState.SUCCESS;
         } catch (ClassNotFoundException e) {
-            logger.error("Class not found. Does the Component specified exist?", e);
+            logger.error("Class not found. " +
+                    "Does the Component specified exist?", e);
         } catch (NoSuchFieldException e) {
-            logger.error("Field not found. Does the field specified in 'values' (publicly) exist in the Component specified in 'componentPresent'?", e);
+            logger.error("Field not found. " +
+                    "Does the field specified in 'values' (publicly) exist in the Component specified in 'componentPresent'?", e);
         } catch (IllegalAccessException e) {
-            logger.error("Illegal access. Do we have access to the Component in question?", e);
+            logger.error("Illegal access. " +
+                    "Do we have access to the Component in question?", e);
         }
         return BehaviorState.FAILURE;
     }

@@ -3,9 +3,9 @@
 package org.terasology.engine.input.events;
 
 
+import org.joml.Vector2i;
 import org.terasology.input.ButtonState;
 import org.terasology.input.MouseInput;
-import org.joml.Vector2i;
 
 public class MouseDownButtonEvent extends MouseButtonEvent {
 

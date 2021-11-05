@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
 
@@ -24,7 +11,50 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 public final class ExternalApiWhitelist {
+    private static final Set<String> NUI_PACKAGES = new ImmutableSet.Builder<String>()
+            .add("org.terasology.input")
+            .add("org.terasology.input.device")
+            .add("org.terasology.input.device.nulldevices")
+            .add("org.terasology.nui")
+            .add("org.terasology.nui.asset")
+            .add("org.terasology.nui.asset.font")
+            .add("org.terasology.nui.canvas")
+            .add("org.terasology.nui.databinding")
+            .add("org.terasology.nui.events")
+            .add("org.terasology.nui.itemRendering")
+            .add("org.terasology.nui.layouts")
+            .add("org.terasology.nui.layouts.miglayout")
+            .add("org.terasology.nui.layouts.relative")
+            .add("org.terasology.nui.properties")
+            .add("org.terasology.nui.reflection")
+            .add("org.terasology.nui.skin")
+            .add("org.terasology.nui.translate")
+            .add("org.terasology.nui.util")
+            .add("org.terasology.nui.widgets")
+            .add("org.terasology.nui.widgets.treeView")
+            .add("org.terasology.nui.widgets.types")
+            .add("org.terasology.nui.widgets.types.builtin")
+            .add("org.terasology.nui.widgets.types.builtin.object")
+            .add("org.terasology.nui.widgets.types.builtin.util")
+            .add("org.terasology.nui.widgets.types.math")
+            .add("org.terasology.reflection.metadata")
+            .build();
+
+    private static final Set<Class<?>> NUI_CLASSES = new ImmutableSet.Builder<Class<?>>()
+            .add(org.terasology.input.device.InputDevice.class)
+            .add(org.terasology.input.device.KeyboardDevice.class)
+            .add(org.terasology.input.device.MouseDevice.class)
+            .add(org.terasology.reflection.MappedContainer.class)
+            .add(org.terasology.reflection.TypeInfo.class)
+            .build();
+
+    private static final Set<String> GESTALT_ECS_PACKAGES = new ImmutableSet.Builder<String>()
+            .add("org.terasology.gestalt.entitysystem.component")
+            .build();
+
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
+            .addAll(NUI_PACKAGES)
+            .addAll(GESTALT_ECS_PACKAGES)
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
@@ -84,9 +114,21 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .add("org.joml")
+            .add("reactor.core")
+            .add("reactor.core.publisher")
+            .add("reactor.core.scheduler")
+            .add("reactor.util")
+            .add("reactor.util.annotation")
+            .add("reactor.util.concurrent")
+            .add("reactor.util.context")
+            .add("reactor.util.function")
+            .add("reactor.util.retry")
+            .add("reactor.adapter")
+            .add("java.time")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
+            .addAll(NUI_CLASSES)
             .add(com.esotericsoftware.reflectasm.MethodAccess.class)
             .add(InvocationTargetException.class)
             .add(LoggerFactory.class)
@@ -136,6 +178,13 @@ public final class ExternalApiWhitelist {
             .add(java.io.DataOutputStream.class)
             .add(java.io.FilterOutputStream.class)
             .add(java.io.PipedOutputStream.class)
+            // terasology math
+            .add(org.terasology.math.TeraMath.class)
+            // gestalt module
+            .add(org.terasology.gestalt.naming.Name.class)
+            .add(org.terasology.persistence.typeHandling.StringRepresentationTypeHandler.class)
+            .add(org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory.class)
+            .add(org.terasology.reflection.metadata.FieldMetadata.class)
             .build();
 
     private ExternalApiWhitelist() {

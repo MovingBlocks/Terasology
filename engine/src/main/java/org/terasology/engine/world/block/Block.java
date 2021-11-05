@@ -2,32 +2,31 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
+import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
+import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.math.Rotation;
-import org.terasology.engine.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.engine.physics.shapes.CollisionShape;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
-import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
-import org.terasology.engine.rendering.primitives.Tessellator;
-import org.terasology.engine.utilities.Assets;
-import org.terasology.engine.utilities.collection.EnumBooleanMap;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.util.Map;
 import java.util.Optional;
@@ -36,21 +35,6 @@ import java.util.Optional;
  * Stores all information for a specific block type.
  */
 public final class Block {
-
-    // TODO: Use directional light(s) when rendering instead of this
-    private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
-
-
-     // Initialize the LUTs
-    static {
-        DIRECTION_LIT_LEVEL.put(BlockPart.TOP, 0.9f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.BOTTOM, 0.9f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.FRONT, 1.0f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.BACK, 1.0f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.LEFT, 0.75f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.RIGHT, 0.75f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.CENTER, 0.8f);
-    }
 
     private short id;
     private BlockUri uri;
@@ -66,7 +50,7 @@ public final class Block {
     private boolean replacementAllowed;
     private int hardness = 3;
     private boolean supportRequired;
-    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
+    private final boolean[] fullSide = new boolean[Side.values().length];
     private BlockSounds sounds;
 
     // Special rendering flags (TODO: clean this up)
@@ -82,6 +66,9 @@ public final class Block {
     private boolean waving;
     private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
+    private Map<BlockPart, BlockColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Colorc> colorOffsets = Maps.newEnumMap(BlockPart.class);
+
 
     // Collision related
     private boolean penetrable;
@@ -105,13 +92,23 @@ public final class Block {
     private boolean stackable = true;
 
     private BlockAppearance primaryAppearance = new BlockAppearance();
-    private Map<Side, BlockMeshPart> lowLiquidMesh = Maps.newEnumMap(Side.class);
-    private Map<Side, BlockMeshPart> topLiquidMesh = Maps.newEnumMap(Side.class);
+    private final BlockMeshPart[] lowLiquidMesh = new BlockMeshPart[Side.values().length];
+    private final BlockMeshPart[] topLiquidMesh = new BlockMeshPart[Side.values().length];
 
     /* Collision */
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
     private AABBf bounds = new AABBf();
+
+    /**
+     * Init. a new block with default properties in place.
+     */
+    public Block() {
+        for (BlockPart part : BlockPart.values()) {
+            colorSource.put(part, DefaultColorSource.DEFAULT);
+            colorOffsets.put(part, Color.white);
+        }
+    }
 
     public short getId() {
         return id;
@@ -239,27 +236,8 @@ public final class Block {
      *                      If meshGenerator is null then this block is invisible.
      */
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
+        Preconditions.checkNotNull(meshGenerator);
         this.meshGenerator = meshGenerator;
-    }
-
-    /**
-     * @return Whether this block needs to be rendered at all
-     * @deprecated Use getMeshGenerator()==null instead.
-     */
-    @Deprecated
-    public boolean isInvisible() {
-        return meshGenerator == null;
-    }
-
-    /**
-     * @param invisible Set if invisible
-     * @deprecated Use setMeshGenerator() instead.
-     */
-    @Deprecated
-    public void setInvisible(boolean invisible) {
-        if (invisible) {
-            this.meshGenerator = null;
-        }
     }
 
     /**
@@ -358,7 +336,7 @@ public final class Block {
      * @return False if this block is not allowed attachment or the side of this block is not full side
      */
     public boolean canAttachTo(Side side) {
-        return attachmentAllowed && fullSide.get(side);
+        return attachmentAllowed && fullSide[side.ordinal()];
     }
 
     /**
@@ -518,6 +496,33 @@ public final class Block {
         this.primaryAppearance = appearence;
     }
 
+    public BlockColorSource getColorSource(BlockPart part) {
+        return colorSource.get(part);
+    }
+
+    public void setColorSource(BlockColorSource colorSource) {
+        for (BlockPart part : BlockPart.values()) {
+            this.colorSource.put(part, colorSource);
+        }
+    }
+
+    public void setColorSource(BlockPart part, BlockColorSource value) {
+        this.colorSource.put(part, value);
+    }
+
+    public Colorc getColorOffset(BlockPart part) {
+        return colorOffsets.get(part);
+    }
+
+    public void setColorOffset(BlockPart part, Colorc color) {
+        colorOffsets.put(part, color);
+    }
+
+    public void setColorOffsets(Colorc color) {
+        for (BlockPart part : BlockPart.values()) {
+            colorOffsets.put(part, color);
+        }
+    }
 
     /**
      * @return Standalone mesh
@@ -532,19 +537,19 @@ public final class Block {
     }
 
     public BlockMeshPart getLowLiquidMesh(Side side) {
-        return lowLiquidMesh.get(side);
+        return lowLiquidMesh[side.ordinal()];
     }
 
     public void setLowLiquidMesh(Side side, BlockMeshPart meshPart) {
-        lowLiquidMesh.put(side, meshPart);
+        lowLiquidMesh[side.ordinal()] = meshPart;
     }
 
     public BlockMeshPart getTopLiquidMesh(Side side) {
-        return topLiquidMesh.get(side);
+        return topLiquidMesh[side.ordinal()];
     }
 
     public void setTopLiquidMesh(Side side, BlockMeshPart meshPart) {
-        topLiquidMesh.put(side, meshPart);
+        topLiquidMesh[side.ordinal()] = meshPart;
     }
 
     /**
@@ -552,11 +557,11 @@ public final class Block {
      * @return Is the given side of the block "full" (a full square filling the side)
      */
     public boolean isFullSide(Side side) {
-        return fullSide.get(side);
+        return fullSide[side.ordinal()];
     }
 
     public void setFullSide(Side side, boolean full) {
-        fullSide.put(side, full);
+        fullSide[side.ordinal()] = full;
     }
 
     /**
@@ -587,26 +592,6 @@ public final class Block {
         return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 
-    public void renderWithLightValue(float sunlight, float blockLight) {
-        if (meshGenerator == null) {
-            return;
-        }
-
-        Material mat = Assets.getMaterial("engine:prog.block").orElseThrow(() -> new RuntimeException("Missing engine material"));
-        mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-
-        mat.enable();
-        mat.setFloat("sunlight", sunlight);
-        mat.setFloat("blockLight", blockLight);
-
-
-        Mesh mesh = meshGenerator.getStandaloneMesh();
-        if (mesh != null) {
-            mesh.render();
-        }
-
-        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-    }
 
     @Override
     public String toString() {

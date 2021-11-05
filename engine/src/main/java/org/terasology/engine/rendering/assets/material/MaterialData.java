@@ -3,16 +3,14 @@
 package org.terasology.engine.rendering.assets.material;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.AssetData;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- */
 public class MaterialData implements AssetData {
     private Shader shader;
     private Map<String, Texture> textures = Maps.newHashMap();

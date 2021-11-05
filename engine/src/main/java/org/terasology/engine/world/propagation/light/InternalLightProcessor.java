@@ -49,7 +49,7 @@ public final class InternalLightProcessor {
                     Block block = chunk.getBlock(x, y, z);
                     if (block.getLuminance() > 0) {
                         chunk.setLight(x, y, z, block.getLuminance());
-                        lightPropagator.propagateFrom(pos.set(x,y,z), block.getLuminance());
+                        lightPropagator.propagateFrom(pos.set(x, y, z), block.getLuminance());
                     }
                 }
             }

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
@@ -9,8 +9,6 @@ import gnu.trove.list.TLongList;
 
 import java.util.List;
 
-/**
- */
 public interface PersistedDataArray extends PersistedData, Iterable<PersistedData> {
 
     int size();

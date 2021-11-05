@@ -1,21 +1,10 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
@@ -24,9 +13,8 @@ import org.terasology.engine.network.exceptions.HostingFailedException;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 
-/**
- */
 public class StartServer extends SingleStepLoadProcess {
+    private static final Logger logger = LoggerFactory.getLogger(StartServer.class);
 
     private final Context context;
     private final boolean dedicated;
@@ -51,8 +39,14 @@ public class StartServer extends SingleStepLoadProcess {
             int port = config.getNetwork().getServerPort();
             context.get(NetworkSystem.class).host(port, dedicated);
         } catch (HostingFailedException e) {
-            context.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
-                    e.getMessage() + " - Reverting to single player");
+            NUIManager nui = context.get(NUIManager.class);
+            if (nui != null) {
+                nui.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
+                        e.getMessage() + " - Reverting to single player");
+            } else {
+                logger.error("Failed to Host. NUI was also unavailable for warning popup (headless?)", e);
+                throw new RuntimeException("Cannot host game successfully from likely headless start, terminating");
+            }
         }
         return true;
     }

@@ -7,8 +7,6 @@ import com.google.common.base.Preconditions;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 
-/**
- */
 public class BoneWeight {
     private float[] biases;
     private int[] boneIndices;

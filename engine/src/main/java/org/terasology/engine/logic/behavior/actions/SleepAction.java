@@ -6,7 +6,7 @@ import org.terasology.engine.logic.behavior.BehaviorAction;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BaseAction;
 import org.terasology.engine.logic.behavior.core.BehaviorState;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.properties.Range;
 
 /**
@@ -28,7 +28,7 @@ public class SleepAction extends BaseAction {
     public BehaviorState modify(Actor actor, BehaviorState result) {
 
         float timeRemaining = 0;
-        try {// TODO figure out the delegation issue
+        try { // TODO figure out the delegation issue
             timeRemaining = actor.getValue(getId());
         } catch (NullPointerException e) {
             construct(actor);

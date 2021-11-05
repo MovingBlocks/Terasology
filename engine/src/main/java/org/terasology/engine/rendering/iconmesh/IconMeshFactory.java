@@ -2,18 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.iconmesh;
 
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.terasology.assets.Asset;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.rendering.primitives.Tessellator;
-import org.terasology.engine.rendering.primitives.TessellatorHelper;
-import org.terasology.joml.geom.Rectanglei;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.joml.geom.Rectanglei;
+import org.terasology.nui.Color;
 
 import java.nio.ByteBuffer;
 
@@ -27,10 +30,13 @@ public final class IconMeshFactory {
         if (region instanceof Asset) {
             ResourceUrn urn = ((Asset<?>) region).getUrn();
             if (urn.getFragmentName().isEmpty()) {
-                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, urn.getResourceName()), Mesh.class).get();
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
+                        urn.getResourceName()), Mesh.class).get();
             } else {
-                Name fragName = new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
-                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, fragName), Mesh.class).get();
+                Name fragName =
+                        new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
+                        fragName), Mesh.class).get();
             }
         } else {
             return generateIconMesh(region);
@@ -57,6 +63,88 @@ public final class IconMeshFactory {
         }
     }
 
+    private static void addPixel(StandardMeshData mesh, Vector2fc position, float size, Color c) {
+        Vector3f pos = new Vector3f();
+        Vector3f norm = new Vector3f();
+        final float sizeHalf = size / 2;
+
+        int firstIndex = mesh.position.getPosition();
+
+        // top
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 1.0f, 0));
+            mesh.color0.put(c);
+        }
+
+        // left
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(-1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
+
+        // right
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
+
+        // darkern for sides facing left, right and bottom
+        Color cd = new Color(c.rf() * 0.6f, c.gf() * 0.6f, c.bf() * 0.6f, c.af());
+        // back
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, -1.0f));
+            mesh.color0.put(cd);
+        }
+
+        // front
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, sizeHalf, sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, 1.0f));
+            mesh.color0.put(cd);
+        }
+
+        // bottom
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.set(position, 0.0f).add(-sizeHalf, -sizeHalf, sizeHalf));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, -1, 0f));
+            mesh.color0.put(cd);
+        }
+
+
+        int lastIndex = mesh.position.getPosition();
+        for (int i = firstIndex; i < lastIndex - 2; i += 4) {
+            mesh.indices.put(i);
+            mesh.indices.put(i + 1);
+            mesh.indices.put(i + 2);
+
+            mesh.indices.put(i + 2);
+            mesh.indices.put(i + 3);
+            mesh.indices.put(i);
+        }
+    }
+
     public static MeshData generateIconMeshData(TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getTexture().getData().getBuffers()[0];
 
@@ -68,8 +156,9 @@ public final class IconMeshFactory {
 
         float textureSize = Math.max(tex.getWidth(), tex.getHeight());
 
-        Tessellator tessellator = new Tessellator();
-
+        StandardMeshData mesh = new StandardMeshData();
+        Vector2f pos = new Vector2f();
+        Color color = new Color();
         for (int y = 0; y < tex.getHeight(); y++) {
             for (int x = 0; x < tex.getWidth(); x++) {
                 int r = buffer.get((posY + y) * stride + (posX + x) * 4) & 255;
@@ -78,9 +167,12 @@ public final class IconMeshFactory {
                 int a = buffer.get((posY + y) * stride + (posX + x) * 4 + 3) & 255;
 
                 if (a > alphaLimit) {
-                    Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f,
-                            2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f, 0f);
+                    color.setRed(r)
+                            .setGreen(g)
+                            .setBlue(b)
+                            .setAlpha(a);
+                    pos.set(2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f);
+                    addPixel(mesh, pos, 2f / textureSize, color);
 
                     if (withContour) {
                         int newX = 0;
@@ -127,15 +219,18 @@ public final class IconMeshFactory {
                             }
 
                             if (newA < alphaLimit) {
-                                Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
-                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
+                                color.setRed(colorContour.x)
+                                        .setGreen(colorContour.y)
+                                        .setBlue(colorContour.z)
+                                        .setAlpha(colorContour.w);
+                                addPixel(mesh, pos.set(2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f), 0.125f, color);
                             }
                         }
                     }
                 }
             }
         }
-        return tessellator.generateMeshData();
+        return mesh;
     }
 
 }

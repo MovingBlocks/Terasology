@@ -10,7 +10,10 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
  * Class containing static factory methods for generating {@link GsonBuilder} objects that follow Terasology
  * serialization rules and support Terasology TypeHandlers.
  */
-public class GsonBuilderFactory {
+public final class GsonBuilderFactory {
+
+    private GsonBuilderFactory() { }
+
     /**
      * Create a {@link GsonBuilder} with options set to comply with Terasology JSON serialization rules.
      */

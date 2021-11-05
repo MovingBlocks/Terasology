@@ -13,8 +13,6 @@ import org.terasology.engine.world.time.WorldTime;
 import java.util.Collection;
 import java.util.Map;
 
-/**
- */
 public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     private WorldProviderCore base;
@@ -66,6 +64,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
         return base.getWorldViewAround(chunk);
+    }
+
+    @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc region) {
+        return base.getWorldViewAround(region);
     }
 
     @Override

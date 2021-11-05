@@ -27,7 +27,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private Set<Vector3ic>[] reduceQueues;
     private Set<Vector3ic>[] increaseQueues;
 
-    public SunlightRegenBatchPropagator(PropagationRules regenRules, PropagatorWorldView regenWorld, BatchPropagator sunlightPropagator, PropagatorWorldView sunlightWorld) {
+    public SunlightRegenBatchPropagator(PropagationRules regenRules, PropagatorWorldView regenWorld,
+                                        BatchPropagator sunlightPropagator, PropagatorWorldView sunlightWorld) {
         this.regenRules = regenRules;
         this.regenWorld = regenWorld;
         this.sunlightPropagator = sunlightPropagator;

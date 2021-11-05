@@ -3,7 +3,7 @@
 package org.terasology.engine.world.zones;
 
 import org.terasology.engine.world.generation.Region;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * The ZoneRegionFunction determines which blocks are part of a given region.
@@ -36,6 +36,6 @@ public interface ZoneRegionFunction {
      *
      * @param parent the zone this function is attached to
      */
-    default void initialize(Zone parent) {}
+    default void initialize(Zone parent) { }
 
 }

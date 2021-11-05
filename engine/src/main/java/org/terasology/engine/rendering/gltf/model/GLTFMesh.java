@@ -9,7 +9,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * A glTF mesh is composed of one or more primitives. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-mesh for details.
+ * A glTF mesh is composed of one or more primitives.
+ * See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-mesh for details.
  */
 public class GLTFMesh {
     private List<GLTFPrimitive> primitives = Lists.newArrayList();

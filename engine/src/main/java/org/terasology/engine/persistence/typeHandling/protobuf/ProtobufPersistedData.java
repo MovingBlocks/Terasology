@@ -31,8 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class ProtobufPersistedData implements PersistedData, PersistedDataArray {
     private EntityData.Value data;
 
@@ -210,7 +208,8 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public boolean isNull() {
-        return !data.hasBytes() && data.getBooleanCount() + data.getFloatCount() + data.getDoubleCount() + data.getIntegerCount() + data.getLongCount()
+        return !data.hasBytes() && data.getBooleanCount() + data.getFloatCount() + data.getDoubleCount()
+                + data.getIntegerCount() + data.getLongCount()
                 + data.getStringCount() + data.getValueCount() + data.getNameValueCount() == 0;
     }
 

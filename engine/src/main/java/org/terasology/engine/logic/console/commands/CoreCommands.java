@@ -5,19 +5,15 @@ package org.terasology.engine.logic.console.commands;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import org.joml.Vector3f;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -27,6 +23,8 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
@@ -36,20 +34,14 @@ import org.terasology.engine.logic.console.suggesters.ScreenSuggester;
 import org.terasology.engine.logic.console.suggesters.SkinSuggester;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.console.Console;
-import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.math.Direction;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.PingService;
 import org.terasology.engine.network.Server;
-import org.terasology.nui.FontColor;
-import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.skin.UISkin;
 import org.terasology.engine.persistence.WorldDumper;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.engine.registry.In;
@@ -66,9 +58,18 @@ import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.FontColor;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.skin.UISkinAsset;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -279,7 +280,7 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
         Locale locale = Locale.forLanguageTag(langTag);
-        TranslationProject proj = translationSystem.getProject(new SimpleUri("engine:menu"));
+        TranslationProject proj = translationSystem.getProject(new ResourceUrn("engine:menu"));
 
         // Try if language exists
         if (proj.getAvailableLocales().contains(locale)) {
@@ -364,7 +365,7 @@ public class CoreCommands extends BaseComponentSystem {
         if (!nuiSkinEditorSystem.isEditorActive()) {
             nuiSkinEditorSystem.toggleEditor();
         }
-        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkin.class);
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkinAsset.class);
         switch (urns.size()) {
             case 0:
                 return String.format("No asset found for screen '%s'", uri);
@@ -468,22 +469,24 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing information about number of entities saved
      * @throws IOException thrown when error with saving file occures
      */
-    @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\"." +
+    @Command(shortDescription = "Writes out information on all entities to a JSON file for debugging",
+            helpText = "Writes entity information out into a file named \"<timestamp>-entityDump.json\"." +
                     " Supports list of component names, which will be used to only save entities that contains" +
                     " one or more of those components. Names should be separated by spaces.")
     public String dumpEntities(@CommandParam(value = "componentNames", required = false) String... componentNames) throws IOException {
         int savedEntityCount;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
-        PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
+        PrefabSerializer prefabSerializer =
+                new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
+        Path outFile = PathManager.getInstance().getHomePath().resolve(Instant.now() + "-entityDump.json");
         if (componentNames.length == 0) {
-            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+            savedEntityCount = worldDumper.save(outFile);
         } else {
             List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
                     .map(String::trim) //Trim off whitespace
                     .filter(o -> !o.isEmpty()) //Remove empty strings
-                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
+                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names end with "component"
                     .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
                             .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
                             .findFirst())
@@ -491,7 +494,7 @@ public class CoreCommands extends BaseComponentSystem {
                     .map(Optional::get)
                     .collect(Collectors.toList());
             if (!filterComponents.isEmpty()) {
-                savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+                savedEntityCount = worldDumper.save(outFile, filterComponents);
             } else {
                 return "Could not find components matching given names";
             }
@@ -506,7 +509,8 @@ public class CoreCommands extends BaseComponentSystem {
      * @param prefabName String containing prefab name
      * @return String containing final message
      */
-    @Command(shortDescription = "Spawns an instance of a prefab in the world", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Spawns an instance of a prefab in the world", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnPrefab(@Sender EntityRef sender, @CommandParam("prefabId") String prefabName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -543,7 +547,8 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            "item in front of the player. You can simply pick it up.", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -702,27 +707,27 @@ public class CoreCommands extends BaseComponentSystem {
             } else {
                 StringBuilder msg = new StringBuilder();
 
-                msg.append("=====================================================================================================================");
+                msg.append("===========================================================================================================");
                 msg.append(Console.NEW_LINE);
                 msg.append(cmd.getUsage());
                 msg.append(Console.NEW_LINE);
-                msg.append("=====================================================================================================================");
+                msg.append("===========================================================================================================");
                 msg.append(Console.NEW_LINE);
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 } else if (!cmd.getDescription().isEmpty()) {
                     msg.append(cmd.getDescription());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
                 if (!cmd.getRequiredPermission().isEmpty()) {
                     msg.append("Required permission level - " + cmd.getRequiredPermission());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
 

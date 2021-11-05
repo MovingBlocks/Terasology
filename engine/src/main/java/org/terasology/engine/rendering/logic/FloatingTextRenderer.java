@@ -3,11 +3,11 @@
 package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Maps;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -18,16 +18,16 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.opengl.OpenGLUtils;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.Color;
 import org.terasology.nui.HorizontalAlign;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.world.WorldProvider;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -35,11 +35,6 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glTranslated;
-
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FloatingTextRenderer extends BaseComponentSystem implements RenderSystem {
@@ -74,6 +69,9 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     private void render(Iterable<EntityRef> floatingTextEntities) {
         Vector3fc cameraPosition = camera.getPosition();
 
+        Matrix4f model = new Matrix4f();
+        Matrix4f modelView = new Matrix4f();
+        Vector3f worldPos = new Vector3f();
         for (EntityRef entity : floatingTextEntities) {
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -83,7 +81,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                 continue;
             }
 
-            Vector3f worldPos = location.getWorldPosition(new Vector3f());
+            location.getWorldPosition(worldPos);
             if (!worldProvider.isBlockRelevant(worldPos) || !worldPos.isFinite()) {
                 continue;
             }
@@ -105,8 +103,8 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             Map<Material, Mesh> meshMap = entityMeshCache.get(entity);
             if (meshMap == null) {
                 meshMap = meshBuilder
-                    .createTextMesh(font, Arrays.asList(linesOfText), textWidth, HorizontalAlign.CENTER, baseColor,
-                        shadowColor, underline);
+                        .createTextMesh(font, Arrays.asList(linesOfText), textWidth, HorizontalAlign.CENTER, baseColor,
+                                shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
 
@@ -114,27 +112,31 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                 glDisable(GL_DEPTH_TEST);
             }
 
-            glPushMatrix();
-
             float scale = METER_PER_PIXEL * floatingText.scale;
 
-            glTranslated(worldPos.x - cameraPosition.x(), worldPos.y - cameraPosition.y(), worldPos.z - cameraPosition.z());
-            OpenGLUtils.applyBillboardOrientation();
-            glScaled(scale, -scale, scale);
-            glTranslated(-textWidth / 2.0, 0.0, 0.0);
+            model.setTranslation(worldPos.sub(cameraPosition));
+
+
+            modelView.set(camera.getViewMatrix()).mul(model)
+                    .m00(1.0f).m10(0.0f).m20(0.0f)
+                    .m01(0.0f).m11(1.0f).m21(0.0f)
+                    .m02(0.0f).m12(0.0f).m22(1.0f);
+            modelView.scale(scale, -scale, scale);
+            modelView.translate(-textWidth / 2.0f, 0.0f, 0.0f);
+
             for (Map.Entry<Material, Mesh> meshMapEntry : meshMap.entrySet()) {
                 Mesh mesh = meshMapEntry.getValue();
                 Material material = meshMapEntry.getKey();
                 material.enable();
                 material.bindTextures();
                 material.setFloat4("croppingBoundaries", Float.MIN_VALUE, Float.MAX_VALUE,
-                    Float.MIN_VALUE, Float.MAX_VALUE);
+                        Float.MIN_VALUE, Float.MAX_VALUE);
+                material.setMatrix4("modelViewMatrix", modelView);
+                material.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
                 material.setFloat2("offset", 0.0f, 0.0f);
                 material.setFloat("alpha", 1.0f);
                 mesh.render();
             }
-
-            glPopMatrix();
 
             // Revert to default state
             if (floatingText.isOverlay) {
@@ -152,29 +154,16 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     @Override
-    public void renderOpaque() {
-    }
-
-    @Override
     public void renderAlphaBlend() {
         render(entityManager.getEntitiesWith(FloatingTextComponent.class, LocationComponent.class));
     }
 
-    @Override
-    public void renderOverlay() {
-    }
-
-    @Override
-    public void renderShadows() {
-    }
-
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
 
-
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }

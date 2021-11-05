@@ -24,7 +24,7 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedLong;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class TroveUtils {
+public final class TroveUtils {
 
     private TroveUtils() {
 

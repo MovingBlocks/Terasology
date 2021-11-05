@@ -1,14 +1,18 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.subsystem.headless.renderer;
 
 import org.joml.Quaternionfc;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Border;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
@@ -16,10 +20,6 @@ import org.terasology.nui.ScaleMode;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
-import org.terasology.engine.rendering.opengl.FrameBufferObject;
 
 public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
 
@@ -34,7 +34,8 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
+    public void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion,
+                         Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
         // Do nothing
     }
 
@@ -64,18 +65,20 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegion, float ux, float uy, float uw, float uh, float alpha) {
+    public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegion,
+                            float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 
     @Override
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion, Colorc color, Colorc shadowColor,
-                         float alpha, boolean underlined) {
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion,
+                         Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
         // Do nothing
     }
 
     @Override
-    public void drawTextureBordered(UITextureRegion texture, Rectanglei absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+    public void drawTextureBordered(UITextureRegion texture, Rectanglei absoluteRegion, Border border, boolean tile,
+                                    float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 

@@ -5,20 +5,25 @@ package org.terasology.engine.persistence.typeHandling;
 
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.joml.Vector4i;
 import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.math.IntegerRange;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ChunkMeshTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorcTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.NameTypeHandler;
-import org.terasology.engine.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
@@ -48,14 +53,15 @@ import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4iTypeHand
 import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBi;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.UITextureRegion;
@@ -109,28 +115,29 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
         serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
+        serializationLibrary.addTypeHandler(ChunkMesh.class, new ChunkMeshTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Colorc.class, new ColorcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.addTypeHandler(Vector4fc.class, new Vector4fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.addTypeHandler(Vector3fc.class, new Vector3fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.addTypeHandler(Vector2fc.class, new Vector2fcTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(Vector3ic.class, new Vector3icTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
         serializationLibrary.addTypeHandler(Vector2ic.class, new Vector2icTypeHandler());
 
-        serializationLibrary.addTypeHandler(org.joml.Vector4i.class, new Vector4iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4i.class, new Vector4iTypeHandler());
         serializationLibrary.addTypeHandler(Vector4ic.class, new Vector4icTypeHandler());
 
         serializationLibrary.addTypeHandler(Rectanglei.class, new RectangleiTypeHandler());
@@ -145,7 +152,6 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
         serializationLibrary.addTypeHandler(Quaternionfc.class, new QuaternionfcTypeHandler());
 
-        serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
     }
 

@@ -7,10 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.PermissionProvider;
-import org.terasology.naming.Name;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.PermissionProvider;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.NotifyingBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
@@ -21,7 +22,6 @@ import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -57,30 +57,30 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
         Set<Name> allowedProvidingModules =
-            ImmutableSet.<Name>builder()
-                .add(contextModule.getId())
-                .addAll(environment.getDependencyNamesOf(contextModule.getId()))
-                .build();
+                ImmutableSet.<Name>builder()
+                        .add(contextModule.getId())
+                        .addAll(environment.getDependencyNamesOf(contextModule.getId()))
+                        .build();
 
         List<Class<? extends T>> allowedSubclasses =
-            typeRegistry.getSubtypesOf(baseType.getRawType())
-                .stream()
-                // Type must come from an allowed module or be in the whitelist
-                .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz)) ||
-                                     permissionProvider.isPermitted(clazz))
-                // Filter public, instantiable types
-                .filter(clazz -> {
-                    int modifiers = clazz.getModifiers();
-                    return Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers) && !clazz.isInterface();
-                })
-                // Filter non-local, static inner classes
-                .filter(clazz -> {
-                    if (clazz.isLocalClass()) {
-                        return false;
-                    }
-                    return !clazz.isMemberClass() || Modifier.isStatic(clazz.getModifiers());
-                })
-                .collect(Collectors.toList());
+                typeRegistry.getSubtypesOf(baseType.getRawType())
+                        .stream()
+                        // Type must come from an allowed module or be in the whitelist
+                        .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz))
+                                || permissionProvider.isPermitted(clazz))
+                        // Filter public, instantiable types
+                        .filter(clazz -> {
+                            int modifiers = clazz.getModifiers();
+                            return Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers) && !clazz.isInterface();
+                        })
+                        // Filter non-local, static inner classes
+                        .filter(clazz -> {
+                            if (clazz.isLocalClass()) {
+                                return false;
+                            }
+                            return !clazz.isMemberClass() || Modifier.isStatic(clazz.getModifiers());
+                        })
+                        .collect(Collectors.toList());
 
         allowedSubclasses.add(baseType.getRawType());
 
@@ -101,13 +101,13 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         }
 
         allowedSubtypes =
-            allowedSubclasses
-                .stream()
-                .map(clazz -> {
-                    Type parameterized = ReflectionUtil.parameterizeandResolveRawType(baseType.getType(), clazz);
-                    return (TypeInfo<T>) TypeInfo.of(parameterized);
-                })
-                .collect(Collectors.toList());
+                allowedSubclasses
+                        .stream()
+                        .map(clazz -> {
+                            Type parameterized = ReflectionUtil.parameterizeandResolveRawType(baseType.getType(), clazz);
+                            return (TypeInfo<T>) TypeInfo.of(parameterized);
+                        })
+                        .collect(Collectors.toList());
     }
 
     private Name getModuleProviding(Class<?> type) {

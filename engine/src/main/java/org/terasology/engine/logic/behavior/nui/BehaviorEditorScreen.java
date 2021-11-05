@@ -6,37 +6,35 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.logic.behavior.asset.BehaviorTree;
-import org.terasology.engine.logic.behavior.core.ActionNode;
-import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.BehaviorComponent;
 import org.terasology.engine.logic.behavior.BehaviorSystem;
 import org.terasology.engine.logic.behavior.Interpreter;
-import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.widgets.UIDropdown;
-import org.terasology.nui.widgets.UIList;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.core.ActionNode;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.mainMenu.EnterTextPopup;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.EnterTextPopup;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.Property;
 import org.terasology.nui.properties.PropertyProvider;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-/**
- */
 public class BehaviorEditorScreen extends CoreScreenLayer {
     public static final Logger logger = LoggerFactory.getLogger(BehaviorEditorScreen.class);
     public static final String PALETTE_ITEM_OPEN = "--";

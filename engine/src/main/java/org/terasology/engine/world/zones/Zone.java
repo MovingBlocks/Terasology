@@ -14,7 +14,7 @@ import org.terasology.engine.world.generation.WorldBuilder;
 import org.terasology.engine.world.generation.WorldRasterizer;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.viewer.layers.FacetLayer;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.world.block.Block;
@@ -118,7 +118,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
         //Save the blocks that aren't in the zone
         for (int x = 0; x < Chunks.SIZE_X; x++) {
-            for (int y = 0; y <Chunks.SIZE_Y; y++) {
+            for (int y = 0; y < Chunks.SIZE_Y; y++) {
                 for (int z = 0; z < Chunks.SIZE_Z; z++) {
                     if (!containsBlock(x + offsetX, y + offsetY, z + offsetZ, chunkRegion)) {
                         savedBlocks[x][y][z] = chunk.getBlock(x, y, z);

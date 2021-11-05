@@ -1,21 +1,9 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 /**
- * This package provides a low-level system for describing classes and fields, with support for construction and field access. Essentially it is a simplified reflection
+ * This package provides a low-level system for describing classes and fields, with support for construction and field access.
+ * Essentially it is a simplified reflection
  * framework.
  * <br><br>
  * To support this functionality, a copy-strategy library is used to provide copying support for types. This is used instead of cloning because
@@ -29,4 +17,4 @@
  */
 @API package org.terasology.engine.audio.events;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

@@ -8,11 +8,9 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.logic.players.LocalPlayerSystem;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.cameras.SubmersibleCamera;
 import org.terasology.engine.rendering.dag.RenderGraph;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
@@ -29,12 +27,14 @@ import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x()
+            * ViewDistance.MEGA.getChunkDistance().y()
+            * ViewDistance.MEGA.getChunkDistance().z();
 
     private WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
 
-    private Camera noCamera = new NullCamera(null, null);
+    private Camera noCamera = new NullCamera();
 
     /* CHUNKS */
     private boolean pendingChunks;
@@ -46,8 +46,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public HeadlessWorldRenderer(Context context) {
         this.worldProvider = context.get(WorldProvider.class);
         this.chunkProvider = context.get(ChunkProvider.class);
-        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
-        localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
     }
 
@@ -77,8 +75,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public SubmersibleCamera getActiveCamera() {
-        return (SubmersibleCamera) noCamera;
+    public Camera getActiveCamera() {
+        return noCamera;
     }
 
     @Override
@@ -193,20 +191,22 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         boolean chunksCurrentlyPending = false;
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
             Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-            BlockRegion viewRegion = new BlockRegion(newChunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+            BlockRegion viewRegion = new BlockRegion(newChunkPos)
+                    .expand(new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
                     }
                 }
             } else {
-                BlockRegion oldRegion = new BlockRegion(chunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+                BlockRegion oldRegion = new BlockRegion(chunkPos)
+                        .expand(new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
 
                 // remove
                 for (Vector3ic candidateForRemove : viewRegion) {
@@ -222,7 +222,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;

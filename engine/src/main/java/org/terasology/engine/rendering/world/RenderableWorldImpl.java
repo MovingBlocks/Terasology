@@ -13,14 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
-import org.terasology.math.TeraMath;
-import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockRegion;
@@ -31,9 +30,10 @@ import org.terasology.engine.world.chunks.LodChunkProvider;
 import org.terasology.engine.world.chunks.RenderableChunk;
 import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.joml.geom.AABBfc;
+import org.terasology.math.TeraMath;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -43,54 +43,58 @@ import java.util.PriorityQueue;
  * TODO: write javadoc unless this class gets slated for removal, which might be.
  */
 class RenderableWorldImpl implements RenderableWorld {
-
-    private static final int MAX_ANIMATED_CHUNKS = 64;
-    private static final int MAX_BILLBOARD_CHUNKS = 64;
-    private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
-    private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
-
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
-    private final int maxChunksForShadows = TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
+    private static final int MAX_ANIMATED_CHUNKS = 64;
+    private static final int MAX_LOADABLE_CHUNKS =
+            ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
+    private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
+
+    private final int maxChunksForShadows =
+            TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
     private final WorldProvider worldProvider;
-    private ChunkProvider chunkProvider;
-    private LodChunkProvider lodChunkProvider;
+    private final ChunkProvider chunkProvider;
+    private final LodChunkProvider lodChunkProvider;
 
-    private ChunkTessellator chunkTessellator;
+    private final ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
-    private RenderQueuesHelper renderQueues;
+    private final RenderQueuesHelper renderQueues;
+    private ChunkMeshRenderer chunkMeshRenderer;
 
-    private Camera playerCamera;
+    private final Camera playerCamera;
     private Camera shadowMapCamera;
 
-    private Config config = CoreRegistry.get(Config.class);
-    private RenderingConfig renderingConfig = config.getRendering();
+    private final Config config = CoreRegistry.get(Config.class);
+    private final RenderingConfig renderingConfig = config.getRendering();
 
     private int statDirtyChunks;
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
 
-    RenderableWorldImpl(Context context, GLBufferPool bufferPool, Camera playerCamera) {
+    RenderableWorldImpl(Context context, Camera playerCamera) {
 
         worldProvider = context.get(WorldProvider.class);
         chunkProvider = context.get(ChunkProvider.class);
-        chunkTessellator = new ChunkTessellator(bufferPool);
+        chunkTessellator = context.get(ChunkTessellator.class);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
         WorldGenerator worldGenerator = context.get(WorldGenerator.class);
         if (worldGenerator instanceof ScalableWorldGenerator) {
-            lodChunkProvider = new LodChunkProvider(context, (ScalableWorldGenerator) worldGenerator, chunkTessellator, renderingConfig.getViewDistance(), (int) renderingConfig.getChunkLods(), calcCameraCoordinatesInChunkUnits());
+            lodChunkProvider = new LodChunkProvider(context, (ScalableWorldGenerator) worldGenerator,
+                    chunkTessellator, renderingConfig.getViewDistance(), (int) renderingConfig.getChunkLods(),
+                    calcCameraCoordinatesInChunkUnits());
         } else {
             lodChunkProvider = null;
         }
 
-        renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
+        renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS,
+                new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -103,7 +107,7 @@ class RenderableWorldImpl implements RenderableWorld {
             Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
                 if (lodChunkProvider != null) {
                     lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
                 }
@@ -126,7 +130,7 @@ class RenderableWorldImpl implements RenderableWorld {
             Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
             while (iterator.hasNext()) {
                 chunk = iterator.next();
-                if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkCoordinates)) {
+                if (chunk.getPosition().equals(chunkCoordinates)) {
                     chunk.disposeMesh();
                     iterator.remove();
                     break;
@@ -163,6 +167,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                 newMesh = chunkTessellator.generateMesh(localView);
                 newMesh.generateVBOs();
+                newMesh.discardData();
 
                 if (chunk.hasMesh()) {
                     chunk.getMesh().dispose();
@@ -210,9 +215,9 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext(); ) {
-                        chunk = it.next();
-                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
+                    while (nearbyChunks.hasNext()) {
+                        chunk = nearbyChunks.next();
+                        if (chunk.getPosition().equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
                             break;
@@ -233,7 +238,7 @@ class RenderableWorldImpl implements RenderableWorld {
             }
 
             if (chunksHaveBeenAdded) {
-                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                chunksInProximityOfCamera.sort(new ChunkFrontToBackComparator());
             }
             renderableRegion = newRenderableRegion;
             return true;
@@ -248,7 +253,8 @@ class RenderableWorldImpl implements RenderableWorld {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
             if (lodChunkProvider != null) {
-                lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods, calcCameraCoordinatesInChunkUnits());
+                lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods,
+                        calcCameraCoordinatesInChunkUnits());
             }
             return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
         } else {
@@ -259,7 +265,8 @@ class RenderableWorldImpl implements RenderableWorld {
     private BlockRegion calculateRenderableRegion(ViewDistance newViewDistance) {
         Vector3i cameraCoordinates = calcCameraCoordinatesInChunkUnits();
         Vector3ic renderableRegionSize = newViewDistance.getChunkDistance();
-        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x() / 2, renderableRegionSize.y() / 2, renderableRegionSize.z() / 2);
+        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x() / 2, renderableRegionSize.y() / 2,
+                renderableRegionSize.z() / 2);
         return new BlockRegion(cameraCoordinates).expand(renderableRegionExtents);
     }
 
@@ -269,7 +276,7 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        org.joml.Vector3f cameraCoordinates = playerCamera.getPosition();
+        Vector3f cameraCoordinates = playerCamera.getPosition();
         return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
 
@@ -283,6 +290,7 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
                 pendingMesh = chunk.getPendingMesh();
                 pendingMesh.generateVBOs();
+                pendingMesh.discardData();
                 if (chunk.hasMesh()) {
                     chunk.getMesh().dispose();
                 }
@@ -316,8 +324,10 @@ class RenderableWorldImpl implements RenderableWorld {
 
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
+        int billboardLimit = (int) renderingConfig.getBillboardLimit();
 
         List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
+        allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
         if (lodChunkProvider != null) {
             lodChunkProvider.addAllChunks(allChunks);
         }
@@ -326,7 +336,10 @@ class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleFromMainLight(chunk)) {
+                if (isDynamicShadows
+                        && isFirstRenderingStageForCurrentFrame
+                        && chunkCounter < maxChunksForShadows
+                        && isChunkVisibleFromMainLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
@@ -347,7 +360,8 @@ class RenderableWorldImpl implements RenderableWorld {
                         statIgnoredPhases++;
                     }
 
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && chunkCounter < MAX_BILLBOARD_CHUNKS) {
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0
+                            && (billboardLimit == 0 || chunkCounter < billboardLimit)) {
                         renderQueues.chunksAlphaReject.add(chunk);
                     } else {
                         statIgnoredPhases++;
@@ -355,11 +369,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                     statVisibleChunks++;
 
-                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
-                        chunk.setAnimated(true);
-                    } else {
-                        chunk.setAnimated(false);
-                    }
+                    chunk.setAnimated(statVisibleChunks < MAX_ANIMATED_CHUNKS);
                 }
 
                 if (isChunkVisibleReflection(chunk)) {
@@ -420,7 +430,9 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkVisibleReflection(RenderableChunk chunk) {
-        return playerCamera.getViewFrustumReflected().intersects(chunk.getAABB());
+        AABBfc bounds = chunk.getAABB();
+        return playerCamera.getViewFrustumReflected().testAab(bounds.minX(), bounds.minY(), bounds.minZ(),
+                bounds.maxX(), bounds.maxY(), bounds.maxZ());
     }
 
     @Override
@@ -436,6 +448,11 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void setShadowMapCamera(Camera camera) {
         this.shadowMapCamera = camera;
+    }
+
+    @Override
+    public void setChunkMeshRenderer(ChunkMeshRenderer meshes) {
+        chunkMeshRenderer = meshes;
     }
 
     @Override
@@ -494,13 +511,7 @@ class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (distance1 == distance2) {
-                return 0;
-            } else if (distance2 > distance1) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return Double.compare(distance2, distance1);
         }
     }
 

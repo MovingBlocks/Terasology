@@ -57,7 +57,7 @@ public final class ChunkMeshUpdateManager {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
 
-        chunkUpdater = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, new ChunkUpdaterComparator());
+        chunkUpdater = TaskMaster.createPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, 100, new ChunkUpdaterComparator());
     }
 
     /**
@@ -145,7 +145,7 @@ public final class ChunkMeshUpdateManager {
         @Override
         public void run() {
             ChunkMesh newMesh;
-            ChunkView chunkView = worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i()));
+            ChunkView chunkView = worldProvider.getLocalView(c.getPosition(new Vector3i()));
             if (chunkView != null) {
                 /*
                  * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we
@@ -156,7 +156,7 @@ public final class ChunkMeshUpdateManager {
                     newMesh = tessellator.generateMesh(chunkView);
 
                     c.setPendingMesh(newMesh);
-                    ChunkMonitor.fireChunkTessellated(c.getPosition(new org.joml.Vector3i()), newMesh);
+                    ChunkMonitor.fireChunkTessellated(c.getPosition(new Vector3i()), newMesh);
                 }
 
             }

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * This package contains support for skinning nui - a UIStyle provides generic information on how to draw a widget, and a UISkin provides a hierarchy of styles.
+ * This package contains support for skinning nui - a UIStyle provides generic information on how to draw a widget,
+ * and a UISkin provides a hierarchy of styles.
  */
 @API package org.terasology.engine.rendering.nui.skin;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

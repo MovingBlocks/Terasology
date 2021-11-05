@@ -5,8 +5,6 @@ package org.terasology.engine.world.generation.facets.base;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.generation.WorldFacet3D;
 
-/**
- */
 public interface FieldFacet3D extends WorldFacet3D {
 
     float get(int x, int y, int z);

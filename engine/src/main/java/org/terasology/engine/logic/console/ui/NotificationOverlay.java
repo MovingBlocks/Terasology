@@ -4,13 +4,17 @@ package org.terasology.engine.logic.console.ui;
 
 import com.google.common.collect.Iterables;
 import org.codehaus.plexus.util.StringUtils;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingDebugConfig;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
-import org.terasology.nui.Canvas;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
 
@@ -51,6 +55,9 @@ public class NotificationOverlay extends CoreScreenLayer {
     @In
     private Console console;
 
+    @In
+    private Config config;
+
     @Override
     public void initialise() {
         message = find("message", UILabel.class);
@@ -74,6 +81,18 @@ public class NotificationOverlay extends CoreScreenLayer {
 
                 return messageHistory.toString();
             }
+        });
+
+        // hide the chat notification overlay when the rest of the HUD is hidden
+        //FIXME? To bind the 'visible' property which already exists on this screen layer we need to create
+        //       a new binding. To avoid unnecessary lookup calls we use a default binding which we modify
+        //       imperatively based on the property change events we receive from the rendering config.
+        Binding<Boolean> visible = new DefaultBinding<>(true);
+        this.bindVisible(visible);
+        //FIXME? The debug rendering config is properly informed about hiding the HUD, whereas the
+        //       corresponding method on the NUI manager 'NUIManager#isHUDVisible' does not work properly.
+        config.getRendering().getDebug().subscribe(RenderingDebugConfig.HUD_HIDDEN, evt -> {
+            visible.set(!(Boolean) evt.getNewValue());
         });
     }
 

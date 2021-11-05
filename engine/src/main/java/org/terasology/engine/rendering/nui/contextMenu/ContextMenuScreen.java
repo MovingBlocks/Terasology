@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
@@ -68,7 +68,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 } else {
                     currentPosition.x += currentWidth;
                 }
-                org.joml.Vector2i preferredSize = canvas.calculatePreferredSize(level);
+                Vector2i preferredSize = canvas.calculatePreferredSize(level);
                 Rectanglei region = new Rectanglei(
                         currentPosition.x, currentPosition.y).setSize(preferredSize.x, preferredSize.y);
                 double percentageThreshold = 0.9;

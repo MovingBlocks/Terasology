@@ -1,22 +1,8 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles;
 
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -26,7 +12,6 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.particles.components.ParticleEmitterComponent;
 import org.terasology.engine.particles.events.ParticleSystemUpdateEvent;
 import org.terasology.engine.particles.rendering.ParticleRenderingData;
@@ -35,6 +20,8 @@ import org.terasology.engine.particles.updating.ParticleUpdaterImpl;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +48,7 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     private ParticleUpdater particleUpdater;
 
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterActivated(OnActivatedComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
         particleEmitterComponent.ownerEntity = entity;
         particleEmitterComponent.locationComponent = entity.getComponent(LocationComponent.class);
@@ -73,12 +60,12 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         particleUpdater.configureEmitter(particleEmitterComponent);
     }
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterChanged(ParticleSystemUpdateEvent event, EntityRef entity, ParticleEmitterComponent emitter) {
         particleUpdater.configureEmitter(emitter);
     }
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterDeactivated(BeforeDeactivateComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
         particleUpdater.removeEmitter(entity);
     }
@@ -112,8 +99,10 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     @Override
     public Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
         return particleUpdater.getParticleEmitters().stream()
-                .filter(emitter -> emitter.ownerEntity.hasComponent(particleDataComponent))  // filter emitters, whose owning entity has a particleDataComponent
-                .filter(distinctByKey(emitter -> emitter.particlePool))  // filter emitters referencing a unique particle pool
+                // filter emitters, whose owning entity has a particleDataComponent
+                .filter(emitter -> emitter.ownerEntity.hasComponent(particleDataComponent))
+                // filter emitters referencing a unique particle pool
+                .filter(distinctByKey(emitter -> emitter.particlePool))
                 .map(emitter -> new ParticleRenderingData<>(
                         emitter.ownerEntity.getComponent(particleDataComponent),
                         emitter.particlePool

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
@@ -14,7 +14,6 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
-import org.terasology.engine.rendering.backdrop.BackdropRenderer;
 import org.terasology.engine.rendering.backdrop.Skysphere;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
@@ -70,11 +69,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         context.get(ComponentSystemManager.class).register(celestialSystem);
 
         // Init. a new world
-        Skysphere skysphere = new Skysphere(context);
-        BackdropProvider backdropProvider = skysphere;
-        BackdropRenderer backdropRenderer = skysphere;
-        context.put(BackdropProvider.class, backdropProvider);
-        context.put(BackdropRenderer.class, backdropRenderer);
+        context.put(BackdropProvider.class, new Skysphere(context));
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);

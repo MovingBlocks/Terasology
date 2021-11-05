@@ -5,8 +5,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.nui.databinding.Binding;
 
-/**
- */
 public class PresetBinding implements Binding<Preset> {
     private RenderingConfig config;
 
@@ -16,7 +14,9 @@ public class PresetBinding implements Binding<Preset> {
 
     @Override
     public Preset get() {
-        if (config.isFlickeringLight() && config.isVignette() && config.isEyeAdaptation() && config.isFilmGrain() && config.isNormalMapping()) {
+        if (config.isFlickeringLight()
+                && config.isVignette() && config.isEyeAdaptation()
+                && config.isFilmGrain() && config.isNormalMapping()) {
             if (config.isSsao()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts() && config.isCloudShadows()) {
                     return Preset.ULTRA;
@@ -32,7 +32,8 @@ public class PresetBinding implements Binding<Preset> {
             } else if (!config.isMotionBlur() && !config.isLightShafts()) {
                 return Preset.LOW;
             }
-        } else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
+        } else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight()
+                && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
             return Preset.MINIMAL;
         }
         return Preset.CUSTOM;

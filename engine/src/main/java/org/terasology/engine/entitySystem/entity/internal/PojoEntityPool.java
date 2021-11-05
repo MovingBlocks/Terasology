@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
@@ -21,7 +8,6 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -29,6 +15,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveCom
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,9 +26,9 @@ import static org.terasology.engine.entitySystem.entity.internal.PojoEntityManag
 
 public class PojoEntityPool implements EngineEntityPool {
 
-    private PojoEntityManager entityManager;
-
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityPool.class);
+
+    private PojoEntityManager entityManager;
 
     private Map<Long, BaseEntityRef> entityStore = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable componentStore = new ComponentTable();
@@ -300,8 +287,14 @@ public class PojoEntityPool implements EngineEntityPool {
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
         return () -> entityStore.keySet().stream()
                 //Keep entities which have all of the required components
-                .filter(id -> Arrays.stream(componentClasses)
-                        .allMatch(component -> componentStore.get(id, component) != null))
+                .filter(id -> {
+                    for (Class<? extends Component> component : componentClasses) {
+                        if (componentStore.get(id, component) == null) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .map(id -> getEntity(id))
                 .iterator();
     }

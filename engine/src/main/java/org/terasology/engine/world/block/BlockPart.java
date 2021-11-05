@@ -7,11 +7,8 @@ import com.google.common.collect.ImmutableList;
 import org.terasology.engine.math.Rotation;
 import org.terasology.engine.math.Side;
 
-import java.util.EnumMap;
 import java.util.List;
 
-/**
- */
 public enum BlockPart {
     TOP(Side.TOP),
     LEFT(Side.LEFT),
@@ -21,10 +18,12 @@ public enum BlockPart {
     BOTTOM(Side.BOTTOM),
     CENTER;
 
-    private static final EnumMap<Side, BlockPart> SIDE_MAP;
-    private static final BlockPart[] SIDES;
-    private static final List<BlockPart> HORIZONTAL_SIDES;
-
+    private static final List<BlockPart> HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
+    /**
+     * Cached block parts in an immutable list.
+     * See https://dzone.com/articles/memory-hogging-enumvalues-method
+     */
+    private static final List<BlockPart> ALL_PARTS = ImmutableList.of(TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM, CENTER);
     private Side side;
 
     BlockPart() {
@@ -34,36 +33,33 @@ public enum BlockPart {
         this.side = side;
     }
 
-    static {
-        SIDE_MAP = new EnumMap<>(Side.class);
-        SIDE_MAP.put(Side.BOTTOM, BOTTOM);
-        SIDE_MAP.put(Side.RIGHT, RIGHT);
-        SIDE_MAP.put(Side.LEFT, LEFT);
-        SIDE_MAP.put(Side.BACK, BACK);
-        SIDE_MAP.put(Side.FRONT, FRONT);
-        SIDE_MAP.put(Side.TOP, TOP);
-
-        SIDES = new BlockPart[]{TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM};
-
-        HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
-    }
-
     public static BlockPart fromSide(Side side) {
-        return SIDE_MAP.get(side);
+        switch (side) {
+            case BOTTOM:
+                return BOTTOM;
+            case RIGHT:
+                return RIGHT;
+            case LEFT:
+                return LEFT;
+            case BACK:
+                return BACK;
+            case FRONT:
+                return FRONT;
+            case TOP:
+                return TOP;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
-
-    /**
-     * @return The block parts corresponding to sides (so not the center)
-     */
-    public static BlockPart[] sideValues() {
-        return SIDES;
-    }
-
     /**
      * @return The horizontal sides
      */
-    public static List<BlockPart> horizontalSides() {
+    public static List<BlockPart> allHorizontalParts() {
         return HORIZONTAL_SIDES;
+    }
+
+    public static List<BlockPart> allParts() {
+        return ALL_PARTS;
     }
 
     public boolean isSide() {

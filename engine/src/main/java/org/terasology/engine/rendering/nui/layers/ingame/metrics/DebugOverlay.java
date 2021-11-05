@@ -12,14 +12,14 @@ import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.math.Orientation;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.rendering.primitives.ChunkTessellator;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.widgets.UILabel;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UILabel;
 
 import java.util.Locale;
 
@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 public class DebugOverlay extends CoreScreenLayer {
 
-    public static double MB_SIZE = 1048576.0;
+    public static final double MB_SIZE = 1048576.0;
 
     @In
     private Config config;
@@ -99,6 +99,9 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine3.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
+                    if (!localPlayer.isValid()) {
+                        return "";
+                    }
                     Vector3f pos = localPlayer.getPosition(new Vector3f());
                     Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
                     Vector3f rotation = localPlayer.getViewDirection(new Vector3f());
@@ -130,7 +133,8 @@ public class DebugOverlay extends CoreScreenLayer {
                             orientation = "NW";
                             break;
                     }
-                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), " +
+                                    "Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
                             chunkPos.x, chunkPos.y, chunkPos.z,
                             cameraPos.x, cameraPos.y, cameraPos.z,
                             rotation.x, rotation.y, rotation.z, orientation);

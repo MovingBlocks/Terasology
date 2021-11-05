@@ -31,59 +31,51 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
     <tr>
         <td></td>
         <th>Minimum Requirements</th>
-        <th>Recommended Requirements</th>
     </tr>
     <tr>
         <td>System (OS)</td>
-        <td colspan="2" align="center">Windows, MacOS, Linux (64 bit)</td>
+        <td>Windows, MacOS, Linux (64 bit)</td>
     </tr>
     <tr>
         <td>Processor (CPU)</td>
         <td>dual-core CPU</td>
-        <td>quad-core CPU</td>
     </tr>
     <tr>
         <td>Memory (RAM)</td>
         <td>2 GB</td>
-        <td>8 GB</td>
     </tr>
     <tr>
         <td>Graphics (GPU)</td>
         <td style="vertical-align:top">
-            Intel HD Graphics (Gen 5)<br/>
-            GeForce 6xxx series or<br/>
-            Radeon HD 2000 series <br/>
-            with OpenGL 2.1*
-        </td>
-        <td  style="vertical-align:top">
+            Intel HD Graphics (Gen 7)<br/>
             GeForce 8xxx series (or higher) or<br/>
             Radeon HD 2000 series (or higher)<br/>
-            with OpenGL 3.x
+            with OpenGL 3.3
         </td>
     </tr>
     <tr>
         <td>Storage (HDD)</td>
-        <td colspan="2" align="center">1 GB</td>
+        <td>1 GB</td>
     </tr>
 </table>
 
-Internet connectivity is required for downloading Terasology via the Launcher, afterwards offline play is possible.
+Internet connectivity is required for downloading Terasology via the Launcher, afterwards playing offline is possible.
 
 For easy game setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
 For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
 
 
-#### Alternate Install Method
+#### Alternative Installation Methods
 
-If you know you already have a Java Runtime Environment installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
+If you already have Java Runtime Environment (JRE) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
 
-Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/master/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
 
 
 ## Developing
 
-We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
+We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
 
 
 ## Links

@@ -14,8 +14,6 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockRegionSystem extends BaseComponentSystem {
 

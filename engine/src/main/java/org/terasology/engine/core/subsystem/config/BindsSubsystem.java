@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.config;
 
 import com.google.common.collect.Lists;
@@ -30,11 +17,7 @@ import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindableAxis;
 import org.terasology.engine.input.BindableButton;
-import org.terasology.input.ControllerInput;
 import org.terasology.engine.input.DefaultBinding;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
-import org.terasology.input.MouseInput;
 import org.terasology.engine.input.RegisterBindAxis;
 import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.engine.input.RegisterRealBindAxis;
@@ -44,11 +27,15 @@ import org.terasology.engine.input.internal.AbstractBindableAxis;
 import org.terasology.engine.input.internal.BindableAxisImpl;
 import org.terasology.engine.input.internal.BindableButtonImpl;
 import org.terasology.engine.input.internal.BindableRealAxis;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.predicates.FromModule;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.input.ControllerInput;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.MouseInput;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -149,16 +136,14 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         ModuleManager moduleManager = passedContext.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        FromModule filter = new FromModule(environment, moduleId);
-                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
-                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        addButtonDefaultsFor(moduleId, buttons, config);
-                        addAxisDefaultsFor(moduleId, axes, config);
-                    }
+            ResolutionResult result = resolver.resolve(moduleId);
+            if (result.isSuccess()) {
+                try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                    FromModule filter = new FromModule(environment, moduleId);
+                    Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
+                    Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
+                    addButtonDefaultsFor(moduleId, buttons, config);
+                    addAxisDefaultsFor(moduleId, axes, config);
                 }
             }
         }
@@ -242,7 +227,9 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    bindsConfiguration.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
+                    bindsConfiguration.getBinds(bindUri).stream()
+                            .filter(input -> input != null)
+                            .forEach(input -> linkBindButtonToInput(input, bindUri));
 
                     logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -272,7 +259,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     continue;
                 }
                 try {
-                    BindableAxis bindAxis = registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
+                    BindableAxis bindAxis = registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(),
+                            positiveButton, negativeButton);
                     bindAxis.setSendEventMode(info.eventMode());
                     logger.debug("Registered axis bind: {}", id);
                 } catch (InstantiationException | IllegalAccessException e) {

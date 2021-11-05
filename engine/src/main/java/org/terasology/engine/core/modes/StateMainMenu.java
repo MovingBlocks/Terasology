@@ -1,38 +1,21 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes;
 
+import com.google.common.base.MoreObjects;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.TelemetryConfig;
-import org.terasology.engine.context.Context;
-import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
-import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.loadProcesses.RegisterInputSystem;
-import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.input.InputSystem;
-import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.logic.console.Console;
-import org.terasology.engine.logic.console.ConsoleImpl;
-import org.terasology.engine.logic.console.ConsoleSystem;
-import org.terasology.engine.logic.console.commands.CoreCommands;
-import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.network.ClientComponent;
-import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.engine.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.nui.canvas.CanvasRenderer;
-import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.engine.telemetry.TelemetryScreen;
@@ -42,15 +25,8 @@ import org.terasology.engine.utilities.Assets;
 
 /**
  * The class implements the main game menu.
- * <br><br>
- *
- * @version 0.3
  */
-public class StateMainMenu implements GameState {
-    private Context context;
-    private EngineEntityManager entityManager;
-    private EventSystem eventSystem;
-    private ComponentSystemManager componentSystemManager;
+public class StateMainMenu extends AbstractState {
     private NUIManager nuiManager;
     private InputSystem inputSystem;
     private Console console;
@@ -69,33 +45,15 @@ public class StateMainMenu implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        CoreRegistry.setContext(context);
+        initEntityAndComponentManagers(false);
 
-        //let's get the entity event system running
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        entityManager = context.get(EngineEntityManager.class);
+        createLocalPlayer(context);
 
-        eventSystem = context.get(EventSystem.class);
-        console = new ConsoleImpl(context);
-        context.put(Console.class, console);
+        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
+        new RegisterInputSystem(context).step();
 
-        nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
-
+        nuiManager = context.get(NUIManager.class);
         eventSystem.registerEventHandler(nuiManager);
-
-        componentSystemManager = new ComponentSystemManager(context);
-        context.put(ComponentSystemManager.class, componentSystemManager);
-
-        // TODO: Reduce coupling between Input system and CameraTargetSystem,
-        // TODO: potentially eliminating the following lines. See Issue #1126
-        CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-        context.put(CameraTargetSystem.class, cameraTargetSystem);
-
-        componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
-        componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
-        componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
-
         NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
         context.put(NUIEditorSystem.class, nuiEditorSystem);
         componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
@@ -106,17 +64,9 @@ public class StateMainMenu implements GameState {
 
         inputSystem = context.get(InputSystem.class);
 
-        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem(context).step();
-
-        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-        LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
-        context.put(LocalPlayer.class, localPlayer);
-        localPlayer.setClientEntity(localPlayerEntity);
-
         componentSystemManager.initialise();
 
+        console = context.get(Console.class);
         storageServiceWorker = context.get(StorageServiceWorker.class);
 
         playBackgroundMusic();
@@ -164,22 +114,11 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        // Apparently this can be disposed of before it is completely initialized? Probably only during
-        // crashes, but crashing again during shutdown complicates the diagnosis.
-        if (eventSystem != null) {
-            eventSystem.process();
-        }
-        if (componentSystemManager != null) {
-            componentSystemManager.shutdown();
-        }
         stopBackgroundMusic();
-
         if (nuiManager != null) {
             nuiManager.clear();
         }
-        if (entityManager != null) {
-            entityManager.clear();
-        }
+        super.dispose(shuttingDown);
     }
 
     private void playBackgroundMusic() {
@@ -215,16 +154,18 @@ public class StateMainMenu implements GameState {
     }
 
     @Override
-    public Context getContext() {
-        return context;
-    }
-
-    @Override
     public boolean isHibernationAllowed() {
         return true;
     }
 
     private void updateUserInterface(float delta) {
         nuiManager.update(delta);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("messageOnLoad", messageOnLoad)
+                .toString();
     }
 }

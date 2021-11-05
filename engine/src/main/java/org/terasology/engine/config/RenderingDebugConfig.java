@@ -1,30 +1,15 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.module.sandbox.API;
-import org.terasology.engine.rendering.world.WorldRendererImpl;
-import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
-/**
- */
 @API
 public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
     public static final String WIREFRAME = "wireframe";
@@ -34,7 +19,10 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     public static final String HUD_HIDDEN = "hudHidden";
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
+    public static final String RENDER_ENTITY_COLLIDERS = "renderEntityColliders";
+    public static final String RENDER_ENTITY_BOUNDING_BOXES = "renderEntityBoundingBoxes";
+  
+    private static final Logger logger = LoggerFactory.getLogger(RenderingDebugConfig.class);
 
     private boolean enabled;
     private boolean firstPersonElementsHidden;
@@ -42,9 +30,20 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     private boolean wireframe;
     private boolean renderChunkBoundingBoxes;
     private boolean renderSkeletons;
+    private boolean renderEntityColliders;
 
     public RenderingDebugConfig() {
         subscribe(this);
+    }
+
+    public boolean isRenderEntityBoundingBoxes() {
+        return renderEntityColliders;
+    }
+
+    public void setRenderEntityBoundingBoxes(boolean colliders) {
+        boolean oldValue = this.renderEntityColliders;
+        this.renderEntityColliders = colliders;
+        propertyChangeSupport.firePropertyChange(RENDER_ENTITY_BOUNDING_BOXES, oldValue, this.renderEntityColliders);
     }
 
     public boolean isWireframe() {

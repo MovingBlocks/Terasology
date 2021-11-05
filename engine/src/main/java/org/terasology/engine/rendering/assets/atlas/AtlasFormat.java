@@ -11,15 +11,15 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.joml.geom.Rectanglef;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.utilities.gson.Vector2iTypeAdapter;
 
 import java.io.IOException;
@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 @RegisterAssetFileFormat
 public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
     public static final float BORDER_SIZE = 0.0001f;
@@ -130,8 +128,8 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
                 Vector2f pos = new Vector2f(offset);
                 pos.x += tileX * tileSize.x;
                 pos.y += tileY * tileSize.y;
-                Rectanglef tileLocation = new Rectanglef(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y
-                    , 0.0f, 0.0f).setSize(tileSize.x, tileSize.y);
+                Rectanglef tileLocation = new Rectanglef(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y,
+                        0.0f, 0.0f).setSize(tileSize.x, tileSize.y);
                 out.put(new Name(name), new SubtextureData(texture, shrinkRegion(tileLocation)));
             }
 

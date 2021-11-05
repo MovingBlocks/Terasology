@@ -4,10 +4,9 @@ package org.terasology.engine.logic.characters;
 
 import org.joml.Math;
 import org.joml.Quaternionf;
+import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.events.FootstepEvent;
 import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
@@ -16,13 +15,13 @@ import org.terasology.engine.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.engine.logic.characters.events.SwimStrokeEvent;
 import org.terasology.engine.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.math.TeraMath;
 import org.terasology.engine.physics.engine.CharacterCollider;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.physics.events.MovedEvent;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
+import org.terasology.math.TeraMath;
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
@@ -65,7 +64,6 @@ public class KinematicCharacterMover implements CharacterMover {
     public static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
-    private static final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
     private boolean stepped;
 
     // Processing state variables
@@ -91,8 +89,8 @@ public class KinematicCharacterMover implements CharacterMover {
                 //      The CharacterMovementComponent also has a 'radius' which may be used here.
                 //      Question: Is this connected with _shapes_ or bounding boxes in some way?
                 checkBlockEntry(entity,
-                        new Vector3i(initial.getPosition(), org.joml.RoundingMode.HALF_UP),
-                        new Vector3i(result.getPosition(), org.joml.RoundingMode.HALF_UP),
+                        new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
+                        new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
                         characterMovementComponent.height);
             }
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
@@ -307,10 +305,10 @@ public class KinematicCharacterMover implements CharacterMover {
         float movementLength = direction.length();
         if (movementLength > physics.getEpsilon()) {
             direction.normalize();
-            Vector3f reflectDir = direction.reflect(hitNormal,new Vector3f());
+            Vector3f reflectDir = direction.reflect(hitNormal, new Vector3f());
             reflectDir.normalize();
 
-            Vector3f perpendicularDir = hitNormal.mul(reflectDir.dot(hitNormal),new Vector3f()).mul(-1).add(reflectDir);
+            Vector3f perpendicularDir = hitNormal.mul(reflectDir.dot(hitNormal), new Vector3f()).mul(-1).add(reflectDir);
             if (normalMag != 0.0f) {
                 Vector3f perpComponent = new Vector3f(perpendicularDir);
                 perpComponent.mul(normalMag * movementLength);
@@ -443,7 +441,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         boolean horizontalHit = false;
         Vector3f normalizedDir = horizMove.normalize();
-        if(!normalizedDir.isFinite()) {
+        if (!normalizedDir.isFinite()) {
             normalizedDir.set(0);
         }
 
@@ -652,7 +650,7 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
-            if (input.isJumpRequested()) {
+            if (input.isJumping()) {
 
                 state.setGrounded(false);
 
@@ -682,7 +680,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
+            if (input.isJumping() && movementComp.numberOfJumpsLeft > 0) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.
@@ -773,7 +771,7 @@ public class KinematicCharacterMover implements CharacterMover {
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
-            climbDir3f.rotate(rotation,tmp);
+            climbDir3f.rotate(rotation, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {

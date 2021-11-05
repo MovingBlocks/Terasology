@@ -4,15 +4,13 @@ package org.terasology.engine.rendering;
 
 import com.google.common.collect.Sets;
 import org.lwjgl.Version;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.material.MaterialData;
@@ -20,6 +18,8 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.opengl.GLSLMaterial;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.Optional;
 import java.util.Set;
@@ -33,8 +33,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManagerLwjgl.class);
 
     private GLSLMaterial activeMaterial;
-    private GLSLMaterial defaultShaderProgram;
-    private GLSLMaterial defaultTexturedShaderProgram;
 
     private Set<GLSLMaterial> progamaticShaders = Sets.newHashSet();
 
@@ -44,32 +42,9 @@ public class ShaderManagerLwjgl implements ShaderManager {
     @Override
     public void initShaders() {
         logCapabilities();
-        defaultShaderProgram = addShaderProgram("default");
-        defaultTexturedShaderProgram = addShaderProgram("defaultTextured");
-
-        // TODO: Find a better way to do this
-        addShaderProgram("post");
-        addShaderProgram("ssao");
-        addShaderProgram("lightShafts");
-        addShaderProgram("sobel");
-        addShaderProgram("initialPost");
-        addShaderProgram("prePostComposite");
-        addShaderProgram("highPass");
-        addShaderProgram("blur");
-        addShaderProgram("vignette");
-        addShaderProgram("downSampler");
-        addShaderProgram("toneMapping");
-        addShaderProgram("sky");
-        addShaderProgram("chunk");
-        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
-            addShaderProgram("particle");
-        } else {
-            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
-        }
-        addShaderProgram("shadowMap");
-        addShaderProgram("lightBufferPass");
-        addShaderProgram("lightGeometryPass");
-        addShaderProgram("ssaoBlur");
+        addShaderProgram("default");
+        addShaderProgram("blockSelection");
+        addShaderProgram("particle");
     }
 
     private void logCapabilities() {
@@ -80,7 +55,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
         logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
 
-        String extStr = GL11.glGetString(GL11.GL_EXTENSIONS);
+        int[] extension = new int[1];
+        GL30.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, extension);
 
         // log shader extensions in smaller packages,
         // because the full string can be extremely long
@@ -88,20 +64,19 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
         // starting with OpenGL 3.0, extensions can also listed using
         // GL_NUM_EXTENSIONS and glGetStringi(GL_EXTENSIONS, idx)
-        String[] exts = extStr.split(" ");
-        if (exts.length > 0) {
-            StringBuilder bldr = new StringBuilder(exts[0]);
-            for (int i = 1; i < exts.length; i++) {
+        if (extension[0] > 0) {
+            StringBuilder bldr = new StringBuilder();
+            for (int i = 1; i < extension[0]; i++) {
                 if (i % extsPerLine == 0) {
-                    logger.info("EXTENSIONS: {}", bldr.toString());
+                    logger.info("EXTENSIONS: {}", bldr);
                     bldr.setLength(0);
                 } else {
                     bldr.append(" ");
                 }
-                bldr.append(exts[i]);
+                bldr.append(GL30.glGetStringi(GL30.GL_EXTENSIONS, i));
             }
             if (bldr.length() > 0) {
-                logger.info("EXTENSIONS: {}", bldr.toString());
+                logger.info("EXTENSIONS: {}", bldr);
             }
         }
     }
@@ -152,27 +127,12 @@ public class ShaderManagerLwjgl implements ShaderManager {
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);
         shader.get().recompile();
-        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title), new MaterialData(shader.get()), Material.class);
+        GLSLMaterial material =
+                (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title),
+                        new MaterialData(shader.get()), Material.class);
         progamaticShaders.add(material);
 
         return material;
-    }
-
-
-    /**
-     * Enables the default shader program.
-     */
-    @Override
-    public void enableDefault() {
-        defaultShaderProgram.enable();
-    }
-
-    /**
-     * Enables the default shader program.
-     */
-    @Override
-    public void enableDefaultTextured() {
-        defaultTexturedShaderProgram.enable();
     }
 
     @Override

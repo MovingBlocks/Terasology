@@ -4,8 +4,8 @@ package org.terasology.engine.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglefc;
 import org.terasology.joml.geom.Rectanglei;
@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class HUDScreenLayer extends CoreScreenLayer {
 
     private Map<ResourceUrn, HUDElement> elementsLookup = Maps.newLinkedHashMap();

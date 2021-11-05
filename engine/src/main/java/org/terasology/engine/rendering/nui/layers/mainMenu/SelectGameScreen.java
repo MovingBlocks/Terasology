@@ -4,25 +4,26 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.modes.StateLoading;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.engine.network.NetworkMode;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.engine.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SelectGameScreen extends SelectionScreen {
@@ -80,10 +81,13 @@ public class SelectGameScreen extends SelectionScreen {
             });
 
             delete.subscribe(e -> {
-                TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
-                confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
+                TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI,
+                        TwoButtonPopup.class);
+                confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup" +
+                                "-title}"),
                         translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
-                confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::removeSelectedGame);
+                confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"),
+                        this::removeSelectedGame);
                 confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
                 });
             });
@@ -99,7 +103,8 @@ public class SelectGameScreen extends SelectionScreen {
             details.subscribe(e -> {
                 final GameInfo gameInfo = getGameInfos().getSelection();
                 if (gameInfo != null) {
-                    final GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
+                    final GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI,
+                            GameDetailsScreen.class);
                     detailsScreen.setGameInfo(gameInfo);
                     detailsScreen.setPreviews(previewSlideshow.getImages());
                     getManager().pushScreen(detailsScreen);
@@ -109,7 +114,8 @@ public class SelectGameScreen extends SelectionScreen {
     }
 
     private void removeSelectedGame() {
-        final Path world = PathManager.getInstance().getSavePath(getGameInfos().getSelection().getManifest().getTitle());
+        final Path world =
+                PathManager.getInstance().getSavePath(getGameInfos().getSelection().getManifest().getTitle());
         remove(getGameInfos(), world, REMOVE_STRING);
     }
 
@@ -119,19 +125,21 @@ public class SelectGameScreen extends SelectionScreen {
 
         if (isValidScreen()) {
             if (GameProvider.isSavesFolderEmpty()) {
-                final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+                final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI,
+                        NewGameScreen.class);
                 newGameScreen.setUniverseWrapper(universeWrapper);
                 triggerForwardAnimation(newGameScreen);
             }
 
-            if (isLoadingAsServer() && !super.config.getPlayer().hasEnteredUsername()) {
+            if (isLoadingAsServer() && super.playerConfig.playerName.getDefaultValue().equals(super.playerConfig.playerName.get())) {
                 getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
             }
 
             refreshGameInfoList(GameProvider.getSavedGames());
         } else {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -162,10 +170,13 @@ public class SelectGameScreen extends SelectionScreen {
             final GameManifest manifest = item.getManifest();
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            Optional.ofNullable(CoreRegistry.get(GameEngine.class))
+                    .orElseThrow(() -> new IllegalStateException("Failed to get game engine from CoreRegistry"))
+                    .changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game",
+                    e.getMessage());
         }
     }
 
@@ -191,8 +202,7 @@ public class SelectGameScreen extends SelectionScreen {
     @Override
     protected boolean isValidScreen() {
         if (Stream.of(load, delete, close, details, create, gameTypeTitle)
-                .anyMatch(Objects::isNull) ||
-                !super.isValidScreen()) {
+                .anyMatch(Objects::isNull) || !super.isValidScreen()) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
         }

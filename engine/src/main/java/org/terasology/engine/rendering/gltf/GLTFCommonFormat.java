@@ -23,10 +23,6 @@ import org.joml.Vector4f;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetData;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
@@ -52,6 +48,10 @@ import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
 import org.terasology.engine.rendering.gltf.model.GLTFSkin;
 import org.terasology.engine.rendering.gltf.model.GLTFTargetBuffer;
 import org.terasology.engine.rendering.gltf.model.GLTFVersion;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -89,7 +89,9 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
     }
 
     protected void readBuffer(byte[] bytes, GLTFAccessor accessor, GLTFBufferView bufferView, TIntList target) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, bufferView.getByteOffset(), accessor.getCount() * accessor.getType().getDimension() * accessor.getComponentType().getByteLength());
+        ByteBuffer byteBuffer =
+                ByteBuffer.wrap(bytes, bufferView.getByteOffset(),
+                        accessor.getCount() * accessor.getType().getDimension() * accessor.getComponentType().getByteLength());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         switch (accessor.getComponentType()) {
             case UNSIGNED_BYTE:
@@ -160,23 +162,28 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
                 uri = uri.substring(DATA_APPLICATION_OCTET_STREAM_BASE_64.length());
                 byte[] data = BaseEncoding.base64().decode(uri);
                 if (data.length != buffer.getByteLength()) {
-                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + data.length + ")");
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. " +
+                            "Expected (" + buffer.getByteLength() + "), actual (" + data.length + ")");
                 }
                 loadedBuffers.add(data);
             } else if (uri.startsWith(DATA_APPLICATION_GLTF_BUFFER_BASE_64)) {
                 uri = uri.substring(DATA_APPLICATION_GLTF_BUFFER_BASE_64.length());
                 byte[] data = BaseEncoding.base64().decode(uri);
                 if (data.length != buffer.getByteLength()) {
-                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + data.length + ")");
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. " +
+                            "Expected (" + buffer.getByteLength() + "), actual (" + data.length + ")");
                 }
                 loadedBuffers.add(data);
             } else {
                 if (uri.endsWith(".bin")) {
                     uri = uri.substring(0, uri.length() - 4);
                 }
-                ByteBufferAsset bufferAsset = assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName()).orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
+                ByteBufferAsset bufferAsset =
+                        assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName())
+                            .orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
                 if (bufferAsset.getBytes().length != buffer.getByteLength()) {
-                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. "
+                            + "Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
                 }
                 loadedBuffers.add(bufferAsset.getBytes());
             }
@@ -207,7 +214,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             return;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(), bufferView.getByteLength() - accessor.getByteOffset());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(),
+                bufferView.getByteLength() - accessor.getByteOffset());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int gap = 0;
@@ -229,8 +237,9 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
     }
 
     protected void checkVersionSupported(ResourceUrn urn, GLTF gltf) throws IOException {
-        if (gltf.getAsset().getMinVersion() != null && (gltf.getAsset().getMinVersion().getMajor() != SUPPORTED_VERSION.getMajor() || gltf.getAsset().getMinVersion().getMinor() > SUPPORTED_VERSION.getMinor())) {
-            throw new IOException("Cannot read gltf for " + urn + " as gltf version " + gltf.getAsset().getMinVersion() + " is not supported");
+        GLTFVersion minVersion = gltf.getAsset().getMinVersion();
+        if (minVersion != null && (minVersion.getMajor() != SUPPORTED_VERSION.getMajor() || minVersion.getMinor() > SUPPORTED_VERSION.getMinor())) {
+            throw new IOException("Cannot read gltf for " + urn + " as gltf version " + minVersion + " is not supported");
         } else if (gltf.getAsset().getVersion().getMajor() != SUPPORTED_VERSION.getMajor()) {
             throw new IOException("Cannot read gltf for " + urn + " as gltf version " + gltf.getAsset().getVersion() + " is not supported");
         }
@@ -245,7 +254,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             GLTFNode node = gltf.getNodes().get(nodeIndex);
             Vector3f position = new Vector3f();
             Quaternionf rotation = new Quaternionf();
-            Vector3f scale = new Vector3f(1,1,1);
+            Vector3f scale = new Vector3f(1, 1, 1);
             if (node.getTranslation() != null) {
                 position.set(node.getTranslation());
             }
@@ -308,7 +317,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return matricies;
     }
 
-    protected List<Vector4i> loadVector4iList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected List<Vector4i> loadVector4iList(MeshAttributeSemantic semantic,
+                                              GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         TIntList values = readIntBuffer(semantic, gltfPrimitive, gltf, loadedBuffers);
         List<Vector4i> vectors = Lists.newArrayListWithCapacity(values.size() / 4);
         for (int i = 0; i < values.size(); i += 4) {
@@ -317,7 +327,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return vectors;
     }
 
-    protected List<Vector2f> loadVector2fList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected List<Vector2f> loadVector2fList(MeshAttributeSemantic semantic,
+                                              GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         TFloatList floats = readFloatBuffer(semantic, gltfPrimitive, gltf, loadedBuffers);
         if (floats == null) {
             return Collections.emptyList();
@@ -330,7 +341,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return vectors;
     }
 
-    protected List<Vector3f> loadVector3fList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected List<Vector3f> loadVector3fList(MeshAttributeSemantic semantic,
+                                              GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         TFloatList floats = readFloatBuffer(semantic, gltfPrimitive, gltf, loadedBuffers);
         List<Vector3f> vectors = Lists.newArrayListWithCapacity(floats.size() / 3);
         for (int i = 0; i < floats.size(); i += 3) {
@@ -339,7 +351,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return vectors;
     }
 
-    protected List<Vector4f> loadVector4fList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected List<Vector4f> loadVector4fList(MeshAttributeSemantic semantic,
+                                              GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         TFloatList floats = readFloatBuffer(semantic, gltfPrimitive, gltf, loadedBuffers);
         List<Vector4f> vectors = Lists.newArrayListWithCapacity(floats.size() / 4);
         for (int i = 0; i < floats.size(); i += 4) {
@@ -348,7 +361,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return vectors;
     }
 
-    protected TFloatList readFloatBuffer(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected TFloatList readFloatBuffer(MeshAttributeSemantic semantic,
+                                         GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
         if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
             GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());
@@ -360,7 +374,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         return new TFloatArrayList();
     }
 
-    protected TIntList readIntBuffer(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
+    protected TIntList readIntBuffer(MeshAttributeSemantic semantic,
+                                     GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
         if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
             GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());

@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.identity.storageServiceClient;
 
 
@@ -34,7 +21,8 @@ import java.net.URLDecoder;
  */
 final class ServiceApiRequest {
 
-    private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
+    private static final Gson GSON =
+            new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
 
     private ServiceApiRequest() {
     }
@@ -57,7 +45,8 @@ final class ServiceApiRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection firstConn, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection firstConn, HttpMethod method, String sessionToken,
+                                                       REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
         HttpURLConnection conn = null;
         int followedRedirects = 0;
@@ -75,7 +64,8 @@ final class ServiceApiRequest {
 
                 //needed if the Location header specifies a relative redirect, e.g. "Location: /some/path/on/the/same/server"
                 URL baseUrl = conn.getURL();
-                //if redirectUrl is already absolute (contains authority), baseUrl will be ignored (see javadoc for the URL(URL, String) constructor for more info)
+                //if redirectUrl is already absolute (contains authority), baseUrl will be ignored
+                // (see javadoc for the URL(URL, String) constructor for more info)
                 URL target = new URL(baseUrl, redirectUrl);
 
                 conn = (HttpURLConnection) target.openConnection();
@@ -108,7 +98,8 @@ final class ServiceApiRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, String sessionToken,
+                                                       REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
         return request((HttpURLConnection) url.openConnection(), method, sessionToken, data, responseClass);
     }

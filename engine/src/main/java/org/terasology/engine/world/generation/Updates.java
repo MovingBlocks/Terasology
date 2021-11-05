@@ -7,10 +7,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Updates {
     Facet[] value();
+
+    /**
+     * The priority of this provider. Higher values are run first.
+     */
+    int priority() default UpdatePriority.PRIORITY_NORMAL;
 }

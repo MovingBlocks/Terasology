@@ -50,7 +50,7 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
         Optional<TypeHandler<?>> declaredElementTypeHandler =
                 context.getTypeHandlerLibrary().getTypeHandler(elementType);
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
                 declaredElementTypeHandler.orElse(null),
                 elementTypeInfo,
@@ -59,7 +59,7 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
 
         CollectionCopyConstructor constructor = ConstructorLibrary.getCollectionCopyConstructor((TypeInfo) typeInfo);
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<T> typeHandler = new CollectionTypeHandler(elementTypeHandler, constructor);
 
         return Optional.of(typeHandler);

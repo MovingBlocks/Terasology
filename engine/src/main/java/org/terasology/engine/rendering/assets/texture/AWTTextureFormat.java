@@ -3,11 +3,11 @@
 
 package org.terasology.engine.rendering.assets.texture;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.ModuleAssetDataProducer;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.module.resources.FileReference;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,27 +17,27 @@ import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.PathMatcher;
 import java.util.List;
+import java.util.function.Predicate;
 
-/**
- */
+import static org.terasology.gestalt.assets.module.ModuleAssetScanner.OVERRIDE_FOLDER;
+
 @RegisterAssetFileFormat
 public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
     private Texture.FilterMode defaultFilterMode;
-    private PathMatcher pathMatcher;
+    private Predicate<FileReference> pathMatcher;
 
     public AWTTextureFormat() {
         this(Texture.FilterMode.NEAREST, path -> {
-                if (path.getName(1).toString().equals(ModuleAssetDataProducer.OVERRIDE_FOLDER)) {
-                    return path.getName(3).toString().equals("textures");
-                } else {
-                    return path.getName(2).toString().equals("textures");
-                }
-            });
+            if (path.getPath().get(0).equals(OVERRIDE_FOLDER)) {
+                return path.getPath().get(2).equals("textures");
+            } else {
+                return path.getPath().get(1).equals("textures");
+            }
+        });
     }
-    public AWTTextureFormat(Texture.FilterMode defaultFilterMode, PathMatcher pathMatcher) {
+    public AWTTextureFormat(Texture.FilterMode defaultFilterMode, Predicate<FileReference> pathMatcher) {
         super("jpeg", "jpg", "bmp", "gif", "png");
         this.defaultFilterMode = defaultFilterMode;
         this.pathMatcher = pathMatcher;
@@ -54,8 +54,8 @@ public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
     }
 
     @Override
-    public PathMatcher getFileMatcher() {
-        return path -> super.getFileMatcher().matches(path) && pathMatcher.matches(path);
+    public Predicate<FileReference> getFileMatcher() {
+        return path -> super.getFileMatcher().test(path) && pathMatcher.test(path);
     }
 
     /**

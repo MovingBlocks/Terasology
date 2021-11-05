@@ -3,8 +3,8 @@
 
 package org.terasology.engine.i18n;
 
-import org.terasology.engine.core.Uri;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.translate.Translator;
 
 import java.util.Locale;
@@ -22,7 +22,7 @@ public interface TranslationSystem extends Translator {
      * @param name
      * @return the project or <code>null</code>.
      */
-    TranslationProject getProject(Uri name);
+    TranslationProject getProject(ResourceUrn name);
 
     /**
      * If no perfect match is found for the default locale, fallback strategies will attempt to find the closest match.

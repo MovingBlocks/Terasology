@@ -6,7 +6,7 @@ import org.joml.Vector2i;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.generation.Region;
 import org.terasology.engine.world.generation.facets.ElevationFacet;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Comparator;
 import java.util.List;
@@ -30,18 +30,6 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private LayerThickness layerThickness;
     private long seed;
     private Zone parent;
-
-    public static final class LayeredZoneOrdering {
-        public static final int HIGH_SKY = 400;
-        public static final int MEDIUM_SKY = 300;
-        public static final int LOW_SKY = 200;
-        public static final int ABOVE_GROUND = 100;
-        public static final int GROUND = 0;
-        public static final int SHALLOW_UNDERGROUND = -100;
-        public static final int MEDIUM_UNDERGROUND = -200;
-        public static final int DEEP_UNDERGROUND = -300;
-
-    }
 
     private final int ordering;
 
@@ -142,6 +130,18 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
         return seed;
     }
 
+    public static final class LayeredZoneOrdering {
+        public static final int HIGH_SKY = 400;
+        public static final int MEDIUM_SKY = 300;
+        public static final int LOW_SKY = 200;
+        public static final int ABOVE_GROUND = 100;
+        public static final int GROUND = 0;
+        public static final int SHALLOW_UNDERGROUND = -100;
+        public static final int MEDIUM_UNDERGROUND = -200;
+        public static final int DEEP_UNDERGROUND = -300;
+
+    }
+
     private static class LayerRange {
         private Optional<Integer> min = Optional.empty();
         private Optional<Integer> max = Optional.empty();
@@ -172,7 +172,5 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
 
             return satisfiesMin && satisfiesMax;
         }
-
     }
-
 }

@@ -5,6 +5,7 @@ package org.terasology.engine.math;
 import com.google.common.base.Preconditions;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -16,7 +17,7 @@ import java.util.NoSuchElementException;
  * <br><br>
  * The iterating vector is reused. <b>Do not attempt to store the instance</b> e.g. in a collection.
  */
-public class SpiralIterable implements Iterable<Vector2ic>{
+public final class SpiralIterable implements Iterable<Vector2ic> {
 
     /**
      * (MAX_SIDELEN * 2 + 1) ^2 must be < Integer.MAX_VALUE

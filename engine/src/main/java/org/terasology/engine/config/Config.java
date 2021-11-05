@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.config;
 
@@ -26,22 +13,22 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.input.Input;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
-import org.terasology.naming.Version;
-import org.terasology.naming.gson.NameTypeAdapter;
-import org.terasology.naming.gson.VersionTypeAdapter;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.InputHandler;
 import org.terasology.engine.utilities.gson.ResolutionHandler;
 import org.terasology.engine.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
+import org.terasology.gestalt.naming.gson.NameTypeAdapter;
+import org.terasology.gestalt.naming.gson.VersionTypeAdapter;
+import org.terasology.input.Input;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -91,10 +78,6 @@ public final class Config {
 
     public NetworkConfig getNetwork() {
         return config.getNetwork();
-    }
-
-    public PlayerConfig getPlayer() {
-        return config.getPlayer();
     }
 
     public RenderingConfig getRendering() {
@@ -256,7 +239,7 @@ public final class Config {
      * @param clazz the class to convert the data to
      * @return a config component for the given uri and class or <code>null</code>
      */
-    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+    public <T extends Component<T>> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
         Map<String, JsonElement> map = config.getModuleConfigs().get(uri);
         if (map == null) {
             return null;

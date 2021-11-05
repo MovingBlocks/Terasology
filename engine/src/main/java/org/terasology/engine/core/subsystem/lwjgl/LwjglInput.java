@@ -1,9 +1,8 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ControllerConfig;
 import org.terasology.engine.context.Context;
@@ -13,6 +12,7 @@ import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.lwjgl.LwjglControllerDevice;
 import org.terasology.engine.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.engine.input.lwjgl.LwjglMouseDevice;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 

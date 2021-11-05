@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.monitoring.impl;
 
 import com.google.common.collect.Lists;
@@ -126,8 +113,12 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
-            currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
-            currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0) ? currentActivity.startMem - newActivity.startMem : 0;
+            currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0)
+                    ? currentActivity.resumeTime
+                    : currentActivity.startTime);
+            currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0)
+                    ? currentActivity.startMem - newActivity.startMem
+                    : 0;
         }
 
         activityStack.push(newActivity);
@@ -143,11 +134,15 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         ActivityInfo oldActivity = activityStack.pop();
 
         long endTime = timer.getRealTimeInMs();
-        long totalTime = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + endTime - oldActivity.resumeTime : endTime - oldActivity.startTime;
+        long totalTime = (oldActivity.resumeTime > 0)
+                ? oldActivity.ownTime + endTime - oldActivity.resumeTime
+                : endTime - oldActivity.startTime;
         currentExecutionData.adjustOrPutValue(oldActivity.name, totalTime, totalTime);
         
         long endMem = Runtime.getRuntime().freeMemory();
-        long totalMem = (oldActivity.startMem - endMem > 0) ? oldActivity.startMem - endMem + oldActivity.ownMem : oldActivity.ownMem;
+        long totalMem = (oldActivity.startMem - endMem > 0)
+                ? oldActivity.startMem - endMem + oldActivity.ownMem
+                : oldActivity.ownMem;
         currentAllocationData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {

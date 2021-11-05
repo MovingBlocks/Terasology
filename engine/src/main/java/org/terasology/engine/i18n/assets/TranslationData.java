@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.i18n.assets;
 
+import com.google.common.base.Preconditions;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.ResourceUrn;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import org.terasology.assets.AssetData;
-import org.terasology.engine.core.Uri;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -20,17 +19,17 @@ public class TranslationData implements AssetData {
 
     private final Map<String, String> map = new HashMap<>();
     private final Locale locale;
-    private final Uri uri;
+    private final ResourceUrn urn;
 
     /**
-     * @param uri the id of the data set, never <code>null</code>.
+     * @param urn the id of the data set, never <code>null</code>.
      * @param locale the locale of the data set, never <code>null</code>.
      */
-    public TranslationData(Uri uri, Locale locale) {
-        Preconditions.checkArgument(uri != null);
+    public TranslationData(ResourceUrn urn, Locale locale) {
+        Preconditions.checkArgument(urn != null);
         Preconditions.checkArgument(locale != null);
 
-        this.uri = uri;
+        this.urn = urn;
         this.locale = locale;
     }
 
@@ -59,7 +58,7 @@ public class TranslationData implements AssetData {
     /**
      * @return the project uri this data set belongs to.
      */
-    public Uri getProjectUri() {
-        return uri;
+    public ResourceUrn getProjectUrn() {
+        return urn;
     }
 }

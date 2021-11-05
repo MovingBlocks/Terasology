@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 plugins {
@@ -16,13 +16,23 @@ dependencies {
     implementation("net.sf.trove4j:trove4j:3.0.3")
 
     implementation("org.terasology:reflections:0.9.12-MB")
-    implementation("org.terasology.nui:nui-reflect:1.3.1")
-    implementation("org.terasology:gestalt-module:5.1.5")
-    implementation("org.terasology:gestalt-asset-core:5.1.5")
+    implementation("org.terasology.nui:nui-reflect:3.0.0")
+    implementation("org.terasology.gestalt:gestalt-module:7.1.0")
+    implementation("org.terasology.gestalt:gestalt-asset-core:7.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.11.2")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+}
+
+tasks.register<Test>("unitTest") {
+    group = "Verification"
+    description = "Runs unit tests (fast)"
+
+    useJUnitPlatform {
+        excludeTags("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
 }

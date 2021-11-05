@@ -1,12 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.event.internal;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Event system propagates events to registered handlers
@@ -28,7 +28,8 @@ public interface EventSystem {
     void registerEvent(ResourceUrn uri, Class<? extends Event> eventType);
 
     /**
-     * Registers an object as an event handler - all methods with the {@link org.terasology.engine.entitySystem.event.ReceiveEvent} annotation will be registered
+     * Registers an object as an event handler - all methods with the {@link org.terasology.engine.entitySystem.event.ReceiveEvent}
+     * annotation will be registered
      *
      * @param handler
      */
@@ -48,7 +49,8 @@ public interface EventSystem {
      * @param componentTypes
      * @param <T>
      */
-    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes);
+    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass,
+                                                 Class<? extends Component>... componentTypes);
 
     /**
      * @param eventReceiver
@@ -57,9 +59,11 @@ public interface EventSystem {
      * @param componentTypes
      * @param <T>
      */
-    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes);
+    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass,
+                                                 int priority, Class<? extends Component>... componentTypes);
 
-    <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes);
+    <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass,
+                                                   Class<? extends Component>... componentTypes);
 
     /**
      * Sends an event to all handlers for an entity's components

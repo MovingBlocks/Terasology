@@ -1,18 +1,5 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.audio.openAL;
 
 import com.google.common.collect.Maps;
@@ -29,7 +16,6 @@ import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetFactory;
 import org.terasology.engine.audio.AudioEndListener;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.Sound;
@@ -43,6 +29,7 @@ import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.engine.config.AudioConfig;
 import org.terasology.engine.math.Direction;
+import org.terasology.gestalt.assets.AssetFactory;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;
@@ -62,7 +49,7 @@ public class OpenALManager implements AudioManager {
 
     protected Map<String, SoundPool<? extends Sound<?>, ?>> pools = Maps.newHashMap();
 
-    private final org.joml.Vector3f listenerPosition = new org.joml.Vector3f();
+    private final Vector3f listenerPosition = new Vector3f();
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
@@ -281,7 +268,7 @@ public class OpenALManager implements AudioManager {
     }
 
     protected boolean checkDistance(Vector3fc soundPosition) {
-        org.joml.Vector3f distance = new org.joml.Vector3f(soundPosition)
+        Vector3f distance = new Vector3f(soundPosition)
                 .sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;
@@ -289,12 +276,14 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
-        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this);
+        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data,
+                OpenALManager.this, new OpenALSound.DisposalAction(urn));
     }
 
     @Override
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
-        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this);
+        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data,
+                OpenALManager.this, new OpenALStreamingSound.DisposalAction(urn));
     }
 
     public void purgeSound(Sound<?> sound) {

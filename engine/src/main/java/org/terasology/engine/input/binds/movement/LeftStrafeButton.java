@@ -5,12 +5,10 @@ package org.terasology.engine.input.binds.movement;
 
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.DefaultBinding;
+import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
-import org.terasology.engine.input.RegisterBindButton;
 
-/**
- */
 @RegisterBindButton(id = "left", description = "${engine:menu#binding-left}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.A)
 public class LeftStrafeButton extends BindButtonEvent {

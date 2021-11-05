@@ -4,8 +4,6 @@ package org.terasology.engine.core;
 
 import java.util.Iterator;
 
-/**
- */
 public interface EngineTime extends Time {
 
     /**

@@ -6,7 +6,7 @@ import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.CollectiveBehaviorTreeRunner;
 import org.terasology.engine.logic.common.DisplayNameComponent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class CollectiveInterpreter {
     }
 
     public void tick(float delta) {
-        for(Actor actor : this.actors) {
+        for (Actor actor : this.actors) {
             actor.setDelta(delta);
         }
         if (treeRunner == null && tree != null) {
@@ -78,7 +78,7 @@ public class CollectiveInterpreter {
     @Override
     public String toString() {
         String returnString = "";
-        for(Actor actor : this.actors) {
+        for (Actor actor : this.actors) {
             if (actor.hasComponent(DisplayNameComponent.class)) {
                 returnString = returnString + actor.getComponent(DisplayNameComponent.class).name
                         + System.lineSeparator();

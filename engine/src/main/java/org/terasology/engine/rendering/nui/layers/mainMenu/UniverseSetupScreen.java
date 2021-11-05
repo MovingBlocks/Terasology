@@ -6,62 +6,56 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
-import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
-import org.terasology.engine.rendering.world.WorldSetupWrapper;
-import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
-import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.asset.UIData;
-import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.itemRendering.StringTextRenderer;
-import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.skin.UISkinData;
-import org.terasology.nui.widgets.UIDropdownScrollable;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
+import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.engine.world.block.shapes.BlockShapeData;
 import org.terasology.engine.world.block.shapes.BlockShapeImpl;
 import org.terasology.engine.world.block.sounds.BlockSounds;
-import org.terasology.engine.world.block.sounds.BlockSoundsData;
 import org.terasology.engine.world.block.tiles.BlockTile;
-import org.terasology.engine.world.block.tiles.TileData;
 import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.skin.UISkinAsset;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -179,7 +173,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
                 logger.error("Can't configure the world! due to {}", e.getMessage());
@@ -190,8 +185,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
             //      modules may do
             if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
-                        "HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("HeightMap not supported",
+                                "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
             } else {
                 addNewWorld(worldGenerator.getSelection());
                 worldsDropdown.setOptions(worldNames());
@@ -199,7 +195,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
+            final WorldPreGenerationScreen worldPreGenerationScreen =
+                    getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             if (!worlds.isEmpty()) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
@@ -207,7 +204,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     if (result != null && result) {
                         triggerForwardAnimation(worldPreGenerationScreen);
                     } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't load world pre generation screen! Please, try again!");
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                .setMessage("Error", "Can't load world pre generation screen! Please, try again!");
                     }
                 });
                 loadPopup.startOperation(() -> {
@@ -219,8 +217,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     return true;
                 }, true);
             } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
-                        "Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }
         });
 
@@ -323,7 +321,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
         context.put(NUIManager.class, getManager());
         context.put(UniverseSetupScreen.class, this);
-        assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager = new AutoReloadAssetTypeManager();
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
@@ -367,24 +365,18 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class,
-                (AssetFactory<BlockShape, BlockShapeData>) BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class,
-                (AssetFactory<BlockSounds, BlockSoundsData>) BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class,
-                (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
-                (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+        assetTypeManager.createAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
+        assetTypeManager.createAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
+        assetTypeManager.createAssetType(BlockTile.class, BlockTile::new, "blockTiles");
+
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionDataAssetType = assetTypeManager.createAssetType(
+                BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+        assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionDataAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
-                (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class,
-                (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.createAssetType(UISkinAsset.class, UISkinAsset::new, "skins");
+        assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new, "behaviors");
+        assetTypeManager.createAssetType(UIElement.class, UIElement::new, "ui");
     }
 
     /**

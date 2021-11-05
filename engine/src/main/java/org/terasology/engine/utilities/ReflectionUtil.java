@@ -8,8 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeInfo;
 
@@ -33,9 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- */
+
 public final class ReflectionUtil {
     private ReflectionUtil() {
     }
@@ -239,7 +237,7 @@ public final class ReflectionUtil {
      * @param type The {@link TypeInfo} describing the type of the array.
      * @param <C>  The component type of the array.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public static <C> TypeInfo<C> getComponentType(TypeInfo<C[]> type) {
         if (type.getType() instanceof GenericArrayType) {
             GenericArrayType arrayType = (GenericArrayType) type.getType();
@@ -260,13 +258,16 @@ public final class ReflectionUtil {
      * @param type The {@link TypeInfo} describing the type of the {@link Collection}.
      * @param <E>  The element type of the {@link Collection}.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public static <E> TypeInfo<E> getElementType(TypeInfo<? extends Collection<E>> type) {
         Type elementType = getTypeParameterForSuper(type.getType(), Collection.class, 0);
 
         return (TypeInfo<E>) TypeInfo.of(elementType);
     }
 
+    @SuppressWarnings("checkstyle:ParameterAssignment")
+    // TODO: figure out whether the reassignment is necessary and/or whether it's a desired property of this method
+    //       until then, this is accepted and, thus, suppressed
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
         for (Class targetClass = getRawType(target);
              !Object.class.equals(targetClass);
@@ -302,9 +303,7 @@ public final class ReflectionUtil {
         }
 
         for (Type genericInterface : targetClass.getGenericInterfaces()) {
-            genericInterface = resolveType(target, genericInterface);
-
-            Type typeParameter = getTypeParameterForSuperInterface(genericInterface, superClass, index);
+            Type typeParameter = getTypeParameterForSuperInterface(resolveType(target, genericInterface), superClass, index);
 
             if (typeParameter != null) {
                 return typeParameter;
@@ -707,7 +706,7 @@ public final class ReflectionUtil {
         private final Type[] upperBounds;
         private final Type[] lowerBounds;
 
-        public WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
+        WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
             this.upperBounds = upperBounds;
             this.lowerBounds = lowerBounds;
         }
@@ -778,7 +777,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class GenericArrayTypeImpl implements GenericArrayType {
+    private static final class GenericArrayTypeImpl implements GenericArrayType {
         private final Type genericComponentType;
 
         private GenericArrayTypeImpl(Type genericComponentType) {
@@ -817,7 +816,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class ParameterizedTypeImpl implements ParameterizedType {
+    private static final class ParameterizedTypeImpl implements ParameterizedType {
         private final Type[] actualTypeArguments;
         private final Class<?> rawType;
         private final Type ownerType;
@@ -894,9 +893,9 @@ public final class ReflectionUtil {
                 return true;
             }
 
-            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType()) &&
-                       Objects.equals(this.rawType, otherParameterizedType.getRawType()) &&
-                       Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
+            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType())
+                    && Objects.equals(this.rawType, otherParameterizedType.getRawType())
+                    && Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
         }
 
         public int hashCode() {

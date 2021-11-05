@@ -9,10 +9,11 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.characters.CharacterSystem;
-import org.terasology.engine.logic.common.ActivateEvent;
-import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.characters.events.ActivationPredicted;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.common.RangeComponent;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.physics.HitResult;
@@ -85,7 +86,9 @@ public class LocalPlayer {
 
     public boolean isValid() {
         EntityRef characterEntity = getCharacterEntity();
-        return characterEntity.exists() && characterEntity.hasComponent(LocationComponent.class) && characterEntity.hasComponent(CharacterComponent.class)
+        return characterEntity.exists()
+                && characterEntity.hasComponent(LocationComponent.class)
+                && characterEntity.hasComponent(CharacterComponent.class)
                 && characterEntity.hasComponent(CharacterMovementComponent.class);
     }
 
@@ -97,13 +100,7 @@ public class LocalPlayer {
      */
     public Vector3f getPosition(Vector3f dest) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location != null) {
-            Vector3f result = location.getWorldPosition(new Vector3f());
-            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
-                dest.set(result);
-            }
-        }
-        return dest;
+        return location.getWorldPosition(dest);
     }
 
     /**
@@ -114,13 +111,7 @@ public class LocalPlayer {
      */
     public Quaternionf getRotation(Quaternionf dest) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location != null) {
-            Quaternionf result = location.getWorldRotation(new Quaternionf());
-            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
-                dest.set(result);
-            }
-        }
-        return dest;
+        return location.getWorldRotation(dest);
     }
 
     /**
@@ -131,18 +122,8 @@ public class LocalPlayer {
      */
     public Vector3f getViewPosition(Vector3f dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
-        if (clientComponent == null) {
-            return dest;
-        }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location != null) {
-            Vector3f result = location.getWorldPosition(new Vector3f());
-            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
-                dest.set(result);
-                return dest;
-            }
-        }
-        return getPosition(dest);
+        return location.getWorldPosition(dest);
     }
 
     /**
@@ -153,18 +134,8 @@ public class LocalPlayer {
      */
     public Quaternionf getViewRotation(Quaternionf dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
-        if (clientComponent == null) {
-            return new Quaternionf();
-        }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location != null) {
-            Quaternionf result = location.getWorldRotation(new Quaternionf());
-            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
-                dest.set(result);
-                return dest;
-            }
-        }
-        return getRotation(dest);
+        return location.getWorldRotation(dest);
     }
 
     /**
@@ -180,10 +151,7 @@ public class LocalPlayer {
 
     public Vector3f getVelocity(Vector3f dest) {
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
-        if (movement != null) {
-            return dest.set(movement.getVelocity());
-        }
-        return dest;
+        return dest.set(movement.getVelocity());
     }
 
 
@@ -234,23 +202,28 @@ public class LocalPlayer {
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+
+        //FIXME This is the same code as in CharacterSystem#isPredictionOfEventCorrect to derive the actual interaction range from the
+        //      player's character component and the used item's range component...
+        float interactionRange;
+        if (ownedEntityUsage && usedOwnedEntity.hasComponent(RangeComponent.class)) {
+            interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).range, characterComponent.interactionRange);
+        } else {
+            interactionRange = characterComponent.interactionRange;
+        }
+
+        HitResult result = physics.rayTrace(originPos, direction, interactionRange,
                 Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
-        if (eventWithTarget) {
+
+        if (ownedEntityUsage || eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
                     result.getHitPoint(), result.getHitNormal(), activationId));
+
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
                     result.getEntity(),
                     originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
-            return true;
-        } else if (ownedEntityUsage) {
-            usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f(), activationId));
-            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
-                    EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f(), activationId));
             return true;
         }
         return false;

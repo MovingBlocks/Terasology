@@ -5,12 +5,10 @@ package org.terasology.engine.input.binds.general;
 
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.DefaultBinding;
+import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
-import org.terasology.engine.input.RegisterBindButton;
 
-/**
- */
 @RegisterBindButton(id = "console", description = "${engine:menu#binding-console}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.GRAVE)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F1)

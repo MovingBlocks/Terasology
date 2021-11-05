@@ -1,27 +1,14 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.components;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.functions.affectors.AffectorFunction;
 import org.terasology.engine.particles.functions.generators.GeneratorFunction;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,7 +25,7 @@ import java.util.Map;
  * See ParticleDataSpriteComponent and SpriteParticleRenderer for an example.
  */
 @API
-public class ParticleEmitterComponent implements Component {
+public class ParticleEmitterComponent implements Component<ParticleEmitterComponent> {
     public static final int INFINITE_PARTICLE_SPAWNS = -1;
     public static final int INDEFINITE_EMITTER_LIFETIME = -1;
 
@@ -68,12 +55,14 @@ public class ParticleEmitterComponent implements Component {
     public boolean enabled = true;
 
     /**
-     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0 TODO: Implement emitter lifetime
+     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter lifetime
      */
     public float lifeTime = INDEFINITE_EMITTER_LIFETIME;
 
     /**
-     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0 TODO: Implement emitter max spawns
+     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter max spawns
      */
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 
@@ -121,4 +110,26 @@ public class ParticleEmitterComponent implements Component {
      * Allows checking only some particles each update since it's a heavy operation.
      */
     public int collisionUpdateIteration;
+
+    @Override
+    public void copyFrom(ParticleEmitterComponent other) {
+        this.maxParticles = other.maxParticles;
+        this.particleCollision = other.particleCollision;
+        this.spawnRateMax = other.spawnRateMax;
+        this.spawnRateMin = other.spawnRateMin;
+        this.enabled = other.enabled;
+        this.lifeTime = other.lifeTime;
+        this.particleSpawnsLeft = other.particleSpawnsLeft;
+        this.destroyEntityWhenDead = other.destroyEntityWhenDead;
+        this.ownerEntity = other.ownerEntity;
+        this.particlePool = other.particlePool;
+        this.generatorFunctionMap.clear();
+        this.generatorFunctionMap.putAll(other.generatorFunctionMap);
+        this.affectorFunctionMap.clear();
+        this.affectorFunctionMap.putAll(other.affectorFunctionMap);
+        this.locationComponent = new LocationComponent();
+        this.locationComponent.copyFrom(other.locationComponent); // TODO check this
+        this.nextEmission = other.nextEmission;
+        this.collisionUpdateIteration = other.collisionUpdateIteration;
+    }
 }
