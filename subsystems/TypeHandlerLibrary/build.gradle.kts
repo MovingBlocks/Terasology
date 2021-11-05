@@ -26,3 +26,13 @@ dependencies {
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 }
+
+tasks.register<Test>("unitTest") {
+    group = "Verification"
+    description = "Runs unit tests (fast)"
+
+    useJUnitPlatform {
+        excludeTags("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
