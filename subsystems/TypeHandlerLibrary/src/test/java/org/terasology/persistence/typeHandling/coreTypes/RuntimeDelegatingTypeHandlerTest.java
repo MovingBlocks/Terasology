@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -17,7 +16,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
-import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Type;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,19 +43,25 @@ public class RuntimeDelegatingTypeHandlerTest {
     private final RuntimeDelegatingTypeHandler<Base> runtimeDelegatingTypeHandler;
 
 
-    RuntimeDelegatingTypeHandlerTest(@Mock TypeHandler<Base> baseTypeHandler, @Mock SubHandler subTypeHandler) {
+    RuntimeDelegatingTypeHandlerTest(@Mock TypeHandler<Base> baseTypeHandler, @Mock SubHandler subTypeHandler,
+                                     @Mock SerializationSandbox sandbox, @Mock TypeHandlerLibrary typeHandlerLibrary) {
         this.baseTypeHandler = baseTypeHandler;
         this.subTypeHandler = subTypeHandler;
         configureMockSerializer(baseTypeHandler);
         configureMockSerializer(subTypeHandler);
 
-        Reflections reflections = new Reflections(getClass().getClassLoader());
-        typeHandlerLibrary = spy(new TypeHandlerLibrary(reflections));
+        this.typeHandlerLibrary = typeHandlerLibrary;
+        when(typeHandlerLibrary.getTypeHandler(baseType)).thenReturn(Optional.of(baseTypeHandler));
+        when(typeHandlerLibrary.getTypeHandler(subType)).thenReturn(Optional.of(subTypeHandler));
 
-        typeHandlerLibrary.addTypeHandler(Base.class, baseTypeHandler);
-        typeHandlerLibrary.addTypeHandler(Sub.class, subTypeHandler);
+        when(sandbox.findSubTypeOf(subType.getName(), baseType)).thenReturn(Optional.of(subType));
 
-        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(reflections));
+//        typeHandlerLibrary = spy(new MyTypeHandlerLibrary(sandbox));
+//
+//        typeHandlerLibrary.addTypeHandler(Base.class, baseTypeHandler);
+//        typeHandlerLibrary.addTypeHandler(Sub.class, subTypeHandler);
+
+        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary, sandbox);
         runtimeDelegatingTypeHandler = new RuntimeDelegatingTypeHandler<>(
                 baseTypeHandler, TypeInfo.of(Base.class), context);
     }
@@ -168,4 +172,11 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     private abstract static class SubHandler extends TypeHandler<Sub> { }
+
+//    // subclass to allow access to the constructor that takes a sandbox
+//    private static class MyTypeHandlerLibrary extends TypeHandlerLibrary {
+//        MyTypeHandlerLibrary(SerializationSandbox sandbox) {
+//            super(sandbox);
+//        }
+//    }
 }
