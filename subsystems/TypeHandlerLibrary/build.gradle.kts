@@ -20,11 +20,15 @@ dependencies {
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
     implementation("org.terasology.gestalt:gestalt-asset-core:7.1.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.11.2")
+    testImplementation(platform("org.junit:junit-bom:5.8.1")) {
+        // junit-bom will set version numbers for the other org.junit dependencies.
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.mockito:mockito-inline:3.12.4")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
 }
 
 tasks.register<Test>("unitTest") {
