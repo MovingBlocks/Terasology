@@ -51,6 +51,7 @@ public class RuntimeDelegatingTypeHandlerTest {
         configureMockSerializer(subTypeHandler);
 
         this.typeHandlerLibrary = typeHandlerLibrary;
+        // We must mock `getTypeHandler(Type)`, not only `getTypeHandler(Class<>)`
         when(typeHandlerLibrary.getTypeHandler((Type) baseType))
                 .thenReturn(Optional.of(baseTypeHandler));
         when(typeHandlerLibrary.getTypeHandler((Type) subType))
