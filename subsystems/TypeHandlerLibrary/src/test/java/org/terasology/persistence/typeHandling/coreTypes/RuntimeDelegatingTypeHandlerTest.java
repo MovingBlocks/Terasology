@@ -51,17 +51,20 @@ public class RuntimeDelegatingTypeHandlerTest {
         configureMockSerializer(subTypeHandler);
 
         this.typeHandlerLibrary = typeHandlerLibrary;
-        when(typeHandlerLibrary.getTypeHandler(baseType)).thenReturn(Optional.of(baseTypeHandler));
-        when(typeHandlerLibrary.getTypeHandler(subType)).thenReturn(Optional.of(subTypeHandler));
-
-        when(sandbox.findSubTypeOf(subType.getName(), baseType)).thenReturn(Optional.of(subType));
+        when(typeHandlerLibrary.getTypeHandler(baseType))
+                .thenReturn(Optional.of(baseTypeHandler));
+        when(typeHandlerLibrary.getTypeHandler(subType))
+                .thenReturn(Optional.of(subTypeHandler));
 
 //        typeHandlerLibrary = spy(new MyTypeHandlerLibrary(sandbox));
 //
 //        typeHandlerLibrary.addTypeHandler(Base.class, baseTypeHandler);
 //        typeHandlerLibrary.addTypeHandler(Sub.class, subTypeHandler);
 
+        when(sandbox.findSubTypeOf(subType.getName(), baseType))
+                .thenReturn(Optional.of(subType));
         TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary, sandbox);
+
         runtimeDelegatingTypeHandler = new RuntimeDelegatingTypeHandler<>(
                 baseTypeHandler, TypeInfo.of(Base.class), context);
     }
