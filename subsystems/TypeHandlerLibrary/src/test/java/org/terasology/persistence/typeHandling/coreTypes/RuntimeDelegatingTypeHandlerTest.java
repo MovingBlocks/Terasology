@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,14 +45,14 @@ public class RuntimeDelegatingTypeHandlerTest {
     private final RuntimeDelegatingTypeHandler<Base> runtimeDelegatingTypeHandler;
 
 
-    RuntimeDelegatingTypeHandlerTest(@Mock TypeHandler<Base> baseTypeHandler, @Mock TypeHandler<Sub> subTypeHandler) {
+    RuntimeDelegatingTypeHandlerTest(@Mock TypeHandler<Base> baseTypeHandler, @Mock SubHandler subTypeHandler) {
         this.baseTypeHandler = baseTypeHandler;
         this.subTypeHandler = subTypeHandler;
         configureMockSerializer(baseTypeHandler);
         configureMockSerializer(subTypeHandler);
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
-        typeHandlerLibrary = new TypeHandlerLibrary(reflections);
+        typeHandlerLibrary = spy(new TypeHandlerLibrary(reflections));
 
         typeHandlerLibrary.addTypeHandler(Base.class, baseTypeHandler);
         typeHandlerLibrary.addTypeHandler(Sub.class, subTypeHandler);
@@ -128,9 +128,7 @@ public class RuntimeDelegatingTypeHandlerTest {
                 )
         );
 
-        Optional<Base> result = runtimeDelegatingTypeHandler.deserialize(persistedSub);
-
-        assertTrue(result.isPresent());
+        runtimeDelegatingTypeHandler.deserialize(persistedSub);
 
         verify(typeHandlerLibrary, never()).getTypeHandler(eq(baseType));
         verify(typeHandlerLibrary).getTypeHandler(eq((Type) subType));
@@ -168,4 +166,6 @@ public class RuntimeDelegatingTypeHandlerTest {
         @SuppressWarnings("unused")
         float y;
     }
+
+    private abstract static class SubHandler extends TypeHandler<Sub> { }
 }
