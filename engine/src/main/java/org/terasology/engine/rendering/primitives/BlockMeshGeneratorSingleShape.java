@@ -28,7 +28,7 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
     }
 
     @Override
-    public ResourceUrn baseUrn() {
+    public ResourceUrn getBaseUrn() {
         return this.baseUrn;
     }
 

@@ -18,7 +18,7 @@ public abstract class BlockMeshShapeGenerator implements BlockMeshGenerator {
 
     public abstract Block getBlock();
 
-    public abstract ResourceUrn baseUrn();
+    public abstract ResourceUrn getBaseUrn();
 
     @Override
     public Mesh getStandaloneMesh() {
@@ -51,7 +51,7 @@ public abstract class BlockMeshShapeGenerator implements BlockMeshGenerator {
                 }
             }
             mesh = Assets.generateAsset(
-                    new ResourceUrn(baseUrn(), block.getURI().toString()), meshData,
+                    new ResourceUrn(getBaseUrn(), block.getURI().toString()), meshData,
                     Mesh.class);
         }
         return mesh;
