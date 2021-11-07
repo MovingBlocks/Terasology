@@ -49,7 +49,6 @@ public class ChunkMeshImpl implements ChunkMesh {
     @Override
     public boolean updateMesh() {
 
-        // IMPORTANT: A mesh can only be generated once.
         if (vertexElements == null || disposed) {
             return false;
         }
