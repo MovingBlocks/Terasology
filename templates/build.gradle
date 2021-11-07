@@ -20,7 +20,7 @@ buildscript {
         // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
         maven {
             name = "Terasology snapshot locals"
-            url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
+            url = "http://artifactory.terasology.org/artifactory/terasology-snapshot-local"
             isAllowInsecureProtocol = true  // 😱
         }
     }
