@@ -12,13 +12,17 @@ group = "org.terasology.subsystems"
 version = project(":engine").version
 
 dependencies {
-    implementation("org.slf4j:slf4j-api:1.7.21")
+    implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("net.sf.trove4j:trove4j:3.0.3")
 
     implementation("org.terasology:reflections:0.9.12-MB")
     implementation("org.terasology.nui:nui-reflect:3.0.0")
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
     implementation("org.terasology.gestalt:gestalt-asset-core:7.1.0")
+
+    testRuntimeOnly("org.slf4j:slf4j-simple:1.7.32") {
+        because("log output during tests")
+    }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
