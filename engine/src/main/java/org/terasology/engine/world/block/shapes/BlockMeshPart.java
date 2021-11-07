@@ -94,8 +94,8 @@ public class BlockMeshPart {
             elements.color.put(colorOffset);
             elements.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
             elements.normals.put(normals[vIdx]);
-            elements.flags.put(flags.getValue());
-            elements.frames.put(texFrames - 1);
+            elements.flags.put((byte) (flags.getValue()));
+            elements.frames.put((byte) (texFrames - 1));
             float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ,
                     new Vector3f()), normals[vIdx]);
             elements.sunlight.put(lightingData[0]);
