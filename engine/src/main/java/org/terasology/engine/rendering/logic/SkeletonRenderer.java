@@ -328,7 +328,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-
             Matrix4f relMat = new Matrix4f();
             Matrix4f relFinal = new Matrix4f();
             Matrix4f entityTransform = new Matrix4f();
@@ -348,9 +347,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Quaternionf rotation = locationComponent.getWorldRotation(new Quaternionf());
                 entityTransform.translationRotateScale(location, rotation, 1.0f);
 
-                Vector3f worldPos = new Vector3f();
-                Vector3f worldPositionCameraSpace = new Vector3f();
-                worldPos.sub(cameraPosition, worldPositionCameraSpace);
+                // position is referenced around (0,0,0) (worldposition - cameraposition)
+                Vector3f worldPositionCameraSpace = cameraPosition.negate(new Vector3f());
 
                 // same heightOffset is applied to worldPositionCameraSpace from #renderOpaque()
                 // TODO: resolve repeated logic for transformation applied to bones
@@ -372,23 +370,24 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     LocationComponent locCompA = boneEntity.getComponent(LocationComponent.class);
                     LocationComponent locCompB = boneParentEntity.getComponent(LocationComponent.class);
 
+                    // relative transform around the root skeletalMesh.scale and skeletalMesh.translate are relative to root
                     locCompA.getRelativeTransform(relMat.identity(), entity);
                     result.set(entityTransform)
                             .mul(relFinal.identity()
                                     .scale(skeletalMesh.scale)
                                     .translate(skeletalMesh.translate)
-                                    .mul(relMat))
+                                    .mul(relMat)) // apply relative transformation for the skeletalMesh scale and transform
                             .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
-
+                    // relative transform around the root skeletalMesh.scale and skeletalMesh.translate are relative to root
                     locCompB.getRelativeTransform(relMat.identity(), entity);
                     result.set(entityTransform)
                             .mul(relFinal
                                     .identity()
                                     .scale(skeletalMesh.scale)
                                     .translate(skeletalMesh.translate)
-                                    .mul(relMat))
+                                    .mul(relMat))  // apply relative transformation for the skeletalMesh scale and transform
                             .transformPosition(currentPos.zero());
                     meshData.position.put(currentPos);
 
