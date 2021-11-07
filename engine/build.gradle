@@ -100,9 +100,9 @@ dependencies {
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
 
-    api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.7'
-    api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.4'
-
+    api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.11'
+    api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.5'
+    
     api group: 'org.joml', name: 'joml', version: '1.10.0'
     api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '0.1.0'
 

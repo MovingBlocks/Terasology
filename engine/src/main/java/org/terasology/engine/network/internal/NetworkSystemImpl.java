@@ -179,13 +179,20 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
                 // enumerate all network interfaces that listen
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+
                 while (interfaces.hasMoreElements()) {
                     NetworkInterface ifc = interfaces.nextElement();
                     if (!ifc.isLoopback()) {
                         for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
-                            InetAddress adr = ifadr.getAddress();
-                            logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
-                                    ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                            // Exclude interfaces with the following key words to avoid common virtual and otherwise unlikely useful nics
+                            // TODO: Make this configurable via config.cfg?
+                            if (ifc.getDisplayName().contains("VirtualBox") || ifc.getDisplayName().contains("ISATAP")) {
+                                logger.info("Skipping filtered interface name {}", ifc.getDisplayName());
+                            } else {
+                                InetAddress adr = ifadr.getAddress();
+                                logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
+                                        ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                            }
                         }
                     }
                 }
