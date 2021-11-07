@@ -18,8 +18,9 @@ apply plugin: 'org.sonarqube'
 
 apply plugin: 'terasology-repositories'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
 
 javadoc.options.encoding = 'UTF-8'
 

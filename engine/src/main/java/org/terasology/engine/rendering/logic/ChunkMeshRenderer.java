@@ -51,7 +51,7 @@ public class ChunkMeshRenderer extends BaseComponentSystem implements UpdateSubs
         disposalSet.add(new BuffersReference(mesh.mesh, disposalQueue));
     }
 
-    @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {ChunkMeshComponent.class, LocationComponent.class})
     public void onDestroyMesh(BeforeDeactivateComponent event, EntityRef entity) {
         pseudoChunks.remove(entity);
     }
