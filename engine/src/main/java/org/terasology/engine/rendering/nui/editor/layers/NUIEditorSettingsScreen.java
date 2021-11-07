@@ -3,18 +3,17 @@
 package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.common.collect.Lists;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.settings.LocaleRenderer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.widgets.UIDropdownScrollable;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +47,7 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
         alternativeLocale = find("alternativeLocale", UIDropdownScrollable.class);
         if (alternativeLocale != null) {
             // Build the list of available locales and set the dropdown's options to them.
-            TranslationProject menuProject = translationSystem.getProject(new SimpleUri("engine:menu"));
+            TranslationProject menuProject = translationSystem.getProject(new ResourceUrn("engine:menu"));
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
             Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
             alternativeLocale.setOptions(Lists.newArrayList(locales));
