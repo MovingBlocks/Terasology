@@ -15,6 +15,7 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.utilities.OperatingSystemMemory;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -31,7 +32,7 @@ import java.util.Locale;
  */
 public class DebugOverlay extends CoreScreenLayer {
 
-    public static final double MB_SIZE = 1048576.0;
+    public static final float MB_SIZE = 1048576.0f;
 
     @In
     private Config config;
@@ -72,13 +73,39 @@ public class DebugOverlay extends CoreScreenLayer {
         });
 
         UILabel debugLine1 = find("debugLine1", UILabel.class);
+
+        // This limit doesn't change after start-up.
+        final long dataLimit = OperatingSystemMemory.isAvailable()
+                ? OperatingSystemMemory.dataAndStackSizeLimit() : -1;
+
         if (debugLine1 != null) {
             debugLine1.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / MB_SIZE;
-                    return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
-                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / MB_SIZE, Runtime.getRuntime().maxMemory() / MB_SIZE);
+                    long runtimeTotalMemory = Runtime.getRuntime().totalMemory();
+                    float memoryUsage = ((float) runtimeTotalMemory - (float) Runtime.getRuntime().freeMemory()) / MB_SIZE;
+                    String s = String.format(
+                            "FPS: %.1f, Memory Usage: %.1f MB, Total Memory: %.1f MB, Max Memory: %.1f MB",
+                            time.getFps(),
+                            memoryUsage,
+                            runtimeTotalMemory / MB_SIZE,
+                            Runtime.getRuntime().maxMemory() / MB_SIZE
+                    );
+                    if (OperatingSystemMemory.isAvailable()) {
+                        // Check data size, because that's the one comparable to Terasology#setMemoryLimit
+                        long dataSize = OperatingSystemMemory.dataAndStackSize();
+                        // How much bigger is that than the number reported by the Java runtime?
+                        long nonJava = dataSize - runtimeTotalMemory;
+                        String limitString = (dataLimit > 0)
+                            ? String.format(" / %.1f MB (%02d%%)", dataLimit / MB_SIZE, 100 * dataSize / dataLimit)
+                            : "";
+                        return String.format(
+                                "%s, Data: %.1f MB%s, Extra: %.1f MB",
+                                s, dataSize / MB_SIZE, limitString, nonJava / MB_SIZE
+                        );
+                    } else {
+                        return s;
+                    }
                 }
             });
         }
@@ -158,7 +185,7 @@ public class DebugOverlay extends CoreScreenLayer {
             debugInfo.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return String.format("[H] : Debug Documentation");
+                    return "[H] : Debug Documentation";
                 }
             });
         }
