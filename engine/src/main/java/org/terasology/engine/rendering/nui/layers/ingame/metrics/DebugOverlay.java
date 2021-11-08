@@ -15,7 +15,6 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -147,8 +146,7 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f",
-                            ChunkTessellator.getVertexArrayUpdateCount(),
+                    return String.format("World Time: %.3f, Time Dilation: %.1f",
                             worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
                             time.getGameTimeDilation());
                 }
