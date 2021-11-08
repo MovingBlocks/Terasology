@@ -6,18 +6,16 @@ import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
-import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
-import org.terasology.engine.world.WorldProvider;
 
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.
  */
-public class OpenVRStereoCamera extends SubmersibleCamera {
+public class OpenVRStereoCamera extends Camera {
 
     private final Matrix4f projectionMatrixLeftEye = new Matrix4f();
     private final Matrix4f projectionMatrixRightEye = new Matrix4f();
@@ -46,8 +44,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     private final Matrix4f viewTranslationRightEye = new Matrix4f();
     private final OpenVRProvider vrProvider;
 
-    public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
-        super(worldProvider, renderingConfig);
+    public OpenVRStereoCamera(OpenVRProvider provider) {
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;

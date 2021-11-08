@@ -45,7 +45,7 @@ public class ChunkMeshRenderer extends BaseComponentSystem {
         pseudoChunks.put(entity, new EntityBasedRenderableChunk(entity));
     }
 
-    @ReceiveEvent(components = {MeshComponent.class})
+    @ReceiveEvent(components = {ChunkMeshComponent.class})
     public void onDestroyMesh(BeforeDeactivateComponent event, EntityRef entity) {
         EntityBasedRenderableChunk renderableChunk = pseudoChunks.remove(entity);
         if (renderableChunk != null) {
