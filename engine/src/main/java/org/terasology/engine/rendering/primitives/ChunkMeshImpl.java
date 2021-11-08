@@ -8,8 +8,6 @@ import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
-import java.lang.ref.WeakReference;
-
 public class ChunkMeshImpl implements ChunkMesh {
 
     /* VERTEX DATA */
