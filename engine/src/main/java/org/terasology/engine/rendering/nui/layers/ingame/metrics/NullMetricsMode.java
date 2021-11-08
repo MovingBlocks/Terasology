@@ -17,9 +17,4 @@ public class NullMetricsMode extends MetricsMode {
     public boolean isAvailable() {
         return true;
     }
-
-    @Override
-    public boolean isPerformanceManagerMode() {
-        return false;
-    }
 }
