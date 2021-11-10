@@ -77,6 +77,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
         }, Clock.SYSTEM);
         Metrics.addRegistry(jmxMeterRegistry);
 
+
         // If we want to make global metrics available to our custom view,
         // we add our custom registry to the global composite:
         //
