@@ -166,7 +166,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 chunk.setDirty(false);
 
                 newMesh = chunkTessellator.generateMesh(localView);
-                newMesh.generateVBOs();
+                newMesh.updateMesh();
                 newMesh.discardData();
 
                 if (chunk.hasMesh()) {
@@ -289,7 +289,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
                 pendingMesh = chunk.getPendingMesh();
-                pendingMesh.generateVBOs();
+                pendingMesh.updateMesh();
                 pendingMesh.discardData();
                 if (chunk.hasMesh()) {
                     chunk.getMesh().dispose();
