@@ -79,29 +79,30 @@ public class DebugOverlay extends CoreScreenLayer {
                 ? OperatingSystemMemory.dataAndStackSizeLimit() : -1;
 
         if (debugLine1 != null) {
-            debugLine1.bindText(new ReadOnlyBinding<String>() {
+            debugLine1.bindText(new ReadOnlyBinding<>() {
                 @Override
                 public String get() {
-                    long runtimeTotalMemory = Runtime.getRuntime().totalMemory();
-                    float memoryUsage = ((float) runtimeTotalMemory - (float) Runtime.getRuntime().freeMemory()) / MB_SIZE;
+                    Runtime runtime = Runtime.getRuntime();
+                    long totalHeapSize = runtime.totalMemory();
+                    float usedHeapMemory = ((float) totalHeapSize - (float) runtime.freeMemory()) / MB_SIZE;
                     String s = String.format(
-                            "FPS: %.1f, Memory Usage: %.1f MB, Total Memory: %.1f MB, Max Memory: %.1f MB",
+                            "FPS: %.1f, Heap Usage: %.1f MB, Total Heap: %.1f MB, Max Heap: %.1f MB",
                             time.getFps(),
-                            memoryUsage,
-                            runtimeTotalMemory / MB_SIZE,
-                            Runtime.getRuntime().maxMemory() / MB_SIZE
+                            usedHeapMemory,
+                            totalHeapSize / MB_SIZE,
+                            runtime.maxMemory() / MB_SIZE
                     );
                     if (OperatingSystemMemory.isAvailable()) {
                         // Check data size, because that's the one comparable to Terasology#setMemoryLimit
                         long dataSize = OperatingSystemMemory.dataAndStackSize();
                         // How much bigger is that than the number reported by the Java runtime?
-                        long nonJava = dataSize - runtimeTotalMemory;
+                        long nonJavaHeapDataSize = dataSize - totalHeapSize;
                         String limitString = (dataLimit > 0)
                             ? String.format(" / %.1f MB (%02d%%)", dataLimit / MB_SIZE, 100 * dataSize / dataLimit)
                             : "";
                         return String.format(
                                 "%s, Data: %.1f MB%s, Extra: %.1f MB",
-                                s, dataSize / MB_SIZE, limitString, nonJava / MB_SIZE
+                                s, dataSize / MB_SIZE, limitString, nonJavaHeapDataSize / MB_SIZE
                         );
                     } else {
                         return s;
