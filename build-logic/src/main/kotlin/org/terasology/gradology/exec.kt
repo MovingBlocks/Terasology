@@ -7,10 +7,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaApplication
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.the
 
 const val DEFAULT_MAX_HEAP_SIZE = "3G"
@@ -45,6 +48,14 @@ fun isMacOS() : Boolean {
 
 open class RunTerasology : JavaExec() {
 
+    @get:Input
+    val jmxPort: Property<Int> = objectFactory.property()
+
+    @Option(option="jmx-port", description="Enable JMX connections on this port (jmxremote.port)")
+    fun parseJmxPort(value: String?) {
+        jmxPort.set(value.takeUnless { it.isNullOrEmpty() }?.toIntOrNull())
+    }
+
     @Option(option="max-heap", description="Set maximum heap size (-Xmx)")
     override fun setMaxHeapSize(heapSize: String?) {
         super.setMaxHeapSize(heapSize)
@@ -56,6 +67,8 @@ open class RunTerasology : JavaExec() {
         mainClass.set(project.the<JavaApplication>().mainClass)
         workingDir = project.rootDir
 
+        // All calls to non-final Task methods must be within a non-final method
+        // themselves. This includes #dependsOn, #args, etc.
         initConfig()
     }
 
@@ -71,5 +84,21 @@ open class RunTerasology : JavaExec() {
             args("--no-splash")
             jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
         }
+
+        // Any configuration that depends on the value of a task Property like jmxPort
+        // should be done later, as that Property value will change between object
+        // construction time and task execution time.
+    }
+
+    override fun exec() {
+        jmxPort.orNull?.let {
+            systemProperty("com.sun.management.jmxremote.port", it)
+            systemProperty("com.sun.management.jmxremote.rmi.port",it + 1)
+            systemProperty("com.sun.management.jmxremote.password.file",
+                project.rootProject.file("config/jmxremote.password"))
+            systemProperty("com.sun.management.jmxremote.ssl", "false")
+        }
+
+        super.exec()
     }
 }
