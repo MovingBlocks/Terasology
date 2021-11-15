@@ -3,10 +3,13 @@
 package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 
 import com.google.common.base.Preconditions;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.ArrayList;
 
@@ -24,6 +27,12 @@ import java.util.ArrayList;
 @Share(DebugMetricsSystem.class)
 @API
 public class DebugMetricsSystem extends BaseComponentSystem {
+
+    @In
+    MonitoringSubsystem monitoringSubsystem;
+
+    @In
+    Context context;
 
     private final MetricsMode defaultMode = new NullMetricsMode();
     private ArrayList<MetricsMode> modes;
@@ -43,8 +52,21 @@ public class DebugMetricsSystem extends BaseComponentSystem {
         register(new HeapAllocationMode());
         register(new RenderingExecTimeMeansMode("\n- Rendering - Execution Time: Running Means - Sorted Alphabetically -"));
         currentMode = defaultMode;
+
+        if (monitoringSubsystem == null) {
+            monitoringSubsystem = context.get(MonitoringSubsystem.class);
+        }
     }
 
+    @Override
+    public void preBegin() {
+        monitoringSubsystem.initMeters(context);
+    }
+
+    @Override
+    public void shutdown() {
+        // FIXME: Remove all the meters we added to the global registry.
+    }
 
     /**
      * Adds a MetricsMode instance to the set. Use the toggle() and getCurrentMode() methods to iterate over the set and

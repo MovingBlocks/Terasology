@@ -23,9 +23,6 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.monitoring.gui.AdvancedMonitor;
 import reactor.core.publisher.Flux;
-import reactor.function.TupleUtils;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.List;
@@ -46,17 +43,18 @@ public class MonitoringSubsystem implements EngineSubsystem {
     }
 
     @Override
+    public void preInitialise(Context rootContext) {
+        // FIXME: `@Share` is not implemented for EngineSubsystems?
+        rootContext.put(MonitoringSubsystem.class, this);
+    }
+
+    @Override
     public void initialise(GameEngine engine, Context rootContext) {
         if (rootContext.get(SystemConfig.class).monitoringEnabled.get()) {
             advancedMonitor = new AdvancedMonitor();
             advancedMonitor.setVisible(true);
         }
         meterRegistry = initMeterRegistries();
-    }
-
-    @Override
-    public void postInitialise(Context context) {
-        initMeters(context);
     }
 
     /**
@@ -95,7 +93,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
     }
 
     /** Initialize meters for all the things in this Context. */
-    protected void initMeters(Context context) {
+    public void initMeters(Context context) {
         // We can build meters individually like this:
         var time = context.get(Time.class);
         Gauge.builder("terasology.fps", time::getFps)
@@ -117,15 +115,17 @@ public class MonitoringSubsystem implements EngineSubsystem {
     }
 
     protected void registerForContext(Context context, Iterable<GaugeMapEntry> gaugeMap) {
-        Flux.fromIterable(gaugeMap)
-            .map(entry -> Tuples.of(context.get(entry.iface), entry.gaugeSpecs))
-            .filter(TupleUtils.predicate((subject, specs) -> subject != null))
-            .doOnDiscard(Tuple2.class, TupleUtils.consumer((iface, gaugeSpecs) ->
-                    logger.debug("Not building gauges for {}, none was in {}", iface, context)))
-            .subscribe(TupleUtils.consumer(this::registerAll));
+        for (GaugeMapEntry entry : gaugeMap) {
+            var subject = context.get(entry.iface);
+            if (subject != null) {
+                registerAll(subject, entry.gaugeSpecs);
+            } else {
+                logger.warn("Not building gauges for {}, none was in {}", entry.iface, context);
+            }
+        }
     }
 
-    protected <T> void registerAll(T subject, Set<GaugeSpec<? extends T>> gaugeSpecs) {
+    public <T> void registerAll(T subject, Set<GaugeSpec<? extends T>> gaugeSpecs) {
         Flux.fromIterable(gaugeSpecs)
             .filter(spec -> spec.isInstanceOfType(subject))
             // Make sure the gauge is right for the specific type.
@@ -134,6 +134,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
     }
 
     public void registerMeter(MeterBinder meterBinder) {
+        logger.debug("Binding {} to {}", meterBinder, meterRegistry);
         meterBinder.bindTo(meterRegistry);
     }
 
