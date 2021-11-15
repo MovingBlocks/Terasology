@@ -4,11 +4,13 @@
 package org.terasology.workspace.validation;
 
 import com.google.common.collect.Streams;
+import com.google.common.io.ByteStreams;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicContainer;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.behavior.BehaviorComponent;
@@ -17,8 +19,12 @@ import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetData;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.resources.ModuleFileSource;
 import org.terasology.moduletestingenvironment.Engines;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -34,6 +40,35 @@ public class WorkspaceBehaviorsTests {
         return temporary.getRegistry()
                 .getModuleIds()
                 .stream()
+                .filter(name -> {
+                    Module module = temporary.getRegistry().getLatestModuleVersion(name);
+                    ModuleFileSource resources = module.getResources();
+
+                    boolean haveBehaviors = !resources.getFilesInPath(true, "assets/behaviors").isEmpty();
+                    boolean haveBehaviorOverride =
+                            resources.getFilesInPath(false, "overrides")
+                                    .stream()
+                                    .anyMatch(fr -> fr.getPath().contains("behaviors"));
+                    boolean haveBehaviorDelta =
+                            resources.getFilesInPath(false, "deltas")
+                                    .stream()
+                                    .anyMatch(fr -> fr.getPath().contains("behaviors"));
+
+                    boolean havePrefab = resources.getFiles().stream()
+                            .filter(fr -> fr.toString().contains("behaviours") && fr.toString().contains(".prefab"))
+                            .anyMatch(fr -> {
+                                try (InputStream inputStream = fr.open()) {
+                                    byte[] bytes = ByteStreams.toByteArray(inputStream);
+                                    String content = new String(bytes, TerasologyConstants.CHARSET);
+                                    return content.contains(BehaviorComponent.class.getSimpleName());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    return false;
+                                }
+                            });
+
+                    return haveBehaviors || haveBehaviorOverride || haveBehaviorDelta || havePrefab;
+                })
                 .map(moduleName -> {
                     EnginesAccessor engine = new EnginesAccessor(Set.of(moduleName.toString()), null);
                     AtomicReference<AssetManager> assetManagerRef = new AtomicReference<>();
