@@ -25,7 +25,9 @@ dependencies {
 
     implementation(platform(project(":modules")))
 
-    implementation("org.terasology.modules:ModuleTestingEnvironment:0.3.0+")
+    implementation(project(":engine-tests"))
+
+    implementation("org.terasology.modules:ModuleTestingEnvironment:0.3.3-SNAPSHOT")
 
     implementation(group: 'com.google.guava', name: 'guava', version: '30.1-jre')
 
