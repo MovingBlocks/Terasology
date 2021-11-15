@@ -24,16 +24,8 @@ dependencies {
     implementation "org.terasology:reflections:0.9.12-MB"
 
     implementation(platform(project(":modules")))
-//    // For the "natives" configuration make it depend on the native files from LWJGL
-//    implementation platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
-//    ["natives-linux", "natives-windows", "natives-macos"].forEach {
-//        implementation "org.lwjgl:lwjgl::$it"
-//        implementation "org.lwjgl:lwjgl-assimp::$it"
-//        implementation "org.lwjgl:lwjgl-glfw::$it"
-//        implementation "org.lwjgl:lwjgl-openal::$it"
-//        implementation "org.lwjgl:lwjgl-opengl::$it"
-//        implementation "org.lwjgl:lwjgl-stb::$it"
-//    }
+
+    implementation("org.terasology.modules:ModuleTestingEnvironment:0.3.0+")
 
     implementation(group: 'com.google.guava', name: 'guava', version: '30.1-jre')
 
