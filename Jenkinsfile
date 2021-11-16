@@ -126,10 +126,10 @@ pipeline {
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
                         qualityGates: [
-                            [threshold: 0, type: 'NEW_HIGH', unstable: false],      // mark stage "failed" on new high findings
-                            [threshold: 0, type: 'NEW_NORMAL', unstable: false],    // mark stage "failed" on new normal findings
-                            [threshold: 0, type: 'TOTAL_HIGH', unstable: true],     // mark stage "unstable" on existing high findings
-                            [threshold: 0, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
+                            [threshold: 1, type: 'NEW_HIGH', unstable: false],      // mark stage "failed" on new high findings
+                            [threshold: 1, type: 'NEW_NORMAL', unstable: false],    // mark stage "failed" on new normal findings
+                            [threshold: 1, type: 'TOTAL_HIGH', unstable: true],     // mark stage "unstable" on existing high findings
+                            [threshold: 1, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
                         ])
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
