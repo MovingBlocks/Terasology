@@ -34,7 +34,7 @@ properties([
 
 pipeline {
     agent {
-        label 'ts-engine && heavy && java8'
+        label 'ts-engine && heavy && java11'
     }
     stages {
         // declarative pipeline does `checkout scm` automatically when hitting first stage
@@ -42,6 +42,7 @@ pipeline {
             steps {
                 echo 'Automatically checked out the things!'
                 sh 'chmod +x gradlew'
+                sh './gradlew --version'
             }
         }
 
