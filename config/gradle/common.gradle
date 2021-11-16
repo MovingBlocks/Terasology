@@ -119,7 +119,16 @@ spotbugsMain {
     }
 }
 
-// TODO: Temporary until javadoc has been fixed for Java 8 everywhere
-javadoc {
+tasks.javadoc {
+    // Disable doclint messages about missing "@param" or "@return" tags.
+    options.addBooleanOption("Xdoclint:all,-missing", true)
+
+    // Omit package qualifiers for some of the most common types.
+    options.noQualifiers(
+            "java.lang", "java.util.*", "org.joml",
+            "org.terasology.engine.entitySystem.entity"
+    )
+
+    // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
     failOnError = false
 }
