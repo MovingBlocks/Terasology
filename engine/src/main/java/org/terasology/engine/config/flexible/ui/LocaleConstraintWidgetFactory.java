@@ -6,10 +6,10 @@ package org.terasology.engine.config.flexible.ui;
 import com.google.common.collect.Lists;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.LocaleConstraint;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.rendering.nui.layers.mainMenu.settings.LocaleRenderer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UIDropdownScrollable;
@@ -58,8 +58,8 @@ public class LocaleConstraintWidgetFactory extends ConstraintWidgetFactory<Local
         };
 
         UIDropdownScrollable<Locale> dropdownScrollable = new UIDropdownScrollable<>();
-        SimpleUri menuUri = new SimpleUri("engine:menu");
-        TranslationProject menuProject = translationSystem.getProject(menuUri);
+        ResourceUrn menuUrn = new ResourceUrn("engine:menu");
+        TranslationProject menuProject = translationSystem.getProject(menuUrn);
         List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
         for (Locale languageExcluded : languagesExcluded) {
             locales.remove(languageExcluded);
