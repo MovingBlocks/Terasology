@@ -5,7 +5,6 @@ package org.terasology.engine.i18n.assets;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.core.Uri;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
@@ -27,7 +26,7 @@ public class Translation extends Asset<TranslationData> {
 
     private Map<String, String> dictionary = new HashMap<>();
     private Locale locale;
-    private Uri projectUri;
+    private ResourceUrn projectUrn;
 
     private final DisposalAction disposalAction;
 
@@ -57,8 +56,8 @@ public class Translation extends Asset<TranslationData> {
     /**
      * @return the uri of the project this instance is part of
      */
-    public Uri getProjectUri() {
-        return projectUri;
+    public ResourceUrn getProjectUrn() {
+        return projectUrn;
     }
     /**
      * @return the locale of the translation data
@@ -101,14 +100,14 @@ public class Translation extends Asset<TranslationData> {
     protected void doReload(TranslationData data) {
         Preconditions.checkArgument(data != null);
 
-        boolean isEqual = Objects.equal(data.getProjectUri(), projectUri)
+        boolean isEqual = Objects.equal(data.getProjectUrn(), projectUrn)
                 && Objects.equal(data.getLocale(), locale)
                 && Objects.equal(data.getTranslations(), dictionary);
 
         if (!isEqual) {
             this.dictionary.clear();
             this.dictionary.putAll(data.getTranslations());
-            this.projectUri = data.getProjectUri();
+            this.projectUrn = data.getProjectUrn();
             this.locale = data.getLocale();
 
             for (Consumer<Translation> listener : disposalAction.changeListeners) {

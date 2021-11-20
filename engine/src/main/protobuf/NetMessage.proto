@@ -1,3 +1,4 @@
+syntax = "proto3";
 import "EntityData.proto";
 
 option java_package = "org.terasology.protobuf";
@@ -30,42 +31,30 @@ message NetMessage {
     optional NewIdentityRequest newIdentityRequest = 101;
     optional ProvisionIdentity provisionIdentity = 102;
     optional HandshakeVerification handshakeVerification = 103;
-
-    extensions 5000 to max;
 }
 
 message HandshakeHello {
     optional bytes random = 1;
     optional Certificate certificate = 2;
     optional sint64 timestamp = 3;
-
-    extensions 5000 to max;
 }
 
 message NewIdentityRequest {
     optional bytes preMasterSecret = 1;
     optional bytes random = 2;
-
-    extensions 5000 to max;
 }
 
 message ProvisionIdentity {
     optional bytes encryptedCertificates = 1;
-
-    extensions 5000 to max;
 }
 
 message CertificateSet {
     optional Certificate publicCertificate = 1;
     optional bytes privateExponent = 2;
-
-    extensions 5000 to max;
 }
 
 message HandshakeVerification {
     optional bytes signature = 1;
-
-    extensions 5000 to max;
 }
 
 message Certificate {
@@ -73,36 +62,26 @@ message Certificate {
     optional bytes modulus = 2;
     optional bytes exponent = 3;
     optional bytes signature = 4;
-
-    extensions 5000 to max;
 }
 
 message BlockFamilyRegisteredMessage {
     repeated string blockUri = 1;
     repeated int32 blockId = 2;
-
-    extensions 5000 to max;
 }
 
 message InvalidateChunkMessage {
     optional Vector3iData pos = 1;
-
-    extensions 5000 to max;
 }
 
 message BlockChangeMessage {
     optional Vector3iData pos = 1;
     optional int32 newBlock = 2;
-
-    extensions 5000 to max;
 }
 
 message ExtraDataChangeMessage {
     optional int32 index = 1;
     optional Vector3iData pos = 2;
     optional int32 newData = 3;
-    
-    extensions 5000 to max;
 }
 
 message Vector3iData {
@@ -113,7 +92,6 @@ message Vector3iData {
 
 message ServerInfoRequest {
 
-    extensions 5000 to max;
 }
 
 message JoinMessage {
@@ -121,8 +99,6 @@ message JoinMessage {
     optional string version = 2;
     optional sint32 viewDistanceLevel = 3;
     optional Color color = 4;
-
-    extensions 5000 to max;
 }
 
 message Color {
@@ -131,17 +107,15 @@ message Color {
 
 message JoinCompleteMessage {
     optional int32 clientId = 1;
-
-    extensions 5000 to max;
 }
 
 message ServerInfoMessage {
     repeated ModuleInfo module = 1;
-    repeated sint32 blockId = 2 [packed=true];
+    repeated sint32 blockId = 2;
     repeated string blockName = 3;
     repeated SerializationInfo component = 4;
     repeated SerializationInfo event = 5;
-    repeated int32 assetId = 6 [packed=true];
+    repeated int32 assetId = 6;
     repeated string assetUri = 7;
     repeated string registerBlockFamily = 8;
     repeated WorldInfo worldInfo = 9;
@@ -153,15 +127,11 @@ message ServerInfoMessage {
     optional float reflectionHeight = 18;
     optional string MOTD = 19;
     optional int32 onlinePlayersAmount = 20;
-
-    extensions 5000 to max;
 }
 
 message WorldInfo {
     optional string title = 1;
     optional int64 time = 2;
-
-    extensions 5000 to max;
 }
 
 message SerializationInfo {
@@ -169,21 +139,15 @@ message SerializationInfo {
     optional int32 id = 2;
     repeated string fieldName = 3;
     optional bytes fieldIds = 4;
-
-    extensions 5000 to max;
 }
 
 message ModuleInfo {
     optional string moduleId = 1;
     optional string moduleVersion = 2;
-
-    extensions 5000 to max;
 }
 
 message ModuleRequest {
     optional string moduleId = 1;
-
-    extensions 5000 to max;
 }
 
 message ModuleDataHeader {
@@ -191,46 +155,32 @@ message ModuleDataHeader {
     optional string version = 2;
     optional int64 size = 3;
     optional string error = 15;
-
-    extensions 5000 to max;
 }
 
 message ModuleData {
     optional bytes module = 1;
-
-    extensions 5000 to max;
 }
 
 message ModuleSendError {
     optional string message = 1;
-
-    extensions 5000 to max;
 }
 
 message CreateEntityMessage {
     optional PackedEntity entity = 1;
     optional Vector3iData blockPos = 2;
-
-    extensions 5000 to max;
 }
 
 message UpdateEntityMessage {
     optional PackedEntity entity = 1;
     optional int32 netId = 2;
-
-    extensions 5000 to max;
 }
 
 message RemoveEntityMessage {
     optional int32 netId = 1;
-
-    extensions 5000 to max;
 }
 
 message EventMessage {
     optional int32 targetId = 1;
     optional Event event = 2;
     optional Vector3iData targetBlockPos = 3;
-
-    extensions 5000 to max;
 }

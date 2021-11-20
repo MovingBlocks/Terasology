@@ -35,7 +35,7 @@ public interface Chunk extends RenderableChunk {
      * @deprecated use {@link #getPosition()}
      */
     @Deprecated
-    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
+    Vector3i getPosition(Vector3i dest);
 
     /**
      * Returns block at given position relative to the chunk.

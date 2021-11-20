@@ -34,3 +34,13 @@ dependencies {
     // Make sure all module dependencies are available to the game in cacheModules.
     "modules"(project(":modules"))
 }
+
+tasks.register<Test>("unitTest") {
+    group = "Verification"
+    description = "Runs unit tests (fast)"
+
+    useJUnitPlatform {
+        excludeTags("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}

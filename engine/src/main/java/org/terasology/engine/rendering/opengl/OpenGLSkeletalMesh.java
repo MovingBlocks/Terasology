@@ -59,7 +59,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
 
-    public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
+    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
         this.scale = newScale;
         this.translate = newTranslate;
     }
@@ -140,15 +140,11 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
     public void render() {
-//        preRender();
         doRender(data.getBindPoseVertexPositions(), data.getBindPoseVertexNormals());
-//        postRender();
     }
 
     public void render(List<Matrix4f> boneTransforms) {
-//        preRender();
         doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
-//        postRender();
     }
 
     @Override

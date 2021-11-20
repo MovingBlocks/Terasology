@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Optional;
 
+import static java.lang.Math.max;
 import static org.terasology.engine.config.flexible.SettingArgument.constraint;
 import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
 import static org.terasology.engine.config.flexible.SettingArgument.name;
@@ -31,7 +32,7 @@ public class SystemConfig extends AutoConfig {
 
     public final Setting<Integer> maxThreads = setting(
             type(Integer.class),
-            defaultValue(Runtime.getRuntime().availableProcessors() - 1),
+            defaultValue(max(1, Runtime.getRuntime().availableProcessors() - 1)),
             name("Max threads(not yet)"),
             constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
     );

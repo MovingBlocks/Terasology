@@ -68,7 +68,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 } else {
                     currentPosition.x += currentWidth;
                 }
-                org.joml.Vector2i preferredSize = canvas.calculatePreferredSize(level);
+                Vector2i preferredSize = canvas.calculatePreferredSize(level);
                 Rectanglei region = new Rectanglei(
                         currentPosition.x, currentPosition.y).setSize(preferredSize.x, preferredSize.y);
                 double percentageThreshold = 0.9;

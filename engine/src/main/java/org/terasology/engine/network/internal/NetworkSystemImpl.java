@@ -80,13 +80,8 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,25 +172,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     logger.info("No server MOTD is defined");
                 }
 
-                // enumerate all network interfaces that listen
-                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-                while (interfaces.hasMoreElements()) {
-                    NetworkInterface ifc = interfaces.nextElement();
-                    if (!ifc.isLoopback()) {
-                        for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
-                            InetAddress adr = ifadr.getAddress();
-                            logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
-                                    ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
-                        }
-                    }
-                }
                 if (serverChannelFuture.isSuccess()) {
                     logger.info("Server started");
                 }
                 serverChannelFuture.sync();
                 nextNetworkTick = time.getRealTimeInMs();
-            } catch (SocketException e) {
-                throw new HostingFailedException("Could not identify network interfaces", e);
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
                     throw new HostingFailedException("Port already in use (are you already hosting a game?)",
@@ -203,7 +184,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 } else {
                     throw new HostingFailedException("Failed to host game", e.getCause());
                 }
-
             } catch (InterruptedException e) {
                 shutdown();
                 throw new HostingFailedException("Server has been interrupted", e.getCause());

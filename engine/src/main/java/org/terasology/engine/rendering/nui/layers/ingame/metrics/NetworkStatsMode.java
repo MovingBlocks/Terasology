@@ -50,9 +50,4 @@ final class NetworkStatsMode extends MetricsMode {
     public boolean isAvailable() {
         return networkSystem.getMode() != NetworkMode.NONE;
     }
-
-    @Override
-    public boolean isPerformanceManagerMode() {
-        return false;
-    }
 }

@@ -13,8 +13,8 @@ import org.terasology.engine.identity.CertificateGenerator;
 import org.terasology.engine.identity.CertificatePair;
 import org.terasology.engine.identity.IdentityConstants;
 import org.terasology.engine.identity.PublicIdentityCertificate;
-import org.terasology.protobuf.NetData;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.protobuf.NetData;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
