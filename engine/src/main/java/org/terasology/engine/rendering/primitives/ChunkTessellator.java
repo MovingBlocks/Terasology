@@ -29,7 +29,7 @@ public final class ChunkTessellator {
 
     public ChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
         PerformanceMonitor.startActivity("GenerateMesh");
-        ChunkMesh mesh = new ChunkMesh();
+        ChunkMeshImpl mesh = new ChunkMeshImpl();
 
         final Stopwatch watch = Stopwatch.createStarted();
 

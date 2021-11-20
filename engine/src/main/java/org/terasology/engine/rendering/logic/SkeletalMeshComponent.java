@@ -55,7 +55,9 @@ public class SkeletalMeshComponent implements VisualComponent<SkeletalMeshCompon
     public EntityRef rootBone = EntityRef.NULL;
     public float animationTime;
 
+    @Replicate
     public Vector3f scale = new Vector3f(1, 1, 1);
+    @Replicate
     public Vector3f translate = new Vector3f();
 
     @Replicate

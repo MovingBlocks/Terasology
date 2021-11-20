@@ -128,7 +128,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 .publishOn(GameScheduler.gameMain())
                 .subscribe(result -> result.ifPresent(TupleUtils.consumer((chunk, chunkMesh) -> {
                     if (chunksInProximityOfCamera.contains(chunk)) {
-                        chunkMesh.generateVBOs();
+                        chunkMesh.updateMesh();//.generateVBOs();
                         chunkMesh.discardData();
                         if (chunk.hasMesh()) {
                             chunk.getMesh().dispose();
@@ -206,7 +206,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 chunk.setDirty(false);
 
                 newMesh = chunkTessellator.generateMesh(localView);
-                newMesh.generateVBOs();
+                newMesh.updateMesh();
                 newMesh.discardData();
 
                 if (chunk.hasMesh()) {
@@ -319,7 +319,6 @@ class RenderableWorldImpl implements RenderableWorld {
         Vector3f cameraCoordinates = playerCamera.getPosition();
         return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
-
 
     /**
      * Updates the currently visible chunks (in sight of the player).
