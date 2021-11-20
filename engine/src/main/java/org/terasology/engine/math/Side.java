@@ -8,6 +8,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public enum Side {
 
     public static EnumSet<Side> getSides(final byte data) {
         final EnumSet<Side> result = EnumSet.noneOf(Side.class);
-        for (Side side : Side.values()) {
+        for (Side side : ALL_SIDES) {
             if ((data & side.getFlag()) > 0) {
                 result.add(side);
             }
