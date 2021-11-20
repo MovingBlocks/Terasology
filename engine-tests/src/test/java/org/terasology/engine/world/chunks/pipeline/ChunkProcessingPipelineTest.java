@@ -130,13 +130,13 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
             TimeoutException {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
-        Map<Vector3i, Chunk> chunkToGenerate =
+        Map<Vector3ic, Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
                         .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
-                                (chunk) -> new Vector3i(chunk.getPosition()),
+                                ChunkImpl::getPosition,
                                 Function.identity()
                         ));
 
@@ -181,10 +181,10 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                 "flat merging task",
                 (chunks) -> chunks.stream()
                         .sorted((o1, o2) -> {
-                            Function<Chunk, Vector3i> pos = (c) -> new Vector3i(c.getPosition());
-                            return Comparator.comparing(pos.andThen(Vector3i::x))
-                                    .thenComparing(pos.andThen(Vector3i::y))
-                                    .thenComparing(pos.andThen(Vector3i::z))
+                            Function<Chunk, Vector3ic> pos = Chunk::getPosition;
+                            return Comparator.comparing(pos.andThen(Vector3ic::x))
+                                    .thenComparing(pos.andThen(Vector3ic::y))
+                                    .thenComparing(pos.andThen(Vector3ic::z))
                                     .compare(o1, o2);
                         }).toArray(Chunk[]::new)[5],
                 this::getNearChunkPositions));
