@@ -1,5 +1,5 @@
 ---
-name: Documentation request
+name: 📜 Documentation Request
 about: Report a need for additional documentation for Terasology
 title: Request for documentation for ...
 labels: 'Category: Doc, Status: Needs Discussion'
