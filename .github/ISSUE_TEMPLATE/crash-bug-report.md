@@ -45,6 +45,10 @@ Please attach (a link to) all of them.
 
 If applicable, add screenshots to help explain your problem.
 
-### Additional context
+### Workaround
+
+If applicable, describe any workaround you found to avoid the issue
+
+### Additional Infos / Context
 
 Feel free to add any other context about the problem here.
