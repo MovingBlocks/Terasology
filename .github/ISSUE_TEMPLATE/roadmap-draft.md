@@ -1,5 +1,5 @@
 ---
-name: Roadmap draft
+name: 🛤️ Roadmap Draft
 about: Document the roadmap for a bigger effort within Terasology
 title: Roadmap for ...
 labels: 'Category: Doc, Status: Needs Discussion'
