@@ -427,7 +427,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                            return new LightMerger().merge(localChunks);
+                            return LightMerger.merge(localChunks);
                         },
                         pos -> {
                             BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);
@@ -472,7 +472,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                            return new LightMerger().merge(localChunks);
+                            return LightMerger.merge(localChunks);
                         },
                         pos -> {
                             BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);

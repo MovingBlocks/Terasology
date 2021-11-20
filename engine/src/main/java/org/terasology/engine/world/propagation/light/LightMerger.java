@@ -32,7 +32,7 @@ public class LightMerger {
     private static final LightPropagationRules LIGHT_RULES = new LightPropagationRules();
     private static final SunlightRegenPropagationRules SUNLIGHT_REGEN_RULES = new SunlightRegenPropagationRules();
 
-    public LightMerger() {
+    private LightMerger() {
 
     }
 
