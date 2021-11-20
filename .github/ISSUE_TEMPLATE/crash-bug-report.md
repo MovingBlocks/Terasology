@@ -1,5 +1,5 @@
 ---
-name: Crash/Bug report
+name: 🐛 Crash/Bug Report
 about: Create a crash or bug report to help us improve Terasology
 title: Crash/Bug on trying to ...
 labels: 'Status: Needs Investigation, Topic: Stabilization, Type: Bug'
