@@ -1,5 +1,5 @@
 ---
-name: Improvement request
+name: ✨ Improvement Request
 about: Suggest an improvement for Terasology
 title: Request for improving ...
 labels: 'Status: Needs Discussion, Type: Improvement'
