@@ -4,7 +4,7 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
@@ -52,6 +52,7 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Sinks;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +60,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -120,11 +120,9 @@ public class LocalChunkProvider implements ChunkProvider {
         this.chunkCache = chunkCache;
         ChunkMonitor.fireChunkProviderInitialized(this);
         resetDeactivationPublisher();
-
-
     }
 
-    protected Future<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
+    protected ListenableFuture<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
         Vector3i pos = new Vector3i(chunkPos);
         return loadingPipeline.invokeGeneratorTask(
                 pos,
@@ -431,9 +429,15 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localChunks);
                         },
-                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                                .map(Vector3i::new)
-                                .collect(Collectors.toSet())
+                        pos -> {
+                            BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);
+                            List<Vector3ic> positions = new ArrayList<>(region.volume());
+                            for (Vector3ic loc : new BlockRegion(pos).expand(1, 1, 1)) {
+                                positions.add(new Vector3i(loc));
+                            }
+                            return positions;
+
+                        }
                 ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
 
@@ -470,9 +474,14 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localChunks);
                         },
-                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                                .map(Vector3i::new)
-                                .collect(Collectors.toCollection(Sets::newLinkedHashSet))
+                        pos -> {
+                            BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);
+                            List<Vector3ic> positions = new ArrayList<>(region.volume());
+                            for (Vector3ic loc : new BlockRegion(pos).expand(1, 1, 1)) {
+                                positions.add(new Vector3i(loc));
+                            }
+                            return positions;
+                        }
                 ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }

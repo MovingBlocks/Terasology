@@ -4,13 +4,13 @@
     <option name="configuration">
       <map>
         <entry key="active-configuration" value="PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology" />
-        <entry key="checkstyle-version" value="8.32" />
+        <entry key="checkstyle-version" value="8.45" />
         <entry key="copy-libs" value="false" />
         <entry key="location-0" value="BUNDLED:(bundled):Sun Checks" />
         <entry key="location-1" value="BUNDLED:(bundled):Google Checks" />
         <entry key="location-2" value="PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology" />
-        <entry key="property-2.samedir" value="config/metrics/checkstyle" />
-        <entry key="scan-before-checkin" value="false" />
+        <entry key="property-2.samedir" value="$PROJECT_DIR$/config/metrics/checkstyle" />
+        <entry key="scan-before-checkin" value="true" />
         <entry key="scanscope" value="AllSourcesWithTests" />
         <entry key="suppress-errors" value="false" />
       </map>

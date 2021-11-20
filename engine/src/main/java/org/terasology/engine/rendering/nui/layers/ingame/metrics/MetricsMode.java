@@ -45,7 +45,9 @@ public abstract class MetricsMode {
      */
     public abstract boolean isAvailable();
 
-    public abstract boolean isPerformanceManagerMode();
+    public boolean isPerformanceManagerMode() {
+        return false;
+    }
 
     /**
      * A (human readable) name for the metrics mode.

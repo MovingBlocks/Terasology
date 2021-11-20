@@ -8,6 +8,7 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.network.Replicate;
@@ -35,7 +36,7 @@ public final class LocationComponent implements Component<LocationComponent>, Re
     // Standard position/rotation
     @Replicate
     @TextField
-    Vector3f position = new Vector3f();
+    final Vector3f position = new Vector3f();
     @Replicate
     Quaternionf rotation = new Quaternionf();
     @Replicate
@@ -51,6 +52,10 @@ public final class LocationComponent implements Component<LocationComponent>, Re
 
     public LocationComponent(Vector3fc position) {
         setLocalPosition(position);
+    }
+
+    public LocationComponent(Vector3ic position) {
+        this(new Vector3f(position));
     }
 
     private void dirty() {
@@ -280,11 +285,12 @@ public final class LocationComponent implements Component<LocationComponent>, Re
         this.replicateChanges = other.replicateChanges;
         this.isDirty = other.isDirty;
         this.parent = other.parent;
-        this.children = Lists.newArrayList(other.children);
-        this.position = new Vector3f(other.position);
-        this.rotation = new Quaternionf(other.rotation);
+        this.children.clear();
+        this.children.addAll(other.children);
+        this.position.set(other.position);
+        this.rotation.set(other.rotation);
         this.scale = other.scale;
-        this.lastPosition = new Vector3f(other.lastPosition);
-        this.lastRotation = new Quaternionf(other.lastRotation);
+        this.lastPosition.set(other.lastPosition);
+        this.lastRotation.set(other.lastRotation);
     }
 }
