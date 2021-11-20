@@ -429,15 +429,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
                             return LightMerger.merge(localChunks);
                         },
-                        pos -> {
-                            BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);
-                            List<Vector3ic> positions = new ArrayList<>(region.volume());
-                            for (Vector3ic loc : new BlockRegion(pos).expand(1, 1, 1)) {
-                                positions.add(new Vector3i(loc));
-                            }
-                            return positions;
-
-                        }
+                        LightMerger::requiredChunks
                 ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
 
@@ -474,14 +466,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localChunks = chunks.toArray(new Chunk[0]);
                             return LightMerger.merge(localChunks);
                         },
-                        pos -> {
-                            BlockRegion region = new BlockRegion(pos).expand(1, 1, 1);
-                            List<Vector3ic> positions = new ArrayList<>(region.volume());
-                            for (Vector3ic loc : new BlockRegion(pos).expand(1, 1, 1)) {
-                                positions.add(new Vector3i(loc));
-                            }
-                            return positions;
-                        }
+                        LightMerger::requiredChunks
                 ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
