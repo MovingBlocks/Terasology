@@ -10,10 +10,10 @@ import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.the
 
 const val DEFAULT_MAX_HEAP_SIZE = "3G"
@@ -46,10 +46,11 @@ fun isMacOS() : Boolean {
 }
 
 
-open class RunTerasology : JavaExec() {
+abstract class RunTerasology : JavaExec() {
 
+    @get:Optional
     @get:Input
-    val jmxPort: Property<Int> = objectFactory.property()
+    abstract val jmxPort: Property<Int>
 
     @Option(option="jmx-port", description="Enable JMX connections on this port (jmxremote.port)")
     fun parseJmxPort(value: String?) {
