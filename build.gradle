@@ -242,6 +242,26 @@ task copyInMissingTemplates {
     }
 }
 
+tasks.register("jmxPassword", Copy) {
+    description = "Create config/jmxremote.password from a template."
+
+    setFileMode(0600)  // passwords must be accessible only by owner
+
+    // there is a template file in $JAVA_HOME/conf/management
+    from(java.nio.file.Path.of(System.getProperty("java.home"), "conf", "management"))
+    include("jmxremote.password.template")
+    rename("(.*).template", '$1')
+    into("config")
+
+    onlyIf {
+        // Do not overwrite an existing password file.
+        !it.destinationDir.toPath().resolve("jmxremote.password").toFile().exists()
+    }
+    doLast {
+        logger.warn("${it.outputs.files.singleFile}/jmxremote.password:100: Edit this to set your password.")
+    }
+}
+
 // Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
 ideaModule.dependsOn copyInMissingTemplates
