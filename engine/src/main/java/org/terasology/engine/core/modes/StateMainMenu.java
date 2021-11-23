@@ -82,7 +82,11 @@ public class StateMainMenu extends AbstractState {
         if (!messageOnLoad.isEmpty()) {
             TranslationSystem translationSystem = context.get(TranslationSystem.class);
             if (headless) {
-                throw new RuntimeException("Game receive error and fall to main menu. See logs before");
+                throw new RuntimeException(
+                        String.format(
+                                "Game receive error and fall to main menu: [%s]. See logs before",
+                                translationSystem.translate(messageOnLoad)
+                        ));
             } else {
                 MessagePopup popup = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 popup.setMessage("Error", translationSystem.translate(messageOnLoad));
