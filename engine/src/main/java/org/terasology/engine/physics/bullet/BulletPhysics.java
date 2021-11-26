@@ -106,6 +106,7 @@ import java.util.Set;
 @Share(Physics.class)
 public class BulletPhysics extends BaseComponentSystem implements UpdateSubscriberSystem, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
+    private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
     @In
     protected BlockEntityRegistry blockEntityRegistry;
@@ -119,9 +120,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     protected NetworkSystem networkSystem;
     @In
     protected WorldProvider worldProvider;
-
-    private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
-
+    
     private final btCollisionDispatcher dispatcher;
     private final btBroadphaseInterface broadphase;
     private final btDiscreteDynamicsWorld discreteDynamicsWorld;
@@ -765,6 +764,13 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * The character collider associated with the target {@link EntityRef}. Entity must
+     * have {@link CharacterMovementComponent}
+     *
+     * @param entity the associated entity
+     * @return the {@link CharacterCollider}
+     */
     @Override
     public CharacterCollider getCharacterCollider(EntityRef entity) {
         CharacterCollider cc = entityColliders.get(entity);
@@ -774,7 +780,12 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         return cc;
     }
 
-
+    /**
+     * Activates {@link EntityRef} in a sphere around the target position.
+     *
+     * @param pos    The position around which to wake up objects.
+     * @param radius the radius of the sphere.
+     */
     @Override
     public void awakenArea(Vector3fc pos, float radius) {
         btPairCachingGhostObject ghost = new btPairCachingGhostObject();
