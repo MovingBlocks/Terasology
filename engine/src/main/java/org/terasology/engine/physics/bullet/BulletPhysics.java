@@ -107,6 +107,19 @@ import java.util.Set;
 public class BulletPhysics extends BaseComponentSystem implements UpdateSubscriberSystem, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
+    @In
+    protected BlockEntityRegistry blockEntityRegistry;
+    @In
+    protected Config config;
+    @In
+    protected AssetManager assetManager;
+    @In
+    protected Time time;
+    @In
+    protected NetworkSystem networkSystem;
+    @In
+    protected WorldProvider worldProvider;
+
     private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
     private final btCollisionDispatcher dispatcher;
@@ -124,25 +137,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     private final btGhostPairCallback ghostPairCallback;
     private long lastNetsync;
 
-    @In
-    protected BlockEntityRegistry blockEntityRegistry;
-    @In
-    protected Config config;
-    @In
-    protected AssetManager assetManager;
-    @In
-    protected Time time;
-    @In
-    protected NetworkSystem networkSystem;
-    @In
-    protected WorldProvider worldProvider;
-
-
-    @Override
-    public void initialise() {
-        super.initialise();
-    }
-
     public BulletPhysics() {
         ghostPairCallback = new btGhostPairCallback();
 
@@ -157,6 +151,10 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(ghostPairCallback);
     }
 
+    @Override
+    public void initialise() {
+        super.initialise();
+    }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void newRigidBody(OnActivatedComponent event, EntityRef entity, RigidBodyComponent rigidBody, LocationComponent location) {
@@ -232,7 +230,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class})
+    @ReceiveEvent(components = RigidBodyComponent.class)
     public void removeRigidBody(BeforeDeactivateComponent event, EntityRef entity) {
         entityRigidBodies.computeIfPresent(entity, (entityRef, rb) -> {
             Matrix4f m = new Matrix4f();
@@ -312,8 +310,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
             rb.setAngularVelocity(vNewVelocity);
         }
     }
-
-
 
     @ReceiveEvent
     public void updateTrigger(OnChangedComponent event, EntityRef entity, TriggerComponent trigger, LocationComponent location) {
@@ -532,7 +528,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         Vector3f a1 = new Vector3f();
         Vector3f a2 = new Vector3f();
         Vector3f a3 = new Vector3f();
-        
+
         try {
             PerformanceMonitor.startActivity("Step Simulation");
             if (discreteDynamicsWorld.stepSimulation(delta, 10) != 0) {
@@ -694,7 +690,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
-    public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
+    public void rsyncPhysics(PhysicsResynchEvent event, EntityRef entity) {
+        //TODO: re-sync is enforced by the server but the time is not consistent between the server/client
         btRigidBody rb = entityRigidBodies.get(entity);
         if (rb != null) {
             rb.setLinearVelocity(event.getVelocity());
@@ -703,7 +700,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
-    public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
+    public void rsyncLocation(LocationResynchEvent event, EntityRef entity) {
+        //TODO: re-sync is enforced by the server but the time is not consistent between the server/client
         btRigidBody rb = entityRigidBodies.get(entity);
         if (rb != null) {
             Matrix4f transform = new Matrix4f();
@@ -712,6 +710,15 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * The {@link CollisionGroup} for the associated entity
+     * <br>
+     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision flags else return {@link StandardCollisionGroup#NONE} if neither
+     * component is specified
+     *
+     * @param entity the target entity
+     * @return the collision flag
+     */
     private short getCollisionGroupFlag(EntityRef entity) {
         CollisionGroup collisionGroup = StandardCollisionGroup.NONE;
         if (entity.hasComponent(TriggerComponent.class)) {
@@ -723,7 +730,16 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
         return collisionGroup.getFlag();
     }
-
+    /**
+     *
+     * The {@link CollisionGroup} that the associated {@link EntityRef} will collide with.
+     * <br>
+     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision groups else return {@link StandardCollisionGroup#NONE} if neither
+     * component is specified
+     *
+     * @param entity the target entity
+     * @return the collision flag
+     */
     private short getCollidesWithGroupFlag(EntityRef entity) {
         List<CollisionGroup> collidesWithGroup = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.NONE);
         if (entity.hasComponent(TriggerComponent.class)) {
@@ -798,7 +814,6 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                 CollisionGroup.combineGroups(movementComp.collidesWith),
                 btCollisionObject.CollisionFlags.CF_CHARACTER_OBJECT, owner);
     }
-
 
     private void removeCollider(btCollisionObject collider) {
         discreteDynamicsWorld.removeCollisionObject(collider);
