@@ -31,6 +31,8 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.mockito:mockito-inline:3.12.4")
 
+    testImplementation("com.google.guava:guava:31.0-jre")
+
     testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
 }
 

@@ -7,6 +7,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 /**
  * Write {@link PersistedData} to files, stream, buffer, etc.
@@ -16,4 +17,6 @@ public interface PersistedDataWriter<T extends PersistedData> {
     byte[] writeBytes(T data);
 
     void writeTo(T data, OutputStream outputStream) throws IOException;
+
+    void writeTo(T data, ByteBuffer byteBuffer) throws IOException;
 }
