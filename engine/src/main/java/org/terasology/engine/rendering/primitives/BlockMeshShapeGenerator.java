@@ -26,7 +26,7 @@ public abstract class BlockMeshShapeGenerator implements BlockMeshGenerator {
             Block block = getBlock();
             StandardMeshData meshData = new StandardMeshData();
             int nextIndex = 0;
-            Vector3f light0 = new Vector3f(1,1,1);
+            Vector3f light0 = new Vector3f(1, 1, 1);
             for (BlockPart dir : BlockPart.allParts()) {
                 BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
                 if (part != null) {
