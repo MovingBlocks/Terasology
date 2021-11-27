@@ -4,7 +4,6 @@ package org.terasology.engine.rendering.primitives;
 
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockAppearance;
@@ -15,14 +14,24 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
-public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
-
-    private Block block;
-    private Mesh mesh;
+public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
+    private final Block block;
+    private final ResourceUrn baseUrn = new ResourceUrn("engine", "blockmesh");
 
     public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
     }
+
+    @Override
+    public Block getBlock() {
+        return block;
+    }
+
+    @Override
+    public ResourceUrn getBaseUrn() {
+        return this.baseUrn;
+    }
+
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
@@ -167,26 +176,4 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     }
 
-    @Override
-    public Mesh getStandaloneMesh() {
-        if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
-        }
-        return mesh;
-    }
-
-    private void generateMesh() {
-        Tessellator tessellator = new Tessellator();
-        for (BlockPart dir : BlockPart.values()) {
-            BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
-            if (part != null) {
-                if (block.isDoubleSided()) {
-                    tessellator.addMeshPartDoubleSided(part);
-                } else {
-                    tessellator.addMeshPart(part);
-                }
-            }
-        }
-        mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
-    }
 }
