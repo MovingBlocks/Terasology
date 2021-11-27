@@ -6,8 +6,6 @@ package org.terasology.engine.world.chunks.pipeline;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3ic;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -27,10 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Manages execution of chunk processing.
