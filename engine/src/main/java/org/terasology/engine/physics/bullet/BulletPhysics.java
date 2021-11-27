@@ -120,7 +120,7 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     protected NetworkSystem networkSystem;
     @In
     protected WorldProvider worldProvider;
-    
+
     private final btCollisionDispatcher dispatcher;
     private final btBroadphaseInterface broadphase;
     private final btDiscreteDynamicsWorld discreteDynamicsWorld;
@@ -155,6 +155,14 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         super.initialise();
     }
 
+    /**
+     * creates a new {@link btRigidBody} if an associated {@link btRigidBody} is not bound
+     * to the {@link RigidBodyComponent}.
+     * @param event the activated component
+     * @param entity the associated entity
+     * @param rigidBody The target rigid body
+     * @param location The location of the entity
+     */
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void newRigidBody(OnActivatedComponent event, EntityRef entity, RigidBodyComponent rigidBody, LocationComponent location) {
         entityRigidBodies.computeIfAbsent(entity, e -> {
@@ -229,6 +237,12 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * removes {@link btRigidBody} when {@link RigidBodyComponent} is removed from the {@link EntityRef}.
+     *
+     * @param event the deactivate event
+     * @param entity the associated entity
+     */
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void removeRigidBody(BeforeDeactivateComponent event, EntityRef entity) {
         entityRigidBodies.computeIfPresent(entity, (entityRef, rb) -> {
@@ -244,6 +258,11 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         });
     }
 
+    /**
+     * applies impulse to the center of the {@link EntityRef} with a {@link RigidBodyComponent}.
+     * @param event the impulse event.
+     * @param entity the associated {@link EntityRef}.
+     */
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
         btRigidBody bt = entityRigidBodies.get(entity);
@@ -252,6 +271,11 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * apply force to the center of the {@link EntityRef} with a {@link RigidBodyComponent}
+     * @param event the impulse event.
+     * @param entity associated {@link EntityRef}.
+     */
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onForce(ForceEvent event, EntityRef entity) {
         btRigidBody bt = entityRigidBodies.get(entity);
@@ -260,6 +284,12 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * applies a velocity change to the target {@link EntityRef} with a {@link RigidBodyComponent}.
+     *
+     * @param event the change velocity.
+     * @param entity the associated {@link EntityRef}.
+     */
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
         btRigidBody bt = entityRigidBodies.get(entity);
@@ -273,12 +303,22 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * wakes up the around a {@link Block} when block is modified i.e destroyed, added etc ...
+     *
+     * @param event the associated event.
+     * @param entity the target {@link EntityRef}.
+     */
     @ReceiveEvent(components = BlockComponent.class)
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
         awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
     }
 
-
+    /**
+     * applies an impact on the target {@link EntityRef}
+     * @param event the associated event.
+     * @param entity the target {@link EntityRef}.
+     */
     @ReceiveEvent(components = {LocationComponent.class, RigidBodyComponent.class})
     public void onItemImpact(ImpactEvent event, EntityRef entity) {
         btRigidBody rb = entityRigidBodies.get(entity);
@@ -310,6 +350,16 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * update the location of the trigger when a change occurs.
+     *
+     * TODO: need to handle when {@link TriggerComponent#collisionGroup} and {@link TriggerComponent#detectGroups} changes
+     *
+     * @param event the change event
+     * @param entity the associated entity
+     * @param trigger trigger associated with the entity
+     * @param location the location of the entity
+     */
     @ReceiveEvent
     public void updateTrigger(OnChangedComponent event, EntityRef entity, TriggerComponent trigger, LocationComponent location) {
         btPairCachingGhostObject bt = entityTriggers.get(entity);
@@ -326,6 +376,15 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
+    /**
+     * creates a new trigger if a {@link TriggerComponent} is present on the {@link EntityRef}. If a trigger
+     * is already built then a trigger is not built.
+     *
+     * @param event active event.
+     * @param entity the target {@link EntityRef}
+     * @param location the location of the {@link EntityRef}
+     * @param trigger The {@link TriggerComponent}
+     */
     @ReceiveEvent
     public void newTrigger(OnActivatedComponent event, EntityRef entity, LocationComponent location, TriggerComponent trigger) {
         Preconditions.checkNotNull(location);
