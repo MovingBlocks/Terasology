@@ -17,8 +17,8 @@ import org.terasology.engine.physics.Physics;
 public final class CharacterMovementSystemUtility {
     private final Physics physics;
 
-    public CharacterMovementSystemUtility(Physics physicsEngine) {
-        this.physics = physicsEngine;
+    public CharacterMovementSystemUtility(Physics physics) {
+        this.physics = physics;
     }
 
 
