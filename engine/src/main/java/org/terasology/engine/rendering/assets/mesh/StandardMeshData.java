@@ -53,13 +53,13 @@ public class StandardMeshData extends MeshData {
      */
     public StandardMeshData(StandardMeshData data) {
         this();
-        positionBuffer.copy(data.positionBuffer);
-        normalBuffer.copy(data.normalBuffer);
-        uv0Buffer.copy(data.uv0Buffer);
-        uv1Buffer.copy(data.uv1Buffer);
-        lightBuffer.copy(data.lightBuffer);
-        colorBuffer.copy(data.colorBuffer);
-        indices.copy(data.indices);
+        positionBuffer.replace(data.positionBuffer);
+        normalBuffer.replace(data.normalBuffer);
+        uv0Buffer.replace(data.uv0Buffer);
+        uv1Buffer.replace(data.uv1Buffer);
+        lightBuffer.replace(data.lightBuffer);
+        colorBuffer.replace(data.colorBuffer);
+        indices.replace(data.indices);
 
         position.setPosition(data.position.getPosition());
         normal.setPosition(data.normal.getPosition());

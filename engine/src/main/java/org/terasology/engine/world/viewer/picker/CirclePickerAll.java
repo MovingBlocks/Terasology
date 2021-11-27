@@ -3,6 +3,7 @@
 
 package org.terasology.engine.world.viewer.picker;
 
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class CirclePickerAll<T> implements CirclePicker<T> {
     private final Function<? super T, ? extends Number> radiusFunc;
 
     public CirclePickerAll(Vector2fc cursor, Function<? super T, ? extends Number> radiusFunc) {
-        this.cursor = new org.joml.Vector2f(cursor);
+        this.cursor = new Vector2f(cursor);
         this.radiusFunc = radiusFunc;
     }
 

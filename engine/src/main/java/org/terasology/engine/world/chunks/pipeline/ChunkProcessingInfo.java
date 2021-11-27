@@ -39,7 +39,7 @@ public final class ChunkProcessingInfo {
         return chunkTaskProvider;
     }
 
-    public org.terasology.engine.world.chunks.pipeline.stages.ChunkTask getChunkTask() {
+    public ChunkTask getChunkTask() {
         return chunkTask;
     }
 

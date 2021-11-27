@@ -18,8 +18,9 @@ apply plugin: 'org.sonarqube'
 
 apply plugin: 'terasology-repositories'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
 
 javadoc.options.encoding = 'UTF-8'
 
@@ -90,8 +91,10 @@ jacocoTestReport {
 // TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
 checkstyle {
     ignoreFailures = false
-    configFile = new File(rootDir, 'config/metrics/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
+
+    def checkstyleDir = rootProject.file('config/metrics/checkstyle')
+    configDirectory = checkstyleDir
+    configProperties.samedir = checkstyleDir
 }
 
 pmd {
@@ -116,7 +119,16 @@ spotbugsMain {
     }
 }
 
-// TODO: Temporary until javadoc has been fixed for Java 8 everywhere
-javadoc {
+tasks.javadoc {
+    // Disable doclint messages about missing "@param" or "@return" tags.
+    options.addBooleanOption("Xdoclint:all,-missing", true)
+
+    // Omit package qualifiers for some of the most common types.
+    options.noQualifiers(
+            "java.lang", "java.util.*", "org.joml",
+            "org.terasology.engine.entitySystem.entity"
+    )
+
+    // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
     failOnError = false
 }

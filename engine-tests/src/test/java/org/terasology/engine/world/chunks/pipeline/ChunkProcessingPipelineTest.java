@@ -3,6 +3,7 @@
 
 package org.terasology.engine.world.chunks.pipeline;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
@@ -29,7 +30,6 @@ import reactor.core.scheduler.Schedulers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -239,12 +239,12 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         }
     }
 
-    private Set<Vector3ic> getNearChunkPositions(Vector3ic p) {
+    private List<Vector3ic> getNearChunkPositions(Vector3ic p) {
         return getNearChunkPositions(p, 1);
     }
 
-    private Set<Vector3ic> getNearChunkPositions(Vector3ic p, int distance) {
-        Set<Vector3ic> requirements = new HashSet<>();
+    private List<Vector3ic> getNearChunkPositions(Vector3ic p, int distance) {
+        List<Vector3ic> requirements = Lists.newArrayListWithCapacity((distance + distance + 1) * (distance + distance + 1));
         for (int x = -distance; x <= distance; x++) {
             for (int y = -distance; y <= distance; y++) {
                 requirements.add(new Vector3i(p.x() + x, p.y() + y, p.z()));

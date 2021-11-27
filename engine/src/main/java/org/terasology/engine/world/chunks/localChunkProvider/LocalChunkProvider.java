@@ -5,7 +5,7 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
@@ -64,8 +64,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
@@ -527,18 +525,15 @@ public class LocalChunkProvider implements ChunkProvider {
             loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(this::onSubscribe));
         }
         loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localChunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toCollection(Sets::newLinkedHashSet))
-            ))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+                        ChunkTaskProvider.create("Chunk generate internal lightning",
+                                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
+                .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
+                .addStage(ChunkTaskProvider.createMulti("Light merging",
+                        chunks -> {
+                            Chunk[] localChunks = chunks.toArray(new Chunk[0]);
+                            return LightMerger.merge(localChunks);
+                        }, LightMerger::requiredChunks
+                ))
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }

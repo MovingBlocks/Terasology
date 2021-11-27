@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks received from remote source.
@@ -84,11 +82,8 @@ public class RemoteChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
                     Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
+                    return LightMerger.merge(localchunks);
+                }, LightMerger::requiredChunks
             ))
             .addStage(ChunkTaskProvider.create("", readyChunks::add));
 
@@ -222,6 +217,9 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
 
         private int score(Chunk chunk) {
+            if (!localPlayer.isValid()) {
+                return 1;
+            }
             return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new Vector3i()).distance(chunk.getPosition());
         }
     }
