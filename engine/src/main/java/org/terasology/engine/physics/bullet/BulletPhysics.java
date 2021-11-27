@@ -577,30 +577,10 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         return new HitResult();
     }
 
-    @Override
-    public void update(float delta) {
-        Matrix4f tempTransform = new Matrix4f();
-        Vector3f tempPosition = new Vector3f();
-        Quaternionf tempRotation = new Quaternionf();
-
+    private void updateCollisionPairs(float delta) {
         Vector3f a1 = new Vector3f();
         Vector3f a2 = new Vector3f();
         Vector3f a3 = new Vector3f();
-
-        try {
-            PerformanceMonitor.startActivity("Step Simulation");
-            if (discreteDynamicsWorld.stepSimulation(delta, 10) != 0) {
-                for (BulletCharacterMoverCollider collider : entityColliders.values()) {
-                    collider.pending = false;
-                }
-            }
-            PerformanceMonitor.endActivity();
-        } catch (Exception e) {
-            logger.error("Error running simulation step.", e);
-        }
-
-        PerformanceMonitor.startActivity("Physics Update");
-
         // update collision pairs
         discreteDynamicsWorld.getCollisionWorld().performDiscreteCollisionDetection();
         for (btPairCachingGhostObject trigger : entityTriggers.values()) {
@@ -671,9 +651,16 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
 
             }
         }
+    }
+
+    private void updateRigidBodies(float delta) {
+        Matrix4f tempTransform = new Matrix4f();
+        Vector3f tempPosition = new Vector3f();
 
         // update rigid bodies
-        entityRigidBodies.forEach((entity, rigidBody) -> {
+        for (Map.Entry<EntityRef, btRigidBody> entry : entityRigidBodies.entrySet()) {
+            EntityRef entity = entry.getKey();
+            btRigidBody rigidBody = entry.getValue();
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
             TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -728,7 +715,14 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
                     }
                 }
             }
-        });
+        }
+    }
+
+
+    private void updateNetworkState(float delta) {
+        Matrix4f tempTransform = new Matrix4f();
+        Vector3f tempPosition = new Vector3f();
+        Quaternionf tempRotation = new Quaternionf();
 
         if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             entityRigidBodies.forEach((entity, body) -> {
@@ -744,6 +738,28 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
             });
             lastNetsync = time.getGameTimeInMs();
         }
+    }
+
+    @Override
+    public void update(float delta) {
+        try {
+            PerformanceMonitor.startActivity("Step Simulation");
+            if (discreteDynamicsWorld.stepSimulation(delta, 10) != 0) {
+                for (BulletCharacterMoverCollider collider : entityColliders.values()) {
+                    collider.pending = false;
+                }
+            }
+            PerformanceMonitor.endActivity();
+        } catch (Exception e) {
+            logger.error("Error running simulation step.", e);
+        }
+
+        PerformanceMonitor.startActivity("Physics Update");
+
+        updateCollisionPairs(delta);
+        updateRigidBodies(delta);
+        updateNetworkState(delta);
+
         PerformanceMonitor.endActivity();
     }
 
