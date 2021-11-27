@@ -204,7 +204,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Set<Vector3ic> relativeRegion = Collections.emptySet();
         for (int i = 0; i < 10; i++) {
             position.set(new Vector3i(i, 0, 0));
-            Set<Vector3ic> newRegion = getNearChunkPositions(position.get(), 10);
+            Set<Vector3ic> newRegion = Sets.newHashSet(getNearChunkPositions(position.get(), 10));
             // load new chunks.
             Sets.difference(newRegion, relativeRegion).forEach((pos) -> chunkSink.next(createChunkAt(pos)));
 
