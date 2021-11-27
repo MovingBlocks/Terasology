@@ -73,7 +73,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
     public KinematicCharacterMover(WorldProvider wp, Physics physics) {
         this.worldProvider = wp;
-        physics = physics;
+        this.physics = physics;
     }
 
     @Override
