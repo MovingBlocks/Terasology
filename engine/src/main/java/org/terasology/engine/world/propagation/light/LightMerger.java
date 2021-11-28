@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Merging light in chunks
  */
-public class LightMerger {
+public final class LightMerger {
     private static final int CENTER_INDEX = 13;
     private static final int LOCAL_CHUNKS_SIDE_LENGTH = 3;
     private static final int LOCAL_CHUNKS_ARRAY_LENGTH =
