@@ -84,7 +84,7 @@ public class StateMainMenu extends AbstractState {
             if (headless) {
                 throw new RuntimeException(
                         String.format(
-                                "Game receive error and fall to main menu: [%s]. See logs before",
+                                "Game could not be started, server attempted to return to main menu: [%s]. See logs before",
                                 translationSystem.translate(messageOnLoad)
                         ));
             } else {
