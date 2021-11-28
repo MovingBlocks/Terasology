@@ -7,7 +7,7 @@ import com.google.common.base.Objects;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 
-public final class StringComponent implements Component<StringComponent>{
+public final class StringComponent implements Component<StringComponent> {
     public static String staticValue = "Test";
     public String value;
 
