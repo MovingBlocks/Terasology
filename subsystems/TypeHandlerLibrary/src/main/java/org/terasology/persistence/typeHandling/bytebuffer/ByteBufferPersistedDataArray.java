@@ -250,7 +250,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public Iterator<PersistedData> iterator() {
-        return new Iterator<PersistedData>() {
+        return new Iterator<>() {
             private int index;
 
             @Override
@@ -271,7 +271,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
     }
 
     private Iterator<PersistedData> typedIterator(BBType type) {
-        return new Iterator<PersistedData>() {
+        return new Iterator<>() {
             private int index;
 
             @Override
