@@ -25,7 +25,7 @@ class DataSizeConverterTest {
             "44040192, 42 m",
             "268435456, 256M",
             "2684354560, 2.5g",
-            "8589934592, 8G",
+            "8589934592, 8G"
     })
     void testValidInputs(long expected, String input) {
         assertEquals(expected, new DataSizeConverter().convert(input));
