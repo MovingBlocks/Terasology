@@ -39,6 +39,7 @@ import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.nui.Color;
 
 import java.nio.FloatBuffer;
@@ -92,19 +93,19 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
         if (skeleton.boneEntities == null) {
             skeleton.boneEntities = Maps.newHashMap();
-            for (Bone bone : skeleton.mesh.getBones()) {
+            for (Bone bone : skeleton.mesh.bones()) {
                 LocationComponent loc = new LocationComponent();
                 EntityRef boneEntity = entityManager.create(loc);
                 skeleton.boneEntities.put(bone.getName(), boneEntity);
             }
         }
 
-        for (Bone bone : skeleton.mesh.getBones()) {
+        for (Bone bone : skeleton.mesh.bones()) {
             EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
             EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
             Location.attachChild(parent, boneEntity);
         }
-        for (Bone bone : skeleton.mesh.getBones()) {
+        for (Bone bone : skeleton.mesh.bones()) {
             EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
             LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
             loc.setLocalPosition(bone.getLocalPosition());
@@ -205,9 +206,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                                 float interpolationVal) {
         for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
             String boneName = skeletalMeshComp.animation.getBoneName(i);
-            Bone bone = skeletalMeshComp.mesh.getBone(boneName);
             EntityRef boneEntity = skeletalMeshComp.boneEntities.get(boneName);
-            if (boneEntity == null || bone == null) {
+            if (boneEntity == null) {
                 continue;
             }
             LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
@@ -243,12 +243,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
-            AABBf aabb;
+            AABBfc aabb;
             MeshAnimation animation = skeletalMesh.animation;
             if (animation != null) {
                 aabb = animation.getAabb();
             } else {
-                aabb = skeletalMesh.mesh.getStaticAabb();
+                aabb = skeletalMesh.mesh.getAABB();
             }
             LocationComponent location = entity.getComponent(LocationComponent.class);
             location.getWorldRotation(worldRot);
@@ -294,8 +294,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
-            Matrix4f[] boneTransforms = new Matrix4f[skeletalMesh.mesh.getBones().size()];
-            for (Bone bone : skeletalMesh.mesh.getBones()) {
+            Matrix4f[] boneTransforms = new Matrix4f[skeletalMesh.mesh.bones().size()];
+            for (Bone bone : skeletalMesh.mesh.bones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
                     boneEntity = EntityRef.NULL;
@@ -312,8 +312,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
             }
 
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.asList(boneTransforms));
+
+            skeletalMesh.mesh.render();
         }
     }
 
@@ -359,7 +359,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
                 material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
-                for (Bone bone : skeletalMesh.mesh.getBones()) {
+                for (Bone bone : skeletalMesh.mesh.bones()) {
                     Bone parentBone = bone.getParent();
                     EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                     if (parentBone == null) {
