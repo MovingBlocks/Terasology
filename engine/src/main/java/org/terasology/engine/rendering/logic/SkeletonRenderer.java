@@ -74,8 +74,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     private Mesh mesh;
     private Material material;
 
-    private FloatBuffer matrixBuffer = FloatBuffer.allocate(16 * 254);
-
     private Random random = new Random();
 
     @Override
@@ -306,19 +304,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     Matrix4f boneTransform = new Matrix4f();
                     boneLocation.getRelativeTransform(boneTransform, entity);
                     boneTransform.mul(bone.getInverseBindMatrix());
-                    boneTransforms[bone.getIndex()] = boneTransform.transpose();
+                    boneTransforms[bone.getIndex()] = boneTransform;
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     boneTransforms[bone.getIndex()] = new Matrix4f();
                 }
             }
-            matrixBuffer.rewind();
-            matrixBuffer.limit(16 * boneTransforms.length);
-            for (Matrix4f transform : boneTransforms) {
-                transform.get(matrixBuffer);
+            for (int i = 0; i < boneTransforms.length; i++) {
+                skeletalMesh.material.setMatrix4("boneTransforms[" + i + "]", boneTransforms[i], true);
             }
-
-            material.setMatrix4("boneTransforms", matrixBuffer);
             skeletalMesh.mesh.render();
         }
     }

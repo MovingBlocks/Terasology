@@ -32,7 +32,7 @@ public class StandardSkinnedMeshData extends SkinnedMeshData {
     public static final int BONE_IDX1_INDEX = 5;
     public static final int BONE_IDX2_INDEX = 6;
     public static final int BONE_IDX3_INDEX = 7;
-    public static final int BONE_WEIGHT_INDEX = 7;
+    public static final int BONE_WEIGHT_INDEX = 8;
 
     public final VertexResource positionBuffer;
     public final VertexAttributeBinding<Vector3fc, Vector3f> position;
@@ -90,19 +90,19 @@ public class StandardSkinnedMeshData extends SkinnedMeshData {
         uv1Buffer = builder.build();
 
         builder = new VertexResourceBuilder();
-        boneIndex0 = builder.add(BONE_IDX0_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        boneIndex0 = builder.add(BONE_IDX0_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE, VertexResource.FEATURE_INTEGER);
         boneIndexBuffer0 = builder.build();
 
         builder = new VertexResourceBuilder();
-        boneIndex1 = builder.add(BONE_IDX1_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        boneIndex1 = builder.add(BONE_IDX1_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE, VertexResource.FEATURE_INTEGER);
         boneIndexBuffer1 = builder.build();
 
         builder = new VertexResourceBuilder();
-        boneIndex2 = builder.add(BONE_IDX2_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        boneIndex2 = builder.add(BONE_IDX2_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE, VertexResource.FEATURE_INTEGER);
         boneIndexBuffer2 = builder.build();
 
         builder = new VertexResourceBuilder();
-        boneIndex3 = builder.add(BONE_IDX3_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+        boneIndex3 = builder.add(BONE_IDX3_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE, VertexResource.FEATURE_INTEGER);
         boneIndexBuffer3 = builder.build();
 
         builder = new VertexResourceBuilder();

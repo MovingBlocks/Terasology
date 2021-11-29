@@ -12,7 +12,6 @@ uniform bool textured;
 
 in vec3 v_normal;
 in vec2 v_uv0;
-in vec4 v_color0;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outNormal;

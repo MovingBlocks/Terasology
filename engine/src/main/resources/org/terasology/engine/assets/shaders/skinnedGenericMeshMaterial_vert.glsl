@@ -24,9 +24,8 @@ void main() {
          skinMat += boneTransforms[int(in_bone[2])] * in_weight.z;
          skinMat += boneTransforms[int(in_bone[3])] * in_weight.w;
 
-    gl_Position = (projectionMatrix * modelViewMatrix) * (skinMat * vec4(in_vert, 1.0));
+    gl_Position = (projectionMatrix * modelViewMatrix * skinMat)  * vec4(in_vert, 1.0);
     v_normal = normalMatrix * in_normal * mat3(skinMat);
     v_uv0 = in_uv0;
-    v_color0 = in_color0;
 
 }
