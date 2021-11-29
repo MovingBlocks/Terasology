@@ -34,7 +34,6 @@ import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
 import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
-import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -74,6 +73,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     private StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES, AllocationType.STREAM);
     private Mesh mesh;
     private Material material;
+
+    private FloatBuffer matrixBuffer = FloatBuffer.allocate(16 * 254);
 
     private Random random = new Random();
 
@@ -311,8 +312,13 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneTransforms[bone.getIndex()] = new Matrix4f();
                 }
             }
+            matrixBuffer.rewind();
+            matrixBuffer.limit(16 * boneTransforms.length);
+            for (Matrix4f transform : boneTransforms) {
+                transform.get(matrixBuffer);
+            }
 
-
+            material.setMatrix4("boneTransforms", matrixBuffer);
             skeletalMesh.mesh.render();
         }
     }

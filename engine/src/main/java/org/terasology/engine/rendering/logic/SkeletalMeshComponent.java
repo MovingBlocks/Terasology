@@ -12,7 +12,6 @@ import org.terasology.engine.network.Replicate;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.nui.Color;
 import org.terasology.nui.properties.Range;

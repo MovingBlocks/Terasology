@@ -48,8 +48,8 @@ import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontImpl;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
 import org.terasology.engine.rendering.assets.shader.Shader;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
@@ -228,7 +228,7 @@ public class HeadlessEnvironment extends Environment {
                 HeadlessMaterial::new, "materials");
         assetTypeManager.createAssetType(Mesh.class,
                 HeadlessMesh::new, "mesh");
-        assetTypeManager.createAssetType(SkeletalMesh.class,
+        assetTypeManager.createAssetType(SkinnedMesh.class,
                 HeadlessSkeletalMesh::new, "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class,
                 MeshAnimationImpl::new, "animations");

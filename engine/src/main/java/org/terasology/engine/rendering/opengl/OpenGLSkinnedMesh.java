@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.opengl;
 
+import com.google.common.collect.Maps;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
@@ -25,6 +26,7 @@ import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
@@ -41,6 +43,7 @@ public class OpenGLSkinnedMesh extends SkinnedMesh implements OpenGLMeshBase {
     private VertexByteAttributeBinding boneIndex1;
     private VertexByteAttributeBinding boneIndex2;
     private VertexByteAttributeBinding boneIndex3;
+    private Map<String, Bone> boneLookup = Maps.newHashMap();
 
     private List<Bone> bones;
 
@@ -110,6 +113,11 @@ public class OpenGLSkinnedMesh extends SkinnedMesh implements OpenGLMeshBase {
     }
 
     @Override
+    public Bone getBone(String name) {
+        return boneLookup.get(name);
+    }
+
+    @Override
     public void render() {
         if (!isDisposed()) {
             updateState(state);
@@ -135,12 +143,16 @@ public class OpenGLSkinnedMesh extends SkinnedMesh implements OpenGLMeshBase {
         drawMode = newData.getMode();
 
         GL30.glBindVertexArray(this.disposalAction.vao);
+        this.boneLookup.clear();
         this.positions = newData.positions();
         this.boneIndex0 = newData.boneIndex0();
         this.boneIndex1 = newData.boneIndex0();
         this.boneIndex2 = newData.boneIndex0();
         this.boneIndex3 = newData.boneIndex0();
         this.bones = newData.bones();
+        this.bones.forEach(b -> {
+            boneLookup.put(b.getName(), b);
+        });
         this.state = buildVBO(this.disposalAction.vbo, allocationType, newData.vertexResources());
 
         IndexResource indexResource = newData.indexResource();

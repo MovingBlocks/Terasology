@@ -23,13 +23,16 @@ import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontImpl;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
+import org.terasology.engine.rendering.assets.mesh.SkinnedMeshData;
 import org.terasology.engine.rendering.assets.shader.Shader;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.gestalt.assets.AssetFactory;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 
@@ -54,7 +57,7 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetTypeManager.createAssetType(Shader.class, HeadlessShader::new, "shaders");
         assetTypeManager.createAssetType(Material.class, HeadlessMaterial::new, "materials");
         assetTypeManager.createAssetType(Mesh.class, HeadlessMesh::new, "mesh");
-        assetTypeManager.createAssetType(SkeletalMesh.class, HeadlessSkeletalMesh::new, "skeletalMesh");
+        assetTypeManager.createAssetType(SkinnedMesh.class, HeadlessSkeletalMesh::new, "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
         assetTypeManager.createAssetType(Atlas.class, Atlas::new, "atlas");
         assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);

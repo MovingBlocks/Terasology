@@ -55,5 +55,6 @@ public abstract class SkinnedMesh extends Asset<SkinnedMeshData> {
     public abstract VertexByteAttributeBinding boneIndex2();
     public abstract VertexByteAttributeBinding boneIndex3();
     public abstract List<Bone> bones();
+    public abstract Bone getBone(String name);
     public abstract void render();
 }

@@ -18,8 +18,8 @@ import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontImpl;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
 import org.terasology.engine.rendering.assets.shader.Shader;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
@@ -27,7 +27,7 @@ import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.engine.rendering.opengl.GLSLMaterial;
 import org.terasology.engine.rendering.opengl.GLSLShader;
 import org.terasology.engine.rendering.opengl.OpenGLMesh;
-import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.engine.rendering.opengl.OpenGLSkinnedMesh;
 import org.terasology.engine.rendering.opengl.OpenGLTexture;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.module.ModuleAssetScanner;
@@ -86,9 +86,9 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
                 "materials");
         assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data, this),
                 "mesh");
-        assetTypeManager.createAssetType(SkeletalMesh.class,
+        assetTypeManager.createAssetType(SkinnedMesh.class,
                 (urn, assetType, data) ->
-                        OpenGLSkeletalMesh.create(urn, assetType, data, this),
+                        OpenGLSkinnedMesh.create(urn, assetType, data, this),
                 "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new,
                 "animations", "skeletalMesh");
