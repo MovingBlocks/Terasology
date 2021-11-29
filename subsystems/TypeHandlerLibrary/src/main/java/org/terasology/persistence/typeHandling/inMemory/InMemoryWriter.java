@@ -3,6 +3,8 @@
 
 package org.terasology.persistence.typeHandling.inMemory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.serializers.PersistedDataWriter;
 
 import java.io.ByteArrayOutputStream;
@@ -12,13 +14,15 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class InMemoryWriter implements PersistedDataWriter<AbstractPersistedData> {
+    private static final  Logger logger = LoggerFactory.getLogger(InMemoryWriter.class);
+
     @Override
     public byte[] writeBytes(AbstractPersistedData data) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            writeTo(data, baos); // TODO!
+            writeTo(data, baos);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Cannot writeBytes", e);
         }
         return baos.toByteArray();
     }

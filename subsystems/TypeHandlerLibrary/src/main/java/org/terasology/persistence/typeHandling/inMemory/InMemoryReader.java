@@ -3,6 +3,8 @@
 
 package org.terasology.persistence.typeHandling.inMemory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.serializers.PersistedDataReader;
 
 import java.io.ByteArrayInputStream;
@@ -12,13 +14,16 @@ import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 
 public class InMemoryReader implements PersistedDataReader<AbstractPersistedData> {
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryReader.class);
+
     @Override
     public AbstractPersistedData read(InputStream inputStream) throws IOException {
         ObjectInputStream ois = new ObjectInputStream(inputStream);
         try {
             return (AbstractPersistedData) ois.readObject();
         } catch (ClassNotFoundException e) {
-            return null; // TODO
+            logger.error("Cannot read to inputStream");
+            return InMemoryPersistedDataSerializer.NULL;
         }
     }
 

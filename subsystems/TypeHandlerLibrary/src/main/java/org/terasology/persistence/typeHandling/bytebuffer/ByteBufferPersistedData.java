@@ -87,7 +87,7 @@ public class ByteBufferPersistedData implements PersistedData {
             case LONG:
                 return (double) getData().getLong();
         }
-        throw new ClassCastException("Data is not a number");
+        throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ByteBufferPersistedData implements PersistedData {
             case LONG:
                 return (int) getData().getLong();
         }
-        throw new ClassCastException("Data is not a number");
+        throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
     }
 
     @Override
