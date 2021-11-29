@@ -12,6 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.bytebuffer.ByteBufferDataReader;
 import org.terasology.persistence.typeHandling.bytebuffer.ByteBufferDataWriter;
@@ -32,6 +34,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class FullSerializationDeserializationTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(FullSerializationDeserializationTest.class);
 
     private static Reflections reflections;
     private static TypeHandlerLibrary typeHandlerLibrary;
@@ -128,7 +132,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<T> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertEquals(value, deserialized.get());
@@ -143,7 +147,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<boolean[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -157,7 +161,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<byte[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -171,7 +175,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<int[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -185,7 +189,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<long[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -199,7 +203,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<float[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -213,7 +217,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<double[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -227,7 +231,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<char[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -241,7 +245,7 @@ public class FullSerializationDeserializationTest {
         Optional<byte[]> serialized = serializer.serialize(value, type);
         Assertions.assertTrue(serialized.isPresent(), String.format("Serializer didn't serialize type %s", type));
         byte[] bytes = serialized.get();
-        System.out.println("Size in bytes: " + bytes.length);
+        logger.info("Size in bytes: {}", bytes.length);
         Optional<String[]> deserialized = serializer.deserialize(type, bytes);
         Assertions.assertTrue(deserialized.isPresent(), String.format("Serializer didn't deserialize type %s", type));
         Assertions.assertArrayEquals(value, deserialized.get());
@@ -275,7 +279,10 @@ public class FullSerializationDeserializationTest {
                 return false;
             }
             SampleClass that = (SampleClass) o;
-            return value1 == that.value1 && Objects.equals(name, that.name) && Objects.equals(child, that.child) && Objects.equals(children, that.children);
+            return value1 == that.value1
+                    && Objects.equals(name, that.name)
+                    && Objects.equals(child, that.child)
+                    && Objects.equals(children, that.children);
         }
 
         @Override
