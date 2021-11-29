@@ -25,19 +25,16 @@ import java.util.NoSuchElementException;
  * ByteBuffer-backed persisted data array representation.
  * <pre>
  * 1 byte - BBType
- * 1 byte - BBArrayType
  * 4 bytes - size
  * 0..n bytes - data
  * </pre>
  */
 public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implements PersistedDataArray {
 
-    private final BBArrayType arrayType;
     private final int size;
 
     public ByteBufferPersistedDataArray(ByteBuffer byteBuffer) {
         super(byteBuffer);
-        arrayType = BBArrayType.parse(byteBuffer.get());
         size = byteBuffer.getInt();
     }
 
@@ -48,7 +45,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public PersistedData getArrayItem(int index) {
-        BBType primitiveType = arrayType.getPrimitiveType();
+        BBType primitiveType = type.getPrimitiveType();
         if (primitiveType != null) {
             return new ByteBufferPersistedData(byteBuffer, calculateIndex(index), primitiveType.getCode());
         } else {
@@ -58,20 +55,20 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public boolean isNumberArray() {
-        return arrayType == BBArrayType.FLOAT
-                || arrayType == BBArrayType.DOUBLE
-                || arrayType == BBArrayType.INTEGER
-                || arrayType == BBArrayType.LONG;
+        return type == BBType.FLOAT_ARRAY
+                || type == BBType.DOUBLE_ARRAY
+                || type == BBType.INTEGER_ARRAY
+                || type == BBType.LONG_ARRAY;
     }
 
     @Override
     public boolean isBooleanArray() {
-        return arrayType == BBArrayType.BOOLEAN;
+        return type == BBType.BOOLEAN_ARRAY;
     }
 
     @Override
     public boolean isStringArray() {
-        return arrayType == BBArrayType.STRING;
+        return type == BBType.STRING_ARRAY;
     }
 
     @Override
@@ -98,7 +95,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsString();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type string array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type string array: %s", type.name()));
         }
     }
 
@@ -118,7 +115,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsDouble();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type number array: %s", type.name()));
         }
     }
 
@@ -137,7 +134,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsFloat();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type number array: %s", type.name()));
         }
     }
 
@@ -156,7 +153,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsInteger();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type number array: %s", type.name()));
         }
     }
 
@@ -175,15 +172,15 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsLong();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type number array: %s", type.name()));
         }
     }
 
     @Override
     public TDoubleList getAsDoubleArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         TDoubleList list = new TDoubleArrayList(size());
-        Iterator<PersistedData> iter = typedIterator(arrayType.getPrimitiveType());
+        Iterator<PersistedData> iter = typedIterator(type.getPrimitiveType());
         while (iter.hasNext()) {
             list.add(iter.next().getAsDouble());
         }
@@ -192,9 +189,9 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public TFloatList getAsFloatArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         TFloatList list = new TFloatArrayList(size());
-        Iterator<PersistedData> iter = typedIterator(arrayType.getPrimitiveType());
+        Iterator<PersistedData> iter = typedIterator(type.getPrimitiveType());
         while (iter.hasNext()) {
             list.add(iter.next().getAsFloat());
         }
@@ -203,9 +200,9 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public TIntList getAsIntegerArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         TIntList list = new TIntArrayList(size());
-        Iterator<PersistedData> iter = typedIterator(arrayType.getPrimitiveType());
+        Iterator<PersistedData> iter = typedIterator(type.getPrimitiveType());
         while (iter.hasNext()) {
             list.add(iter.next().getAsInteger());
         }
@@ -214,9 +211,9 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public TLongList getAsLongArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         TLongList list = new TLongArrayList(size());
-        Iterator<PersistedData> iter = typedIterator(arrayType.getPrimitiveType());
+        Iterator<PersistedData> iter = typedIterator(type.getPrimitiveType());
         while (iter.hasNext()) {
             list.add(iter.next().getAsLong());
         }
@@ -225,7 +222,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public boolean[] getAsBooleanArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         int sizeInBytes = size() % 8 + 1;
         byte[] bytes = new byte[sizeInBytes];
         byteBuffer.get(bytes);
@@ -243,7 +240,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
 
     @Override
     public List<PersistedData> getAsValueArray() {
-        byteBuffer.position(position + 6);
+        byteBuffer.position(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER);
         List<PersistedData> data = new ArrayList<>(size());
         for (int i = 0; i < size(); i++) {
             data.add(new ByteBufferPersistedData(byteBuffer, calculateIndex(i)));
@@ -295,29 +292,29 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
     }
 
     private int calculateIndex(int index) {
-        switch (arrayType) {
-            case BOOLEAN:
-                return 6 + index % 8 + 1;
-            case FLOAT:
-            case INTEGER:
-                return 6 + index * 4;
-            case DOUBLE:
-            case LONG:
-                return 6 + index * 8;
-            case STRING: {
-                int pos = position + 6;
+        switch (type) {
+            case BOOLEAN_ARRAY:
+                return BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + index % 8 + 1;
+            case FLOAT_ARRAY:
+            case INTEGER_ARRAY:
+                return BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + index * 4;
+            case DOUBLE_ARRAY:
+            case LONG_ARRAY:
+                return BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + index * 8;
+            case STRING_ARRAY: {
+                int pos = position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER;
                 for (int i = 0; i < index; i++) {
-                    pos += byteBuffer.getInt(pos) + 4;
+                    pos += byteBuffer.getInt(pos) + BBConsts.SIZE_HEADER;
                 }
                 return pos;
             }
-            case VALUE: {
+            case VALUE_ARRAY: {
                 int pos = 0;
                 for (int i = 0; i < index; i++) {
-                    pos += byteBuffer.getInt(position + 6 + i * 4);
+                    pos += byteBuffer.getInt(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + i *  BBConsts.SIZE_HEADER);
                 }
                 int sizeArraySize = size() * 4;
-                return pos + position + 6 + sizeArraySize;
+                return pos + position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + sizeArraySize;
             }
 
         }
@@ -328,7 +325,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
     public boolean getAsBoolean() {
         if (isBooleanArray()) {
             if (size() == 1) {
-                return (byteBuffer.get(position + 6) & 1) == 1;
+                return (byteBuffer.get(position + BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER) & 1) == 1;
             } else {
                 throw new IllegalStateException("boolean array have size != 1");
             }
@@ -339,7 +336,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsBoolean();
                 }
             }
-            throw new ClassCastException(String.format("Source is not of type boolean array: %s", arrayType.name()));
+            throw new ClassCastException(String.format("Source is not of type boolean array: %s", type.name()));
         }
     }
 
@@ -351,7 +348,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                 return data.getAsBytes();
             }
         }
-        throw new DeserializationException(String.format("Source is not of type bytes array: %s", arrayType.name()));
+        throw new DeserializationException(String.format("Source is not of type bytes array: %s", type.name()));
     }
 
     @Override
@@ -362,6 +359,6 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                 return data.getAsByteBuffer();
             }
         }
-        throw new DeserializationException(String.format("Source is not of type bytes array: %s", arrayType.name()));
+        throw new DeserializationException(String.format("Source is not of type bytes array: %s", type.name()));
     }
 }

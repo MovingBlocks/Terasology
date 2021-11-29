@@ -32,7 +32,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
     @Override
     public PersistedData serialize(String value) {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer buffer = ByteBuffer.allocate(bytes.length + 1 + 4);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + bytes.length);
         buffer.put(BBType.STRING.getCode());
         buffer.putInt(bytes.length);
         buffer.put(bytes);
@@ -59,9 +59,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
         if (size == 1) {
             return buffers.get(0);
         }
-        ByteBuffer buffer = ByteBuffer.allocate(byteSize + 4);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.STRING.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.SIZE_HEADER + byteSize);
+        buffer.put(BBType.STRING_ARRAY.getCode());
         buffer.putInt(size);
         for (ByteBufferPersistedData data : buffers) {
             data.getData().position(1); // remove header of string.
@@ -73,7 +72,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(float value) {
-        ByteBuffer buffer = ByteBuffer.allocate(5);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.FLOAT_SIZE);
         buffer.put(BBType.FLOAT.getCode());
         buffer.putFloat(value);
         buffer.rewind();
@@ -82,9 +81,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(float... values) {
-        ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + values.length * 4);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.FLOAT.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + values.length * BBConsts.FLOAT_SIZE);
+        buffer.put(BBType.FLOAT_ARRAY.getCode());
         buffer.putInt(values.length);
         for (float value : values) {
             buffer.putFloat(value);
@@ -104,7 +102,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(int value) {
-        ByteBuffer buffer = ByteBuffer.allocate(5);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.INT_SIZE);
         buffer.put(BBType.INTEGER.getCode());
         buffer.putInt(value);
         buffer.rewind();
@@ -113,9 +111,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(int... values) {
-        ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + values.length * 4);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.INTEGER.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + values.length * BBConsts.INT_SIZE);
+        buffer.put(BBType.INTEGER_ARRAY.getCode());
         buffer.putInt(values.length);
         for (int value : values) {
             buffer.putInt(value);
@@ -135,7 +132,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(long value) {
-        ByteBuffer buffer = ByteBuffer.allocate(9);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.LONG_SIZE);
         buffer.put(BBType.LONG.getCode());
         buffer.putLong(value);
         buffer.rewind();
@@ -144,9 +141,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(long... values) {
-        ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + values.length * 8);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.LONG.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + values.length * BBConsts.LONG_SIZE);
+        buffer.put(BBType.LONG_ARRAY.getCode());
         buffer.putInt(values.length);
         for (long value : values) {
             buffer.putLong(value);
@@ -166,7 +162,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(boolean value) {
-        ByteBuffer buffer = ByteBuffer.allocate(9);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.BYTE_SIZE);
         buffer.put(BBType.BOOLEAN.getCode());
         buffer.put(value ? (byte) 1 : (byte) 0);
         buffer.rewind();
@@ -177,9 +173,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
     public PersistedData serialize(boolean... values) {
         int size = values.length;
         int sizeInBytes = size % 8 + 1;
-        ByteBuffer buffer = ByteBuffer.allocate(6 + sizeInBytes);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.BOOLEAN.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + sizeInBytes);
+        buffer.put(BBType.BOOLEAN_ARRAY.getCode());
         buffer.putInt(size);
         for (int i = 0; i < sizeInBytes; i++) {
             byte valueByte = 0;
@@ -199,7 +194,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(double value) {
-        ByteBuffer buffer = ByteBuffer.allocate(10);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.DOUBLE_SIZE);
         buffer.put(BBType.DOUBLE.getCode());
         buffer.putDouble(value);
         buffer.rewind();
@@ -208,9 +203,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(double... values) {
-        ByteBuffer buffer = ByteBuffer.allocate(2 + 4 + values.length * 8);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.DOUBLE.getCode());
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + values.length * BBConsts.DOUBLE_SIZE);
+        buffer.put(BBType.DOUBLE_ARRAY.getCode());
         buffer.putInt(values.length);
         for (double value : values) {
             buffer.putDouble(value);
@@ -230,7 +224,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData serialize(byte[] value) {
-        ByteBuffer buffer = ByteBuffer.allocate(value.length + 1 + 4);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + value.length);
         buffer.put(BBType.BYTES.getCode());
         buffer.putInt(value.length);
         buffer.put(value);
@@ -241,7 +235,7 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
     @Override
     public PersistedData serialize(ByteBuffer value) {
         int size = value.array().length;
-        ByteBuffer buffer = ByteBuffer.allocate(1 + 4 + size);
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + size);
         buffer.put(BBType.BYTEBUFFER.getCode());
         buffer.putInt(size);
         buffer.put(value);
@@ -260,9 +254,9 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
             bytes += length;
             sizes[i] = length;
         }
-        ByteBuffer buffer = ByteBuffer.allocate(6 + values.length * 4 + bytes);
-        buffer.put(BBType.ARRAY.getCode());
-        buffer.put(BBArrayType.VALUE.getCode());
+        int refSize = BBConsts.INT_SIZE;
+        ByteBuffer buffer = ByteBuffer.allocate(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + values.length * refSize + bytes);
+        buffer.put(BBType.VALUE_ARRAY.getCode());
         buffer.putInt(values.length);
         // Write data sizes
         for (int size : sizes) {
@@ -297,7 +291,8 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
             size += ((ByteBufferPersistedData) entry.getValue()).byteBuffer.array().length;
             values.add(entry.getValue());
         }
-        int refsSize = 8 * entryCount;
+        int oneRefSize = BBConsts.INT_SIZE;
+        int refsSize = oneRefSize * 2 * entryCount;
         ByteBuffer buffer = ByteBuffer.allocate(1 + 4 + refsSize + size);
         buffer.put(BBType.VALUEMAP.getCode());
         buffer.putInt(entryCount);
@@ -307,14 +302,14 @@ public class ByteBufferPersistedSerializer implements PersistedDataSerializer {
             ByteBufferPersistedData key = (ByteBufferPersistedData) keys.get(i);
             int keySize = key.byteBuffer.remaining();
             buffer.put(key.byteBuffer);
-            buffer.putInt(1 + 4 + i * 8, dataPosition);
+            buffer.putInt(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + i * oneRefSize * 2, dataPosition);
             dataPosition += keySize;
         }
         for (int i = 0; i < values.size(); i++) {
             ByteBufferPersistedData value = (ByteBufferPersistedData) values.get(i);
             int keySize = value.byteBuffer.array().length;
             buffer.put(value.byteBuffer.array());
-            buffer.putInt(1 + 4 + i * 8 + 4, dataPosition);
+            buffer.putInt(BBConsts.TYPE_HEADER + BBConsts.SIZE_HEADER + i * oneRefSize * 2 + oneRefSize, dataPosition);
             dataPosition += keySize;
         }
         buffer.rewind();

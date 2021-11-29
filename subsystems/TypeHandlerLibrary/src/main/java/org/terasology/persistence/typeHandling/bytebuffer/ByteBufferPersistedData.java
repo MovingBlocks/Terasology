@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 public class ByteBufferPersistedData implements PersistedData {
     protected final ByteBuffer byteBuffer;
     protected final int position;
-    private final BBType type;
+    protected final BBType type;
     private final boolean typeForced;
 
     public ByteBufferPersistedData(ByteBuffer byteBuffer, int position, byte type) {
@@ -221,7 +221,7 @@ public class ByteBufferPersistedData implements PersistedData {
 
     @Override
     public boolean isArray() {
-        return type == BBType.ARRAY;
+        return type.isArray();
     }
 
     @Override

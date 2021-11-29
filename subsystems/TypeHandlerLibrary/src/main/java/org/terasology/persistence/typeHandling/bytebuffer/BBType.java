@@ -16,17 +16,19 @@ public enum BBType {
     STRING(6),
     BYTES(7),
     BYTEBUFFER(8),
-    ARRAY(9),
-    VALUEMAP(10);
+    BOOLEAN_ARRAY(9),
+    FLOAT_ARRAY(10),
+    DOUBLE_ARRAY(11),
+    LONG_ARRAY(12),
+    INTEGER_ARRAY(13),
+    STRING_ARRAY(14),
+    VALUE_ARRAY(15),
+    VALUEMAP(16);
 
     private final byte code;
 
     BBType(int code) {
         this.code = (byte) code;
-    }
-
-    public byte getCode() {
-        return code;
     }
 
     public static BBType parse(byte code) {
@@ -36,5 +38,43 @@ public enum BBType {
             }
         }
         return null;
+    }
+
+
+    public BBType getPrimitiveType() {
+        switch (this) {
+            case BOOLEAN_ARRAY:
+                return BBType.BOOLEAN;
+            case FLOAT_ARRAY:
+                return BBType.FLOAT;
+            case DOUBLE_ARRAY:
+                return BBType.DOUBLE;
+            case LONG_ARRAY:
+                return BBType.LONG;
+            case INTEGER_ARRAY:
+                return BBType.INTEGER;
+            case STRING_ARRAY:
+                return BBType.STRING;
+        }
+        return null;
+    }
+
+    public boolean isArray() {
+        switch (this) {
+            case BOOLEAN_ARRAY:
+            case FLOAT_ARRAY:
+            case DOUBLE_ARRAY:
+            case LONG_ARRAY:
+            case INTEGER_ARRAY:
+            case STRING_ARRAY:
+            case VALUE_ARRAY:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public byte getCode() {
+        return code;
     }
 }
