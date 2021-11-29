@@ -58,7 +58,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public String getAsString() {
         if (!isString()) {
-            throw new ClassCastException("it is not string");
+            throw new ClassCastException(String.format("Source is not of type string: %s", type.name()));
         }
         resetPosition();
         int size = byteBuffer.getInt();
@@ -74,7 +74,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public double getAsDouble() {
         if (!isNumber()) {
-            throw new ClassCastException("It is not number");
+            throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
         }
         resetPosition();
         switch (type) {
@@ -93,7 +93,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public float getAsFloat() {
         if (!isNumber()) {
-            throw new ClassCastException("It is not number");
+            throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
         }
         resetPosition();
         switch (type) {
@@ -106,13 +106,13 @@ public class ByteBufferPersistedData implements PersistedData {
             case LONG:
                 return (float) getData().getLong();
         }
-        throw new ClassCastException("Data is not a number");
+        throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
     }
 
     @Override
     public int getAsInteger() {
         if (!isNumber()) {
-            throw new ClassCastException("It is not number");
+            throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
         }
         resetPosition();
         switch (type) {
@@ -131,7 +131,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public long getAsLong() {
         if (!isNumber()) {
-            throw new ClassCastException("It is not number");
+            throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
         }
         resetPosition();
         switch (type) {
@@ -144,14 +144,14 @@ public class ByteBufferPersistedData implements PersistedData {
             case LONG:
                 return getData().getLong();
         }
-        throw new ClassCastException("Data is not a number");
+        throw new ClassCastException(String.format("Source is not of type number: %s", type.name()));
     }
 
 
     @Override
     public boolean getAsBoolean() {
         if (!isBoolean()) {
-            throw new ClassCastException("It is not boolean");
+            throw new ClassCastException(String.format("Source is not of type boolean: %s", type.name()));
         }
         resetPosition();
         return byteBuffer.get() != 0; // Don't Packed booleans
@@ -160,7 +160,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public byte[] getAsBytes() {
         if (!isBytes()) {
-            throw new DeserializationException("it is not bytes or bytebuffer");
+            throw new DeserializationException(String.format("Source is not of type bytes or bytebuffer: %s", type.name()));
         }
         resetPosition();
         int size = byteBuffer.getInt();
@@ -172,7 +172,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public ByteBuffer getAsByteBuffer() {
         if (!isBytes()) {
-            throw new DeserializationException("it is not bytes or bytebuffer");
+            throw new DeserializationException(String.format("Source is not of type bytes or bytebuffer: %s", type.name()));
         }
         resetPosition();
         return ByteBuffer.wrap(getAsBytes());
@@ -181,7 +181,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public PersistedDataArray getAsArray() {
         if (!isArray()) {
-            throw new IllegalStateException("it is not array");
+            throw new IllegalStateException(String.format("Source is not of type array: %s", type.name()));
         }
         byteBuffer.position(position);
         return new ByteBufferPersistedDataArray(byteBuffer);
@@ -190,7 +190,7 @@ public class ByteBufferPersistedData implements PersistedData {
     @Override
     public PersistedDataMap getAsValueMap() {
         if (!isValueMap()) {
-            throw new IllegalStateException("it is not valuemap");
+            throw new IllegalStateException(String.format("Source is not of type valuemap: %s", type.name()));
         }
         byteBuffer.position(position);
         return new ByteBufferPersistedDataMap(byteBuffer);

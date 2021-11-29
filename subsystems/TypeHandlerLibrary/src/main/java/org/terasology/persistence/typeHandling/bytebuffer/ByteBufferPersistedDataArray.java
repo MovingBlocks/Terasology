@@ -98,7 +98,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsString();
                 }
             }
-            throw new ClassCastException("it is not string array");
+            throw new ClassCastException(String.format("Source is not of type string array: %s", arrayType.name()));
         }
     }
 
@@ -118,7 +118,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsDouble();
                 }
             }
-            throw new ClassCastException("it is not number array");
+            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
         }
     }
 
@@ -137,7 +137,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsFloat();
                 }
             }
-            throw new ClassCastException("it is not number array");
+            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
         }
     }
 
@@ -156,7 +156,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsInteger();
                 }
             }
-            throw new ClassCastException("it is not number array");
+            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
         }
     }
 
@@ -175,7 +175,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsLong();
                 }
             }
-            throw new ClassCastException("it is not number array");
+            throw new ClassCastException(String.format("Source is not of type number array: %s", arrayType.name()));
         }
     }
 
@@ -339,7 +339,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                     return data.getAsBoolean();
                 }
             }
-            throw new ClassCastException("it is not boolean array");
+            throw new ClassCastException(String.format("Source is not of type boolean array: %s", arrayType.name()));
         }
     }
 
@@ -351,7 +351,7 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                 return data.getAsBytes();
             }
         }
-        throw new DeserializationException("it is not bytes array");
+        throw new DeserializationException(String.format("Source is not of type bytes array: %s", arrayType.name()));
     }
 
     @Override
@@ -362,6 +362,6 @@ public class ByteBufferPersistedDataArray extends ByteBufferPersistedData implem
                 return data.getAsByteBuffer();
             }
         }
-        throw new DeserializationException("it is not bytes array");
+        throw new DeserializationException(String.format("Source is not of type bytes array: %s", arrayType.name()));
     }
 }
