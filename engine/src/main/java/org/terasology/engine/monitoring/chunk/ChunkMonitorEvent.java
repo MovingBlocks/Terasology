@@ -3,7 +3,6 @@
 package org.terasology.engine.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.chunks.ChunkProvider;
