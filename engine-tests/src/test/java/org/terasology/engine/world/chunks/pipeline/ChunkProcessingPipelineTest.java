@@ -23,22 +23,21 @@ import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @Tag("TteTest")
@@ -48,30 +47,40 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             CoreRegistry.get(AssetManager.class));
     private final ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
     private ChunkProcessingPipeline pipeline;
+    private FluxSink<Chunk> chunkSink;
+
+    void initPipeline(Function<Vector3ic, Chunk> getCached) {
+        // Use a custom scheduler which runs everything immediately, on the same thread
+        pipeline = new ChunkProcessingPipeline(getCached, Flux.push(sink -> chunkSink = sink), Schedulers.immediate());
+    }
 
     @Test
-    void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+    void simpleProcessingSuccess() {
+        initPipeline(p -> null);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
+        List<Chunk> result = new ArrayList<>();
 
         pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
+        pipeline.addStage(ChunkTaskProvider.create("Chunk ready", (Consumer<Chunk>) result::add));
 
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
-        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
+        chunkSink.next(chunk);
+        chunkSink.complete();
+        pipeline.notifyUpdate();
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
-                "Chunk after processing must have equals position, probably pipeline lost you chunk");
+        Chunk chunkAfterProcessing = result.get(0);
+
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
+                "Chunk after processing must have the same position, the pipeline probably lost your chunk");
     }
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        initPipeline(p -> null);
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
-
 
         pipeline.addStage(ChunkTaskProvider.create("dummy long executing task", (c) -> {
             try {
@@ -81,20 +90,19 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             return c;
         }));
 
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(position, () -> chunk);
+        chunkSink.next(chunk);
+        chunkSink.complete();
+        pipeline.notifyUpdate();
+
         pipeline.stopProcessingAt(position);
-        Assertions.assertThrows(
-                CancellationException.class,
-                () -> chunkFuture.get(1, TimeUnit.SECONDS),
-                "chunkFuture must be cancelled, when processing stopped"
-        );
+        Assertions.assertFalse(pipeline.isPositionProcessing(position));
     }
 
     /**
      * Imagine that we have task, which requires neighbors with same Z level. neighbors chunk already in chunk cache.
      */
     @Test
-    void multiRequirementsChunksExistsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    void multiRequirementsChunksExistsSuccess() {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3ic, Chunk> chunkCache =
                 getNearChunkPositions(positionToGenerate)
@@ -106,7 +114,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> 0);
+        initPipeline(chunkCache::get);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -114,69 +122,68 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                         .findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
+        List<Chunk> result = new ArrayList<>();
+        pipeline.addStage(ChunkTaskProvider.create("Chunk ready", (Consumer<Chunk>) result::add));
 
         Chunk chunk = createChunkAt(positionToGenerate);
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
-        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
-                "Chunk after processing must have equals position, probably pipeline lost you chunk");
+        chunkSink.next(chunk);
+        chunkSink.complete();
+        pipeline.notifyUpdate();
+
+        Chunk chunkAfterProcessing = result.get(0);
+
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
+                "Chunk after processing must have the same position, the pipeline probably lost your chunk");
     }
 
     /**
      * Imagine that we have task, which requires neighbors with same Z level. neighbor will generated.
      */
     @Test
-    void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
-            TimeoutException {
+    void multiRequirementsChunksWillGeneratedSuccess() throws InterruptedException {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
-        Map<Vector3i, Chunk> chunkToGenerate =
+        List<Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
                         .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
-                        .collect(Collectors.toMap(
-                                (chunk) -> chunk.getPosition(new Vector3i()),
-                                Function.identity()
-                        ));
+                        .collect(Collectors.toList());
 
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        initPipeline(p -> null);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
                         .filter((c) -> c.getPosition().equals(positionToGenerate)).findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
+        List<Chunk> result = new ArrayList<>();
+        pipeline.addStage(ChunkTaskProvider.create("Chunk ready", (Consumer<Chunk>) result::add));
 
         Chunk chunk = createChunkAt(positionToGenerate);
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
+
+        chunkSink.next(chunk);
+
 
         Thread.sleep(1_000); // sleep 1 second. and check future.
-        Assertions.assertFalse(chunkFuture.isDone(), "Chunk must be not generated, because ChunkTask have not exists " +
-                "neighbors in requirements");
+        Assertions.assertTrue(result.isEmpty(), "Chunk must be not generated, because the ChunkTask have doesn't have " +
+                "its neighbors in requirements");
 
-        chunkToGenerate.forEach((position, neighborChunk) -> pipeline.invokeGeneratorTask(position,
-                () -> neighborChunk));
+        chunkToGenerate.forEach(chunkSink::next);
+        chunkSink.complete();
+        pipeline.notifyUpdate();
 
-        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
+        Chunk chunkAfterProcessing = result.get(0);
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
-                "Chunk after processing must have equals position, probably pipeline lost you chunk");
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
+                "Chunk after processing must have the same position, the pipeline probably lost your chunk");
     }
 
     @Test
     void emulateEntityMoving() throws InterruptedException {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
-        Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
-            if (position.get() != null) {
-                Vector3ic entityPos = position.get();
-                return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition())
-                            - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
-            }
-            return 0;
-        });
+        initPipeline(chunkCache::get);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -190,7 +197,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                 this::getNearChunkPositions));
         pipeline.addStage(ChunkTaskProvider.create("finish chunk", (c) -> {
             c.markReady();
-            chunkCache.put(c.getPosition(new Vector3i()), c);
+            chunkCache.put(c.getPosition(), c);
         }));
 
 
@@ -198,13 +205,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         for (int i = 0; i < 10; i++) {
             position.set(new Vector3i(i, 0, 0));
             Set<Vector3ic> newRegion = Sets.newHashSet(getNearChunkPositions(position.get(), 10));
-            Sets.difference(newRegion, relativeRegion).forEach(// load new chunks.
-                    (pos) -> {
-                        Future<Chunk> future = pipeline.invokeGeneratorTask(new Vector3i(pos),
-                                () -> createChunkAt(pos));
-                        futures.put(pos, future);
-                    }
-            );
+            // load new chunks.
+            Sets.difference(newRegion, relativeRegion).forEach((pos) -> chunkSink.next(createChunkAt(pos)));
 
             Sets.difference(relativeRegion, newRegion).forEach(// remove old chunks
                     (pos) -> {
@@ -216,21 +218,15 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             );
             relativeRegion = newRegion;
 
+            pipeline.notifyUpdate();
+
             Assertions.assertTrue(Sets.difference(chunkCache.keySet(), relativeRegion).isEmpty(), "We must haven't " +
                     "chunks not related to relativeRegion");
-            Assertions.assertTrue(Sets.difference(Sets.newHashSet(pipeline.getProcessingPosition()), relativeRegion).isEmpty(),
+            Assertions.assertTrue(Sets.difference(pipeline.getProcessingPositions(), relativeRegion).isEmpty(),
                     "We must haven't chunks in processing not related to relativeRegion");
 
-            Stream<Future<Chunk>> relativeFutures = relativeRegion.stream().map(futures::get);
-            Assertions.assertTrue(
-                    relativeFutures.noneMatch(Future::isCancelled),
-                    "Relative futures must be not cancelled");
-
-            Stream<Future<Chunk>> nonRelativeFutures =
-                    Sets.difference(futures.keySet(), relativeRegion).stream().map(futures::get);
-            Assertions.assertTrue(
-                    nonRelativeFutures.allMatch((f) -> f.isCancelled() || f.isDone()),
-                    "Non relative futures must be cancelled or done");
+            Assertions.assertTrue(relativeRegion.containsAll(pipeline.getProcessingPositions()),
+                    "No non-relative chunks should be processing");
 
             Thread.sleep(new Random().nextInt(500)); //think time
         }
