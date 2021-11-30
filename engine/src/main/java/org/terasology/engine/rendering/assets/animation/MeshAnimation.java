@@ -3,10 +3,10 @@
 
 package org.terasology.engine.rendering.assets.animation;
 
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.joml.geom.AABBf;
 
 public abstract class MeshAnimation extends Asset<MeshAnimationData> {
@@ -15,7 +15,7 @@ public abstract class MeshAnimation extends Asset<MeshAnimationData> {
         super(urn, assetType);
     }
 
-    public abstract boolean isValidAnimationFor(SkeletalMesh mesh);
+    public abstract boolean isValidAnimationFor(SkinnedMesh mesh);
 
     public abstract int getBoneCount();
 
