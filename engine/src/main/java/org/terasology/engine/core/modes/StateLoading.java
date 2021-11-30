@@ -45,6 +45,7 @@ import org.terasology.engine.core.modes.loadProcesses.RegisterSystems;
 import org.terasology.engine.core.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.engine.core.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.core.modes.loadProcesses.StartServer;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.game.Game;
 import org.terasology.engine.game.GameManifest;
@@ -63,11 +64,10 @@ import java.util.Queue;
 public class StateLoading implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
-
-    private Context context;
     private final GameManifest gameManifest;
     private final NetworkMode netMode;
     private final Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
+    private Context context;
     private LoadProcess current;
     private JoinStatus joinStatus;
 
@@ -82,6 +82,7 @@ public class StateLoading implements GameState {
 
     private boolean chunkGenerationStarted;
     private long timeLastChunkGenerated;
+    private boolean headless;
 
     /**
      * Constructor for server or single player games
@@ -105,11 +106,12 @@ public class StateLoading implements GameState {
     @Override
     public void init(GameEngine engine) {
         this.context = engine.createChildContext();
+        headless = context.get(DisplayDevice.class).isHeadless();
+        
         CoreRegistry.setContext(context);
-
         systemConfig = context.get(SystemConfig.class);
 
-        if (netMode.hasLocalClient()) {
+        if (!headless) {
             this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
             context.put(NUIManager.class, nuiManager);
         }
@@ -144,15 +146,21 @@ public class StateLoading implements GameState {
 
     private void initClient() {
         loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
-        loadProcesses.add(new InitialiseRendering(context));
+        if (!headless) {
+            loadProcesses.add(new InitialiseRendering(context));
+        }
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new InitialiseGraphics(context));
+        if (!headless) {
+            loadProcesses.add(new InitialiseGraphics(context));
+        }
         loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new LoadExtraBlockData(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
-        loadProcesses.add(new RegisterInputSystem(context));
+        if (!headless) {
+            loadProcesses.add(new RegisterInputSystem(context));
+        }
         loadProcesses.add(new RegisterSystems(context, netMode));
         loadProcesses.add(new InitialiseCommandSystem(context));
         loadProcesses.add(new InitialiseRemoteWorld(context, gameManifest));
@@ -168,18 +176,18 @@ public class StateLoading implements GameState {
 
     private void initHost() {
         loadProcesses.add(new RegisterMods(context, gameManifest));
-        if (netMode.hasLocalClient()) {
+        if (!headless) {
             loadProcesses.add(new InitialiseRendering(context));
         }
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        if (netMode.hasLocalClient()) {
+        if (!headless) {
             loadProcesses.add(new InitialiseGraphics(context));
         }
         loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
-        if (netMode.hasLocalClient()) {
+        if (!headless) {
             loadProcesses.add(new RegisterInputSystem(context));
         }
         loadProcesses.add(new RegisterSystems(context, netMode));

@@ -34,7 +34,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Multiplayer identities:",
+                            "text": "${engine:menu#multiplayer-identities}",
                             "enabled": false
                         },
                         {

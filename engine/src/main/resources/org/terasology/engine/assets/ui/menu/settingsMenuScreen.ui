@@ -63,7 +63,7 @@
                     {
                         "type": "UIButton",
                         "id": "auto",
-                        "text": "autoconfig"
+                        "text": "${engine:menu#autoconfig}"
                     },
                     {
                         "type": "UISpace",
