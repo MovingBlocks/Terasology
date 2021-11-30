@@ -23,7 +23,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessShader;
-import org.terasology.engine.core.subsystem.headless.assets.HeadlessSkeletalMesh;
+import org.terasology.engine.core.subsystem.headless.assets.HeadlessSkinnedMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -229,7 +229,7 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.createAssetType(Mesh.class,
                 HeadlessMesh::new, "mesh");
         assetTypeManager.createAssetType(SkinnedMesh.class,
-                HeadlessSkeletalMesh::new, "skeletalMesh");
+                HeadlessSkinnedMesh::new, "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class,
                 MeshAnimationImpl::new, "animations");
 
