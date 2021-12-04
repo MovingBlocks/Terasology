@@ -2,57 +2,67 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
-public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
-
-    private Block block;
-    private Mesh mesh;
+public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
+    private final Block block;
+    private final ResourceUrn baseUrn = new ResourceUrn("engine", "blockmesh");
 
     public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
     }
 
     @Override
+    public Block getBlock() {
+        return block;
+    }
+
+    @Override
+    public ResourceUrn getBaseUrn() {
+        return this.baseUrn;
+    }
+
+
+    @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
-        final Block selfBlock = view.getBlock(x, y, z);
-        Vector3i pos = new Vector3i(x, y, z);
-        pos = view.toWorldPos(pos);
+        final BlockAppearance blockAppearance = block.getPrimaryAppearance();
+        if (!blockAppearance.hasAppearance()) {
+            // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
+            return;
+        }
+
         Color colorCache = new Color();
 
         // Gather adjacent blocks
-        Block[] adjacentBlocks = new Block[Side.values().length];
-        for (Side side : Side.values()) {
+        Block[] adjacentBlocks = new Block[Side.allSides().size()];
+        for (Side side : Side.allSides()) {
             Vector3ic offset = side.direction();
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
 
-        final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
-        final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
-        final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
+        final ChunkMesh.RenderType renderType = getRenderType(block);
+        final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);
         boolean isRendered = false;
 
-        for (final Side side : Side.values()) {
-            if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], selfBlock, side)) {
+        for (final Side side : Side.allSides()) {
+            if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], block, side)) {
                 isRendered = true;
 
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
 
                 // If the selfBlock isn't lowered, some more faces may have to be drawn
-                if (selfBlock.isLiquid()) {
+                if (block.isLiquid()) {
                     final Block topBlock = adjacentBlocks[Side.TOP.ordinal()];
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
@@ -61,11 +71,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                         final Block adjacent = adjacentBlocks[side.ordinal()];
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
-                            blockMeshPart = selfBlock.getTopLiquidMesh(side);
+                            blockMeshPart = block.getTopLiquidMesh(side);
                         }
                     } else {
                         if (blockMeshPart != null) {
-                            blockMeshPart = selfBlock.getLowLiquidMesh(side);
+                            blockMeshPart = block.getLowLiquidMesh(side);
                         }
                     }
                 }
@@ -73,11 +83,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 if (blockMeshPart != null) {
                     // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                     ChunkVertexFlag sideVertexFlag = vertexFlag;
-                    if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
+                    if (block.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
-                    Colorc colorOffset = selfBlock.getColorOffset(BlockPart.fromSide(side));
-                    Colorc colorSource = selfBlock.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
+                    Colorc colorOffset = block.getColorOffset(BlockPart.fromSide(side));
+                    Colorc colorSource = block.getColorSource(BlockPart.fromSide(side)).calcColor(view, x, y, z);
                     colorCache.setRed(colorSource.rf() * colorOffset.rf())
                             .setGreen(colorSource.gf() * colorOffset.gf())
                             .setBlue(colorSource.bf() * colorOffset.bf())
@@ -88,8 +98,8 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         }
 
         if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
-            Colorc colorOffset = selfBlock.getColorOffset(BlockPart.CENTER);
-            Colorc colorSource = selfBlock.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
+            Colorc colorOffset = block.getColorOffset(BlockPart.CENTER);
+            Colorc colorSource = block.getColorSource(BlockPart.CENTER).calcColor(view, x, y, z);
             colorCache.setRed(colorSource.rf() * colorOffset.rf())
                     .setGreen(colorSource.gf() * colorOffset.gf())
                     .setBlue(colorSource.bf() * colorOffset.bf())
@@ -117,6 +127,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     /**
      * Determine the render process of the block.
+     *
      * @return The render process for the block
      */
     private ChunkMesh.RenderType getRenderType(final Block selfBlock) {
@@ -165,26 +176,4 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     }
 
-    @Override
-    public Mesh getStandaloneMesh() {
-        if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
-        }
-        return mesh;
-    }
-
-    private void generateMesh() {
-        Tessellator tessellator = new Tessellator();
-        for (BlockPart dir : BlockPart.values()) {
-            BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
-            if (part != null) {
-                if (block.isDoubleSided()) {
-                    tessellator.addMeshPartDoubleSided(part);
-                } else {
-                    tessellator.addMeshPart(part);
-                }
-            }
-        }
-        mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
-    }
 }

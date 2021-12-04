@@ -8,7 +8,7 @@ import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 
 final class RunningThreadsMode extends MetricsMode {
 
-     RunningThreadsMode() {
+    RunningThreadsMode() {
         super("\n- Running Threads -");
     }
 
@@ -29,10 +29,5 @@ final class RunningThreadsMode extends MetricsMode {
     @Override
     public boolean isAvailable() {
         return true;
-    }
-
-    @Override
-    public boolean isPerformanceManagerMode() {
-        return false;
     }
 }

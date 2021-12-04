@@ -5,11 +5,11 @@ package org.terasology.engine.entitySystem.entity.internal;
 import com.google.common.collect.Iterables;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityPool;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.ArrayList;
 import java.util.List;

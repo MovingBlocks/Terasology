@@ -29,7 +29,7 @@ public final class ChunkTessellator {
 
     public ChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
         PerformanceMonitor.startActivity("GenerateMesh");
-        ChunkMesh mesh = new ChunkMesh();
+        ChunkMeshImpl mesh = new ChunkMeshImpl();
 
         final Stopwatch watch = Stopwatch.createStarted();
 
@@ -43,9 +43,7 @@ public final class ChunkTessellator {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 for (int y = 0; y < Chunks.SIZE_Y - border * 2; y++) {
                     Block block = chunkView.getBlock(x, y, z);
-                    if (block != null && block.getMeshGenerator() != null) {
-                        block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
-                    }
+                    block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
                 }
             }
         }

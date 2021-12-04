@@ -8,14 +8,12 @@ import org.joml.Vector3f;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -62,6 +60,7 @@ import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.asset.UIElement;
@@ -281,7 +280,7 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
         Locale locale = Locale.forLanguageTag(langTag);
-        TranslationProject proj = translationSystem.getProject(new SimpleUri("engine:menu"));
+        TranslationProject proj = translationSystem.getProject(new ResourceUrn("engine:menu"));
 
         // Try if language exists
         if (proj.getAvailableLocales().contains(locale)) {

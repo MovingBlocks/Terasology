@@ -22,6 +22,15 @@ repositories {
         }
     }
 
+    // JBoss Maven Repository requried to fetch `org.jpastebin` dependency for CrashReporter
+    maven {
+        name = "JBoss Public Maven Repository Group"
+        url = URI("https://repository.jboss.org/nexus/content/repositories/public/")
+        content {
+            includeModule("org", "jpastebin")
+        }
+    }
+
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         val repoViaEnv = System.getenv()["RESOLUTION_REPO"]
@@ -38,5 +47,13 @@ repositories {
             url = URI("http://artifactory.terasology.org/artifactory/virtual-repo-live")
             isAllowInsecureProtocol = true  // 😱
         }
+    }
+
+    // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
+    // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
+    maven {
+        name = "Terasology snapshot locals"
+        url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
+        isAllowInsecureProtocol = true  // 😱
     }
 }

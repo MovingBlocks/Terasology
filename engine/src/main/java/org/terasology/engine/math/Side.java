@@ -8,7 +8,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
-import java.util.EnumSet;
+import java.util.List;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -18,12 +18,12 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(new Vector3i(0, 1, 0)),
-    BOTTOM(new Vector3i(0, -1, 0)),
-    LEFT(new Vector3i(-1, 0, 0)),
-    RIGHT(new Vector3i(1, 0, 0)),
-    FRONT(new Vector3i(0, 0, -1)),
-    BACK(new Vector3i(0, 0, 1));
+    TOP(new Vector3i(0, 1, 0), (byte) 0b000001),
+    LEFT(new Vector3i(-1, 0, 0), (byte) 0b000010),
+    FRONT(new Vector3i(0, 0, -1), (byte) 0b000100),
+    BOTTOM(new Vector3i(0, -1, 0), (byte) 0b001000),
+    RIGHT(new Vector3i(1, 0, 0), (byte) 0b010000),
+    BACK(new Vector3i(0, 0, 1), (byte) 0b100000);
 
     public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
     public static final ImmutableList<Side> Y_TANGENT_SIDE = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
@@ -33,25 +33,36 @@ public enum Side {
     public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
     public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
 
-    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
-
+    private static final ImmutableList<Side> ALL_SIDES = ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK);
     private final Vector3ic direction;
+    private final byte flag;
 
-    Side(Vector3i vector3i) {
+    Side(Vector3i vector3i, byte flag) {
         this.direction = vector3i;
+        this.flag = flag;
     }
 
     /**
      * @return The horizontal sides, for iteration
      */
-    public static ImmutableList<Side> horizontalSides() {
+    public static List<Side> horizontalSides() {
         return Y_TANGENT_SIDE;
+    }
+
+    /**
+     * This provides a static List of all Sides defined in the enumeration. The result contains the same values as
+     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
+     *
+     * @return All available sides
+     */
+    public static List<Side> allSides() {
+        return ALL_SIDES;
     }
 
     /**
      * @return The vertical sides, for iteration
      */
-    public static ImmutableList<Side> verticalSides() {
+    public static List<Side> verticalSides() {
         return Y_VERTICAL_SIDE;
     }
 
@@ -109,19 +120,6 @@ public enum Side {
         return (z > 0) ? BACK : FRONT;
     }
 
-    /**
-     * This provides a static EnumSet of all Sides defined in the enumeration. The result contains the same values as
-     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
-     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this
-     * method.
-     *
-     * @return All available sides'
-     * @deprecated use {@link Side#values()}
-     */
-    @Deprecated
-    public static EnumSet<Side> getAllSides() {
-        return ALL_SIDES;
-    }
 
     /**
      * the normal vector in the direction of the side
@@ -130,6 +128,22 @@ public enum Side {
      */
     public Vector3ic direction() {
         return direction;
+    }
+
+    /**
+     * the bit flag associated with this side
+     * <ol>
+     * <li>TOP - 0b000001 </li>
+     * <li>LEFT - 0b000010 </li>
+     * <li>FRONT - 0b000100 </li>
+     * <li>BOTTOM - 0b001000 </li>
+     * <li>RIGHT - 0b010000 </li>
+     * <li>BACK - 0b100000 </li>
+     * </ol>
+     * @return bit flag
+     */
+    public byte getFlag() {
+        return this.flag;
     }
 
     /**

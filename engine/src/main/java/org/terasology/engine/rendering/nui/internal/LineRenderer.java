@@ -38,7 +38,7 @@ public final class LineRenderer {
      * </a>
      */
     public static void draw(float x1, float y1, float x2, float y2, float width, Colorc color, Colorc background, float alpha) {
-        if(lineMesh == null) {
+        if (lineMesh == null) {
             lineMesh = Assets.generateAsset(lineMeshData, Mesh.class);
         }
         GL11.glDisable(GL11.GL_CULL_FACE);
@@ -227,14 +227,14 @@ public final class LineRenderer {
             lineMeshData.position.rewind();
             lineMeshData.color0.rewind();
 
-            lineMeshData.position.put(v1.set( x1 - rx + cx, y1 - ry + cy, 0.0f));
-            lineMeshData.position.put(v1.set( x1 + rx + cx, y1 + ry + cy, 0.0f));
-            lineMeshData.position.put(v1.set( x1 - tx - rx, y1 - ty - ry, 0.0f));
-            lineMeshData.position.put(v1.set( x1 + tx + rx, y1 + ty + ry, 0.0f));
-            lineMeshData.position.put(v1.set( x2 - rx - cx, y2 - ry - cy, 0.0f));
-            lineMeshData.position.put(v1.set( x2 + rx - cx, y2 + ry - cy, 0.0f));
-            lineMeshData.position.put(v1.set( x2 - tx - rx, y2 - ty - ry, 0.0f));
-            lineMeshData.position.put(v1.set( x2 + tx + rx, y2 + ty + ry, 0.0f));
+            lineMeshData.position.put(v1.set(x1 - rx + cx, y1 - ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set(x1 + rx + cx, y1 + ry + cy, 0.0f));
+            lineMeshData.position.put(v1.set(x1 - tx - rx, y1 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set(x1 + tx + rx, y1 + ty + ry, 0.0f));
+            lineMeshData.position.put(v1.set(x2 - rx - cx, y2 - ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set(x2 + rx - cx, y2 + ry - cy, 0.0f));
+            lineMeshData.position.put(v1.set(x2 - tx - rx, y2 - ty - ry, 0.0f));
+            lineMeshData.position.put(v1.set(x2 + tx + rx, y2 + ty + ry, 0.0f));
 
             if (!alphaBlend) {
                 lineMeshData.color0.put(c.set(v1.set(bRed, bGreen, bBlue)));

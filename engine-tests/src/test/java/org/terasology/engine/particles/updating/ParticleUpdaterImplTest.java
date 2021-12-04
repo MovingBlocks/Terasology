@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.particles.components.ParticleEmitterComponent;
 import org.terasology.engine.particles.components.affectors.VelocityAffectorComponent;
 import org.terasology.engine.particles.components.generators.EnergyRangeGeneratorComponent;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -44,11 +44,11 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
 
-        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new org.joml.Vector3f(10.0f, 30.0f, -0.001f)));
+        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new Vector3f(10.0f, 30.0f, -0.001f)));
 
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
 
-        INSTANCE.singleAnimal = new Dog<>(2, new Vector3f(4, 5, 6), new org.joml.Vector3f(4, 5.8f, 8));
+        INSTANCE.singleAnimal = new Dog<>(2, new Vector3f(4, 5, 6), new Vector3f(4, 5.8f, 8));
     }
 
     private TypeHandlerLibrary typeHandlerLibrary;
@@ -178,7 +178,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
     private static final class Dog<T> extends Animal<T> {
         private final Vector3f tailPosition;
-        private final org.joml.Vector3f headPosition;
+        private final Vector3f headPosition;
 
         private Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
             super(data);

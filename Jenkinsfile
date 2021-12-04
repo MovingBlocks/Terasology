@@ -28,13 +28,13 @@ properties([
  *   - Git Forensics Plugin (https://plugins.jenkins.io/git-forensics/)
  *      To compare code scans and static analysis against a reference build from the base branch.
  *   - JUnit Plugin (https://plugins.jenkins.io/junit/)
- *      To record the results of our test suites from JUnit format. 
+ *      To record the results of our test suites from JUnit format.
  *
  */
 
 pipeline {
     agent {
-        label 'ts-engine && heavy && java8'
+        label 'ts-engine && heavy && java11'
     }
     stages {
         // declarative pipeline does `checkout scm` automatically when hitting first stage
@@ -42,6 +42,7 @@ pipeline {
             steps {
                 echo 'Automatically checked out the things!'
                 sh 'chmod +x gradlew'
+                sh './gradlew --version'
             }
         }
 
@@ -115,20 +116,32 @@ pipeline {
         stage('Analytics') {
             steps {
                 sh './gradlew --console=plain check -x test'
-                // the default resolution when omitting `defaultBranch` is to `master`
-                // this is wrong in our case, so explicitly set `develop` as default
-                // TODO: does this also work for PRs with different base branch?
-                discoverGitReferenceBuild(defaultBranch: 'develop')
-                recordIssues skipBlames: true,
-                    tools: [
-                        checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
-                        spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
-                        pmdParser(pattern: '**/build/reports/pmd/*.xml')
-                    ]
+            }
+            post {
+                always {
+                    // the default resolution when omitting `defaultBranch` is to `master`
+                    // this is wrong in our case, so explicitly set `develop` as default
+                    // TODO: does this also work for PRs with different base branch?
+                    discoverGitReferenceBuild(defaultBranch: 'develop')
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
+                        qualityGates: [
+                            [threshold: 1, type: 'NEW_HIGH', unstable: false],      // mark stage "failed" on new high findings
+                            [threshold: 1, type: 'NEW_NORMAL', unstable: false],    // mark stage "failed" on new normal findings
+                            [threshold: 1, type: 'TOTAL_HIGH', unstable: true],     // mark stage "unstable" on existing high findings
+                            [threshold: 1, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
+                        ])
 
-                recordIssues skipBlames: true,
-                    tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
-                                        lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tools: [
+                            spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
+                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                        ])
+
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
+                                            lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP'))
+                }
             }
         }
 

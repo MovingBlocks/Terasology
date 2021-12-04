@@ -20,9 +20,4 @@ public class WorldRendererMode extends MetricsMode {
     public boolean isAvailable() {
         return CoreRegistry.get(WorldRenderer.class) != null;
     }
-
-    @Override
-    public boolean isPerformanceManagerMode() {
-        return false;
-    }
 }

@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes;
 
+import com.google.common.base.MoreObjects;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.TelemetryConfig;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.input.InputSystem;
@@ -32,6 +34,7 @@ public class StateMainMenu extends AbstractState {
     private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
+    private boolean headless;
 
 
     public StateMainMenu() {
@@ -44,38 +47,50 @@ public class StateMainMenu extends AbstractState {
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        initEntityAndComponentManagers();
+        headless = context.get(DisplayDevice.class).isHeadless();
+
+        initEntityAndComponentManagers(headless);
 
         createLocalPlayer(context);
 
-        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem(context).step();
+        if (!headless) {
+            // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
+            new RegisterInputSystem(context).step();
 
-        nuiManager = context.get(NUIManager.class);
-        eventSystem.registerEventHandler(nuiManager);
-        NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
-        context.put(NUIEditorSystem.class, nuiEditorSystem);
-        componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
+            nuiManager = context.get(NUIManager.class);
+            eventSystem.registerEventHandler(nuiManager);
+            NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
+            context.put(NUIEditorSystem.class, nuiEditorSystem);
+            componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
 
-        NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
-        context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
-        componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
+            NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
+            context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
+            componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
 
-        inputSystem = context.get(InputSystem.class);
+            inputSystem = context.get(InputSystem.class);
+        }
 
         componentSystemManager.initialise();
-
         console = context.get(Console.class);
         storageServiceWorker = context.get(StorageServiceWorker.class);
-
         playBackgroundMusic();
 
-        //guiManager.openWindow("main");
-        context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+        if (!headless) {
+            //guiManager.openWindow("main");
+            context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+        }
         if (!messageOnLoad.isEmpty()) {
             TranslationSystem translationSystem = context.get(TranslationSystem.class);
-            MessagePopup popup = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage("Error", translationSystem.translate(messageOnLoad));
+            if (headless) {
+                throw new RuntimeException(
+                        String.format(
+                                "Game could not be started, server attempted to return to main menu: [%s]. See logs before",
+                                translationSystem.translate(messageOnLoad)
+                        ));
+            } else {
+                MessagePopup popup = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                popup.setMessage("Error", translationSystem.translate(messageOnLoad));
+            }
         }
 
         // TODO: enable it when exposing the telemetry to users
@@ -105,7 +120,7 @@ public class StateMainMenu extends AbstractState {
                 appender.stop();
             });
             telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
-            telemetryConfirmPopup.setOptionHandler(()-> {
+            telemetryConfirmPopup.setOptionHandler(() -> {
                 nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
             });
         }
@@ -130,7 +145,9 @@ public class StateMainMenu extends AbstractState {
 
     @Override
     public void handleInput(float delta) {
-        inputSystem.update(delta);
+        if (inputSystem != null) {
+            inputSystem.update(delta);
+        }
     }
 
     @Override
@@ -139,12 +156,13 @@ public class StateMainMenu extends AbstractState {
 
         eventSystem.process();
         storageServiceWorker.flushNotificationsToConsole(console);
-
     }
 
     @Override
     public void render() {
-        nuiManager.render();
+        if (nuiManager != null) {
+            nuiManager.render();
+        }
     }
 
     @Override
@@ -154,10 +172,19 @@ public class StateMainMenu extends AbstractState {
 
     @Override
     public boolean isHibernationAllowed() {
-        return true;
+        return !headless;
     }
 
     private void updateUserInterface(float delta) {
-        nuiManager.update(delta);
+        if (nuiManager != null) {
+            nuiManager.update(delta);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("messageOnLoad", messageOnLoad)
+                .toString();
     }
 }
