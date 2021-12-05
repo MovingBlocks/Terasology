@@ -28,4 +28,8 @@ public abstract class MeshAnimation extends Asset<MeshAnimationData> {
     public abstract float getTimePerFrame();
 
     public abstract AABBf getAabb();
+
+    public float getDuration() {
+        return  getTimePerFrame() * (getFrameCount() - 1);
+    }
 }

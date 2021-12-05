@@ -17,7 +17,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -37,12 +36,12 @@ import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.nui.Color;
 
 import java.nio.FloatBuffer;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -130,10 +129,6 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
             return;
         }
 
-        if (skeletalMeshComp.animation == null && skeletalMeshComp.animationPool != null) {
-            skeletalMeshComp.animation = randomAnimationData(skeletalMeshComp, random);
-        }
-
         if (skeletalMeshComp.animation == null) {
             return;
         }
@@ -141,83 +136,61 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
         if (skeletalMeshComp.animation.getFrameCount() < 1) {
             return;
         }
-        skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
-        float animationDuration = getDurationOfAnimation(skeletalMeshComp);
-        while (skeletalMeshComp.animationTime >= animationDuration) {
-            MeshAnimation newAnimation;
-            if (!skeletalMeshComp.loop) {
-                newAnimation = null;
-            } else if (skeletalMeshComp.animationPool != null && !skeletalMeshComp.animationPool.isEmpty()) {
-                newAnimation = randomAnimationData(skeletalMeshComp, random);
-            } else {
-                newAnimation = skeletalMeshComp.animation;
-            }
 
-            if (newAnimation == null) {
-                MeshAnimation finishedAnimation = skeletalMeshComp.animation;
-                skeletalMeshComp.animationTime = animationDuration;
-                MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1);
-                updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
-                // Set animation to null so that AnimEndEvent fires only once
-                skeletalMeshComp.animation = null;
-                entity.saveComponent(skeletalMeshComp);
-                entity.send(new AnimEndEvent(finishedAnimation));
-                return;
+        if (skeletalMeshComp.rootBone != null) {
+            LocationComponent locationComponent = skeletalMeshComp.rootBone.getComponent(LocationComponent.class);
+            if (locationComponent != null) {
+                locationComponent.setLocalPosition(skeletalMeshComp.localOffset);
+                locationComponent.setLocalScale(skeletalMeshComp.localScale);
+                locationComponent.setLocalRotation(skeletalMeshComp.localRotation);
             }
-            skeletalMeshComp.animationTime -= animationDuration;
-            if (skeletalMeshComp.animationTime < 0) {
-                // In case the float calculation wasn't exact:
-                skeletalMeshComp.animationTime = 0;
+        }
+
+        float animationDuration = skeletalMeshComp.animation.getDuration();
+        if (skeletalMeshComp.currentTime >= animationDuration) {
+            skeletalMeshComp.currentTime -= animationDuration;
+            if (skeletalMeshComp.currentTime < 0) {
+                skeletalMeshComp.currentTime = 0;
             }
-            skeletalMeshComp.animation = newAnimation;
-            animationDuration = getDurationOfAnimation(skeletalMeshComp);
         }
-        float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
-        int frameAId = (int) framePos;
-        int frameBId = frameAId + 1;
-        if (frameBId >= skeletalMeshComp.animation.getFrameCount()) {
-            // In case the float calcuation wasn't exact:
-            frameBId = skeletalMeshComp.animation.getFrameCount() - 1;
+
+        float framePos = skeletalMeshComp.currentTime / skeletalMeshComp.animation.getTimePerFrame();
+        int currentFrame = (int) framePos;
+        int nextFrame = currentFrame + 1;
+        if (nextFrame >= skeletalMeshComp.animation.getFrameCount()) {
+            nextFrame = 0;
         }
-        MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameAId);
-        MeshAnimationFrame frameB = skeletalMeshComp.animation.getFrame(frameBId);
-        updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameAId);
+        float frameDelta = framePos - currentFrame;
+        MeshAnimationFrame animatedFrame1 = skeletalMeshComp.animation.getFrame(currentFrame);
+        MeshAnimationFrame animatedFrame2 = skeletalMeshComp.animation.getFrame(nextFrame);
+        updateFrame(skeletalMeshComp, animatedFrame1, animatedFrame2, frameDelta);
         entity.saveComponent(skeletalMeshComp);
     }
 
-    private float getDurationOfAnimation(SkinnedMeshComponent skeletalMeshComp) {
-        return skeletalMeshComp.animation.getTimePerFrame() * (skeletalMeshComp.animation.getFrameCount() - 1);
-    }
+    private void updateFrame(SkinnedMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB,
+                             float interpolationVal) {
 
-    private static MeshAnimation randomAnimationData(SkinnedMeshComponent skeletalMeshComp, Random random) {
-        List<MeshAnimation> animationPool = skeletalMeshComp.animationPool;
-        if (animationPool == null) {
-            return null;
-        }
-        if (animationPool.isEmpty()) {
-            return null;
-        }
-        return animationPool.get(random.nextInt(animationPool.size()));
-    }
 
-    private void updateSkeleton(SkinnedMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB,
-                                float interpolationVal) {
         for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
             String boneName = skeletalMeshComp.animation.getBoneName(i);
             EntityRef boneEntity = skeletalMeshComp.boneEntities.get(boneName);
             if (boneEntity == null) {
                 continue;
             }
+
             LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
-            if (boneLoc != null) {
-                Vector3f newPos = frameA.getPosition(i).lerp(frameB.getPosition(i), interpolationVal, new Vector3f());
-                boneLoc.setLocalPosition(newPos);
-                Quaternionf newRot = frameA.getRotation(i).slerp(frameB.getRotation(i), interpolationVal, new Quaternionf());
-                newRot.normalize();
-                boneLoc.setLocalRotation(newRot);
-                boneLoc.setLocalScale(frameA.getBoneScale(i).lerp(frameB.getBoneScale(i), interpolationVal, new Vector3f()).x);
-                boneEntity.saveComponent(boneLoc);
+            if (boneLoc == null) {
+                continue;
             }
+
+            Vector3f newPos = frameA.getPosition(i).lerp(frameB.getPosition(i), interpolationVal, new Vector3f());
+            boneLoc.setLocalPosition(newPos);
+            Quaternionf newRot = frameA.getRotation(i).slerp(frameB.getRotation(i), interpolationVal, new Quaternionf());
+            newRot.normalize();
+            boneLoc.setLocalRotation(newRot);
+            boneLoc.setLocalScale(frameA.getBoneScale(i).lerp(frameB.getBoneScale(i), interpolationVal, new Vector3f()).x);
+            boneEntity.saveComponent(boneLoc);
+
         }
     }
 
@@ -257,10 +230,10 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
             aabb = aabb.transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
 
             //Scale bounding box for skeletalMesh.
-            Vector3f scale = skeletalMesh.scale;
+            float scale = skeletalMesh.localScale;
 
             Vector3f aabbCenter = aabb.center(new Vector3f());
-            Vector3f scaledExtents = aabb.extent(new Vector3f()).mul(scale.x(), scale.y(), scale.z());
+            Vector3f scaledExtents = aabb.extent(new Vector3f()).mul(scale, scale, scale);
             aabb = new AABBf(aabbCenter, aabbCenter).expand(scaledExtents);
 
             if (!worldRenderer.getActiveCamera().hasInSight(aabb)) {
@@ -279,7 +252,6 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
             Vector3f worldPositionCameraSpace = new Vector3f();
             worldPos.sub(cameraPosition, worldPositionCameraSpace);
 
-            worldPositionCameraSpace.y += skeletalMesh.heightOffset;
             Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, worldRot, worldScale);
 
             Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
@@ -292,25 +264,21 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
-            Matrix4f[] boneTransforms = new Matrix4f[skeletalMesh.mesh.bones().size()];
+            Matrix4f boneTransform = new Matrix4f();
             for (Bone bone : skeletalMesh.mesh.bones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
                     boneEntity = EntityRef.NULL;
                 }
                 LocationComponent boneLocation = boneEntity.getComponent(LocationComponent.class);
+                boneTransform.identity();
                 if (boneLocation != null) {
-                    Matrix4f boneTransform = new Matrix4f();
                     boneLocation.getRelativeTransform(boneTransform, entity);
                     boneTransform.mul(bone.getInverseBindMatrix());
-                    boneTransforms[bone.getIndex()] = boneTransform;
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
-                    boneTransforms[bone.getIndex()] = new Matrix4f();
                 }
-            }
-            for (int i = 0; i < boneTransforms.length; i++) {
-                skeletalMesh.material.setMatrix4("boneTransforms[" + i + "]", boneTransforms[i], true);
+                skeletalMesh.material.setMatrix4("boneTransforms[" + bone.getIndex() + "]", boneTransform, true);
             }
             skeletalMesh.mesh.render();
         }
@@ -327,11 +295,7 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
 
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-            Matrix4f relMat = new Matrix4f();
-            Matrix4f relFinal = new Matrix4f();
             Matrix4f entityTransform = new Matrix4f();
-
-            Matrix4f result = new Matrix4f();
             Vector3f currentPos = new Vector3f();
 
             int index = 0;
@@ -348,10 +312,6 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
 
                 // position is referenced around (0,0,0) (worldposition - cameraposition)
                 Vector3f worldPositionCameraSpace = cameraPosition.negate(new Vector3f());
-
-                // same heightOffset is applied to worldPositionCameraSpace from #renderOpaque()
-                // TODO: resolve repeated logic for transformation applied to bones
-                worldPositionCameraSpace.y += skeletalMesh.heightOffset;
 
                 Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
                 Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
@@ -370,27 +330,10 @@ public class SkinnedMeshRenderer extends BaseComponentSystem implements RenderSy
                     LocationComponent locCompA = boneEntity.getComponent(LocationComponent.class);
                     LocationComponent locCompB = boneParentEntity.getComponent(LocationComponent.class);
 
-                    // need to calculate the relative transformation from the entity to the start of the bone
-                    locCompA.getRelativeTransform(relMat.identity(), entity);
-                    // entityTransform * (scale, translation) * relativeMat * [x,y,z,1]
-                    result.set(entityTransform)
-                            .mul(relFinal.identity()
-                                    .scale(skeletalMesh.scale)
-                                    .translate(skeletalMesh.translate)
-                                    .mul(relMat))
-                            .transformPosition(currentPos.zero()); // get the position of the start of the bone
+                    locCompA.getWorldPosition(currentPos);
                     meshData.position.put(currentPos); // the start of the bone
 
-                    // need to calculate the relative transformation from the entity to the connecting bone
-                    locCompB.getRelativeTransform(relMat.identity(), entity);
-                    // entityTransform * (scale, translation) * relativeMat * [x,y,z,1]
-                    result.set(entityTransform)
-                            .mul(relFinal
-                                    .identity()
-                                    .scale(skeletalMesh.scale)
-                                    .translate(skeletalMesh.translate)
-                                    .mul(relMat))
-                            .transformPosition(currentPos.zero()); // get the position to the connecting bone
+                    locCompB.getWorldPosition(currentPos);
                     meshData.position.put(currentPos); // the end of the bone
 
                     meshData.color0.put(Color.white);
