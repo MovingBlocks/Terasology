@@ -10,7 +10,6 @@ import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.delay.DelayManager;
@@ -20,6 +19,7 @@ import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.stream.Collectors;
 

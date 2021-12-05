@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
 import org.terasology.engine.world.block.Block;
@@ -30,6 +29,7 @@ import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

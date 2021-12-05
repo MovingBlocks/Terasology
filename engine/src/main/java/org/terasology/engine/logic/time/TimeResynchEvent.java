@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.time;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.BroadcastEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 @BroadcastEvent
 public class TimeResynchEvent implements Event {

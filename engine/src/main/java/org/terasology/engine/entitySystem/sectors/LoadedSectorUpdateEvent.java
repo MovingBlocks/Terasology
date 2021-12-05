@@ -3,7 +3,7 @@
 package org.terasology.engine.entitySystem.sectors;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
