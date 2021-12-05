@@ -14,10 +14,10 @@ import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.characters.events;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class CollisionEvent implements Event {
     private Vector3f velocity;

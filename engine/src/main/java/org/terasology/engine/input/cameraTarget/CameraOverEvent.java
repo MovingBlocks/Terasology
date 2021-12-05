@@ -3,7 +3,7 @@
 package org.terasology.engine.input.cameraTarget;
 
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event is sent when the camera starts pointing at a target, to the target
