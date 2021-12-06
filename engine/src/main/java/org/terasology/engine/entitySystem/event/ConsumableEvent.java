@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.event;
 
+import org.terasology.gestalt.entitysystem.event.Event;
+
 /**
  * A consumable event is an event that can be prevented from continuing through remaining event receivers. This is
  * primarily useful for input event.

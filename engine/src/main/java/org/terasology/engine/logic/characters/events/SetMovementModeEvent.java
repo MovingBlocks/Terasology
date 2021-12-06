@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.characters.events;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.logic.characters.MovementMode;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class SetMovementModeEvent implements Event {
     private MovementMode mode;
