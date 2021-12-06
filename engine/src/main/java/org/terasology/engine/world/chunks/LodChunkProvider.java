@@ -8,7 +8,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
@@ -36,15 +35,15 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class LodChunkProvider {
     private static final Logger logger = LoggerFactory.getLogger(LodChunkProvider.class);
 
-    private ChunkProvider chunkProvider;
-    private BlockManager blockManager;
-    private ExtraBlockDataManager extraDataManager;
-    private ChunkTessellator tessellator;
-    private ScalableWorldGenerator generator;
+    private final ChunkProvider chunkProvider;
+    private final BlockManager blockManager;
+    private final ExtraBlockDataManager extraDataManager;
+    private final ChunkTessellator tessellator;
+    private final ScalableWorldGenerator generator;
 
-    private Vector3i center;
-    private ViewDistance viewDistanceSetting;
-    private int chunkLods;
+    private Vector3i center = new Vector3i();
+    private ViewDistance viewDistanceSetting = ViewDistance.MODERATE;
+    private int chunkLods = 0;
     // The chunks that may be actually loaded.
     private BlockRegion possiblyLoadedRegion = new BlockRegion(BlockRegion.INVALID);
     // The chunks that should be visible, and therefore shouldn't have LOD chunks even if the chunk there hasn't
@@ -53,34 +52,31 @@ public class LodChunkProvider {
     private BlockRegion[] lodRegions = new BlockRegion[0];
     // The sizes of all of the LOD chunks that are meant to exist. All the chunks at the same positions with larger
     // sizes also may exist, but don't always.
-    private Map<Vector3ic, Integer> requiredChunks;
-    private ArrayList<Map<Vector3i, LodChunk>> chunks = new ArrayList<>();
-    private ClosenessComparator nearby;
+    private final Map<Vector3ic, Integer> requiredChunks;
+    private final ArrayList<Map<Vector3i, LodChunk>> chunks = new ArrayList<>();
+    private final ClosenessComparator nearby;
 
     // Communication with the generation threads.
-    private PriorityBlockingQueue<Vector3ic> neededChunks;
-    private BlockingQueue<LodChunk> readyChunks = Queues.newLinkedBlockingQueue();
-    private List<Thread> generationThreads = new ArrayList<>();
+    private final PriorityBlockingQueue<Vector3ic> neededChunks;
+    private final BlockingQueue<LodChunk> readyChunks = Queues.newLinkedBlockingQueue();
+    private final List<Thread> generationThreads = new ArrayList<>();
 
-    public LodChunkProvider(Context context, ScalableWorldGenerator generator, ChunkTessellator tessellator,
-                            ViewDistance viewDistance, int chunkLods, Vector3i center) {
-        chunkProvider = context.get(ChunkProvider.class);
-        blockManager = context.get(BlockManager.class);
-        extraDataManager = context.get(ExtraBlockDataManager.class);
+    public LodChunkProvider(ChunkProvider chunkProvider, BlockManager blockManager, ExtraBlockDataManager extraDataManager, ScalableWorldGenerator generator, ChunkTessellator tessellator) {
+        this.chunkProvider = chunkProvider;
+        this.blockManager = blockManager;
+        this.extraDataManager = extraDataManager;
         this.generator = generator;
         this.tessellator = tessellator;
-        viewDistanceSetting = viewDistance;
-        this.chunkLods = chunkLods;
-        this.center = center;
-        requiredChunks = new ConcurrentHashMap<>();
-        nearby = new ClosenessComparator(center);
-        neededChunks = new PriorityBlockingQueue<>(11, nearby);
+        this.requiredChunks = new ConcurrentHashMap<>();
+        this.nearby = new ClosenessComparator(center);
+        this.neededChunks = new PriorityBlockingQueue<>(11, nearby);
         for (int i = 0; i < 4; i++) {
             Thread thread = new Thread(this::createChunks, "LOD Chunk Generation " + i);
             thread.start();
             generationThreads.add(thread);
         }
     }
+
 
     private void createChunks() {
         Block unloaded = blockManager.getBlock(BlockManager.UNLOADED_ID);
@@ -150,10 +146,10 @@ public class LodChunkProvider {
     }
 
     public void updateRenderableRegion(ViewDistance newViewDistance, int newChunkLods, Vector3i newCenter) {
-        viewDistanceSetting = newViewDistance;
-        center = new Vector3i(delay(center.x, newCenter.x), delay(center.y, newCenter.y), delay(center.z, newCenter.z));
-        chunkLods = newChunkLods;
-        nearby.pos = center;
+        this.viewDistanceSetting = newViewDistance;
+        this.center = new Vector3i(delay(center.x, newCenter.x), delay(center.y, newCenter.y), delay(center.z, newCenter.z));
+        this.chunkLods = newChunkLods;
+        this.nearby.pos = center;
         Vector3i viewDistance = new Vector3i(newViewDistance.getChunkDistance()).div(2);
         Vector3i altViewDistance = viewDistance.add(1 - Math.abs(viewDistance.x % 2),
                 1 - Math.abs(viewDistance.y % 2), 1 - Math.abs(viewDistance.z % 2), new Vector3i());
