@@ -50,8 +50,8 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
@@ -91,6 +91,7 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
@@ -763,7 +764,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         PerformanceMonitor.endActivity();
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void rsyncPhysics(PhysicsResynchEvent event, EntityRef entity) {
         //TODO: re-sync is enforced by the server but the time is not consistent between the server/client
         btRigidBody rb = entityRigidBodies.get(entity);
@@ -773,7 +775,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
         }
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void rsyncLocation(LocationResynchEvent event, EntityRef entity) {
         //TODO: re-sync is enforced by the server but the time is not consistent between the server/client
         btRigidBody rb = entityRigidBodies.get(entity);
