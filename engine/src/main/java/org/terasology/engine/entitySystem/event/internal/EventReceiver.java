@@ -4,7 +4,7 @@
 package org.terasology.engine.entitySystem.event.internal;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Interface for a single event receiver

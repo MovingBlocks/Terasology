@@ -3,6 +3,8 @@
 
 package org.terasology.engine.entitySystem.event;
 
+import org.terasology.gestalt.entitysystem.event.Event;
+
 /**
  * Immutable event to notify a change in a certain value.
  * <p>
