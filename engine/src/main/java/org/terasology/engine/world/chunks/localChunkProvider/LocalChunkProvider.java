@@ -26,7 +26,6 @@ import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.block.OnActivatedBlocks;
 import org.terasology.engine.world.block.OnAddedBlocks;
@@ -52,7 +51,6 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Sinks;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -61,8 +59,6 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
