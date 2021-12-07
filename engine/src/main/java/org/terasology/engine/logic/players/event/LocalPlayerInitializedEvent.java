@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.players.event;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event gets sent when the {@link LocalPlayer} object is ready to be used.

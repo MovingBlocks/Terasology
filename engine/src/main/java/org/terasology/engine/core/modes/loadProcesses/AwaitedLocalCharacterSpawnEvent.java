@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.module.sandbox.API;
 
 /**

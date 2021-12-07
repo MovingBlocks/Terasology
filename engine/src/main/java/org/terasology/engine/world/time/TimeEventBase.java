@@ -4,7 +4,7 @@
 package org.terasology.engine.world.time;
 
 import com.google.common.math.LongMath;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * A base class for different timer events

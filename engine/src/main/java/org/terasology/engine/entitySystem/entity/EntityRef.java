@@ -6,9 +6,9 @@ import com.google.common.base.Objects;
 import org.terasology.engine.entitySystem.MutableComponentContainer;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.engine.entitySystem.entity.internal.NullEntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * A wrapper around an entity id providing access to common functionality

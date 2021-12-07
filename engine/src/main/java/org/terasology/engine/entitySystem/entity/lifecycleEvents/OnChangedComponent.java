@@ -3,7 +3,7 @@
 
 package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event occurs whenever a component is changed and saved.

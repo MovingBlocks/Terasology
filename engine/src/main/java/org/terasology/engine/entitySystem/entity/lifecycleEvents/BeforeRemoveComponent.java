@@ -3,7 +3,7 @@
 
 package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * When a component is about to be removed from an entity, or an entity is about to be destroyed, this event is sent.

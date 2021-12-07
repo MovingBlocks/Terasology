@@ -3,8 +3,8 @@
 package org.terasology.engine.logic.health;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Sent to request the destruction of an entity.

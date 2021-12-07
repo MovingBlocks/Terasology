@@ -5,6 +5,7 @@ package org.terasology.engine.entitySystem.event;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class PendingEvent {
     private EntityRef entity;
