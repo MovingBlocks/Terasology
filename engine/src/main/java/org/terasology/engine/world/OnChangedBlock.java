@@ -5,8 +5,8 @@ package org.terasology.engine.world;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Event when a block has changed

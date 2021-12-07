@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
