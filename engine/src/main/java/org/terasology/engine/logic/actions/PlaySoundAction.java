@@ -6,16 +6,16 @@ import org.joml.Vector3f;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.logic.characters.events.ActivationPredicted;
 import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This systems handles the playing of sounds in response to events, on both server and client,

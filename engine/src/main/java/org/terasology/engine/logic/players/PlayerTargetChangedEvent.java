@@ -4,7 +4,7 @@
 package org.terasology.engine.logic.players;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Fired whenever the targeted entity changes (must be within activation range).

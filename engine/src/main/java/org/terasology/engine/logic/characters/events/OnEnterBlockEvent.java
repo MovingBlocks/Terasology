@@ -3,8 +3,8 @@
 package org.terasology.engine.logic.characters.events;
 
 import org.joml.Vector3i;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event gets sent to the player entity when it enters a new block.

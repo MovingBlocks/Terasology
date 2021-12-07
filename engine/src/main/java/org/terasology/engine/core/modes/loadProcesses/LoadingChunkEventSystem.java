@@ -6,12 +6,12 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * A system to send new chunk events to the current game state, which can be
