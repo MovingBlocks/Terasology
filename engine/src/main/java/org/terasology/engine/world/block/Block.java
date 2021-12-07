@@ -222,15 +222,17 @@ public final class Block {
     }
 
     /**
-     * @return The BlockMeshGenerator that is used in rendering, null if invisible.
+     * MeshGenerator drives how the mesh is produced for this single block.
+     * by default this uses {@link BlockMeshGeneratorSingleShape} and can't be set to null.
+     *
+     * @return The BlockMeshGenerator that is used in rendering.
      */
     public BlockMeshGenerator getMeshGenerator() {
         return meshGenerator;
     }
 
     /**
-     * @param meshGenerator The new BlockMeshGenerator to use in rendering this block.
-     *                      If meshGenerator is null then this block is invisible.
+     * @param meshGenerator The new {@link BlockMeshGenerator} to use in rendering this block.
      */
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
         Preconditions.checkNotNull(meshGenerator);
