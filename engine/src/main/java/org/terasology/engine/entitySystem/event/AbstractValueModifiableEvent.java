@@ -5,6 +5,7 @@ package org.terasology.engine.entitySystem.event;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * A generic event for getting a value for a property.

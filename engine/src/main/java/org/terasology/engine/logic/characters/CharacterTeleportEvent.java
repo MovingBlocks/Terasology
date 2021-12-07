@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.characters;
 
 import org.joml.Vector3fc;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Used within the server to trigger a teleport of a character. Just chaining the position is not possible due to

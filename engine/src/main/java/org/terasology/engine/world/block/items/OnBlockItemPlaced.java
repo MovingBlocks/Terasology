@@ -5,7 +5,7 @@ package org.terasology.engine.world.block.items;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event gets called whenever a block item is placed in the world

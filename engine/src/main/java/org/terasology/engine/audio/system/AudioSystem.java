@@ -11,7 +11,6 @@ import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
@@ -25,6 +24,7 @@ import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This system handles receiving the PlaySound events and activating the AudioManager to play them

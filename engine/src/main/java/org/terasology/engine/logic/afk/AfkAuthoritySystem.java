@@ -4,7 +4,6 @@ package org.terasology.engine.logic.afk;
 
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -16,6 +15,7 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.events.ConnectedEvent;
 import org.terasology.engine.network.events.DisconnectedEvent;
 import org.terasology.engine.registry.In;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class AfkAuthoritySystem extends BaseComponentSystem {

@@ -3,7 +3,7 @@
 
 package org.terasology.engine.network.events;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Event notifying of a client disconnecting.
