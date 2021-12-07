@@ -4,12 +4,12 @@
 package org.terasology.engine.core.bootstrap.eventSystem;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.event.internal.EventReceiver;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public abstract class AbstractEventSystemDecorator implements EventSystem {
     private final EventSystem eventSystem;

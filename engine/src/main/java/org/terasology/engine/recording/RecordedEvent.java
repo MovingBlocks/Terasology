@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.recording;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Saves a recorded event, the id of the entity it was sent against, the component it was sent with, the timestamp in

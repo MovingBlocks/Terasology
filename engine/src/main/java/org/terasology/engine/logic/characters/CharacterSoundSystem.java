@@ -11,7 +11,6 @@ import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -29,6 +28,7 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.List;
 

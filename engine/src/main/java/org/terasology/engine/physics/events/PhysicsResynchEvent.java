@@ -4,8 +4,8 @@
 package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.BroadcastEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 @BroadcastEvent
 public class PhysicsResynchEvent implements Event {

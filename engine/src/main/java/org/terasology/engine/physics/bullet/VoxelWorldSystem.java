@@ -5,7 +5,6 @@ package org.terasology.engine.physics.bullet;
 import com.google.common.collect.Lists;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.physics.bullet.world.VoxelBlockFluidWorld;
@@ -22,6 +21,7 @@ import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
