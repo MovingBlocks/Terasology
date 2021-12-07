@@ -3,8 +3,8 @@
 package org.terasology.engine.logic.selection;
 
 import org.terasology.engine.world.selection.BlockSelectionComponent;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * This event should be sent by a system after it receives a {@link ApplyBlockSelectionEvent} which marks the end of a

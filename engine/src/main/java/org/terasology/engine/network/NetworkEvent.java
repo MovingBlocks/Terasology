@@ -4,7 +4,7 @@
 package org.terasology.engine.network;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Optional parent for events that are replicated over the network. Inherit this to make use of advanced features

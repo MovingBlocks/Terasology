@@ -3,8 +3,8 @@
 
 package org.terasology.engine.network.events;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.persistence.PlayerStore;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.
