@@ -51,7 +51,7 @@ import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
@@ -62,9 +62,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -90,8 +89,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private Config config;
     private SystemConfig systemConfig;
 
-    private Optional<CompletableFuture<SaveTransactionResult>> resultSubject = Optional.empty();
-
+    private Optional<SaveTransaction> saveTransaction = Optional.empty();
+    private Phaser transactionWait = new Phaser(0);
+    private Sinks.Many<SaveTransaction> transactionSink = Sinks.many().multicast().onBackpressureBuffer();
     /**
      * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
      */
@@ -102,12 +102,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
-
     private EngineEntityManager privateEntityManager;
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
     private RecordAndReplaySerializer recordAndReplaySerializer;
     private RecordAndReplayUtils recordAndReplayUtils;
-    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    private final RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+
     /**
      * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
      * that will use the privateEntityManager.
@@ -119,8 +119,22 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
                                    RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus)
             throws IOException {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
-            true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
-
+                true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+        transactionSink.asFlux()
+                .publishOn(Schedulers.newSingle("saving-thread"))
+                .mapNotNull(transaction -> {
+                    transaction.run();
+                    SaveTransactionResult result = transaction.getResult();
+                    transactionWait.arriveAndDeregister();
+                    if (result != null) {
+                        Throwable t = result.getCatchedThrowable();
+                        if (t != null) {
+                            throw new RuntimeException(t);
+                        }
+                        return result;
+                    }
+                    return null;
+                }).subscribe();
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
@@ -135,7 +149,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
-//        this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
         this.systemConfig = CoreRegistry.get((SystemConfig.class));
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
@@ -159,21 +172,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             recordAndReplayUtils.setShutdownRequested(true);
         }
-        resultSubject.ifPresent(CompletableFuture::join);
+        if (transactionWait.getRegisteredParties() > 0) {
+            transactionWait.arriveAndAwaitAdvance();
+        }
         checkSaveTransactionAndClearUpIfItIsDone();
     }
 
     private void checkSaveTransactionAndClearUpIfItIsDone() {
-        if (resultSubject.isPresent() && resultSubject.get().isDone()) {
-            try {
-                SaveTransactionResult result = resultSubject.get().get();
-                Throwable t = result.getCatchedThrowable();
+        if (saveTransaction.isPresent()) {
+            SaveTransactionResult result = saveTransaction.get().getResult();
+            if (result != null) {
+                Throwable t = saveTransaction.get().getResult().getCatchedThrowable();
                 if (t != null) {
                     throw new RuntimeException("Saving failed", t);
                 }
-                resultSubject = Optional.empty();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Saving failed", e);
+                saveTransaction = Optional.empty();
             }
             unloadedAndSavingChunkMap.clear();
         }
@@ -254,7 +267,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
             recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         }
-        resultSubject.ifPresent(CompletableFuture::join);
+        if (transactionWait.getRegisteredParties() > 0) {
+            transactionWait.arriveAndAwaitAdvance();
+        }
         checkSaveTransactionAndClearUpIfItIsDone();
     }
 
@@ -417,12 +432,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         }
 
         saveRequested = false;
-        resultSubject = Optional.of(Mono.just(createSaveTransaction())
-                .publishOn(Schedulers.boundedElastic())
-                .map(result -> {
-                    result.run();
-                    return result.getResult();
-                }).toFuture());
+        saveTransaction = Optional.of(createSaveTransaction());
+        saveTransaction.ifPresent(transaction -> {
+            transactionWait.register();
+            transactionSink.tryEmitNext(transaction);
+        });
 
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
             saveGamePreviewImage();
@@ -444,12 +458,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             sys.preAutoSave();
         }
 
-        resultSubject = Optional.of(Mono.just(createSaveTransaction())
-                .publishOn(Schedulers.boundedElastic())
-                .map(result -> {
-                    result.run();
-                    return result.getResult();
-                }).toFuture());
+        saveTransaction = Optional.of(createSaveTransaction());
+        saveTransaction.ifPresent(transaction -> {
+            transactionWait.register();
+            transactionSink.tryEmitNext(transaction);
+
+        });
 
         for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postAutoSave();
@@ -494,7 +508,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
     @Override
     public boolean isSaving() {
-        return resultSubject.isPresent() && !resultSubject.get().isDone();
+        return saveTransaction.isPresent() && saveTransaction.get().getResult() == null;
     }
 
     @Override
