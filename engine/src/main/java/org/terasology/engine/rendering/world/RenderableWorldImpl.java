@@ -3,7 +3,6 @@
 package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.joml.Math;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -70,7 +69,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private final RenderableWorldImpl.ChunkFrontToBackComparator frontToBackComparator;
     private final RenderableWorldImpl.ChunkBackToFrontComparator backToFrontComparator;
 
-    private final ChunkWorker chunkWorker;
+    private final ChunkMeshWorker chunkWorker;
 
     RenderableWorldImpl(WorldRenderer worldRenderer, LodChunkProvider lodChunkProvider, ChunkProvider chunkProvider, ChunkTessellator chunkTessellator, WorldProvider worldProvider, Config config, Camera playerCamera) {
         frontToBackComparator = new RenderableWorldImpl.ChunkFrontToBackComparator(worldRenderer);
@@ -84,7 +83,7 @@ class RenderableWorldImpl implements RenderableWorld {
         this.renderingConfig = config.getRendering();
         this.maxChunksForShadows = Math.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
-        this.chunkWorker = new ChunkWorker(chunkTessellator, worldProvider, frontToBackComparator);
+        this.chunkWorker = new ChunkMeshWorker(chunkTessellator, worldProvider, frontToBackComparator);
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS,
                 frontToBackComparator),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, frontToBackComparator),

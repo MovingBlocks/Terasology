@@ -6,8 +6,6 @@ package org.terasology.engine.world.chunks;
 import com.google.common.collect.Queues;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
@@ -33,8 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class LodChunkProvider {
-    private static final Logger logger = LoggerFactory.getLogger(LodChunkProvider.class);
-
     private final ChunkProvider chunkProvider;
     private final BlockManager blockManager;
     private final ExtraBlockDataManager extraDataManager;
@@ -61,7 +57,8 @@ public class LodChunkProvider {
     private final BlockingQueue<LodChunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final List<Thread> generationThreads = new ArrayList<>();
 
-    public LodChunkProvider(ChunkProvider chunkProvider, BlockManager blockManager, ExtraBlockDataManager extraDataManager, ScalableWorldGenerator generator, ChunkTessellator tessellator) {
+    public LodChunkProvider(ChunkProvider chunkProvider, BlockManager blockManager, ExtraBlockDataManager extraDataManager,
+                            ScalableWorldGenerator generator, ChunkTessellator tessellator) {
         this.chunkProvider = chunkProvider;
         this.blockManager = blockManager;
         this.extraDataManager = extraDataManager;
