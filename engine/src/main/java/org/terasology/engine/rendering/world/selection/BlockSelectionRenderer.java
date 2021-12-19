@@ -55,7 +55,7 @@ public class BlockSelectionRenderer {
         Vector3f pos = new Vector3f();
         Vector3f norm = new Vector3f();
         Vector2f texCoord = new Vector2f();
-        final float sizeHalf = size / 2;
+        final float sizeHalf = (size / 2) + .001f;
 
         int firstIndex = mesh.position.getPosition();
 
@@ -81,7 +81,7 @@ public class BlockSelectionRenderer {
         mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
         mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
         mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
-        mesh.uv0.put(texCoord.set(texRect.minY, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
         for (int i = 0; i < 4; i++) {
             mesh.normal.put(norm.set(-1.0f, 0, 0));
             mesh.color0.put(c);
@@ -123,7 +123,7 @@ public class BlockSelectionRenderer {
         mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
         mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
         mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
-        mesh.uv0.put(texCoord.set(texRect.minY, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
         for (int i = 0; i < 4; i++) {
             mesh.normal.put(norm.set(0, 0, 1.0f));
             mesh.color0.put(c);
