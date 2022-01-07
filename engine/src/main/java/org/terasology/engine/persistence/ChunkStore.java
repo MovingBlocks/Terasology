@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence;
 
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 

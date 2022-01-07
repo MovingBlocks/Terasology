@@ -5,7 +5,6 @@ package org.terasology.engine.persistence.internal;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
