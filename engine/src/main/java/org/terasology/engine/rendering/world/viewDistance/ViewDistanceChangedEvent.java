@@ -3,8 +3,8 @@
 
 package org.terasology.engine.rendering.world.viewDistance;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.ServerEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Notifies the server that the client's view distance has changed.

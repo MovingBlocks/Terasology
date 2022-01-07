@@ -22,11 +22,16 @@ public final class GameScheduler {
     private static final Scheduler MAIN;
 
     static {
-        MAIN = Schedulers.fromExecutor(GameThread::asynch);
-
-        // Calling Reactor scheduler once to make sure it's initialized.
         // doPriviledged in case this class isn't initialized before the security policy is installed.
-        AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            // Enable Reactor metrics. Must be done before creating schedulers.
+            Schedulers.enableMetrics();
+            // Calling Reactor scheduler once to make sure it's initialized.
+            Schedulers.parallel();
+            return null;
+        });
+
+        MAIN = Schedulers.fromExecutor(GameThread::asynch);
     }
 
     private GameScheduler() {

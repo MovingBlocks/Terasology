@@ -4,8 +4,8 @@ package org.terasology.engine.logic.inventory.events;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.ServerEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Fire this event on an item in order for the authority to add the necessary components to put it in the world.
