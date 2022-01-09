@@ -790,8 +790,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
     /**
      * The {@link CollisionGroup} for the associated entity
      * <br>
-     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision flags else return {@link StandardCollisionGroup#NONE} if neither
-     * component is specified
+     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision flags
+     * else return {@link StandardCollisionGroup#NONE} if neither component is specified
      *
      * @param entity the target entity
      * @return the collision flag
@@ -811,8 +811,8 @@ public class BulletPhysics extends BaseComponentSystem implements UpdateSubscrib
      *
      * The {@link CollisionGroup} that the associated {@link EntityRef} will collide with.
      * <br>
-     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision groups else return {@link StandardCollisionGroup#NONE} if neither
-     * component is specified
+     * {@link TriggerComponent} takes priority over {@link RigidBodyComponent} for collision groups
+     * else return {@link StandardCollisionGroup#NONE} if neither component is specified
      *
      * @param entity the target entity
      * @return the collision flag
