@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
+import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.joml.Vector3i;
 import org.terasology.engine.persistence.ChunkStore;
@@ -13,11 +14,11 @@ import org.terasology.engine.world.chunks.internal.ChunkSerializer;
 
 final class ChunkStoreInternal implements ChunkStore {
 
-    private Vector3i chunkPosition;
-    private Chunk chunk;
+    private final Vector3i chunkPosition;
+    private final Chunk chunk;
 
-    private EngineEntityManager entityManager;
-    private EntityData.EntityStore entityStore;
+    private final EngineEntityManager entityManager;
+    private final EntityData.EntityStore entityStore;
 
     ChunkStoreInternal(EntityData.ChunkStore chunkData, EngineEntityManager entityManager,
                        BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
@@ -29,8 +30,8 @@ final class ChunkStoreInternal implements ChunkStore {
     }
 
     @Override
-    public Vector3i getChunkPosition() {
-        return new Vector3i(chunkPosition);
+    public Vector3ic getChunkPosition() {
+        return chunkPosition;
     }
 
     @Override
