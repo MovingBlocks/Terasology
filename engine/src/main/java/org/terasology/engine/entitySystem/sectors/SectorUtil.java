@@ -46,7 +46,7 @@ public final class SectorUtil {
      */
     public static void addChunksToRegionComponent(SectorRegionComponent regionComponent, Collection<Chunk> chunks) {
         regionComponent.chunks.addAll(chunks.stream()
-                .map(k -> k.getPosition(new Vector3i()))
+                .map(k -> new Vector3i(k.getPosition()))
                 .collect(Collectors.toSet()));
     }
 

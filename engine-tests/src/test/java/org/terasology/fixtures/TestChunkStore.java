@@ -3,7 +3,7 @@
 
 package org.terasology.fixtures;
 
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.world.chunks.Chunk;
 
@@ -18,8 +18,8 @@ public class TestChunkStore implements ChunkStore {
     }
 
     @Override
-    public Vector3i getChunkPosition() {
-        return chunk.getPosition(new Vector3i());
+    public Vector3ic getChunkPosition() {
+        return chunk.getPosition();
     }
 
     @Override

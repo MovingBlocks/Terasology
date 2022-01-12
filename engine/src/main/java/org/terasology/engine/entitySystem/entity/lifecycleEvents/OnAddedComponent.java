@@ -3,7 +3,7 @@
 
 package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event is sent when an entity is created or a component added to an existing entity.

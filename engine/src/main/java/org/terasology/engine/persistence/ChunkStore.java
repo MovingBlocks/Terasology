@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence;
 
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 
 /**
@@ -14,7 +14,7 @@ public interface ChunkStore {
     /**
      * @return The position of the chunk in its world
      */
-    Vector3i getChunkPosition();
+    Vector3ic getChunkPosition();
 
     /**
      * @return The chunk itself

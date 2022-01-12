@@ -7,7 +7,6 @@ import org.terasology.engine.entitySystem.MutableComponentContainer;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.rendering.iconmesh.IconMeshFactory;
@@ -18,6 +17,7 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This system adds meshes to items that have RenderItemBlockMeshComponent or RenderItemIconMeshComponent

@@ -5,7 +5,6 @@ package org.terasology.engine.world.block.structure;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.logic.delay.DelayManager;
 import org.terasology.engine.logic.delay.DelayedActionTriggeredEvent;
@@ -16,6 +15,7 @@ import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.util.Collections;
 import java.util.Map;

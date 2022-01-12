@@ -7,19 +7,19 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.ClientInfoComponent;
 import org.terasology.engine.network.ColorComponent;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.nui.Color;
 import org.terasology.engine.registry.In;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
+import org.terasology.nui.Color;
 
 
 /**
