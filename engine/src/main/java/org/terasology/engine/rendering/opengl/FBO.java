@@ -728,7 +728,8 @@ public final class FBO {
          * @param height An integer representing the new height.
          */
         public void setDimensions(int width, int height) {
-            if(width == 0 && height ==0){
+            if (width == 0 || height == 0) {
+                logger.error("Invalid dimension input.");
                 return;
             }
             this.width = width;
@@ -740,7 +741,8 @@ public final class FBO {
          * @param other A Dimension to use the width and height from.
          */
         public void setDimensions(Dimensions other) {
-            if(width == 0 && height ==0){
+            if (other.width == 0 || other.height == 0) {
+                logger.error("Invalid dimension input.");
                 return;
             }
             this.width = other.width;
