@@ -97,6 +97,9 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
     }
 
     private void updateFullScale() {
+        if (displayDevice.getWidth() == 0 || displayDevice.getHeight() == 0) {
+            displayDevice.update();
+        }
         fullScale.setDimensions(displayDevice.getWidth(), displayDevice.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
