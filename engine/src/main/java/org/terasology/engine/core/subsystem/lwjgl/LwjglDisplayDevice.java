@@ -200,7 +200,9 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     protected void updateViewport(int width, int height) {
         glViewport(0, 0, width, height);
-        propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
+        boolean isMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+        int i = isMinimized ? 0 : 1;
+        propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, i, 1);
     }
 
     private GLFWVidMode getFullScreenDisplayMode() {
