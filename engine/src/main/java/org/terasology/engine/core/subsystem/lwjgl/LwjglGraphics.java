@@ -73,8 +73,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void postUpdate(GameState currentState, float delta) {
         graphics.processActions();
 
-        boolean isMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
-        if (!isMinimized) {
+        boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+        if (!gameWindowIsMinimized) {
             currentState.render();
         }
 
