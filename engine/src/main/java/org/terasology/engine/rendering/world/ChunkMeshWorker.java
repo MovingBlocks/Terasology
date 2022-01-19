@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,7 @@ public final class ChunkMeshWorker {
                     ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                     if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
                         ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                        ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                        ChunkMonitor.fireChunkTessellated(c, newMesh);
                         return Optional.of(Tuples.of(c, newMesh));
                     }
                     return Optional.empty();
