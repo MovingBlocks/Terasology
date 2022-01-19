@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.world;
 
@@ -42,6 +42,12 @@ import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.LodChunkProvider;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.generator.ScalableWorldGenerator;
+import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.math.TeraMath;
 
 import java.util.List;
@@ -156,7 +162,20 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         context.put(ChunkTessellator.class, new ChunkTessellator());
 
-        renderableWorld = new RenderableWorldImpl(context, playerCamera);
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+        ChunkTessellator chunkTessellator = context.get(ChunkTessellator.class);
+        BlockManager blockManager = context.get(BlockManager.class);
+        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
+        Config config = context.get(Config.class);
+
+
+        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
+        LodChunkProvider lodChunkProvider = null;
+        if (worldGenerator instanceof ScalableWorldGenerator) {
+            lodChunkProvider = new LodChunkProvider(chunkProvider, blockManager, extraDataManager,
+                    (ScalableWorldGenerator) worldGenerator, chunkTessellator);
+        }
+        this.renderableWorld = new RenderableWorldImpl(this, lodChunkProvider, chunkProvider, chunkTessellator, worldProvider, config, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
