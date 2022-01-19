@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.world;
 
@@ -120,7 +120,7 @@ class RenderableWorldImpl implements RenderableWorld {
                     ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                     if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
                         ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                        ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                        ChunkMonitor.fireChunkTessellated(c, newMesh);
                         return Optional.of(Tuples.of(c, newMesh));
                     }
                     return Optional.empty();
@@ -128,7 +128,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 .publishOn(GameScheduler.gameMain())
                 .subscribe(result -> result.ifPresent(TupleUtils.consumer((chunk, chunkMesh) -> {
                     if (chunksInProximityOfCamera.contains(chunk)) {
-                        chunkMesh.updateMesh();//.generateVBOs();
+                        chunkMesh.updateMesh();  //.generateVBOs();
                         chunkMesh.discardData();
                         if (chunk.hasMesh()) {
                             chunk.getMesh().dispose();
