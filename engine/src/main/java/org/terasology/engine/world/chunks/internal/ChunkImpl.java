@@ -43,7 +43,7 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-    protected final Vector3i chunkPos = new Vector3i();
+    protected final Vector3ic chunkPos;
     protected BlockRegion region;
 
     private BlockManager blockManager;
@@ -79,7 +79,7 @@ public class ChunkImpl implements Chunk {
     }
 
     public ChunkImpl(Vector3ic chunkPos, TeraArray blocks, TeraArray[] extra, BlockManager blockManager) {
-        this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
+        this.chunkPos = new Vector3i(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(extra);
         sunlightData = new TeraSparseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
@@ -102,7 +102,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Vector3i getPosition(Vector3i dest) {
-        return dest.set(chunkPos.x, chunkPos.y, chunkPos.z);
+        return dest.set(chunkPos.x(), chunkPos.y(), chunkPos.z());
     }
 
     @Override
@@ -251,17 +251,17 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public int getChunkWorldOffsetX() {
-        return chunkPos.x * getChunkSizeX();
+        return chunkPos.x() * getChunkSizeX();
     }
 
     @Override
     public int getChunkWorldOffsetY() {
-        return chunkPos.y * getChunkSizeY();
+        return chunkPos.y() * getChunkSizeY();
     }
 
     @Override
     public int getChunkWorldOffsetZ() {
-        return chunkPos.z * getChunkSizeZ();
+        return chunkPos.z() * getChunkSizeZ();
     }
 
     @Override

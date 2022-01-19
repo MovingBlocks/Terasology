@@ -14,15 +14,12 @@ import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.math.Rotation;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.physics.shapes.CollisionShape;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
 import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
-import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Color;
@@ -225,15 +222,17 @@ public final class Block {
     }
 
     /**
-     * @return The BlockMeshGenerator that is used in rendering, null if invisible.
+     * MeshGenerator drives how the mesh is produced for this single block.
+     * by default this uses {@link BlockMeshGeneratorSingleShape} and can't be set to null.
+     *
+     * @return The BlockMeshGenerator that is used in rendering.
      */
     public BlockMeshGenerator getMeshGenerator() {
         return meshGenerator;
     }
 
     /**
-     * @param meshGenerator The new BlockMeshGenerator to use in rendering this block.
-     *                      If meshGenerator is null then this block is invisible.
+     * @param meshGenerator The new {@link BlockMeshGenerator} to use in rendering this block.
      */
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
         Preconditions.checkNotNull(meshGenerator);
@@ -522,18 +521,6 @@ public final class Block {
         for (BlockPart part : BlockPart.values()) {
             colorOffsets.put(part, color);
         }
-    }
-
-    /**
-     * @return Standalone mesh
-     * @deprecated Use getMeshGenerator() instead.
-     */
-    @Deprecated
-    public Mesh getMesh() {
-        if (meshGenerator != null) {
-            return meshGenerator.getStandaloneMesh();
-        }
-        return new Tessellator().generateMesh(new ResourceUrn("engine", "blockmesh", uri.toString()));
     }
 
     public BlockMeshPart getLowLiquidMesh(Side side) {

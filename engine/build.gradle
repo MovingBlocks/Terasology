@@ -100,6 +100,8 @@ dependencies {
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
 
+    implementation 'io.micrometer:micrometer-core:1.8.0'
+    implementation 'io.micrometer:micrometer-registry-jmx:1.8.0'
     api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.11'
     api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.5'
     

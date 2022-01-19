@@ -22,16 +22,16 @@ public class PreLodChunk extends ChunkImpl {
 
     @Override
     public int getChunkWorldOffsetX() {
-        return chunkPos.x * (Chunks.SIZE_X - 2) - 1;
+        return chunkPos.x() * (Chunks.SIZE_X - 2) - 1;
     }
 
     @Override
     public int getChunkWorldOffsetY() {
-        return chunkPos.y * (Chunks.SIZE_Y - 4) - 2;
+        return chunkPos.y() * (Chunks.SIZE_Y - 4) - 2;
     }
 
     @Override
     public int getChunkWorldOffsetZ() {
-        return chunkPos.z * (Chunks.SIZE_Z - 2) - 1;
+        return chunkPos.z() * (Chunks.SIZE_Z - 2) - 1;
     }
 }
