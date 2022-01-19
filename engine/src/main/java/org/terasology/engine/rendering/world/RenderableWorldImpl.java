@@ -71,7 +71,8 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private final ChunkMeshWorker chunkWorker;
 
-    RenderableWorldImpl(WorldRenderer worldRenderer, LodChunkProvider lodChunkProvider, ChunkProvider chunkProvider, ChunkTessellator chunkTessellator, WorldProvider worldProvider, Config config, Camera playerCamera) {
+    RenderableWorldImpl(WorldRenderer worldRenderer, LodChunkProvider lodChunkProvider, ChunkProvider chunkProvider,
+                        ChunkTessellator chunkTessellator, WorldProvider worldProvider, Config config, Camera playerCamera) {
         frontToBackComparator = new RenderableWorldImpl.ChunkFrontToBackComparator(worldRenderer);
         backToFrontComparator = new RenderableWorldImpl.ChunkBackToFrontComparator(worldRenderer);
 
@@ -418,7 +419,7 @@ class RenderableWorldImpl implements RenderableWorld {
     public static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
 
         private final WorldRenderer worldRenderer;
-        public ChunkFrontToBackComparator(WorldRenderer worldRenderer) {
+        ChunkFrontToBackComparator(WorldRenderer worldRenderer) {
             this.worldRenderer = worldRenderer;
         }
 
@@ -439,7 +440,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     public static class ChunkBackToFrontComparator implements Comparator<RenderableChunk> {
         private final WorldRenderer worldRenderer;
-        public ChunkBackToFrontComparator(WorldRenderer worldRenderer) {
+        ChunkBackToFrontComparator(WorldRenderer worldRenderer) {
             this.worldRenderer = worldRenderer;
         }
         @Override

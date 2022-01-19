@@ -1,9 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.world;
 
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +162,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         context.put(ChunkTessellator.class, new ChunkTessellator());
 
-        WorldProvider worldProvider = context.get(WorldProvider.class);
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         ChunkTessellator chunkTessellator = context.get(ChunkTessellator.class);
         BlockManager blockManager = context.get(BlockManager.class);
