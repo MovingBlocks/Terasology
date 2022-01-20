@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.world;
@@ -29,6 +29,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Receives RenderableChunks, works to make sure their Mesh is up-to-date.
+ * <p>
+ * Prioritizes work according to the given comparator function.
+ * <p>
+ * TODO:
+ * <ul>
+ *  <li> How many of these do we expect to create?
+ *  <li> What's its lifetime?
+ *  <li> Is there anything we need to do for shutdown / cleanup?
+ *  <li> Need it be public, or is it internal to engine.rendering.world?
+ * </ul>
+ */
 public final class ChunkMeshWorker {
     private static final Logger logger = LoggerFactory.getLogger(ChunkMeshWorker.class);
 
@@ -61,7 +74,7 @@ public final class ChunkMeshWorker {
                 .publishOn(GameScheduler.gameMain())
                 .subscribe(result -> result.ifPresent(TupleUtils.consumer((chunk, chunkMesh) -> {
                     if (chunksInProximityOfCamera.contains(chunk)) {
-                        chunkMesh.updateMesh();
+                        chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
                         chunkMesh.discardData();
                         if (chunk.hasMesh()) {
                             chunk.getMesh().dispose();
@@ -74,9 +87,7 @@ public final class ChunkMeshWorker {
 
 
     public void add(Chunk chunk) {
-        if (chunk != null) {
-            chunksInProximityOfCamera.add(chunk);
-        }
+        chunksInProximityOfCamera.add(chunk);
     }
 
     public void remove(Chunk chunk) {

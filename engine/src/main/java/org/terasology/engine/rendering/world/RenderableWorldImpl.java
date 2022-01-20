@@ -203,7 +203,10 @@ class RenderableWorldImpl implements RenderableWorld {
             }
             for (Vector3ic chunkPositionToAdd : newRenderableRegion) {
                 if (!renderableRegion.contains(chunkPositionToAdd)) {
-                    chunkWorker.add(chunkProvider.getChunk(chunkPositionToAdd));
+                    Chunk chunk = chunkProvider.getChunk(chunkPositionToAdd);
+                    if (chunk != null) {
+                        chunkWorker.add(chunk);
+                    }
                 }
             }
 
