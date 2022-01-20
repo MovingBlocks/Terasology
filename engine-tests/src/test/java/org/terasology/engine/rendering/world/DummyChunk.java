@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.world;
 
+import com.google.common.base.MoreObjects;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
@@ -55,17 +56,17 @@ public class DummyChunk implements Chunk {
 
     @Override
     public int getChunkWorldOffsetX() {
-        return 0;
+        return chunkPos.x() * getChunkSizeX();
     }
 
     @Override
     public int getChunkWorldOffsetY() {
-        return 0;
+        return chunkPos.y() * getChunkSizeY();
     }
 
     @Override
     public int getChunkWorldOffsetZ() {
-        return 0;
+        return chunkPos.z() * getChunkSizeZ();
     }
 
     @Override
@@ -216,5 +217,15 @@ public class DummyChunk implements Chunk {
     @Override
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("chunkPos", chunkPos)
+                .add("dirty", dirty)
+                .add("mesh", mesh)
+                .add("ready", ready)
+                .toString();
     }
 }

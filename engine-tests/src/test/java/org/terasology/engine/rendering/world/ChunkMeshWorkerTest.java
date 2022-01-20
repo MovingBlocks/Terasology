@@ -9,12 +9,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.RenderableChunk;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.Optional;
+import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
@@ -23,25 +28,46 @@ import static org.mockito.Mockito.mock;
 public class ChunkMeshWorkerTest {
     static Vector3ic position0 = new Vector3i(123, 456, 789);
 
-    ChunkMeshWorker worker;
+    final Vector3i currentPosition = new Vector3i(position0);
 
-    static Optional<Tuple2<Chunk, ChunkMesh>> alwaysCreateMesh(Chunk chunk) {
-        return Optional.of(Tuples.of(chunk, mock(ChunkMesh.class)));
+    ChunkMeshWorker worker;
+    Comparator<RenderableChunk> comparator;
+
+    static Mono<Tuple2<Chunk, ChunkMesh>> alwaysCreateMesh(Chunk chunk) {
+        return Mono.just(Tuples.of(chunk, mock(ChunkMesh.class)));
     }
 
     @BeforeEach
     void makeWorker() {
-        worker = new ChunkMeshWorker(ChunkMeshWorkerTest::alwaysCreateMesh, null);
+        comparator = Comparator.comparingDouble(chunk ->
+                chunk.getRenderPosition().distanceSquared(currentPosition.x, currentPosition.y, currentPosition.z)
+        );
+
+        worker = new ChunkMeshWorker(
+                ChunkMeshWorkerTest::alwaysCreateMesh,
+                comparator,
+                GameScheduler.parallel(),
+                GameScheduler.gameMain()
+        );
     }
 
     @Test
     void testChunkIsNotProcessedTwice() {
         var chunk1 = new DummyChunk(position0);
         var chunk2 = new DummyChunk(position0);
-        worker.add(chunk1);
-        worker.add(chunk2);
-        // drain
-        fail("TODO: assert number of results == 1");
+
+        Sinks.Many<Chunk> sink = worker.getChunkMeshPublisher();
+
+        StepVerifier verifier = StepVerifier
+                .create(worker.getChunksAndNewMeshes())
+                .expectNextCount(1) // Expect only _one_ result.
+                .expectComplete()
+                .verifyLater();
+
+        sink.tryEmitNext(chunk1);
+        sink.tryEmitNext(chunk2);
+        sink.tryEmitComplete();
+        verifier.verify();
     }
 
     @Test

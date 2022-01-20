@@ -17,7 +17,10 @@ import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.RenderableChunk;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Scheduler;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -26,7 +29,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -51,37 +53,43 @@ public final class ChunkMeshWorker {
 
     private final Comparator<RenderableChunk> frontToBackComparator;
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
+
     private final Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
+    private final Flux<Tuple2<Chunk, ChunkMesh>> chunksAndNewMeshes;
+    private final Flux<Chunk> completedChunks;
 
-    ChunkMeshWorker(Function<? super Chunk, Optional<Tuple2<Chunk, ChunkMesh>>> workFunction,
-                    Comparator<RenderableChunk> frontToBackComparator) {
+    ChunkMeshWorker(Function<? super Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> workFunction,
+                    Comparator<RenderableChunk> frontToBackComparator, Scheduler parallelScheduler, Scheduler graphicsScheduler) {
         this.frontToBackComparator = frontToBackComparator;
 
-        chunkMeshPublisher.asFlux()
-                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
-                .doOnNext(k -> k.setDirty(false))
-                .parallel(5).runOn(GameScheduler.parallel())
-                .<Optional<Tuple2<Chunk, ChunkMesh>>>map(workFunction)
-                .filter(Optional::isPresent).sequential()
-                .publishOn(GameScheduler.gameMain())
-                .subscribe(result -> result.ifPresent(TupleUtils.consumer((chunk, chunkMesh) -> {
-                    if (chunksInProximityOfCamera.contains(chunk)) {
-                        chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
-                        chunkMesh.discardData();
-                        if (chunk.hasMesh()) {
-                            chunk.getMesh().dispose();
-                        }
-                        chunk.setMesh(chunkMesh);
-                    }
+        chunksAndNewMeshes = fluxNewMeshes(chunkMeshPublisher.asFlux(), workFunction, parallelScheduler);
 
-                })), throwable -> logger.error("Failed to build mesh {}", throwable));
+        completedChunks = chunksAndNewMeshes
+                .publishOn(graphicsScheduler)
+                .flatMap(TupleUtils.function(this::uploadNewMesh));
+
+        // FIXME: error handling???
+        //     throwable -> logger.error("Failed to build mesh {}", throwable);
+    }
+
+    private Flux<Tuple2<Chunk, ChunkMesh>> fluxNewMeshes(Flux<Chunk> flux, Function<? super Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> workFunction,
+                                                         Scheduler parallelScheduler) {
+        return flux
+                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+                .parallel().runOn(parallelScheduler)
+                .flatMap(workFunction)
+                .sequential();
     }
 
     public static ChunkMeshWorker create(ChunkTessellator chunkTessellator,
                                          WorldProvider worldProvider,
                                          Comparator<RenderableChunk> frontToBackComparator) {
-        return new ChunkMeshWorker(new MeshGenerator(chunkTessellator, worldProvider)::generate, frontToBackComparator);
+        ChunkMeshWorker worker = new ChunkMeshWorker(new MeshGenerator(chunkTessellator, worldProvider)::generate,
+                frontToBackComparator,
+                GameScheduler.parallel(), GameScheduler.gameMain());
+        worker.completedChunks.subscribe();
+        return worker;
     }
     
     public void add(Chunk chunk) {
@@ -132,6 +140,36 @@ public final class ChunkMeshWorker {
         return chunksInProximityOfCamera;
     }
 
+    Flux<Tuple2<Chunk, ChunkMesh>> getChunksAndNewMeshes() {
+        return chunksAndNewMeshes;
+    }
+
+    Flux<Chunk> getCompletedChunks() {
+        return completedChunks;
+    }
+
+    Sinks.Many<Chunk> getChunkMeshPublisher() {
+        return chunkMeshPublisher;
+    }
+
+    /**
+     *
+     * @param chunk
+     * @param chunkMesh
+     * @return Chunk, if its mesh was updated.
+     */
+    private Mono<Chunk> uploadNewMesh(Chunk chunk, ChunkMesh chunkMesh) {
+        if (chunksInProximityOfCamera.contains(chunk)) {
+            chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
+            chunkMesh.discardData();
+            if (chunk.hasMesh()) {
+                chunk.getMesh().dispose();
+            }
+            chunk.setMesh(chunkMesh);
+            return Mono.just(chunk);
+        }
+        return Mono.empty();
+    }
 
     static class MeshGenerator {
         private final ChunkTessellator chunkTessellator;
@@ -142,14 +180,15 @@ public final class ChunkMeshWorker {
             this.worldProvider = worldProvider;
         }
 
-        Optional<Tuple2<Chunk, ChunkMesh>> generate(Chunk chunk) {
+        Mono<Tuple2<Chunk, ChunkMesh>> generate(Chunk chunk) {
+            chunk.setDirty(false);
             ChunkView chunkView = worldProvider.getLocalView(chunk.getPosition());
             if (chunkView != null && chunkView.isValidView() /* && chunkMeshProcessing.remove(chunk.getPosition()) */) {
                 ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
                 ChunkMonitor.fireChunkTessellated(chunk, newMesh);
-                return Optional.of(Tuples.of(chunk, newMesh));
+                return Mono.just(Tuples.of(chunk, newMesh));
             }
-            return Optional.empty();
+            return Mono.empty();
         }
     }
 }
