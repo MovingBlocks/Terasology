@@ -84,7 +84,7 @@ class RenderableWorldImpl implements RenderableWorld {
         this.renderingConfig = config.getRendering();
         this.maxChunksForShadows = Math.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
-        this.chunkWorker = new ChunkMeshWorker(chunkTessellator, worldProvider, frontToBackComparator);
+        this.chunkWorker = ChunkMeshWorker.create(chunkTessellator, worldProvider, frontToBackComparator);
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS,
                 frontToBackComparator),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, frontToBackComparator),
