@@ -28,6 +28,7 @@ import org.terasology.joml.geom.AABBfc;
 import org.terasology.protobuf.EntityData;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks determined by its
@@ -65,7 +66,7 @@ public class ChunkImpl implements Chunk {
     private boolean animated;
 
     // Rendering
-    private ChunkMesh activeMesh;
+    private final AtomicReference<ChunkMesh> activeMesh = new AtomicReference<>();
 
     public ChunkImpl(int x, int y, int z, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(new Vector3i(x, y, z), blockManager, extraDataManager);
@@ -357,7 +358,10 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void setMesh(ChunkMesh mesh) {
-        this.activeMesh = mesh;
+        var oldMesh = activeMesh.getAndSet(mesh);
+        if (oldMesh != null) {
+            oldMesh.dispose();
+        }
     }
 
     @Override
@@ -372,13 +376,13 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean hasMesh() {
-        return activeMesh != null;
+        return activeMesh.get() != null;
     }
 
 
     @Override
     public ChunkMesh getMesh() {
-        return activeMesh;
+        return activeMesh.get();
     }
 
     @Override
@@ -411,9 +415,9 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void disposeMesh() {
-        if (activeMesh != null) {
-            activeMesh.dispose();
-            activeMesh = null;
+        var oldMesh = activeMesh.getAndSet(null);
+        if (oldMesh != null) {
+            oldMesh.dispose();
         }
     }
 

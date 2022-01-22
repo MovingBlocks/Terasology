@@ -172,9 +172,6 @@ public final class ChunkMeshWorker {
         if (chunksInProximityOfCamera.contains(chunk)) {
             chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
             chunkMesh.discardData();
-            if (chunk.hasMesh()) {
-                chunk.getMesh().dispose();
-            }
             chunk.setMesh(chunkMesh);
             return Mono.just(chunk);
         }
