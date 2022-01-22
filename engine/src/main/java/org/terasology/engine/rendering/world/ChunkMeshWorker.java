@@ -93,6 +93,7 @@ public final class ChunkMeshWorker {
     }
     
     public void add(Chunk chunk) {
+        // FIXME: avoid adding duplicates
         chunksInProximityOfCamera.add(chunk);
     }
 
@@ -117,16 +118,29 @@ public final class ChunkMeshWorker {
         }
     }
 
+    /**
+     * Queue all dirty items in our collection, in priority order.
+     *
+     * @return the number of dirty chunks added to the queue
+     */
     public int update() {
         int statDirtyChunks = 0;
         chunksInProximityOfCamera.sort(frontToBackComparator);
         for (Chunk chunk : chunksInProximityOfCamera) {
-            if (chunk.isReady() && chunk.isDirty()) {
-                statDirtyChunks++;
-                Sinks.EmitResult result = chunkMeshPublisher.tryEmitNext(chunk);
-                if (result.isFailure()) {
-                    logger.error("failed to process chunk {} : {}", chunk, result);
-                }
+            if (!chunk.isReady()) {
+                // Chunk was added as part of some region, but not yet ready.
+                // Leave it here with the expectation that it will be ready later.
+                continue;
+            }
+            if (!chunk.isDirty()) {
+                // Chunk is in proximity list, but is no longer dirty. Probably already processed.
+                // Will poll it again next tick to see if it got dirty since then.
+                continue;
+            }
+            statDirtyChunks++;
+            Sinks.EmitResult result = chunkMeshPublisher.tryEmitNext(chunk);
+            if (result.isFailure()) {
+                logger.error("failed to process chunk {} : {}", chunk, result);
             }
         }
         return statDirtyChunks;
