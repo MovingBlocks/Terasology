@@ -63,7 +63,11 @@ public final class ChunkMeshWorker {
                     Comparator<RenderableChunk> frontToBackComparator, Scheduler parallelScheduler, Scheduler graphicsScheduler) {
         this.frontToBackComparator = frontToBackComparator;
 
-        chunksAndNewMeshes = fluxNewMeshes(chunkMeshPublisher.asFlux(), workFunction, parallelScheduler);
+        chunksAndNewMeshes = chunkMeshPublisher.asFlux()
+                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+                .parallel().runOn(parallelScheduler)
+                .flatMap(workFunction)
+                .sequential();
 
         completedChunks = chunksAndNewMeshes
                 .publishOn(graphicsScheduler)
@@ -72,15 +76,6 @@ public final class ChunkMeshWorker {
 
         // FIXME: error handling???
         //     throwable -> logger.error("Failed to build mesh {}", throwable);
-    }
-
-    private Flux<Tuple2<Chunk, ChunkMesh>> fluxNewMeshes(Flux<Chunk> flux, Function<? super Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> workFunction,
-                                                         Scheduler parallelScheduler) {
-        return flux
-                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
-                .parallel().runOn(parallelScheduler)
-                .flatMap(workFunction)
-                .sequential();
     }
 
     public static ChunkMeshWorker create(ChunkTessellator chunkTessellator,
@@ -94,7 +89,7 @@ public final class ChunkMeshWorker {
     }
     
     public void add(Chunk chunk) {
-        // FIXME: avoid adding duplicates
+        // TODO: avoid adding duplicates
         chunksInProximityOfCamera.add(chunk);
     }
 
