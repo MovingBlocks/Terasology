@@ -67,7 +67,8 @@ public final class ChunkMeshWorker {
 
         completedChunks = chunksAndNewMeshes
                 .publishOn(graphicsScheduler)
-                .flatMap(TupleUtils.function(this::uploadNewMesh));
+                .flatMap(TupleUtils.function(this::uploadNewMesh))
+                .doOnNext(chunk -> chunkMeshProcessing.remove(chunk.getPosition()));
 
         // FIXME: error handling???
         //     throwable -> logger.error("Failed to build mesh {}", throwable);
@@ -197,7 +198,7 @@ public final class ChunkMeshWorker {
         Mono<Tuple2<Chunk, ChunkMesh>> generate(Chunk chunk) {
             chunk.setDirty(false);
             ChunkView chunkView = worldProvider.getLocalView(chunk.getPosition());
-            if (chunkView != null && chunkView.isValidView() /* && chunkMeshProcessing.remove(chunk.getPosition()) */) {
+            if (chunkView != null && chunkView.isValidView()) {
                 ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
                 ChunkMonitor.fireChunkTessellated(chunk, newMesh);
                 return Mono.just(Tuples.of(chunk, newMesh));
