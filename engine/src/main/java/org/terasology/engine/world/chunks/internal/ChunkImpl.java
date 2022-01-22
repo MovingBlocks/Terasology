@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.chunks.internal;
 
@@ -8,15 +8,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.engine.world.chunks.blockdata.TeraArray;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
-import org.terasology.protobuf.EntityData;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -24,8 +16,16 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
 import org.terasology.engine.world.chunks.deflate.TeraDeflator;
 import org.terasology.engine.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
+import org.terasology.protobuf.EntityData;
 
 import java.text.DecimalFormat;
 
@@ -89,21 +89,16 @@ public class ChunkImpl implements Chunk {
         dirty = true;
         this.blockManager = blockManager;
         region = new BlockRegion(
-            chunkPos.x() * Chunks.SIZE_X,
-            chunkPos.y() * Chunks.SIZE_Y,
-            chunkPos.z() * Chunks.SIZE_Z)
-            .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
+            chunkPos.x() * getChunkSizeX(),
+            chunkPos.y() * getChunkSizeY(),
+            chunkPos.z() * getChunkSizeZ())
+            .setSize(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         ChunkMonitor.fireChunkCreated(this);
     }
 
     @Override
     public Vector3ic getPosition() {
         return chunkPos;
-    }
-
-    @Override
-    public Vector3i getPosition(Vector3i dest) {
-        return dest.set(chunkPos.x(), chunkPos.y(), chunkPos.z());
     }
 
     @Override
@@ -131,12 +126,6 @@ public class ChunkImpl implements Chunk {
 
 
     @Override
-    public Block getBlock(Vector3ic pos) {
-        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
-        return blockManager.getBlock(id);
-    }
-
-    @Override
     public final Block getBlock(int x, int y, int z) {
         short id = (short) blockData.get(x, y, z);
         return blockManager.getBlock(id);
@@ -155,23 +144,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Block setBlock(Vector3ic pos, Block block) {
-        return setBlock(pos.x(), pos.y(), pos.z(), block);
-    }
-
-    @Override
-    public byte getSunlight(Vector3ic pos) {
-        return getSunlight(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
     public byte getSunlight(int x, int y, int z) {
         return (byte) sunlightData.get(x, y, z);
-    }
-
-    @Override
-    public boolean setSunlight(Vector3ic pos, byte amount) {
-        return setSunlight(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -181,18 +155,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getSunlightRegen(Vector3ic pos) {
-        return getSunlightRegen(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
     public byte getSunlightRegen(int x, int y, int z) {
         return (byte) sunlightRegenData.get(x, y, z);
-    }
-
-    @Override
-    public boolean setSunlightRegen(Vector3ic pos, byte amount) {
-        return setSunlightRegen(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -202,18 +166,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getLight(Vector3ic pos) {
-        return getLight(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         return (byte) lightData.get(x, y, z);
-    }
-
-    @Override
-    public boolean setLight(Vector3ic pos, byte amount) {
-        return setLight(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -228,21 +182,11 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public int getExtraData(int index, Vector3ic pos) {
-        return getExtraData(index, pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
     public void setExtraData(int index, int x, int y, int z, int value) {
         if (extraDataSnapshots != null && extraData[index] == extraDataSnapshots[index]) {
             extraData[index] = extraData[index].copy();
         }
         extraData[index].set(x, y, z, value);
-    }
-
-    @Override
-    public void setExtraData(int index, Vector3ic pos, int value) {
-        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -263,11 +207,6 @@ public class ChunkImpl implements Chunk {
     @Override
     public int getChunkWorldOffsetZ() {
         return chunkPos.z() * getChunkSizeZ();
-    }
-
-    @Override
-    public Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest) {
-        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
     }
 
     @Override
@@ -466,10 +405,10 @@ public class ChunkImpl implements Chunk {
     public void prepareForReactivation() {
         if (disposed) {
             disposed = false;
-            sunlightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
-            sunlightRegenData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y,
-                Chunks.SIZE_Z);
-            lightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
+            sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+            sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(),
+                    getChunkSizeZ());
+            lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         }
     }
 
@@ -505,21 +444,6 @@ public class ChunkImpl implements Chunk {
     @Override
     public BlockRegion getRegion() {
         return region;
-    }
-
-    @Override
-    public int getChunkSizeX() {
-        return Chunks.SIZE_X;
-    }
-
-    @Override
-    public int getChunkSizeY() {
-        return Chunks.SIZE_Y;
-    }
-
-    @Override
-    public int getChunkSizeZ() {
-        return Chunks.SIZE_Z;
     }
 
     @Override
