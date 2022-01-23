@@ -10,10 +10,7 @@
     "replicateMode": "ALWAYS"
   },
   "CharacterMovement": {
-    "groundFriction": 16,
-    "maxGroundSpeed": 3,
     "distanceBetweenFootsteps": 1.5,
-    "distanceBetweenSwimStrokes": 2.5,
     "height": 1.8,
     "radius": 0.3,
     "jumpSpeed": 12
