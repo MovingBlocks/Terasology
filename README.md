@@ -129,13 +129,13 @@ Technical Requirements:
 
 Non-Technical Requirements:
 - familiarity with Git. Have a look at https://learngitbranching.js.org/ if you're not familiar with Git yet.
-- familiarity with GitHub, _especially forks_. Have a look at https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks if you don't know how to work with forks yet.
+- familiarity with GitHub, _especially forks_. Have a look at [GitHub's "Working with Forks" Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks) if you don't know how to work with forks yet.
 
 ### Workspace Setup
 
 To be able to run **Terasology** from source, you'll need to setup your workspace.
 Follow the [Contributor Quick Start Guide](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start).
-This guide is designed for [IntelliJ IDEA][intellij] (you can use the free community edition), but alternative setups are possible.
+This guide is designed for [IntelliJ IDEA](http://www.jetbrains.com/idea/) (you can use the free community edition), but alternative setups are possible.
 
 :warning: _Note, that a Terasology workspace is a **multi-repo workspace**._
 
