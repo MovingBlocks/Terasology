@@ -24,7 +24,7 @@
     <a href="#community">Community</a> | 
     <a href="#installation">Installation</a> | 
     <a href="#development">Development</a>  | 
-    <a href="#license-">License</a> 
+    <a href="#license">License</a> 
 </b></h3>
 
 The _Terasology_ project was born from a Minecraft-inspired tech demo and is becoming a stable platform for various types of gameplay settings in a voxel world.
@@ -137,7 +137,7 @@ To be able to run **Terasology** from source, you'll need to setup your workspac
 Follow the [Contributor Quick Start Guide](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start).
 This guide is designed for [IntelliJ IDEA][intellij] (you can use the free community edition), but alternative setups are possible.
 
-:warning: _Note that a Terasology workspace is a **multi-repo workspace**._
+:warning: _Note, that a Terasology workspace is a **multi-repo workspace**._
 
 While your workspace itself is a clone of [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology), every subdirectory in your workspace directory `./modules/` is a clone of a [Terasology module repo](https://github.com/Terasology).
 Accordingly, if you want to contribute to modules, you'll need to navigate into the respective subdirectory and work with Git from in there.
@@ -159,6 +159,6 @@ If you find errors or issues in any of our resources, please report them using G
 
 For developers that have not worked with complex software systems or dealt with the intricacies of Java yet, we recommend to start with [Good First Issues in Module Land](https://github.com/search?l=&q=org%3ATerasology+label%3A%22Good+First+Issue%22+state%3Aopen&state=open&type=Issues). Developers with previous experience in rendering, physics and other less trivial aspects of game development are welcome to give the [Good First Issues in Engine](https://github.com/MovingBlocks/Terasology/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Good+First+Issue%22) a go.
 
-## License [![](https://img.shields.io/github/license/MovingBlocks/Terasology)][license]
+## License
 
 Terasology is fully open source and licensed [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0") for code and [Creative Commons Attribution License, Version 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see credits for minor exceptions).
