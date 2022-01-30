@@ -149,7 +149,7 @@ For more information, see our wiki entry on [Understanding Terasology's Git Setu
 
 ### Contributing
 
-Detailed information on how to contribute can be found in [CONTRIBUTING.md][./.github/CONTRIBUTING.md]. Remember, that all submissions must be licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+Detailed information on how to contribute can be found in [CONTRIBUTING.md](./.github/CONTRIBUTING.md). Remember, that all submissions must be licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 Terasology has a rather steep learning curve in the beginning.
 To help you with the learning process, our [Adventure Site](https://terasology.org/AdventureSite/#/) helps you find the resources you need according to the field of contribution you're interested in.
