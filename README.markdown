@@ -1,31 +1,79 @@
-# Terasology
+<p align="center"><img src="./docs/images/terasology-logo.png" height=400px/></>
+<div align="center">
+    <a href="https://jenkins.terasology.org/job/Terasology/">
+        <img src="https://jenkins.terasology.org/job/Terasology/badge/icon" alt="Build Status"/>
+    </a>
+    <a href="https://github.com/MovingBlocks/Terasology/releases/latest">
+        <img src="https://img.shields.io/github/release/MovingBlocks/Terasology.svg" alt="Release" />
+    </a>
+    <a href="http://www.apache.org/licenses/LICENSE-2.0">
+        <img src="https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg" alt="License (Code)" />
+    </a>
+    <a href="http://creativecommons.org/licenses/by/4.0/">
+        <img src="https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg" alt="License (Art)" />
+    </a>
+    <a href="https://lgtm.com/projects/g/MovingBlocks/Terasology/alerts/">
+        <img src="https://img.shields.io/lgtm/alerts/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18" alt="LGTM Alerts" />
+    </a>
+    <a href="https://lgtm.com/projects/g/MovingBlocks/Terasology/context:java">
+        <img src="https://img.shields.io/lgtm/grade/java/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18" alt="Java Grade" />
+    </a>
+</div>
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/MovingBlocks/Terasology)
-[![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
-[![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/total.svg "Downloads")](../../releases/latest)
-[![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/alerts/)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/context:java)
-[![License(code)](https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![License(art)](https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg)](http://creativecommons.org/licenses/by/4.0/)
-[![Discord](https://img.shields.io/discord/270264625419911192.svg?label=discord)](http://discord.gg/Terasology)
-[![IRC Channel](https://img.shields.io/badge/irc-%23terasology-blue.svg "IRC (Outdated)")](https://webchat.freenode.net/?channels=terasology)
+<h3 align="center"><b>
+    <a href="#community">Community</a> | 
+    <a href="#installation">Installation</a> | 
+    <a href="#development">Development</a>  | 
+    <a href="#license-">License</a> 
+</b></h3>
 
-Welcome!
-
-The Terasology project was born from a Minecraft-inspired tech demo and is becoming a stable platform for various types of gameplay settings in a voxel world.
-
+The _Terasology_ project was born from a Minecraft-inspired tech demo and is becoming a stable platform for various types of gameplay settings in a voxel world.
 The [creators and maintainers](https://github.com/MovingBlocks/Terasology/blob/develop/docs/Credits.md) are a diverse mix of software developers, designers, game testers, graphic artists, and musicians. We encourage others to join!
+We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](docs/CODE_OF_CONDUCT.md).
 
-Terasology is fully [open source](https://github.com/MovingBlocks/Terasology) and licensed [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) for code and [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see [credits](docs/Credits.md) for minor exceptions.)
+## Community
 
-We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/CODE_OF_CONDUCT.md).
+If you want to get in contact with the **Terasology** community and the whole **MovingBlocks** team, you can easily connect with us, share your ideas, report and solve problems.
+We are present in nearly the complete round-up of social networks. Follow/friend us wherever you want, chat with us and tell the world.
 
-![Terasology](/docs/images/menuBackground.jpg "Terasology")
+&nbsp;
+
+<p align="center">
+    <a title="Discord" href="https://discord.gg/terasology">
+        <img src="./src/main/resources/org/terasology/launcher/images/discord.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="GitHub Issues" href="https://github.com/MovingBlocks/TerasologyLauncher/issues">
+        <img src="./src/main/resources/org/terasology/launcher/images/github.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Twitter" href="https://twitter.com/Terasology">
+    <img src="./src/main/resources/org/terasology/launcher/images/twitter.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Facebook" href="https://www.facebook.com/Terasology">
+        <img src="./src/main/resources/org/terasology/launcher/images/facebook.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Reddit" href="http://www.reddit.com/r/Terasology">
+        <img src="./src/main/resources/org/terasology/launcher/images/reddit.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Youtube" href="https://www.youtube.com/user/blockmaniaTV">
+        <img src="./src/main/resources/org/terasology/launcher/images/youtube.png" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Patreon" href="https://www.patreon.com/Terasology">
+        <img src="./src/main/resources/org/terasology/launcher/images/patreon.jpg" width="48px"/>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a title="Terasology Forum" href="https://forum.terasology.org">
+        <img src="./src/main/resources/org/terasology/launcher/images/forum.png" width="48px"/>
+    </a>
+</p>
 
 
-## Playing
+## Installation
 
 <table>
     <tr>
@@ -61,32 +109,60 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
 
 Internet connectivity is required for downloading Terasology via the Launcher, afterwards playing offline is possible.
 
-For easy game setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
+For easy game setup (recommended) you can use our launcher - [download it here.](https://terasology.org/download.html)
 
 For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
 
 
-#### Alternative Installation Methods
+### Alternative Installation Methods
 
 If you already have Java Runtime Environment (JRE) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 11 is supported.
 
 Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/master/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip).
 
 
-## Developing
+## Development
 
-We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
+Development is possible on all common platforms (Windows, Linux, MacOS) as long as the JDK is properly set up.
+
+### Requirements
+
+Technical Requirements:
+- Java SE Development Kit (JDK) 11. It may be possible to use a later version of the JDK for local development, but the CI will verify against this baseline version.
+- Git to clone the repo and commit changes.
+
+Non-Technical Requirements:
+- familiarity with Git. Have a look at https://learngitbranching.js.org/ if you're not familiar with Git yet.
+- familiarity with GitHub, especially forks. Have a look at https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks if you don't know how to work with forks yet.
+
+### Workspace Setup
+
+To be able to run **Terasology** from source, you'll need to setup your workspace.
+Follow the [Contributor Quick Start Guide](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start).
+This guide is designed for [IntelliJ IDEA][intellij] (you can use the free community edition), but alternative setups are possible.
+
+:warning: _Note that a Terasology workspace is a **multi-repo workspace**._
+
+While your workspace itself is a clone of [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology), every subdirectory in your workspace directory `./modules/` is a clone of a [Terasology module repo](https://github.com/Terasology).
+Accordingly, if you want to contribute to modules, you'll need to navigate into the respective subdirectory and work with Git from in there.
+Any Git commands executed in your workspace root will target [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology).
+
+For more information, see our wiki entry on [Understanding Terasology's Git Setup](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules#understanding-terasologys-git-setup).
 
 
-## Links
+### Contributing
 
-* [Game Credits](docs/Credits.md)
-* [Code of Conduct](docs/CODE_OF_CONDUCT.md)
-* [Playing](docs/Playing.md)
-* [Modules](docs/Modules.md)
-* [Developing](https://github.com/MovingBlocks/Terasology/wiki)
-* [Community Portal](http://forum.terasology.org)
-* [Reddit](http://www.reddit.com/r/Terasology)
-* [Twitter](https://twitter.com/Terasology)
-* [Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
-* [Discord](https://discord.gg/4uKbB8J)
+Detailed information on how to contribute can be found in [CONTRIBUTING.md][contributing]. Remember, that all submissions must be licensed under [Apache License, Version 2.0][license].
+
+Terasology has a rather steep learning curve in the beginning.
+To help you with the learning process, our [Adventure Site](https://terasology.org/AdventureSite/#/) helps you find the resources you need according to the field of contribution you're interested in.
+
+Additional learning resources can be found in our [wiki](https://github.com/MovingBlocks/Terasology/wiki) and our [tutorial modules](https://github.com/Terasology?q=Tutorial&type=all&language=&sort=).
+
+If you find errors or issues in any of our resources, please report them using GitHub issues and help fix them.
+
+For developers that have not worked with complex software systems or dealt with the intricacies of Java yet, we recommend to start with [Good First Issues in Module Land](https://github.com/search?l=&q=org%3ATerasology+label%3A%22Good+First+Issue%22+state%3Aopen&state=open&type=Issues). Developers with previous experience in rendering, physics and other less trivial aspects of game development are welcome to give the [Good First Issues in Engine](https://github.com/MovingBlocks/Terasology/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Good+First+Issue%22) a go.
+
+## License [![](https://img.shields.io/github/license/MovingBlocks/Terasology)][license]
+
+Terasology is fully open source and licensed [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0") for code and [Creative Commons Attribution License, Version 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see credits for minor exceptions).
