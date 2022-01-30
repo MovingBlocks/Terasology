@@ -40,35 +40,31 @@ We are present in nearly the complete round-up of social networks. Follow/friend
 
 <p align="center">
     <a title="Discord" href="https://discord.gg/terasology">
-        <img src="./src/main/resources/org/terasology/launcher/images/discord.png" width="48px"/>
-    </a>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <a title="GitHub Issues" href="https://github.com/MovingBlocks/TerasologyLauncher/issues">
-        <img src="./src/main/resources/org/terasology/launcher/images/github.png" width="48px"/>
+        <img src="./docs/images/discord.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Twitter" href="https://twitter.com/Terasology">
-    <img src="./src/main/resources/org/terasology/launcher/images/twitter.png" width="48px"/>
+    <img src="./docs/images/twitter.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Facebook" href="https://www.facebook.com/Terasology">
-        <img src="./src/main/resources/org/terasology/launcher/images/facebook.png" width="48px"/>
+        <img src="./docs/images/facebook.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Reddit" href="http://www.reddit.com/r/Terasology">
-        <img src="./src/main/resources/org/terasology/launcher/images/reddit.png" width="48px"/>
+        <img src="./docs/images/reddit.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Youtube" href="https://www.youtube.com/user/blockmaniaTV">
-        <img src="./src/main/resources/org/terasology/launcher/images/youtube.png" width="48px"/>
+        <img src="./docs/images/youtube.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Patreon" href="https://www.patreon.com/Terasology">
-        <img src="./src/main/resources/org/terasology/launcher/images/patreon.jpg" width="48px"/>
+        <img src="./docs/images/patreon.jpg" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a title="Terasology Forum" href="https://forum.terasology.org">
-        <img src="./src/main/resources/org/terasology/launcher/images/forum.png" width="48px"/>
+        <img src="./docs/images/forum.png" width="48px"/>
     </a>
 </p>
 
