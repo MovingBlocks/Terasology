@@ -83,10 +83,10 @@ We are present in nearly the complete round-up of social networks. Follow/friend
     </tr>
     <tr>
         <td>Memory (RAM)</td>
-        <td>2 GB</td>
+        <td>4 GB</td>
     </tr>
     <tr>
-        <td>Graphics (GPU)</td>
+        <td>Graphics* (GPU)</td>
         <td style="vertical-align:top">
             Intel HD Graphics (Gen 7)<br/>
             GeForce 8xxx series (or higher) or<br/>
@@ -100,6 +100,8 @@ We are present in nearly the complete round-up of social networks. Follow/friend
     </tr>
 </table>
 
+\* _Please note, that if you have both integrated (chip) and dedicated (card) graphics, you should make sure that you're actually using your dedicated graphics when running Terasology._
+
 Internet connectivity is required for downloading Terasology via the Launcher, afterwards playing offline is possible.
 
 For easy game setup (recommended) you can use our launcher - [download it here](https://terasology.org/download.html).
@@ -109,7 +111,7 @@ For more information about playing, like hot keys or server hosting, see the [de
 
 ### Alternative Installation Methods
 
-If you already have Java Runtime Environment (JRE) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 11 is supported.
+If you already have a Java Development Kit (JDK) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 11 is required.
 
 Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/master/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip).
 
