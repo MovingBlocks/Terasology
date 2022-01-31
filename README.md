@@ -1,8 +1,5 @@
 <p align="center"><img src="./docs/images/terasology-logo.png" height=400px/></>
 <div align="center">
-    <a href="https://jenkins.terasology.io/teraorg/job/Terasology/job/engine/">
-        <img src="https://jenkins.terasology.org/job/Terasology/badge/icon" alt="Build Status"/>
-    </a>
     <a href="https://github.com/MovingBlocks/Terasology/releases/latest">
         <img src="https://img.shields.io/github/release/MovingBlocks/Terasology.svg" alt="Release" />
     </a>
