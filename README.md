@@ -123,7 +123,8 @@ Development is possible on all common platforms (Windows, Linux, MacOS) as long 
 ### Requirements
 
 Technical Requirements:
-- Java SE Development Kit (JDK) 11. It may be possible to use a later version of the JDK for local development, but the CI will verify against this baseline version.
+- Java SE Development Kit (JDK) 11. The CI will verify against this baseline version.
+  <br>Using newer Java versions may cause issues (see [#3976](https://github.com/MovingBlocks/Terasology/issues/3976)).
 - Git to clone the repo and commit changes.
 
 Non-Technical Requirements:
@@ -136,7 +137,7 @@ To be able to run **Terasology** from source, you'll need to setup your workspac
 Follow the [Contributor Quick Start Guide](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start).
 This guide is designed for [IntelliJ IDEA](http://www.jetbrains.com/idea/) (you can use the free community edition), but alternative setups are possible.
 
-:warning: _Note, that a Terasology workspace is a **multi-repo workspace**._
+> :warning: _Note, that a Terasology workspace is a **multi-repo workspace**._
 
 While your workspace itself is a clone of [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology), every subdirectory in your workspace directory `./modules/` is a clone of a [Terasology module repo](https://github.com/Terasology).
 
