@@ -71,7 +71,7 @@ public final class ChunkMeshWorker {
 
         completedChunks = chunksAndNewMeshes
                 .publishOn(graphicsScheduler)
-                .flatMap(TupleUtils.function(this::uploadNewMesh))
+                .map(TupleUtils.function(ChunkMeshWorker::uploadNewMesh))
                 .doOnNext(chunk -> chunkMeshProcessing.remove(chunk.getPosition()));
 
         // FIXME: error handling???
@@ -81,7 +81,7 @@ public final class ChunkMeshWorker {
     public static ChunkMeshWorker create(ChunkTessellator chunkTessellator,
                                          WorldProvider worldProvider,
                                          Comparator<RenderableChunk> frontToBackComparator) {
-        ChunkMeshWorker worker = new ChunkMeshWorker(new MeshGenerator(chunkTessellator, worldProvider)::generate,
+        ChunkMeshWorker worker = new ChunkMeshWorker(generateMeshFunc(chunkTessellator, worldProvider),
                 frontToBackComparator,
                 GameScheduler.parallel(), GameScheduler.gameMain());
         worker.completedChunks.subscribe();
@@ -150,44 +150,19 @@ public final class ChunkMeshWorker {
         return chunksInProximityOfCamera;
     }
 
-    Flux<Tuple2<Chunk, ChunkMesh>> getChunksAndNewMeshes() {
-        return chunksAndNewMeshes;
-    }
-
     Flux<Chunk> getCompletedChunks() {
         return completedChunks;
     }
 
-    Sinks.Many<Chunk> getChunkMeshPublisher() {
-        return chunkMeshPublisher;
+    private static Chunk uploadNewMesh(Chunk chunk, ChunkMesh chunkMesh) {
+        chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
+        chunkMesh.discardData();
+        chunk.setMesh(chunkMesh);
+        return chunk;
     }
 
-    /**
-     *
-     * @param chunk
-     * @param chunkMesh
-     * @return Chunk, if its mesh was updated.
-     */
-    private Mono<Chunk> uploadNewMesh(Chunk chunk, ChunkMesh chunkMesh) {
-        if (chunksInProximityOfCamera.contains(chunk)) {
-            chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
-            chunkMesh.discardData();
-            chunk.setMesh(chunkMesh);
-            return Mono.just(chunk);
-        }
-        return Mono.empty();
-    }
-
-    static class MeshGenerator {
-        private final ChunkTessellator chunkTessellator;
-        private final WorldProvider worldProvider;
-
-        MeshGenerator(ChunkTessellator chunkTessellator, WorldProvider worldProvider) {
-            this.chunkTessellator = chunkTessellator;
-            this.worldProvider = worldProvider;
-        }
-
-        Mono<Tuple2<Chunk, ChunkMesh>> generate(Chunk chunk) {
+    private static Function<Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> generateMeshFunc(ChunkTessellator chunkTessellator, WorldProvider worldProvider) {
+        return (chunk -> {
             chunk.setDirty(false);
             ChunkView chunkView = worldProvider.getLocalView(chunk.getPosition());
             if (chunkView != null && chunkView.isValidView()) {
@@ -196,6 +171,6 @@ public final class ChunkMeshWorker {
                 return Mono.just(Tuples.of(chunk, newMesh));
             }
             return Mono.empty();
-        }
+        });
     }
 }
