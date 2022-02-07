@@ -3,7 +3,6 @@
 
 package org.terasology.fixtures;
 
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.persistence.ChunkStore;
@@ -33,7 +32,7 @@ public class TestStorageManager implements StorageManager {
     }
 
     public void add(Chunk chunk) {
-        chunkStores.put(chunk.getPosition(new Vector3i()), new TestChunkStore(chunk));
+        chunkStores.put(chunk.getPosition(), new TestChunkStore(chunk));
     }
 
     @Override

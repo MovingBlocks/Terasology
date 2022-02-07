@@ -1,13 +1,13 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.world.chunks.internal;
 
 import org.joml.Vector3i;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 /**
  * A chunk that has a full set of data, but will be turned into
@@ -22,16 +22,16 @@ public class PreLodChunk extends ChunkImpl {
 
     @Override
     public int getChunkWorldOffsetX() {
-        return chunkPos.x * (Chunks.SIZE_X - 2) - 1;
+        return chunkPos.x() * (getChunkSizeX() - 2) - 1;
     }
 
     @Override
     public int getChunkWorldOffsetY() {
-        return chunkPos.y * (Chunks.SIZE_Y - 4) - 2;
+        return chunkPos.y() * (getChunkSizeY() - 4) - 2;
     }
 
     @Override
     public int getChunkWorldOffsetZ() {
-        return chunkPos.z * (Chunks.SIZE_Z - 2) - 1;
+        return chunkPos.z() * (getChunkSizeZ() - 2) - 1;
     }
 }

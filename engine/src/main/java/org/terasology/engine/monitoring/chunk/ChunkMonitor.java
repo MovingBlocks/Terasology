@@ -5,7 +5,7 @@ package org.terasology.engine.monitoring.chunk;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
@@ -16,7 +16,7 @@ import java.util.Map;
 public final class ChunkMonitor {
 
     private static final EventBus EVENT_BUS = new EventBus("ChunkMonitor");
-    private static final Map<Vector3i, ChunkMonitorEntry> CHUNKS = Maps.newConcurrentMap();
+    private static final Map<Vector3ic, ChunkMonitorEntry> CHUNKS = Maps.newConcurrentMap();
 
     private ChunkMonitor() {
     }
@@ -27,7 +27,7 @@ public final class ChunkMonitor {
 
     private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        final Vector3i pos = chunk.getPosition(new Vector3i());
+        final Vector3ic pos = chunk.getPosition();
         ChunkMonitorEntry entry = CHUNKS.get(pos);
         if (entry == null) {
             entry = new ChunkMonitorEntry(pos);
@@ -54,29 +54,27 @@ public final class ChunkMonitor {
     public static void fireChunkCreated(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         final ChunkMonitorEntry entry = registerChunk(chunk);
-        if (entry != null) {
-            post(new ChunkMonitorEvent.Created(entry));
-        }
+        post(new ChunkMonitorEvent.Created(entry));
     }
 
     public static void fireChunkDisposed(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Disposed(chunk.getPosition(new Vector3i())));
+        post(new ChunkMonitorEvent.Disposed(chunk.getPosition()));
     }
 
     public static void fireChunkRevived(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Revived(chunk.getPosition(new Vector3i())));
+        post(new ChunkMonitorEvent.Revived(chunk.getPosition()));
     }
 
     public static void fireChunkDeflated(Chunk chunk, int oldSize, int newSize) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Deflated(chunk.getPosition(new Vector3i()), oldSize, newSize));
+        post(new ChunkMonitorEvent.Deflated(chunk.getPosition(), oldSize, newSize));
     }
 
-    public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh mesh) {
-        Preconditions.checkNotNull(chunkPos, "The parameter 'chunkPos' must not be null");
-        post(new ChunkMonitorEvent.Tessellated(chunkPos, mesh));
+    public static void fireChunkTessellated(Chunk chunk, ChunkMesh mesh) {
+        Preconditions.checkNotNull(chunk, "The parameter 'chunkPos' must not be null");
+        post(new ChunkMonitorEvent.Tessellated(chunk.getPosition(), mesh));
     }
 
     public static synchronized void getChunks(List<ChunkMonitorEntry> output) {

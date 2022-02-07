@@ -61,7 +61,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
         Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
                 "Chunk after processing must have equals position, probably pipeline lost you chunk");
     }
 
@@ -102,7 +102,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                         .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
-                                (chunk) -> chunk.getPosition(new Vector3i()),
+                                ChunkImpl::getPosition,
                                 Function.identity()
                         ));
 
@@ -119,7 +119,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
         Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
                 "Chunk after processing must have equals position, probably pipeline lost you chunk");
     }
 
@@ -130,13 +130,13 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
             TimeoutException {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
-        Map<Vector3i, Chunk> chunkToGenerate =
+        Map<Vector3ic, Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
                         .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
-                                (chunk) -> chunk.getPosition(new Vector3i()),
+                                ChunkImpl::getPosition,
                                 Function.identity()
                         ));
 
@@ -160,7 +160,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
 
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
+        Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
                 "Chunk after processing must have equals position, probably pipeline lost you chunk");
     }
 
@@ -181,16 +181,16 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                 "flat merging task",
                 (chunks) -> chunks.stream()
                         .sorted((o1, o2) -> {
-                            Function<Chunk, Vector3i> pos = (c) -> c.getPosition(new Vector3i());
-                            return Comparator.comparing(pos.andThen(Vector3i::x))
-                                    .thenComparing(pos.andThen(Vector3i::y))
-                                    .thenComparing(pos.andThen(Vector3i::z))
+                            Function<Chunk, Vector3ic> pos = Chunk::getPosition;
+                            return Comparator.comparing(pos.andThen(Vector3ic::x))
+                                    .thenComparing(pos.andThen(Vector3ic::y))
+                                    .thenComparing(pos.andThen(Vector3ic::z))
                                     .compare(o1, o2);
                         }).toArray(Chunk[]::new)[5],
                 this::getNearChunkPositions));
         pipeline.addStage(ChunkTaskProvider.create("finish chunk", (c) -> {
             c.markReady();
-            chunkCache.put(c.getPosition(new Vector3i()), c);
+            chunkCache.put(c.getPosition(), c);
         }));
 
 
