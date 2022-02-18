@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.persistence.typeHandling;
@@ -53,7 +53,7 @@ import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4iTypeHand
 import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
-import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.engine.world.block.BlockRegion;
@@ -115,7 +115,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
         serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
-        serializationLibrary.addTypeHandler(ChunkMesh.class, new ChunkMeshTypeHandler());
+        serializationLibrary.addTypeHandler(MutableChunkMesh.class, new ChunkMeshTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 

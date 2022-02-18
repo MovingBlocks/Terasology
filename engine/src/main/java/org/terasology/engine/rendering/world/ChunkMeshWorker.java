@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
-import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
@@ -56,10 +56,10 @@ public final class ChunkMeshWorker {
 
     private final Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
-    private final Flux<Tuple2<Chunk, ChunkMesh>> chunksAndNewMeshes;
+    private final Flux<Tuple2<Chunk, MutableChunkMesh>> chunksAndNewMeshes;
     private final Flux<Chunk> completedChunks;
 
-    ChunkMeshWorker(Function<? super Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> workFunction,
+    ChunkMeshWorker(Function<? super Chunk, Mono<Tuple2<Chunk, MutableChunkMesh>>> workFunction,
                     Comparator<RenderableChunk> frontToBackComparator, Scheduler parallelScheduler, Scheduler graphicsScheduler) {
         this.frontToBackComparator = frontToBackComparator;
 
@@ -154,19 +154,20 @@ public final class ChunkMeshWorker {
         return completedChunks;
     }
 
-    private static Chunk uploadNewMesh(Chunk chunk, ChunkMesh chunkMesh) {
+    private static Chunk uploadNewMesh(Chunk chunk, MutableChunkMesh chunkMesh) {
         chunkMesh.updateMesh();  // Does GL stuff, must be on main thread!
         chunkMesh.discardData();
         chunk.setMesh(chunkMesh);
         return chunk;
     }
 
-    private static Function<Chunk, Mono<Tuple2<Chunk, ChunkMesh>>> generateMeshFunc(ChunkTessellator chunkTessellator, WorldProvider worldProvider) {
+    private static Function<Chunk, Mono<Tuple2<Chunk, MutableChunkMesh>>> generateMeshFunc(
+            ChunkTessellator chunkTessellator, WorldProvider worldProvider) {
         return (chunk -> {
             chunk.setDirty(false);
             ChunkView chunkView = worldProvider.getLocalView(chunk.getPosition());
             if (chunkView != null && chunkView.isValidView()) {
-                ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+                MutableChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
                 ChunkMonitor.fireChunkTessellated(chunk, newMesh);
                 return Mono.just(Tuples.of(chunk, newMesh));
             }

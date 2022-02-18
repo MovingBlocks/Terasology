@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.world.chunks;
@@ -8,6 +8,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
@@ -106,8 +107,9 @@ public class LodChunkProvider {
             int scale = chunk.scale;
             if (requiredScale != null && requiredScale <= scale) { // The relevant region may have been updated since
                 // this chunk was requested.
-                chunk.getMesh().updateMesh();
-                chunk.getMesh().discardData();
+                MutableChunkMesh mesh = (MutableChunkMesh) chunk.getMesh(); // FIXME ASAP
+                mesh.updateMesh();
+                mesh.discardData();
                 Vector3i subPos = new Vector3i();
                 if (scale > 0) {
                     int subScale = 1 << (scale - 1);

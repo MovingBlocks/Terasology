@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.primitives;
@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
-public class ChunkMeshImpl implements ChunkMesh {
+public class ChunkMeshImpl implements MutableChunkMesh {
 
     /* VERTEX DATA */
     private final int[] vertexBuffers = new int[4];

@@ -18,6 +18,7 @@ import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
@@ -136,7 +137,7 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkProvider.update();
 
         Chunk chunk;
-        ChunkMesh newMesh;
+        MutableChunkMesh newMesh;
         ChunkView localView;
         for (Vector3ic chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
             chunk = chunkProvider.getChunk(chunkCoordinates);
