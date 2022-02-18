@@ -119,14 +119,6 @@ public class ChunkMeshWorkerTest {
     }
 
     @Test
-    @Disabled("TODO: How to do scenarios with mid-pipeline actions?")
-    void testChunksDirtiedBetweenGenerationAndUploadAreUploadedAnyway() {
-        // maybe redundant with testChunkIsRegeneratedIfDirty?
-        // I guess the assertion is that the upload function did a thing
-        // instead of skipping a thing.
-    }
-
-    @Test
     void testChunkCanBeRemovedBeforeMeshGeneration() {
         var chunk = newDirtyChunk(position0);
         verifier.then(() -> {
@@ -152,17 +144,6 @@ public class ChunkMeshWorkerTest {
                 })
                 // chunk was removed, no events expected
                 .verifyTimeout(Duration.ofSeconds(5));
-    }
-
-    @Test
-    @Disabled("TODO: How to do scenarios with mid-pipeline actions?")
-    void testChunkCanBeRemovedBeforeUpload() {
-        var chunk = newDirtyChunk(position0);
-        worker.add(chunk);
-        // tick so generation is finished, but not upload
-        worker.remove(chunk);
-        // drain
-        fail("assert upload did not happen for chunk");
     }
 
     @Test
@@ -202,6 +183,4 @@ public class ChunkMeshWorkerTest {
     void testWorkerStopsWhenShutDown() {
         fail("TODO: add shutdown method");
     }
-
-    // What else? More parallelization tests?
 }
