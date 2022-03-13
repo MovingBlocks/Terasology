@@ -1,3 +1,6 @@
+<!-- Copyright 2021 The Terasology Foundation -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 <configuration>
 
   <!-- Report all changes to this configuration on System.out -->
@@ -46,9 +49,16 @@
   </root>
 
   <logger name="org.terasology" level="${logOverrideLevel:-info}" />
-  <logger name="org.reflections.Reflections" level="${logOverrideLevel:-error}" />
-  <logger name="com.snowplowanalytics" level="${logOverrideLevel:-error}" />
-  <logger name="io.netty" level="${logOverrideLevel:-warn}" />
-  
+  <!-- NOTE You can add fine granular custom log-level overrides here.
+            This works in both ways, i.e., you can increase or decrease the log level for specific packages or classes.
+
+  <logger name="org.terasology.engine.world" level="debug" />
+  <logger name="org.terasology.module.health.systems.HealthAuthoritySystem" level="error" />
+  -->
+
+  <!-- 3rd party overrides, e.g., because we cannot catch and hide some expected exceptions happening off-thread -->
+  <logger name="org.reflections.Reflections" level="error" />
+  <logger name="com.snowplowanalytics" level="error" />
+  <logger name="io.netty" level="warn" />
   <logger name="com.jagrosh.discordipc" level="OFF"/>
 </configuration>

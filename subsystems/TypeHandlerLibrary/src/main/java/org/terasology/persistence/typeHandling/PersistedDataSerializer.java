@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
@@ -10,9 +10,7 @@ import gnu.trove.iterator.TLongIterator;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-/**
- *
- */
+
 public interface PersistedDataSerializer {
 
     /**

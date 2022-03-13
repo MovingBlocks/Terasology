@@ -5,14 +5,29 @@ import java.net.URI
 
 // We use both Maven Central and our own Artifactory instance, which contains module builds, extra libs, and so on
 repositories {
-    // External libs - jcenter is Bintray and a superset of Maven Central
-    jcenter {
+    mavenCentral {
         content {
             // This is first choice for most java dependencies, but assume we'll need to check our
             // own repository for things from our own organization.
-            // (This is an optimization so gradle doesn't try to find our hundreds of modules
-            // in jcenter.)
+            // (This is an optimization so gradle doesn't try to find our hundreds of modules in 3rd party repos)
             excludeGroupByRegex("""org\.terasology(\..+)?""")
+        }
+    }
+
+    google {
+        // gestalt uses an annotation library from Google
+        content {
+            // (This is an optimization so gradle doesn't try to find our hundreds of modules here.)
+            excludeGroupByRegex("""org\.terasology(\..+)?""")
+        }
+    }
+
+    // JBoss Maven Repository requried to fetch `org.jpastebin` dependency for CrashReporter
+    maven {
+        name = "JBoss Public Maven Repository Group"
+        url = URI("https://repository.jboss.org/nexus/content/repositories/public/")
+        content {
+            includeModule("org", "jpastebin")
         }
     }
 
@@ -32,5 +47,13 @@ repositories {
             url = URI("http://artifactory.terasology.org/artifactory/virtual-repo-live")
             isAllowInsecureProtocol = true  // 😱
         }
+    }
+
+    // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
+    // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
+    maven {
+        name = "Terasology snapshot locals"
+        url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
+        isAllowInsecureProtocol = true  // 😱
     }
 }

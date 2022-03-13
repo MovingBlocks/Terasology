@@ -1,9 +1,9 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.fixtures;
 
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.world.chunks.Chunk;
 
@@ -18,8 +18,8 @@ public class TestChunkStore implements ChunkStore {
     }
 
     @Override
-    public Vector3i getChunkPosition() {
-        return chunk.getPosition(new Vector3i());
+    public Vector3ic getChunkPosition() {
+        return chunk.getPosition();
     }
 
     @Override

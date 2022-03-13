@@ -1,11 +1,9 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
 import java.util.Optional;
 
-/**
- */
 public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> {
 
     public abstract String getAsString(T item);

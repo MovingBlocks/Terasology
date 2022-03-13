@@ -5,10 +5,10 @@ package org.terasology.reflection;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

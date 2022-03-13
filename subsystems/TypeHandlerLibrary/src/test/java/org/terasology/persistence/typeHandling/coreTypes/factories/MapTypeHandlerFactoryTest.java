@@ -31,7 +31,7 @@ class MapTypeHandlerFactoryTest {
 
     @Test
     void testStringMap() {
-        TypeInfo<Map<String, Integer>> listTypeInfo = new TypeInfo<Map<String, Integer>>() {};
+        TypeInfo<Map<String, Integer>> listTypeInfo = new TypeInfo<Map<String, Integer>>() { };
 
         Optional<TypeHandler<Map<String, Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);
@@ -45,7 +45,7 @@ class MapTypeHandlerFactoryTest {
 
     @Test
     void testNonStringMap() {
-        TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
+        TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() { };
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);
@@ -55,7 +55,8 @@ class MapTypeHandlerFactoryTest {
 
     @Test
     void testNonGenericMap() {
-        class IntMap extends HashMap<String, Integer> {}
+        @SuppressWarnings("checkstyle:IllegalType")
+        class IntMap extends HashMap<String, Integer> { }
 
         Optional<TypeHandler<IntMap>> typeHandler =
                 typeHandlerFactory.create(TypeInfo.of(IntMap.class), context);
@@ -70,7 +71,7 @@ class MapTypeHandlerFactoryTest {
 
     @Test
     void testGenericMap() {
-        TypeInfo<Map<Integer, Integer>> listTypeInfo = new TypeInfo<Map<Integer, Integer>>() {};
+        TypeInfo<Map<Integer, Integer>> listTypeInfo = new TypeInfo<Map<Integer, Integer>>() { };
 
         Optional<TypeHandler<Map<Integer, Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);

@@ -7,7 +7,10 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaApplication
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.get
@@ -43,7 +46,16 @@ fun isMacOS() : Boolean {
 }
 
 
-open class RunTerasology : JavaExec() {
+abstract class RunTerasology : JavaExec() {
+
+    @get:Optional
+    @get:Input
+    abstract val jmxPort: Property<Int>
+
+    @Option(option="jmx-port", description="Enable JMX connections on this port (jmxremote.port)")
+    fun parseJmxPort(value: String?) {
+        jmxPort.set(value.takeUnless { it.isNullOrEmpty() }?.toIntOrNull())
+    }
 
     @Option(option="max-heap", description="Set maximum heap size (-Xmx)")
     override fun setMaxHeapSize(heapSize: String?) {
@@ -56,6 +68,8 @@ open class RunTerasology : JavaExec() {
         mainClass.set(project.the<JavaApplication>().mainClass)
         workingDir = project.rootDir
 
+        // All calls to non-final Task methods must be within a non-final method
+        // themselves. This includes #dependsOn, #args, etc.
         initConfig()
     }
 
@@ -64,12 +78,28 @@ open class RunTerasology : JavaExec() {
         classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
         dependsOn(project.configurations.named("modules"))
 
-        args("-homedir")
+        args("--homedir=.")
         maxHeapSize = DEFAULT_MAX_HEAP_SIZE
 
         if (isMacOS()) {
-            args("-noSplash")
+            args("--no-splash")
             jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
         }
+
+        // Any configuration that depends on the value of a task Property like jmxPort
+        // should be done later, as that Property value will change between object
+        // construction time and task execution time.
+    }
+
+    override fun exec() {
+        jmxPort.orNull?.let {
+            systemProperty("com.sun.management.jmxremote.port", it)
+            systemProperty("com.sun.management.jmxremote.rmi.port",it + 1)
+            systemProperty("com.sun.management.jmxremote.password.file",
+                project.rootProject.file("config/jmxremote.password"))
+            systemProperty("com.sun.management.jmxremote.ssl", "false")
+        }
+
+        super.exec()
     }
 }

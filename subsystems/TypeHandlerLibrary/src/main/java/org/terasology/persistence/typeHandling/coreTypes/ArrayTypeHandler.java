@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Serializes arrays of type {@code E[]}.
  *
- * {@link ArrayTypeHandler} extends {@link TypeHandler<Object>} because the type parameter {@link E}
+ * {@link ArrayTypeHandler} extends {@link TypeHandler} because the type parameter {@link E}
  * supports only wrapper types, and primitive array to wrapper type array (and vice versa) casts are
  * unsupported. The array is accessed via the {@link Array} utility class as an {@link Object} so that
  * the cast can be avoided.
@@ -50,7 +50,7 @@ public class ArrayTypeHandler<E> extends TypeHandler<Object> {
             return Optional.empty();
         }
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         List<E> items = data.getAsArray().getAsValueArray().stream()
                 .map(itemData -> elementTypeHandler.deserialize(itemData))
                 .filter(Optional::isPresent)

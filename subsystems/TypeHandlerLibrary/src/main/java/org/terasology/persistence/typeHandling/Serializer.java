@@ -112,7 +112,7 @@ public class Serializer {
             if (fieldInfo != null && check.shouldDeserialize(classMetadata, fieldInfo)) {
                 deserializeOnto(target, fieldInfo, field.getValue());
             } else if (fieldInfo == null) {
-                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getKey(), classMetadata.getUri());
+                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getKey(), classMetadata.getId());
             }
         }
     }
