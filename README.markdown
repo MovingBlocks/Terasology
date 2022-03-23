@@ -68,9 +68,9 @@ For more information about playing, like hot keys or server hosting, see the [de
 
 #### Alternative Installation Methods
 
-If you already have Java Runtime Environment (JRE) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
+If you already have Java Runtime Environment (JRE) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 11 is supported.
 
-Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/master/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/master/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip).
 
 
 ## Developing

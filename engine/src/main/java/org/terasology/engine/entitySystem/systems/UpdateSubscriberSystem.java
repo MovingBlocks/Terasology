@@ -12,8 +12,8 @@ import org.terasology.engine.logic.delay.DelayManager;
  * In most cases it will be sufficient to:
  *   <ul>
  *     <li>
- *       use {@link org.terasology.engine.entitySystem.event.ReceiveEvent}
- *       to update the system on specific events ({@link org.terasology.engine.entitySystem.event.Event}),
+ *       use {@link org.terasology.gestalt.entitysystem.event.ReceiveEvent}
+ *       to update the system on specific events ({@link org.terasology.gestalt.entitysystem.event.Event}),
  *     </li>
  *     <li>
  *       use {@link DelayManager} to update entities or to call a

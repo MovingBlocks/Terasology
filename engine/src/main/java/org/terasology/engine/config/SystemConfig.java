@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Optional;
 
+import static java.lang.Math.max;
 import static org.terasology.engine.config.flexible.SettingArgument.constraint;
 import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
 import static org.terasology.engine.config.flexible.SettingArgument.name;
@@ -31,7 +32,7 @@ public class SystemConfig extends AutoConfig {
 
     public final Setting<Integer> maxThreads = setting(
             type(Integer.class),
-            defaultValue(Runtime.getRuntime().availableProcessors() - 1),
+            defaultValue(max(1, Runtime.getRuntime().availableProcessors() - 1)),
             name("Max threads(not yet)"),
             constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
     );
@@ -39,33 +40,33 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Integer> maxSecondsBetweenSaves = setting(
             type(Integer.class),
             defaultValue(60),
-            name("Seconds between saves"),
+            name("${engine:menu#settings-seconds-between-saves}"),
             constraint(new NumberRangeConstraint<>(0, 1200, false, false))
     );
 
     public final Setting<Integer> maxUnloadedChunksPercentageTillSave = setting(
             type(Integer.class),
             defaultValue(40),
-            name("Max unloaded chunks percentage till save"),
+            name("${engine:menu#settings-chunks-till-save}"),
             constraint(new NumberRangeConstraint<>(0, 100, false, false))
     );
 
     public final Setting<Boolean> debugEnabled = setting(
             type(Boolean.class),
             defaultValue(false),
-            name("Debug mode")
+            name("${engine:menu#settings-debug-mode}")
     );
 
     public final Setting<Boolean> monitoringEnabled = setting(
             type(Boolean.class),
             defaultValue(false),
-            name("Monitoring")
+            name("${engine:menu#settings-monitoring-enabled}")
     );
 
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
             defaultValue(true),
-            name("Game saves"),
+            name("${engine:menu#settings-saves-enabled}"),
             override(() -> Optional.ofNullable(
                     System.getProperty(SAVED_GAMES_ENABLED_PROPERTY))
                     .map(Boolean::parseBoolean))
@@ -74,7 +75,7 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Long> chunkGenerationFailTimeoutInMs = setting(
             type(Long.class),
             defaultValue(1800000L),
-            name("Chunk generation fail timeout (ms)"),
+            name("${engine:menu#settings-chunk-timeout}"),
             constraint(new NumberRangeConstraint<>(0L, 3600000L, false, false))
     );
 

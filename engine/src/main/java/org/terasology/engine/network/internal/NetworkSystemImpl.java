@@ -40,7 +40,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
@@ -71,6 +70,7 @@ import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.module.Module;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -80,13 +80,8 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,32 +172,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     logger.info("No server MOTD is defined");
                 }
 
-                // enumerate all network interfaces that listen
-                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-
-                while (interfaces.hasMoreElements()) {
-                    NetworkInterface ifc = interfaces.nextElement();
-                    if (!ifc.isLoopback()) {
-                        for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
-                            // Exclude interfaces with the following key words to avoid common virtual and otherwise unlikely useful nics
-                            // TODO: Make this configurable via config.cfg?
-                            if (ifc.getDisplayName().contains("VirtualBox") || ifc.getDisplayName().contains("ISATAP")) {
-                                logger.info("Skipping filtered interface name {}", ifc.getDisplayName());
-                            } else {
-                                InetAddress adr = ifadr.getAddress();
-                                logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
-                                        ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
-                            }
-                        }
-                    }
-                }
                 if (serverChannelFuture.isSuccess()) {
                     logger.info("Server started");
                 }
                 serverChannelFuture.sync();
                 nextNetworkTick = time.getRealTimeInMs();
-            } catch (SocketException e) {
-                throw new HostingFailedException("Could not identify network interfaces", e);
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
                     throw new HostingFailedException("Port already in use (are you already hosting a game?)",
@@ -210,7 +184,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 } else {
                     throw new HostingFailedException("Failed to host game", e.getCause());
                 }
-
             } catch (InterruptedException e) {
                 shutdown();
                 throw new HostingFailedException("Server has been interrupted", e.getCause());

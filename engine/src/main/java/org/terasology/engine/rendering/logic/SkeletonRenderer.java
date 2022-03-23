@@ -17,7 +17,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -38,6 +37,7 @@ import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.nui.Color;
 
@@ -256,7 +256,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             location.getWorldPosition(worldPos);
             float worldScale = location.getWorldScale();
 
-
             aabb = aabb.transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
 
             //Scale bounding box for skeletalMesh.
@@ -310,9 +309,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     boneTransforms[bone.getIndex()] = new Matrix4f();
-
                 }
             }
+
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.asList(boneTransforms));
         }
@@ -329,20 +328,36 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-            Vector3f worldPos = new Vector3f();
-            Vector3f worldPositionCameraSpace = new Vector3f();
-            worldPos.sub(cameraPosition, worldPositionCameraSpace);
-            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
-            Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-            material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
+            Matrix4f relMat = new Matrix4f();
+            Matrix4f relFinal = new Matrix4f();
+            Matrix4f entityTransform = new Matrix4f();
+
+            Matrix4f result = new Matrix4f();
+            Vector3f currentPos = new Vector3f();
 
             int index = 0;
             for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
                 SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
+                LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 if (skeletalMesh.boneEntities == null) {
                     continue;
                 }
+
+                Vector3f location = locationComponent.getWorldPosition(new Vector3f());
+                Quaternionf rotation = locationComponent.getWorldRotation(new Quaternionf());
+                entityTransform.translationRotateScale(location, rotation, 1.0f); // transformation of the entity
+
+                // position is referenced around (0,0,0) (worldposition - cameraposition)
+                Vector3f worldPositionCameraSpace = cameraPosition.negate(new Vector3f());
+
+                // same heightOffset is applied to worldPositionCameraSpace from #renderOpaque()
+                // TODO: resolve repeated logic for transformation applied to bones
+                worldPositionCameraSpace.y += skeletalMesh.heightOffset;
+
+                Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
+                Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
+                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
                 for (Bone bone : skeletalMesh.mesh.getBones()) {
                     Bone parentBone = bone.getParent();
@@ -351,19 +366,36 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                         continue;
                     }
 
+                    // TODO: the position of the bone is de-coupled from the actual translation/scale
                     EntityRef boneParentEntity = skeletalMesh.boneEntities.get(parentBone.getName());
-
                     LocationComponent locCompA = boneEntity.getComponent(LocationComponent.class);
                     LocationComponent locCompB = boneParentEntity.getComponent(LocationComponent.class);
 
-                    Vector3f worldPosA = locCompA.getWorldPosition(new Vector3f());
-                    Vector3f worldPosB = locCompB.getWorldPosition(new Vector3f());
+                    // need to calculate the relative transformation from the entity to the start of the bone
+                    locCompA.getRelativeTransform(relMat.identity(), entity);
+                    // entityTransform * (scale, translation) * relativeMat * [x,y,z,1]
+                    result.set(entityTransform)
+                            .mul(relFinal.identity()
+                                    .scale(skeletalMesh.scale)
+                                    .translate(skeletalMesh.translate)
+                                    .mul(relMat))
+                            .transformPosition(currentPos.zero()); // get the position of the start of the bone
+                    meshData.position.put(currentPos); // the start of the bone
+
+                    // need to calculate the relative transformation from the entity to the connecting bone
+                    locCompB.getRelativeTransform(relMat.identity(), entity);
+                    // entityTransform * (scale, translation) * relativeMat * [x,y,z,1]
+                    result.set(entityTransform)
+                            .mul(relFinal
+                                    .identity()
+                                    .scale(skeletalMesh.scale)
+                                    .translate(skeletalMesh.translate)
+                                    .mul(relMat))
+                            .transformPosition(currentPos.zero()); // get the position to the connecting bone
+                    meshData.position.put(currentPos); // the end of the bone
 
                     meshData.color0.put(Color.white);
                     meshData.color0.put(Color.white);
-
-                    meshData.position.put(worldPosA);
-                    meshData.position.put(worldPosB);
 
                     meshData.indices.putAll(new int[]{
                             index, index + 1

@@ -5,21 +5,21 @@ package org.terasology.engine.recording;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.events.PlaySoundEvent;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.engine.input.events.InputEvent;
-import org.terasology.engine.input.events.KeyUpEvent;
-import org.terasology.engine.input.events.KeyRepeatEvent;
 import org.terasology.engine.input.events.KeyDownEvent;
 import org.terasology.engine.input.events.KeyEvent;
+import org.terasology.engine.input.events.KeyRepeatEvent;
+import org.terasology.engine.input.events.KeyUpEvent;
 import org.terasology.engine.input.events.MouseAxisEvent;
 import org.terasology.engine.input.events.MouseButtonEvent;
 import org.terasology.engine.input.events.MouseWheelEvent;
 import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
 import org.terasology.engine.logic.characters.GetMaxSpeedEvent;
 import org.terasology.engine.logic.characters.events.AttackEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.lang.reflect.InvocationTargetException;
 

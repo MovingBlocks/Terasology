@@ -3,14 +3,14 @@
 
 package org.terasology.engine.network;
 
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.bootstrap.eventSystem.AbstractEventSystemDecorator;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
 import org.terasology.engine.entitySystem.metadata.EventMetadata;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * Decorator for replicate event to network.

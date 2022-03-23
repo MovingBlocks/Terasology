@@ -106,7 +106,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         for (Rotation rotation: rotations) {
             byte sideBits = 0;
             for (Side side : SideBitFlag.getSides(sides)) {
-                sideBits += SideBitFlag.getSide(rotation.rotate(side));
+                sideBits |= SideBitFlag.getSide(rotation.rotate(side));
             }
             Block block = blockBuilder.constructTransformedBlock(definition, name,
                     rotation, new BlockUri(root, new Name(String.valueOf(sideBits))), this);
@@ -133,7 +133,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         for (Rotation rotation: rotations) {
             byte sideBits = 0;
             for (Side side : SideBitFlag.getSides(sides)) {
-                sideBits += SideBitFlag.getSide(rotation.rotate(side));
+                sideBits |= SideBitFlag.getSide(rotation.rotate(side));
             }
             BlockUri uri = new BlockUri(root, new Name(String.valueOf(sideBits)));
             Block block = blockBuilder.constructTransformedBlock(definition, rotation, uri, this);
@@ -153,7 +153,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
             if (this.connectionCondition(data.blockPosition, connectSide)) {
-                connections += SideBitFlag.getSide(connectSide);
+                connections |= SideBitFlag.getSide(connectSide);
             }
         }
         return blocks.get(connections);
@@ -164,7 +164,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
             if (this.connectionCondition(location, connectSide)) {
-                connections += SideBitFlag.getSide(connectSide);
+                connections |= SideBitFlag.getSide(connectSide);
             }
         }
         return blocks.get(connections);

@@ -5,8 +5,8 @@ package org.terasology.engine.world.block;
 import gnu.trove.list.TIntList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.util.Collections;
 import java.util.Iterator;

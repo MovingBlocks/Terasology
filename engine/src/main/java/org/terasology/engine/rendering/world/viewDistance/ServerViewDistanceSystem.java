@@ -3,7 +3,6 @@
 package org.terasology.engine.rendering.world.viewDistance;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -12,6 +11,7 @@ import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.chunks.localChunkProvider.RelevanceSystem;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * Handles view distance changes on the server
