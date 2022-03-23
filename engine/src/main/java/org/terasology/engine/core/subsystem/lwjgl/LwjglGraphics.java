@@ -27,9 +27,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
+    public static long windowId; // TODO make non static!!!
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
-    public static long windowId; // TODO make non static!!!
     private Context context;
     private RenderingConfig config;
 
