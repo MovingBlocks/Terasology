@@ -76,7 +76,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         GameScheduler.runBlockingGraphics("Lwjgl post-update", () -> {
-            currentState.render();
+
+            boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+            if (!gameWindowIsMinimized) {
+                currentState.render();
+            }
             lwjglDisplay.update();
 
             //TODO. needs there, or not?

@@ -59,7 +59,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public boolean isFullscreen() {
-        return GameScheduler.runBlockingGraphics("isFullscreen", () -> MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext()));
+        return GameScheduler.runBlockingGraphics("isFullscreen",
+                () -> MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext()));
     }
 
     @Override
@@ -211,11 +212,14 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     protected void updateViewport(int width, int height) {
-        GameScheduler.runBlockingGraphics("updateViewport", () ->
-                glViewport(0, 0, width, height)
+        GameScheduler.runBlockingGraphics("updateViewport", () -> {
+                    glViewport(0, 0, width, height)
+                    //If the screen is minimized, resolution change is stopped to avoid the width and height of FBO being set to 0.
+                    boolean isMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+                    int i = isMinimized ? 0 : 1;
+                    propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, i, 1);
+                }
         );
-
-        propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
     }
 
     private GLFWVidMode getFullScreenDisplayMode() {
