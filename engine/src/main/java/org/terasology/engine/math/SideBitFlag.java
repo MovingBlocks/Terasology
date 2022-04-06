@@ -19,7 +19,7 @@ public final class SideBitFlag {
     }
 
     /**
-     * @deprecated Use {@link Side#reversSides(byte)} instead
+     * @deprecated Use {@link Side#reverseSides(byte)} instead
      */
     @Deprecated
     public static byte getReverse(byte sides) {
