@@ -34,6 +34,9 @@ dependencies {
     implementation("org.javassist:javassist:3.27.0-GA")
     implementation("dom4j:dom4j:1.6.1")
 
+    // graph analysis
+    implementation("org.jgrapht:jgrapht-core:1.5.0")
+
     // for inspecting modules
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
 

@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.math;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gnu.trove.map.TObjectByteMap;
-import gnu.trove.map.hash.TObjectByteHashMap;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -16,16 +14,6 @@ import java.util.Set;
  *
  */
 public final class SideBitFlag {
-    private static final TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();
-
-    static {
-        sideBits.put(Side.TOP, (byte) 0b000001);
-        sideBits.put(Side.LEFT, (byte) 0b000010);
-        sideBits.put(Side.FRONT, (byte) 0b000100);
-        sideBits.put(Side.BOTTOM, (byte) 0b001000);
-        sideBits.put(Side.RIGHT, (byte) 0b010000);
-        sideBits.put(Side.BACK, (byte) 0b100000);
-    }
 
     private SideBitFlag() {
     }
@@ -39,7 +27,7 @@ public final class SideBitFlag {
     public static byte getSides(Set<Side> sides) {
         byte result = 0;
         for (Side side : sides) {
-            result += sideBits.get(side);
+            result |= side.getFlag();
         }
         return result;
     }
@@ -48,46 +36,38 @@ public final class SideBitFlag {
     public static byte getSides(Side... sides) {
         byte result = 0;
         for (Side side : sides) {
-            final byte sideBit = sideBits.get(side);
-            if ((result & sideBit) > 0) {
-                throw new IllegalArgumentException("Cannot have multiples of the same side");
-            }
-            result += sideBit;
+            result |= side.getFlag();
         }
         return result;
     }
 
     @Deprecated
     public static byte getSide(Side side) {
-        return sideBits.get(side);
+        return side.getFlag();
     }
 
     @Deprecated
     public static EnumSet<Side> getSides(final byte sidesBit) {
-        final List<Side> result = Lists.newArrayList();
-        sideBits.forEachEntry(
-                (a, b) -> {
-                    if ((b & sidesBit) > 0) {
-                        result.add(a);
-                    }
-
-                    return true;
-                });
+        final List<Side> result = new ArrayList<>(Side.allSides().size());
+        for (Side side : Side.allSides()) {
+            if ((side.getFlag() & sidesBit) > 0) {
+                result.add(side);
+            }
+        }
         return Sets.newEnumSet(result, Side.class);
     }
 
     @Deprecated
     public static boolean hasSide(byte sideBit, Side side) {
-        return (sideBit & sideBits.get(side)) > 0;
+        return  (side.getFlag() & sideBit) > 0;
     }
 
     @Deprecated
     public static byte addSide(byte sideBit, Side... sides) {
         byte result = sideBit;
         for (Side side : sides) {
-            result |= sideBits.get(side);
+            result |= side.getFlag();
         }
-
         return result;
     }
 

@@ -20,12 +20,12 @@ import java.util.Set;
  *
  */
 public enum Side {
-    TOP(new Vector3i(0, 1, 0)),
-    LEFT(new Vector3i(-1, 0, 0)),
-    FRONT(new Vector3i(0, 0, -1)),
-    BOTTOM(new Vector3i(0, -1, 0)),
-    RIGHT(new Vector3i(1, 0, 0)),
-    BACK(new Vector3i(0, 0, 1));
+    TOP(new Vector3i(0, 1, 0), (byte) 0b000001),
+    LEFT(new Vector3i(-1, 0, 0), (byte) 0b000010),
+    FRONT(new Vector3i(0, 0, -1), (byte) 0b000100),
+    BOTTOM(new Vector3i(0, -1, 0), (byte) 0b001000),
+    RIGHT(new Vector3i(1, 0, 0), (byte) 0b010000),
+    BACK(new Vector3i(0, 0, 1), (byte) 0b100000);
 
     public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
     public static final ImmutableList<Side> Y_TANGENT_SIDE = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
@@ -37,13 +37,11 @@ public enum Side {
 
     private static final ImmutableList<Side> ALL_SIDES = ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK);
     private final Vector3ic direction;
+    private final byte flag;
 
-    Side(Vector3i vector3i) {
+    Side(Vector3i vector3i, byte flag) {
         this.direction = vector3i;
-    }
-
-    public byte getFlag() {
-        return (byte) (1 << this.ordinal());
+        this.flag = flag;
     }
 
     public static byte toFlags(Set<Side> sides) {
@@ -174,6 +172,22 @@ public enum Side {
      */
     public Vector3ic direction() {
         return direction;
+    }
+
+    /**
+     * the bit flag associated with this side
+     * <ol>
+     * <li>TOP - 0b000001 </li>
+     * <li>LEFT - 0b000010 </li>
+     * <li>FRONT - 0b000100 </li>
+     * <li>BOTTOM - 0b001000 </li>
+     * <li>RIGHT - 0b010000 </li>
+     * <li>BACK - 0b100000 </li>
+     * </ol>
+     * @return bit flag
+     */
+    public byte getFlag() {
+        return this.flag;
     }
 
     /**

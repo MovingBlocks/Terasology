@@ -191,7 +191,8 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        targetSystem.updateTarget(gazeLocation.getWorldPosition(new Vector3f()), gazeLocation.getWorldDirection(new Vector3f()), maxDistance);
+        targetSystem.updateTarget(gazeLocation.getWorldPosition(new Vector3f()), gazeLocation.getWorldDirection(new Vector3f()),
+                maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
         if (matchingUris.size() == 1) {
@@ -320,7 +321,7 @@ public class BlockCommands extends BaseComponentSystem {
      * Actual implementation of the giveBlock command.
      *
      * @param blockFamily the block family of the queried block
-     * @param quantity    the number of blocks that are queried
+     * @param quantity the number of blocks that are queried
      */
     private String giveBlock(BlockFamily blockFamily, int quantity, EntityRef client) {
         if (quantity < 1) {
@@ -329,10 +330,9 @@ public class BlockCommands extends BaseComponentSystem {
 
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
         int stackLimit = blockFamily.getArchetypeBlock().isStackable() ? 99 : 1;
-
         int quantityLeft;
         for (quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
-            EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantity, stackLimit));
+            EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantityLeft, stackLimit));
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
             }
@@ -345,7 +345,10 @@ public class BlockCommands extends BaseComponentSystem {
                 break;
             }
         }
-
+        //to prevent the wrong display of blocks added to inventory
+        if (quantityLeft < 0) {
+            quantityLeft = 0;
+        }
         return "You received " + (quantity - quantityLeft) + " blocks of " + blockFamily.getDisplayName();
     }
 
@@ -361,7 +364,7 @@ public class BlockCommands extends BaseComponentSystem {
     /**
      * Used to check if an item/prefab/etc name starts with a string that is in {@code uri}
      *
-     * @param uri             the name to be checked
+     * @param uri the name to be checked
      * @param startsWithArray array of possible word to match at the beginning of {@code uri}
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */

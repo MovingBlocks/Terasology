@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
@@ -25,6 +24,7 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemComponent;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This system uses the pickup prefab on an item component to add on extra components needed for the item to display in the world.

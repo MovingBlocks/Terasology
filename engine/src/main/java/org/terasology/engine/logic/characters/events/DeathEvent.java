@@ -3,8 +3,8 @@
 
 package org.terasology.engine.logic.characters.events;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.OwnerEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event is sent to the client entity when the character dies.

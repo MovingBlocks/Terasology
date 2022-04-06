@@ -198,7 +198,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 chunksInProximity.clear();
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
@@ -222,7 +222,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
