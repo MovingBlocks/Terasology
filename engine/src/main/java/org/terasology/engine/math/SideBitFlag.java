@@ -80,6 +80,9 @@ public final class SideBitFlag {
         return  (side.getFlag() & sideBit) > 0;
     }
 
+    /**
+     * @deprecated Use {@link Side#setFlags(byte, Side...)} instead
+     */
     @Deprecated
     public static byte addSide(byte sideBit, Side... sides) {
         byte result = sideBit;
