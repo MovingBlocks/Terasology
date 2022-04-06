@@ -41,11 +41,17 @@ public final class SideBitFlag {
         return result;
     }
 
+    /**
+     * @deprecated Use {@link Side#getFlag()} instead
+     */
     @Deprecated
     public static byte getSide(Side side) {
         return side.getFlag();
     }
 
+    /**
+     * @deprecated Use {@link Side#getSides(byte)} instead
+     */
     @Deprecated
     public static EnumSet<Side> getSides(final byte sidesBit) {
         final List<Side> result = new ArrayList<>(Side.allSides().size());
