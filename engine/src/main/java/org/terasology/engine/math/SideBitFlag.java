@@ -18,11 +18,17 @@ public final class SideBitFlag {
     private SideBitFlag() {
     }
 
+    /**
+     * @deprecated Use {@link Side#reversSides(byte)} instead
+     */
     @Deprecated
     public static byte getReverse(byte sides) {
         return (byte) ((sides / 8) + ((sides % 8) * 8));
     }
 
+    /**
+     * @deprecated Use {@link Side#toFlags(Set)} instead
+     */
     @Deprecated
     public static byte getSides(Set<Side> sides) {
         byte result = 0;
@@ -32,6 +38,9 @@ public final class SideBitFlag {
         return result;
     }
 
+    /**
+     * @deprecated Use {@link Side#toFlags(Side...)} instead
+     */
     @Deprecated
     public static byte getSides(Side... sides) {
         byte result = 0;
@@ -63,6 +72,9 @@ public final class SideBitFlag {
         return Sets.newEnumSet(result, Side.class);
     }
 
+    /**
+     * @deprecated Use {@link Side#hasFlag(byte)} instead
+     */
     @Deprecated
     public static boolean hasSide(byte sideBit, Side side) {
         return  (side.getFlag() & sideBit) > 0;

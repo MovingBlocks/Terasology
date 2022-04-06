@@ -56,7 +56,7 @@ public enum Side {
         return (byte) ((sides / 8) + ((sides % 8) * 8));
     }
 
-    public static byte toFlags(Side ... sides) {
+    public static byte toFlags(Side... sides) {
         byte result = 0;
         for (Side side : sides) {
             result |= side.getFlag();
@@ -72,10 +72,6 @@ public enum Side {
             }
         }
         return result;
-    }
-
-    public static boolean hasFlag(byte flags, Side side) {
-        return (flags & side.getFlag()) > 0;
     }
 
     public static byte setFlags(byte flags, Side... sides) {
@@ -188,6 +184,10 @@ public enum Side {
      */
     public byte getFlag() {
         return this.flag;
+    }
+
+    public boolean hasFlag(byte flags) {
+        return (flags & this.getFlag()) > 0;
     }
 
     /**
