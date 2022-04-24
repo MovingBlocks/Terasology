@@ -235,10 +235,10 @@ task copyInMissingTemplates {
     File gradlePropsFile = new File(rootDir, 'gradle.properties')
     File OverrideCfgFile = new File(rootDir, 'override.cfg')
     if (!gradlePropsFile.exists()) {
-        new File(rootDir, 'gradle.properties') << new File(templatesDir, 'gradle.properties').text
+        new File(rootDir, 'gradle.properties') << new File(rootDir, "$templatesDir/gradle.properties").text
     }
     if (!OverrideCfgFile.exists()) {
-        new File(rootDir, 'override.cfg') << new File(templatesDir, 'override.cfg').text
+        new File(rootDir, 'override.cfg') << new File(rootDir, "$templatesDir/override.cfg").text
     }
 }
 
