@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="org.terasology.engine.entitySystem.event.ReceiveEvent" />
-      <item index="1" class="java.lang.String" itemvalue="org.terasology.engine.logic.console.commandSystem.annotations.Command" />
+      <item index="1" class="java.lang.String" itemvalue="org.terasology.engine.logic.behavior.BehaviorAction" />
+      <item index="2" class="java.lang.String" itemvalue="org.terasology.engine.logic.console.commandSystem.annotations.Command" />
     </list>
     <writeAnnotations>
       <writeAnnotation name="org.terasology.engine.registry.In" />
