@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.shapes;
 
@@ -9,6 +9,7 @@ import org.terasology.engine.math.Direction;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.math.TeraMath;
@@ -80,9 +81,9 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
+    public void appendTo(MutableChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
                          ChunkMesh.RenderType renderType, Colorc colorOffset, ChunkVertexFlag flags) {
-        ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
+        MutableChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
             elements.uv0.put(texCoord);
         }

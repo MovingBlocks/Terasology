@@ -1,10 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.ChunkView;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This is used to generate Mesh data from a block in a chunk to a ChunkMesh output.
@@ -21,7 +21,7 @@ public interface BlockMeshGenerator {
      * @param y     Input position Y.
      * @param z     Input position Z.
      */
-    void generateChunkMesh(ChunkView view, ChunkMesh mesh, int x, int y, int z);
+    void generateChunkMesh(ChunkView view, MutableChunkMesh mesh, int x, int y, int z);
 
     /**
      * @return A standalone mesh used for items, inventory, etc...

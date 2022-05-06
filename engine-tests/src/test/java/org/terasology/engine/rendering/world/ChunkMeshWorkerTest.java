@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.MutableChunkMesh;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.RenderableChunk;
 import reactor.core.publisher.Mono;
@@ -44,9 +44,9 @@ public class ChunkMeshWorkerTest {
     ChunkMeshWorker worker;
     StepVerifier.Step<Chunk> verifier;
 
-    static Mono<Tuple2<Chunk, ChunkMesh>> alwaysCreateMesh(Chunk chunk) {
+    static Mono<Tuple2<Chunk, MutableChunkMesh>> alwaysCreateMesh(Chunk chunk) {
         chunk.setDirty(false);
-        return Mono.just(Tuples.of(chunk, mock(ChunkMesh.class)));
+        return Mono.just(Tuples.of(chunk, mock(MutableChunkMesh.class)));
     }
 
     @BeforeEach

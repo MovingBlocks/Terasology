@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
@@ -23,11 +23,11 @@ public final class ChunkTessellator {
 
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView) {
+    public MutableChunkMesh generateMesh(ChunkView chunkView) {
         return generateMesh(chunkView, 1, 0);
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
+    public MutableChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMeshImpl mesh = new ChunkMeshImpl();
 
@@ -47,7 +47,7 @@ public final class ChunkTessellator {
         if (border != 0) {
             float totalScale = scale * Chunks.SIZE_X / (Chunks.SIZE_X - 2 * border);
             for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
-                ChunkMesh.VertexElements elements = mesh.getVertexElements(type);
+                MutableChunkMesh.VertexElements elements = mesh.getVertexElements(type);
                 Vector3f pos = new Vector3f();
                 for (int x = 0; x < elements.position.elements(); x++) {
                     elements.position.get(x, pos);

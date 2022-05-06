@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
@@ -34,7 +34,7 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
 
 
     @Override
-    public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
+    public void generateChunkMesh(ChunkView view, MutableChunkMesh chunkMesh, int x, int y, int z) {
         final BlockAppearance blockAppearance = block.getPrimaryAppearance();
         if (!blockAppearance.hasAppearance()) {
             // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
