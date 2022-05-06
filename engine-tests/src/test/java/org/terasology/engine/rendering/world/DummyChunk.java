@@ -14,6 +14,8 @@ import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.protobuf.EntityData;
 
+import java.text.NumberFormat;
+
 public class DummyChunk implements Chunk {
     private final Vector3ic chunkPos;
     private boolean dirty;
@@ -221,11 +223,14 @@ public class DummyChunk implements Chunk {
 
     @Override
     public String toString() {
+        // I think using scientific notation for small integers adds a lot of noise.
+        // Should we set `joml.format` to false?
+        String pos = ((Vector3i) chunkPos).toString(NumberFormat.getIntegerInstance());
         return MoreObjects.toStringHelper(this)
-                .add("chunkPos", chunkPos)
+                .addValue(pos)
                 .add("dirty", dirty)
-                .add("mesh", mesh)
                 .add("ready", ready)
+                .add("mesh", mesh)
                 .toString();
     }
 }
