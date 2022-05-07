@@ -9,10 +9,13 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.naming.Name;
@@ -30,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GameManifest {
+    private static final Logger logger = LoggerFactory.getLogger(GameManifest.class);
+
     public static final String DEFAULT_FILE_NAME = "manifest.json";
 
     private String title = "";
@@ -173,6 +178,26 @@ public class GameManifest {
 
     public void addModule(Name id, Version version) {
         modules.add(new NameVersion(id, version));
+    }
+
+    /**
+     * The name of the generator used for the main world.
+     * <p>
+     * Always returns a String, but may be an "ERROR:" string.
+     */
+    public String mainWorldDisplayName(WorldGeneratorManager manager) {
+        var world = getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        if (world == null) {
+            logger.warn("{} has no MAIN_WORLD", this);
+            return "ERROR: No main world";
+        }
+        SimpleUri generatorUri = world.getWorldGenerator();
+        var generator = manager.getWorldGeneratorInfo(generatorUri);
+        if (generator == null) {
+            logger.warn("{}: {} has no generator for {}", this, manager, generatorUri);
+            return "ERROR: No generator found for " + generatorUri;
+        }
+        return generator.getDisplayName();
     }
 
     @Override

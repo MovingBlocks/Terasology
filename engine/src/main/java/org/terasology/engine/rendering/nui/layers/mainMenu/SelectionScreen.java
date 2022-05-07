@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
@@ -18,9 +17,7 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.utilities.FilesUtil;
-import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
-import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.NameVersion;
@@ -81,25 +78,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         }
 
         GameManifest manifest = gameInfo.getManifest();
-        WorldInfo worldInfo = manifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
-
-        String mainWorldGenerator = "ERROR: world generator ";
-        if (worldInfo == null) {
-            logger.warn("Could not get MAIN_WORLD for {} with worlds {}",
-                    manifest, manifest.getWorldInfoMap().keySet());
-            mainWorldGenerator = "ERROR: no main world";
-        } else {
-            final WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(
-                    worldInfo.getWorldGenerator());
-
-            if (wgi != null) {
-                mainWorldGenerator = wgi.getDisplayName();
-            } else {
-                mainWorldGenerator = mainWorldGenerator + worldInfo
-                        .getWorldGenerator()
-                        .toString() + " not found";
-            }
-        }
+        String mainWorldGenerator = manifest.mainWorldDisplayName(worldGeneratorManager);
 
         final String commaSeparatedModules = manifest
                 .getModules()
