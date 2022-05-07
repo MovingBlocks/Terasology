@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 public class GameManifest {
-    private static final Logger logger = LoggerFactory.getLogger(GameManifest.class);
-
     public static final String DEFAULT_FILE_NAME = "manifest.json";
+
+    private static final Logger logger = LoggerFactory.getLogger(GameManifest.class);
 
     private String title = "";
     private String seed = "";
