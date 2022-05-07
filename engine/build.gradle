@@ -102,8 +102,8 @@ dependencies {
 
     implementation 'io.micrometer:micrometer-core:1.8.0'
     implementation 'io.micrometer:micrometer-registry-jmx:1.8.0'
-    api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.11'
-    api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.5'
+    api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.14'
+    api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.6'
     
     api group: 'org.joml', name: 'joml', version: '1.10.0'
     api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '0.1.0'

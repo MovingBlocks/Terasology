@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.world;
 
+import com.google.common.base.MoreObjects;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
@@ -12,6 +13,8 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.protobuf.EntityData;
+
+import java.text.NumberFormat;
 
 public class DummyChunk implements Chunk {
     private final Vector3ic chunkPos;
@@ -55,17 +58,17 @@ public class DummyChunk implements Chunk {
 
     @Override
     public int getChunkWorldOffsetX() {
-        return 0;
+        return chunkPos.x() * getChunkSizeX();
     }
 
     @Override
     public int getChunkWorldOffsetY() {
-        return 0;
+        return chunkPos.y() * getChunkSizeY();
     }
 
     @Override
     public int getChunkWorldOffsetZ() {
-        return 0;
+        return chunkPos.z() * getChunkSizeZ();
     }
 
     @Override
@@ -216,5 +219,18 @@ public class DummyChunk implements Chunk {
     @Override
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
+    }
+
+    @Override
+    public String toString() {
+        // I think using scientific notation for small integers adds a lot of noise.
+        // Should we set `joml.format` to false?
+        String pos = ((Vector3i) chunkPos).toString(NumberFormat.getIntegerInstance());
+        return MoreObjects.toStringHelper(this)
+                .addValue(pos)
+                .add("dirty", dirty)
+                .add("ready", ready)
+                .add("mesh", mesh)
+                .toString();
     }
 }
