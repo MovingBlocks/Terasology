@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.world;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,21 +41,42 @@ public class ChunkMeshWorkerTest {
             chunk.getRenderPosition().distanceSquared(currentPosition.x, currentPosition.y, currentPosition.z)
     );
     ChunkMeshWorker worker;
-    StepVerifier.Step<Chunk> verifier;
 
+    /** Creates a new mock ChunkMesh.
+     * <p>
+     * A simple work function for {@link ChunkMeshWorker}.
+     */
     static Mono<Tuple2<Chunk, ChunkMesh>> alwaysCreateMesh(Chunk chunk) {
         chunk.setDirty(false);
         return Mono.just(Tuples.of(chunk, mock(ChunkMesh.class)));
     }
 
-    @BeforeEach
-    void makeWorker() {
-        StepVerifier.setDefaultTimeout(Duration.ofSeconds(10));
+    /**
+     * Create a new Chunk at this position.
+     * <p>
+     * The {@link DummyChunk} is marked {@code ready} and {@code dirty}.
+     */
+    static Chunk newDirtyChunk(Vector3ic position) {
+        var chunk = new DummyChunk(position);
+        chunk.markReady();
+        chunk.setDirty(true);
+        return chunk;
+    }
+
+    /**
+     * Creates a new ChunkMeshWorker with a StepVerifier on its output.
+     * <p>
+     * Sets {@link #worker} to a new {@link ChunkMeshWorker}.
+     *
+     * @return A verifier for {@link ChunkMeshWorker#getCompletedChunks()}.
+     */
+    protected StepVerifier.Step<Chunk> completedChunksStepVerifier() {
+        StepVerifier.setDefaultTimeout(EXPECTED_DURATION);
 
         // Use virtual time so we don't have to wait around in real time
         // to see whether there are more events pending.
         // Requires that the schedulers be created _inside_ the withVirtualTime supplier.
-        verifier = StepVerifier.withVirtualTime(() -> {
+        return StepVerifier.withVirtualTime(() -> {
             worker = new ChunkMeshWorker(
                     ChunkMeshWorkerTest::alwaysCreateMesh,
                     comparator,
@@ -67,14 +87,17 @@ public class ChunkMeshWorkerTest {
         });
     }
 
-    static Chunk newDirtyChunk(Vector3ic position) {
-        var chunk = new DummyChunk(position);
-        chunk.markReady();
-        chunk.setDirty(true);
-        return chunk;
-    }
-
-    protected List<Chunk> getChunksThatResultFrom(Consumer<ChunkMeshWorker> workFunction) {
+    /**
+     * Get completed Chunks as a list.
+     * <p>
+     * Applies the given function to a new {@link ChunkMeshWorker}, and returns the list of completed
+     * {@link Chunk Chunks}.
+     * <p>
+     * Assumes the work will not be delayed by more than {@link #EXPECTED_DURATION}.
+     */
+    protected List<Chunk> getChunksThatResultFrom(Consumer<ChunkMeshWorker> withWorker) {
+        // TODO: Make a VirtualTimeScheduler JUnit Extension so that we don't have these
+        //       two different ways of creating schedulers for the ChunkMeshWorker.
         var scheduler = VirtualTimeScheduler.create();
 
         var workerB = new ChunkMeshWorker(
@@ -87,11 +110,23 @@ public class ChunkMeshWorkerTest {
         var completed = workerB.getCompletedChunks()
                 .subscribeWith(TestSubscriber.create());
 
-        workFunction.accept(workerB);
+        withWorker.accept(workerB);
 
         // The Worker doesn't mark the flux as complete; it expects it'll still get more work.
         // That means we can't collect the the complete flux in to a list.
         // Instead, we use TestSubscriber's methods to see what it has output so far.
+        //
+        // Other things I have tried here:
+        //  * Adding `.timeout(EXPECTED_DURATION)` to the flux, and waiting for the TimeoutError.
+        //    That works, and perhaps allows for less ambiguity about what is happening, but it
+        //    doesn't seem to be necessary.
+        //
+        //  * Using `.buffer(EXPECTED_DURATION).next()` instead of TestSubscriber.getReceived.
+        //    Did not work; instead of giving me a buffer containing everything from that window,
+        //    waiting on the result just timed out.
+        //
+        // See https://stackoverflow.com/a/72116182/9585 for some notes from the reactor-test author
+        // about this test scenario.
         scheduler.advanceTimeBy(EXPECTED_DURATION);
         return completed.getReceivedOnNext();
     }
@@ -114,7 +149,7 @@ public class ChunkMeshWorkerTest {
     void testChunkIsNotProcessedTwice() {
         var chunk1 = newDirtyChunk(position0);
 
-        verifier.then(() -> {
+        completedChunksStepVerifier().then(() -> {
                     worker.add(chunk1);
                     worker.add(chunk1);  // added twice
                     worker.update();
@@ -125,14 +160,14 @@ public class ChunkMeshWorkerTest {
                     worker.add(chunk1);
                     worker.update();
                 })
-                .verifyTimeout(Duration.ofSeconds(5));
+                .verifyTimeout(EXPECTED_DURATION);
     }
 
     @Test
     void testChunkIsRegeneratedIfDirty() {
         var chunk1 = newDirtyChunk(position0);
 
-        verifier.then(() -> {
+        completedChunksStepVerifier().then(() -> {
                     worker.add(chunk1);
                     worker.update();
                 })
@@ -142,25 +177,25 @@ public class ChunkMeshWorkerTest {
                     worker.update();
                 })
                 .expectNext(chunk1).as("regenerating after dirty")
-                .verifyTimeout(Duration.ofSeconds(5));
+                .verifyTimeout(EXPECTED_DURATION);
     }
 
     @Test
     void testChunkCanBeRemovedBeforeMeshGeneration() {
         var chunk = newDirtyChunk(position0);
-        verifier.then(() -> {
+        completedChunksStepVerifier().then(() -> {
                     worker.add(chunk);
                     worker.remove(chunk);
                     worker.update();
                 })
                 // chunk was removed, no events expected
-                .verifyTimeout(Duration.ofSeconds(5));
+                .verifyTimeout(EXPECTED_DURATION);
     }
 
     @Test
     void testDoubleRemoveIsNoProblem() {
         var chunk = newDirtyChunk(position0);
-        verifier.then(() -> {
+        completedChunksStepVerifier().then(() -> {
                     worker.add(chunk);
                     worker.remove(chunk);
                     worker.update();
@@ -170,19 +205,19 @@ public class ChunkMeshWorkerTest {
                     worker.update();
                 })
                 // chunk was removed, no events expected
-                .verifyTimeout(Duration.ofSeconds(5));
+                .verifyTimeout(EXPECTED_DURATION);
     }
 
     @Test
     void testChunkCanBeRemovedByPosition() {
         var chunk = newDirtyChunk(position0);
-        verifier.then(() -> {
+        completedChunksStepVerifier().then(() -> {
                     worker.add(chunk);
                     worker.remove(position0);
                     worker.update();
                 })
                 // chunk was removed, no events expected
-                .verifyTimeout(Duration.ofSeconds(5));
+                .verifyTimeout(EXPECTED_DURATION);
     }
 
     @Test
