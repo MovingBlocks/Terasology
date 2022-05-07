@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen;
 
@@ -392,11 +392,17 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getGeneralInfo(final GameInfo theGameInfo) {
-        SimpleUri name = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator();
-        WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
-        String display = "ERROR: generator " + name + " not found.";
-        if (wgi != null) {
-            display = wgi.getDisplayName();
+        WorldInfo mainWorld = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        String display;
+        if (mainWorld == null) {
+            display = "ERROR: no main world";
+        } else {
+            SimpleUri name = mainWorld.getWorldGenerator();
+            display = "ERROR: generator " + name + " not found";
+            WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
+            if (wgi != null) {
+                display = wgi.getDisplayName();
+            }
         }
         return translationSystem.translate("${engine:menu#game-details-game-title} ")
                 + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
