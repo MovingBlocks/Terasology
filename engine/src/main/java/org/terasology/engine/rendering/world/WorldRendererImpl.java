@@ -69,6 +69,11 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
+
+    int statChunkMeshEmpty;
+    int statChunkNotReady;
+    int statRenderedTriangles;
+
     private RenderGraph renderGraph;
     private RenderingModuleRegistry renderingModuleRegistry;
 
@@ -88,9 +93,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
-    private int statChunkMeshEmpty;
-    private int statChunkNotReady;
-    private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
     private final Console console;

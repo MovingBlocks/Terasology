@@ -50,6 +50,10 @@ class RenderableWorldImpl implements RenderableWorld {
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
 
+    int statDirtyChunks;
+    int statVisibleChunks;
+    int statIgnoredPhases;
+
     private final int maxChunksForShadows =
             TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
 
@@ -70,10 +74,6 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private final Config config = CoreRegistry.get(Config.class);
     private final RenderingConfig renderingConfig = config.getRendering();
-
-    private int statDirtyChunks;
-    private int statVisibleChunks;
-    private int statIgnoredPhases;
 
 
     RenderableWorldImpl(Context context, Camera playerCamera) {
