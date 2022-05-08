@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen;
 
@@ -9,9 +9,8 @@ import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
@@ -21,7 +20,6 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.utilities.time.DateTimeHelper;
-import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -392,22 +390,18 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getGeneralInfo(final GameInfo theGameInfo) {
-        SimpleUri name = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator();
-        WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
-        String display = "ERROR: generator " + name + " not found.";
-        if (wgi != null) {
-            display = wgi.getDisplayName();
-        }
+        GameManifest manifest = theGameInfo.getManifest();
+
         return translationSystem.translate("${engine:menu#game-details-game-title} ")
-                + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
+                + manifest.getTitle() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-last-play}: ")
                 + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ")
-                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
+                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), manifest.getTime()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ")
-                + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
+                + manifest.getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
-                + display;
+                + manifest.mainWorldDisplayName(worldGeneratorManager);
     }
 
     private void loadGameWorlds() {
