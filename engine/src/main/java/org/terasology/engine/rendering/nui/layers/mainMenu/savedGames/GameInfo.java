@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.savedGames;
 
@@ -9,6 +9,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Contains information about saved game.
  */
@@ -17,11 +19,11 @@ public class GameInfo {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private Date timestamp;
-    private GameManifest manifest;
+    private final GameManifest manifest;
     private Path savePath;
 
     public GameInfo(GameManifest manifest, Date timestamp, Path savePath) {
-        this.manifest = manifest;
+        this.manifest = checkNotNull(manifest, "manifest");
         this.timestamp = timestamp;
         this.savePath = savePath;
     }
