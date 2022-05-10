@@ -17,10 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StubWorldGenerator implements WorldGenerator {
     private final SimpleUri uri;
 
-    public StubWorldGenerator() {
-        this(new SimpleUri("unittest", "stub"));
-    }
-
     public StubWorldGenerator(SimpleUri uri) {
         this.uri = checkNotNull(uri);
     }
