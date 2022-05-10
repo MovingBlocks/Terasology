@@ -1,7 +1,7 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.unittest.stubs;
+package org.terasology.unittest.worlds;
 
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.world.chunks.Chunk;

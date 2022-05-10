@@ -57,7 +57,10 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     implementation group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.15.3'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.9'
+    runtimeOnly('org.codehaus.janino:janino:3.1.7') {
+        because("logback filters")
+    }
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
     implementation "org.terasology:reflections:0.9.12-MB"
 
