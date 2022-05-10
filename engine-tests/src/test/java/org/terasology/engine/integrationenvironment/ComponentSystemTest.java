@@ -8,14 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.stubs.DummyComponent;
 import org.terasology.unittest.stubs.DummyEvent;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies({"engine", "ModuleTestingEnvironment"})
 public class ComponentSystemTest {
     @In
     private EntityManager entityManager;

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.stubs.DummyComponent;
 import org.terasology.unittest.stubs.DummyEvent;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("MteTest")
 @ExtendWith(IsolatedMTEExtension.class)
-@Dependencies("ModuleTestingEnvironment")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class IsolatedEngineTest {
     private final Set<EntityManager> entityManagerSet = Sets.newHashSet();

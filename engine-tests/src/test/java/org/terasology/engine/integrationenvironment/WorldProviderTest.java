@@ -7,14 +7,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies({"engine", "ModuleTestingEnvironment"})
 public class WorldProviderTest {
 
     @In

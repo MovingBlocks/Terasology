@@ -16,7 +16,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.integrationenvironment.MTEExtension;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.integrationenvironment.TestEventReceiver;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.logic.delay.DelayManager;
 import org.terasology.engine.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.engine.network.ClientComponent;
@@ -26,7 +25,6 @@ import java.io.IOException;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies({"engine", "ModuleTestingEnvironment"})
 public class DelayManagerTest {
     private static final Logger logger = LoggerFactory.getLogger(DelayManagerTest.class);
 

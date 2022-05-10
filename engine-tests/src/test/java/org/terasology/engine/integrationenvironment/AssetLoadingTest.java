@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -18,7 +17,6 @@ import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies({"engine", "ModuleTestingEnvironment"})
 public class AssetLoadingTest {
 
     @In

@@ -9,12 +9,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.registry.In;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies({"engine", "ModuleTestingEnvironment"})
 public class NestedTest {
     @In
     public static Engines outerEngines;

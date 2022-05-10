@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;
@@ -23,7 +22,6 @@ import java.io.IOException;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
-@Dependencies("ModuleTestingEnvironment")
 public class ExampleTest {
 
     @In
