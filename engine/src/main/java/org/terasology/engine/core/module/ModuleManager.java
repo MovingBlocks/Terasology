@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
@@ -202,6 +202,7 @@ public class ModuleManager {
             URL url = ClasspathHelper.forClass(aClass);
             config.addUrls(url);  // include this in reflections scan
             classPaths.add(urlToFile(url));  // also include in Module.moduleClasspaths
+            logger.debug("Adding path to engine module for class: {} {}", url, aClass);
         }
 
         if (!config.getUrls().isEmpty()) {
