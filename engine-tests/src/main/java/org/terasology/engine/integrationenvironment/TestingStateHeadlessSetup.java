@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.integrationenvironment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.WorldGenerationConfig;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class TestingStateHeadlessSetup extends StateHeadlessSetup {
-    private static final Logger logger = LoggerFactory.getLogger(TestingStateHeadlessSetup.class);
 
     static final Name MTE_MODULE_NAME = new Name("unittest");
     static final String WORLD_TITLE = "testworld";
