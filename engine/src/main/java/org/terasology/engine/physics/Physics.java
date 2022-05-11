@@ -122,4 +122,19 @@ public interface Physics {
      *         false otherwise.
      */
     boolean removeCharacterCollider(EntityRef entity);
+
+
+    /**
+     * Recompute the character collider for the given entity.
+     *
+     * The entity must have a {@link org.terasology.engine.logic.location.LocationComponent LocationComponent}
+     * and a {@link org.terasology.engine.logic.characters.CharacterMovementComponent CharacterMovementComponent}.
+     *
+     * @param entity the entity to recompute the character collider for.
+     * @return the updated character collider of the entity
+     */
+    default CharacterCollider recomputeCharacterCollider(EntityRef entity) {
+        removeCharacterCollider(entity);
+        return getCharacterCollider(entity);
+    }
 }
