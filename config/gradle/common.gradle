@@ -66,14 +66,11 @@ test {
         dependsOn rootProject.extractNatives
     }
 
-    jacoco {
-        excludes = ["org.terasology.protobuf.*",
-                    "*MethodAccess","*FieldAccess"]
-    }
+    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
