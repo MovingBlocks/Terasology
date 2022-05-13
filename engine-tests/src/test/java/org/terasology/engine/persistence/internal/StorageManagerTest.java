@@ -11,6 +11,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -55,9 +56,12 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.EntityRefComponent;
 import org.terasology.unittest.stubs.StringComponent;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -70,7 +74,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class StorageManagerTest extends TerasologyTestingEnvironment {
-
     public static final String PLAYER_ID = "someId";
     public static final Vector3ic CHUNK_POS = new Vector3i(1, 2, 3);
 
@@ -88,9 +91,15 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(TestInfo testInfo) throws Exception {
         super.setup();
-        savePath = PathManager.getInstance().getSavePath("testSave");
+
+        savePath = PathManager.getInstance().getSavePath("testSave-" +
+                 testInfo.getTestMethod().map(Method::getName).orElseGet(() -> UUID.randomUUID().toString()));
+
+        assertWithMessage("Leftover files in %s", savePath)
+                .that(savePath.resolve("global.dat").toFile().exists())
+                .isFalse();
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);
