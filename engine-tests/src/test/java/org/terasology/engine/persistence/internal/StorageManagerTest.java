@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -56,8 +55,6 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.EntityRefComponent;
 import org.terasology.unittest.stubs.StringComponent;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -77,8 +74,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     public static final String PLAYER_ID = "someId";
     public static final Vector3ic CHUNK_POS = new Vector3i(1, 2, 3);
 
-    private static File temporaryFolder;
-
     private ModuleEnvironment moduleEnvironment;
     private ReadWriteStorageManager esm;
     private EngineEntityManager entityManager;
@@ -91,14 +86,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private RecordAndReplaySerializer recordAndReplaySerializer;
     private RecordAndReplayUtils recordAndReplayUtils;
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
-
-    @BeforeAll
-    static void createFolder() throws IOException {
-        File createdFolder = File.createTempFile("junit", "", null);
-        createdFolder.delete();
-        createdFolder.mkdir();
-        temporaryFolder = createdFolder;
-    }
 
     @BeforeEach
     public void setup() throws Exception {
