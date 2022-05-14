@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -48,6 +49,7 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -72,6 +74,9 @@ import static org.mockito.Mockito.when;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Tag("TteTest")
 @ExtendWith(MockitoExtension.class)
+// TODO: Re-evaluate Mockito strictness settings after replacing TerasologyTestingEnvironment (#5010)
+//   Mockito is currently in LENIENT mode because some of the mocked objects or methods are only used
+//   by a subset of the tests.
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class StorageManagerTest extends TerasologyTestingEnvironment {
     public static final String PLAYER_ID = "someId";
@@ -141,7 +146,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
         WorldProvider worldProvider = mock(WorldProvider.class);
-        // when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
+        when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         context.put(WorldProvider.class, worldProvider);
     }
 
@@ -281,7 +286,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
-        // when(chunkProvider.getChunk(ArgumentMatchers.any(Vector3ic.class))).thenReturn(chunk);
+        when(chunkProvider.getChunk(ArgumentMatchers.any(Vector3ic.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         boolean storeChunkInZips = true;
 
