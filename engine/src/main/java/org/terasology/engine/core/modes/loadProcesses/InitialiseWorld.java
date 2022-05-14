@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static com.google.common.base.Verify.verify;
+import static com.google.common.base.Verify.verifyNotNull;
 
 public class InitialiseWorld extends SingleStepLoadProcess {
 
@@ -84,7 +85,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         context.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment, context));
 
-        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        WorldInfo worldInfo = verifyNotNull(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD),
+                "Game manifest does not contain a MAIN_WORLD");
         verify(worldInfo.getWorldGenerator().isValid(), "Game manifest did not specify world type.");
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();

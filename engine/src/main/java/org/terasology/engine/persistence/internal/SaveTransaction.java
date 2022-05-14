@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
@@ -22,7 +22,6 @@ import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.utilities.concurrency.AbstractTask;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
-import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedOutputStream;
@@ -39,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -49,9 +49,6 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
- * <br><br>
- * The result of this task can be obtained via {@link #getResult()}.
- *
  */
 public class SaveTransaction extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
@@ -84,9 +81,9 @@ public class SaveTransaction extends AbstractTask {
     private final SaveTransactionHelper saveTransactionHelper;
 
     //Record and Replay
-    private RecordAndReplaySerializer recordAndReplaySerializer;
-    private RecordAndReplayUtils recordAndReplayUtils;
-    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    private final RecordAndReplaySerializer recordAndReplaySerializer;
+    private final RecordAndReplayUtils recordAndReplayUtils;
+    private final RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
 
     public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
@@ -129,7 +126,7 @@ public class SaveTransaction extends AbstractTask {
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
                 // should not happen, as initialization should clean it up
-                throw new IOException("Save rand while there were unmerged changes");
+                throw new IOException("Save ran while there were unmerged changes");
             }
             saveTransactionHelper.cleanupSaveTransactionDirectory();
             applyDeltaToPrivateEntityManager();
@@ -256,11 +253,7 @@ public class SaveTransaction extends AbstractTask {
                 if (locationComponent != null) {
                     Vector3f loc = locationComponent.getWorldPosition(new Vector3f());
                     Vector3i chunkPos = Chunks.toChunkPos((int) loc.x, (int) loc.y, (int) loc.z, new Vector3i());
-                    Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
-                    if (collection == null) {
-                        collection = Lists.newArrayList();
-                        chunkPosToEntitiesMap.put(chunkPos, collection);
-                    }
+                    Collection<EntityRef> collection = chunkPosToEntitiesMap.computeIfAbsent(chunkPos, x -> new ArrayList<>());
                     collection.add(entity);
                 }
             }
@@ -285,7 +278,7 @@ public class SaveTransaction extends AbstractTask {
         deltaToSave.getEntityDeltas().forEachEntry((entityId, delta) -> {
             if (privateEntityManager.isActiveEntity(entityId)) {
                 EntityRef entity = privateEntityManager.getEntity(entityId);
-                for (Component changedComponent : delta.getChangedComponents().values()) {
+                for (var changedComponent : delta.getChangedComponents().values()) {
                     entity.removeComponent(changedComponent.getClass());
                     entity.addComponent(changedComponent);
                 }
@@ -303,14 +296,14 @@ public class SaveTransaction extends AbstractTask {
                 entityToDestroy = privateEntityManager.getEntity(entityId);
             } else {
                 /*
-                 * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
+                 * Create the entity as there could be a component that references a {@link DelayedEntityRef}
                  * with the specified id. It is important that the {@link DelayedEntityRef} will reference
                  * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially
                  * bound to one or more {@link DelayedEntityRef}s and then destroyed.
                  *
                  */
                 entityToDestroy = privateEntityManager.createEntityWithId(entityId,
-                        Collections.<Component>emptyList());
+                        Collections.emptyList());
             }
             entitiesToDestroy.add(entityToDestroy);
             return true;
@@ -319,7 +312,7 @@ public class SaveTransaction extends AbstractTask {
         /*
          * Bind the delayed entities refs, before destroying the entities:
          *
-         * That way delayed entity refs will reference the enttiy refs that got marked as destroyed and now new
+         * That way delayed entity refs will reference the entity refs that got marked as destroyed and now new
          * unloaded ones.
          */
         deltaToSave.bindAllDelayedEntityRefsTo(privateEntityManager);
@@ -416,7 +409,7 @@ public class SaveTransaction extends AbstractTask {
                 if (Files.isRegularFile(oldChunkZipPath)) {
                     try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
                         for (Path root : oldZip.getRootDirectories()) {
-                            Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+                            Files.walkFileTree(root, new SimpleFileVisitor<>() {
                                 @Override
                                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                                         throws IOException {

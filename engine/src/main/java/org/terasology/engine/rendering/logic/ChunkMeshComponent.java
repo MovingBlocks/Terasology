@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.logic;
@@ -24,6 +24,13 @@ public class ChunkMeshComponent implements VisualComponent<ChunkMeshComponent> {
     public ChunkMeshComponent(ChunkMesh mesh, AABBf aabb) {
         this.mesh = mesh;
         this.aabb = aabb;
+    }
+
+    public synchronized void setMesh(ChunkMesh mesh) {
+        if (this.mesh != null) {
+            this.mesh.dispose();
+        }
+        this.mesh = mesh;
     }
 
     @Override

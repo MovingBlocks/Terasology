@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
@@ -85,8 +85,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private final ReadWriteLock worldDirectoryLock = new ReentrantReadWriteLock(true);
     private final Lock worldDirectoryReadLock = worldDirectoryLock.readLock();
     private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
-    private Config config;
-    private SystemConfig systemConfig;
+    private final Config config;
+    private final SystemConfig systemConfig;
 
     private Optional<SaveTransaction> saveTransaction = Optional.empty();
     private Phaser transactionWait = new Phaser(0);
@@ -96,22 +96,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
      */
     private Long nextAutoSave;
     private boolean saveRequested;
-    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
-    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
-    private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
-    private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
+    private final ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
+    private final ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
+    private final ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
+    private final ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
-    private EngineEntityManager privateEntityManager;
+    private final EngineEntityManager privateEntityManager;
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
-    private RecordAndReplaySerializer recordAndReplaySerializer;
-    private RecordAndReplayUtils recordAndReplayUtils;
+    private final RecordAndReplaySerializer recordAndReplaySerializer;
+    private final RecordAndReplayUtils recordAndReplayUtils;
     private final RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
-
     /**
      * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
      * that will use the privateEntityManager.
      */
-    private ComponentLibrary entityRefReplacingComponentLibrary;
+    private final ComponentLibrary entityRefReplacingComponentLibrary;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
                                    ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
@@ -200,7 +199,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     @Override
     public void deactivatePlayer(Client client) {
         EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
-        PlayerStoreBuilder playerStoreBuilder = createPlayerStore(client, character);
+        PlayerStoreBuilder playerStoreBuilder = createPlayerStore(character);
         EntityData.PlayerStore playerStore = playerStoreBuilder.build(getEntityManager());
         deactivateOrDestroyEntityRecursive(character);
         unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
@@ -308,7 +307,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             // If there is a newer undisposed version of the player,we don't need to save the disposed version:
             unloadedAndSavingPlayerMap.remove(client.getId());
             EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
-            saveTransactionBuilder.addLoadedPlayer(client.getId(), createPlayerStore(client, character));
+            saveTransactionBuilder.addLoadedPlayer(client.getId(), createPlayerStore(character));
         }
 
         for (Map.Entry<String, EntityData.PlayerStore> entry : unloadedAndSavingPlayerMap.entrySet()) {
@@ -316,7 +315,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         }
     }
 
-    private PlayerStoreBuilder createPlayerStore(Client client, EntityRef character) {
+    private PlayerStoreBuilder createPlayerStore(EntityRef character) {
         LocationComponent location = character.getComponent(LocationComponent.class);
         Vector3f relevanceLocation;
         if (location != null) {
@@ -392,7 +391,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
         if (worldGenerator != null) {
             WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
-            Map<String, Component> params = worldConfigurator.getProperties();
+            var params = worldConfigurator.getProperties();
             gameManifest.setModuleConfigs(worldGenerator.getUri(), params);
         }
 
@@ -414,7 +413,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         } else if (isSavingNecessary()) {
             startAutoSaving();
         }
-
     }
 
     private boolean isRunModeAllowSaving() {
@@ -424,52 +422,52 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
     private void startSaving() {
         logger.info("Saving - Creating game snapshot");
-        PerformanceMonitor.startActivity("Saving");
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
-            sys.preSave();
-        }
+        try (var ignored = PerformanceMonitor.startActivity("Saving")) {
+            ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+            for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
+                sys.preSave();
+            }
 
-        saveRequested = false;
-        saveTransaction = Optional.of(createSaveTransaction());
-        saveTransaction.ifPresent(transaction -> {
+            saveRequested = false;
+            saveTransaction = Optional.of(createSaveTransaction());
+            saveTransaction.ifPresent(transaction -> {
             transactionWait.register();
             transactionSink.tryEmitNext(transaction);
         });
 
-        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
-            saveGamePreviewImage();
-        }
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+                saveGamePreviewImage();
+            }
 
-        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
-            sys.postSave();
+            for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
+                sys.postSave();
+            }
         }
-        PerformanceMonitor.endActivity();
         entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         logger.info("Saving - Snapshot created: Writing phase starts");
     }
 
     private void startAutoSaving() {
         logger.info("Auto Saving - Creating game snapshot");
-        PerformanceMonitor.startActivity("Auto Saving");
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
-            sys.preAutoSave();
-        }
+        try (var ignored = PerformanceMonitor.startActivity("Auto Saving")) {
+            ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+            for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
+                sys.preAutoSave();
+            }
 
-        saveTransaction = Optional.of(createSaveTransaction());
-        saveTransaction.ifPresent(transaction -> {
+            saveTransaction = Optional.of(createSaveTransaction());
+            saveTransaction.ifPresent(transaction -> {
             transactionWait.register();
             transactionSink.tryEmitNext(transaction);
 
         });
 
-        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
-            sys.postAutoSave();
-        }
+            for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
+                sys.postAutoSave();
+            }
 
-        scheduleNextAutoSave();
-        PerformanceMonitor.endActivity();
+            scheduleNextAutoSave();
+        }
         entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         logger.info("Auto Saving - Snapshot created: Writing phase starts");
     }
