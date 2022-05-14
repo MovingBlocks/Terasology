@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.generator;
 
@@ -12,7 +12,8 @@ import java.util.Map;
 public interface WorldConfigurator  {
 
     /**
-     * The values are supposed to be annotated with {@link org.terasology.rendering.nui.properties.Property}
+     * The values are supposed to be annotated with {@link org.terasology.nui.properties.Property}
+     *
      * @return a map (label to object)
      */
     Map<String, Component> getProperties();
