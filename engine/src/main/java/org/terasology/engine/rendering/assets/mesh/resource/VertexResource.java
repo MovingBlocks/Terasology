@@ -98,15 +98,24 @@ public class VertexResource extends BufferedResource {
         return inSize == 0;
     }
 
+    public static class VertexLocation {
+        public final int glLocation;
+        public final int bgfxLocation;
+        public VertexLocation(int glLocation, int bgfxLocation) {
+            this.glLocation = glLocation;
+            this.bgfxLocation = bgfxLocation;
+        }
+    }
+
     /**
      * describes the metadata and placement into the buffer based off the stride.
      */
     public static class VertexDefinition {
-        public final int location;
+        public final VertexLocation location;
         public final BaseVertexAttribute attribute;
         public final int offset;
 
-        public VertexDefinition(int location, int offset, BaseVertexAttribute attribute) {
+        public VertexDefinition(VertexLocation location, int offset, BaseVertexAttribute attribute) {
             this.location = location;
             this.attribute = attribute;
             this.offset = offset;

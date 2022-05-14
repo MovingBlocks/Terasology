@@ -110,6 +110,7 @@ dependencies {
         natives "org.lwjgl:lwjgl-openal::$it"
         natives "org.lwjgl:lwjgl-opengl::$it"
         natives "org.lwjgl:lwjgl-stb::$it"
+        natives "org.lwjgl:lwjgl-bgfx::$it"
     }
 
 

@@ -56,8 +56,8 @@ public interface OpenGLMeshBase {
                 GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, currentOffset, buffer);
             });
             for (VertexResource.VertexDefinition attribute : resource.definitions()) {
-                GL30.glEnableVertexAttribArray(attribute.location);
-                GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
+                GL30.glEnableVertexAttribArray(attribute.location.glLocation);
+                GL30.glVertexAttribPointer(attribute.location.glLocation, attribute.attribute.count,
                         attribute.attribute.mapping.glType, false, resource.inStride(), offset + attribute.offset);
             }
             offset += resource.inSize();

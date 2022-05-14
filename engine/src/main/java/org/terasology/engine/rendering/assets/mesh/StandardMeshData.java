@@ -7,6 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.bgfx.BGFX;
 import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
 import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
@@ -18,12 +19,12 @@ import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
 public class StandardMeshData extends MeshData {
-    public static final int VERTEX_INDEX = 0;
-    public static final int NORMAL_INDEX = 1;
-    public static final int UV0_INDEX = 2;
-    public static final int UV1_INDEX = 3;
-    public static final int COLOR0_INDEX = 4;
-    public static final int LIGHT0_INDEX = 5;
+    public static final VertexResource.VertexLocation VERTEX_INDEX = new VertexResource.VertexLocation(0, BGFX.BGFX_ATTRIB_POSITION);
+    public static final VertexResource.VertexLocation NORMAL_INDEX = new VertexResource.VertexLocation(1, BGFX.BGFX_ATTRIB_NORMAL);
+    public static final VertexResource.VertexLocation UV0_INDEX = new VertexResource.VertexLocation(2, BGFX.BGFX_ATTRIB_TEXCOORD0);
+    public static final VertexResource.VertexLocation UV1_INDEX = new VertexResource.VertexLocation(3, BGFX.BGFX_ATTRIB_TEXCOORD1);
+    public static final VertexResource.VertexLocation COLOR0_INDEX = new VertexResource.VertexLocation(4, BGFX.BGFX_ATTRIB_COLOR0);
+    public static final VertexResource.VertexLocation LIGHT0_INDEX = new VertexResource.VertexLocation(5, BGFX.BGFX_ATTRIB_TEXCOORD2);
 
     public final VertexResource positionBuffer;
     public final VertexAttributeBinding<Vector3fc, Vector3f> position;
