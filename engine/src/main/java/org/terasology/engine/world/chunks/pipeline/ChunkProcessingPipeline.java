@@ -34,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.google.common.primitives.Ints.constrainToRange;
+
 /**
  * Manages execution of chunk processing.
  * <p>
@@ -41,8 +43,9 @@ import java.util.function.Supplier;
  */
 public class ChunkProcessingPipeline {
 
-    private static final int NUM_TASK_THREADS = Math.min(
-            Math.max(1, Runtime.getRuntime().availableProcessors() - 1), 8);
+    @SuppressWarnings("UnstableApiUsage")
+    private static final int NUM_TASK_THREADS = constrainToRange(
+            Runtime.getRuntime().availableProcessors() - 1, 1, 8);
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
