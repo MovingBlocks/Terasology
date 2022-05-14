@@ -31,7 +31,7 @@ public class ModuleTestingHelper implements ModuleTestingEnvironment {
     final Engines engines;
     final MainLoop mainLoop;
 
-    ModuleTestingHelper(Engines engines) {
+    public ModuleTestingHelper(Engines engines) {
         this.engines = engines;
         this.mainLoop = new MainLoop(engines);
     }

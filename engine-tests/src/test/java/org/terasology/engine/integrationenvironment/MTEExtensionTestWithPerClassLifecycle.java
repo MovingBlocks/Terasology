@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.stubs.DummyComponent;
 import org.terasology.unittest.stubs.DummyEvent;

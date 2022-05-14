@@ -6,7 +6,7 @@
  * <p>
  * Key points of interest for test authors are:
  * <ul>
- *     <li>{@link org.terasology.engine.integrationenvironment.MTEExtension MTEExtension}: Use this on your JUnit 5 test classes.
+ *     <li>{@link org.terasology.engine.integrationenvironment.jupiter.MTEExtension MTEExtension}: Use this on your JUnit 5 test classes.
  *     <li>{@link org.terasology.engine.integrationenvironment.MainLoop MainLoop}: Methods for running the engine during your test scenarios.
  *     <li>{@link org.terasology.engine.integrationenvironment.Engines}: You can add additional engines to simulate remote connections to the
  *         host. <i>[Experimental]</i>

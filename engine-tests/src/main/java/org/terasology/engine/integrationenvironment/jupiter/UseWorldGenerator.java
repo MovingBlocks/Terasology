@@ -1,9 +1,7 @@
 // Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.integrationenvironment.extension;
-
-import org.terasology.engine.integrationenvironment.MTEExtension;
+package org.terasology.engine.integrationenvironment.jupiter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

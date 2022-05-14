@@ -17,6 +17,7 @@ import org.joml.Vector3ic;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;

@@ -33,6 +33,7 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.CoreRegistry;
@@ -93,7 +94,7 @@ public class Engines {
      * <p>
      * Every instance should be shut down properly by calling {@link #tearDown()}.
      */
-    protected void setup() {
+    public void setup() {
         mockPathManager();
         try {
             host = createHost();
@@ -110,7 +111,7 @@ public class Engines {
      * <p>
      * Used to properly shut down and clean up a testing environment set up and started with {@link #setup()}.
      */
-    protected void tearDown() {
+    public void tearDown() {
         engines.forEach(TerasologyEngine::shutdown);
         engines.forEach(TerasologyEngine::cleanup);
         engines.clear();

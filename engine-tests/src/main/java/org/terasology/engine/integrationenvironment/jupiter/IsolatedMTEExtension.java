@@ -1,7 +1,9 @@
 // Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.integrationenvironment;
+package org.terasology.engine.integrationenvironment.jupiter;
+
+import org.terasology.engine.integrationenvironment.Scopes;
 
 /**
  * Subclass of {@link MTEExtension} which isolates all test cases by creating a new engine for each test. This is much

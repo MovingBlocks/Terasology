@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;

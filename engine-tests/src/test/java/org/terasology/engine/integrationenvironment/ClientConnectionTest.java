@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.StateIngame;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 
 import java.io.IOException;
 import java.util.List;

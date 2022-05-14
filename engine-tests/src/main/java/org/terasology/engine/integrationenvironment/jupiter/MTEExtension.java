@@ -1,7 +1,7 @@
 // Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.integrationenvironment;
+package org.terasology.engine.integrationenvironment.jupiter;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -17,8 +17,10 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.opentest4j.MultipleFailuresError;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.integrationenvironment.extension.Dependencies;
-import org.terasology.engine.integrationenvironment.extension.UseWorldGenerator;
+import org.terasology.engine.integrationenvironment.Engines;
+import org.terasology.engine.integrationenvironment.MainLoop;
+import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
+import org.terasology.engine.integrationenvironment.Scopes;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.worlds.DummyWorldGenerator;
 

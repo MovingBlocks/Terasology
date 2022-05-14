@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.registry.In;
 
 @Tag("MteTest")

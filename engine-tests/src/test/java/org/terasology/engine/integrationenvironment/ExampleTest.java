@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;

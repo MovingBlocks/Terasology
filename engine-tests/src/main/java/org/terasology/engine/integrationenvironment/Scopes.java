@@ -6,6 +6,7 @@ package org.terasology.engine.integrationenvironment;
 import com.google.common.collect.ObjectArrays;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 
 import java.util.function.Function;
 

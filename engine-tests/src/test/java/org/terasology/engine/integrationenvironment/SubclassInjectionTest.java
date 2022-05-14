@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.integrationenvironment.fixtures.BaseTestingClass;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
