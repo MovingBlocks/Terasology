@@ -99,8 +99,9 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     public void setup(TestInfo testInfo) throws Exception {
         super.setup();
 
-        savePath = PathManager.getInstance().getSavePath("testSave-" +
-                 testInfo.getTestMethod().map(Method::getName).orElseGet(() -> UUID.randomUUID().toString()));
+        String saveName = "testSave-" + testInfo.getTestMethod().map(Method::getName)
+                .orElseGet(() -> UUID.randomUUID().toString());
+        savePath = PathManager.getInstance().getSavePath(saveName);
 
         assertWithMessage("Leftover files in %s", savePath)
                 .that(savePath.resolve("global.dat").toFile().exists())
