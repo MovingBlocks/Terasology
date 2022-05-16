@@ -66,6 +66,7 @@ test {
         dependsOn rootProject.extractNatives
     }
 
+    // Keep in sync with other exclude-lists for Jacoco, e.g., in 'engine-tests/build.gradle' 
     jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 

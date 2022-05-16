@@ -108,6 +108,7 @@ task unitTest(type: Test) {
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
 
+    // Keep in sync with other exclude-lists for Jacoco, e.g., in 'common.gradle' 
     jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
