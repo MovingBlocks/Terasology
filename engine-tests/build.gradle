@@ -107,6 +107,9 @@ task unitTest(type: Test) {
         excludeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
+
+    // Keep in sync with other exclude-lists for Jacoco, e.g., in 'common.gradle' 
+    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 task integrationTest(type: Test) {
@@ -121,6 +124,8 @@ task integrationTest(type: Test) {
         includeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
+
+    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 idea {
