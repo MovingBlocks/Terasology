@@ -79,6 +79,8 @@ dependencies {
 
     testImplementation('com.google.truth:truth:1.1.3')
     testImplementation('com.google.truth.extensions:truth-java8-extension:1.1.3')
+
+    implementation("io.projectreactor:reactor-test:3.4.14")
 }
 
 task copyResourcesToClasses(type:Copy) {
@@ -108,6 +110,9 @@ task unitTest(type: Test) {
         excludeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
+
+    // Keep in sync with other exclude-lists for Jacoco, e.g., in 'common.gradle' 
+    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 task integrationTest(type: Test) {
@@ -122,6 +127,8 @@ task integrationTest(type: Test) {
         includeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
+
+    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 idea {

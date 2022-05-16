@@ -28,6 +28,7 @@ import org.terasology.joml.geom.AABBfc;
 import org.terasology.protobuf.EntityData;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks determined by its
@@ -65,8 +66,7 @@ public class ChunkImpl implements Chunk {
     private boolean animated;
 
     // Rendering
-    private ChunkMesh activeMesh;
-    private ChunkMesh pendingMesh;
+    private final AtomicReference<ChunkMesh> activeMesh = new AtomicReference<>();
 
     public ChunkImpl(int x, int y, int z, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(new Vector3i(x, y, z), blockManager, extraDataManager);
@@ -358,12 +358,10 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void setMesh(ChunkMesh mesh) {
-        this.activeMesh = mesh;
-    }
-
-    @Override
-    public void setPendingMesh(ChunkMesh mesh) {
-        this.pendingMesh = mesh;
+        var oldMesh = activeMesh.getAndSet(mesh);
+        if (oldMesh != null) {
+            oldMesh.dispose();
+        }
     }
 
     @Override
@@ -378,22 +376,13 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean hasMesh() {
-        return activeMesh != null;
+        return activeMesh.get() != null;
     }
 
-    @Override
-    public boolean hasPendingMesh() {
-        return pendingMesh != null;
-    }
 
     @Override
     public ChunkMesh getMesh() {
-        return activeMesh;
-    }
-
-    @Override
-    public ChunkMesh getPendingMesh() {
-        return pendingMesh;
+        return activeMesh.get();
     }
 
     @Override
@@ -416,6 +405,7 @@ public class ChunkImpl implements Chunk {
     public void dispose() {
         disposed = true;
         ready = false;
+        dirty = true;
         disposeMesh();
         /*
          * Explicitly do not clear data, so that background threads that work with the chunk can finish.
@@ -425,9 +415,9 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void disposeMesh() {
-        if (activeMesh != null) {
-            activeMesh.dispose();
-            activeMesh = null;
+        var oldMesh = activeMesh.getAndSet(null);
+        if (oldMesh != null) {
+            oldMesh.dispose();
         }
     }
 
