@@ -16,11 +16,13 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.opentest4j.MultipleFailuresError;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.integrationenvironment.Engines;
 import org.terasology.engine.integrationenvironment.MainLoop;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.integrationenvironment.Scopes;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.worlds.DummyWorldGenerator;
 
@@ -32,6 +34,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+
+import static org.junit.platform.commons.support.AnnotationSupport.findAnnotation;
 
 /**
  * Sets up a Terasology environment for use with your {@index JUnit} 5 test.
@@ -92,6 +96,8 @@ import java.util.function.Function;
 public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestInstancePostProcessor {
 
     static final String LOGBACK_RESOURCE = "default-logback.xml";
+    private static final Logger logger = LoggerFactory.getLogger(MTEExtension.class);
+
     protected Function<ExtensionContext, ExtensionContext.Namespace> helperLifecycle = Scopes.PER_CLASS;
     protected Function<ExtensionContext, Class<?>> getTestClass = Scopes::getTopTestClass;
 
@@ -169,6 +175,17 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
         return dependencies != null ? Sets.newHashSet(dependencies.value()) : Collections.emptySet();
     }
 
+    public NetworkMode getNetworkMode(ExtensionContext context) {
+        return getAnnotationWithDefault(context, IntegrationEnvironment::networkMode);
+    }
+
+    private <T> T getAnnotationWithDefault(ExtensionContext context, Function<IntegrationEnvironment, T> method) {
+        var ann =
+                findAnnotation(context.getRequiredTestClass(), IntegrationEnvironment.class)
+                .orElseGet(ToReadDefaultValuesFrom::getDefaults);
+        return method.apply(ann);
+    }
+
     /**
      * Get the Engines for this test.
      * <p>
@@ -185,7 +202,11 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
     protected Engines getEngines(ExtensionContext context) {
         ExtensionContext.Store store = context.getStore(helperLifecycle.apply(context));
         EnginesCleaner autoCleaner = store.getOrComputeIfAbsent(
-                EnginesCleaner.class, k -> new EnginesCleaner(getDependencyNames(context), getWorldGeneratorUri(context)),
+                EnginesCleaner.class, k -> new EnginesCleaner(
+                        getDependencyNames(context),
+                        getWorldGeneratorUri(context),
+                        getNetworkMode(context)
+                ),
                 EnginesCleaner.class);
         return autoCleaner.engines;
     }
@@ -234,8 +255,8 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
     static class EnginesCleaner implements ExtensionContext.Store.CloseableResource {
         protected Engines engines;
 
-        EnginesCleaner(Set<String> dependencyNames, String worldGeneratorUri) {
-            engines = new Engines(dependencyNames, worldGeneratorUri);
+        EnginesCleaner(Set<String> dependencyNames, String worldGeneratorUri, NetworkMode networkMode) {
+            engines = new Engines(dependencyNames, worldGeneratorUri, networkMode);
             engines.setup();
         }
 
@@ -243,6 +264,13 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
         public void close() {
             engines.tearDown();
             engines = null;
+        }
+    }
+
+    @IntegrationEnvironment
+    private static final class ToReadDefaultValuesFrom {
+        static IntegrationEnvironment getDefaults() {
+            return ToReadDefaultValuesFrom.class.getDeclaredAnnotation(IntegrationEnvironment.class);
         }
     }
 }

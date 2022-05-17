@@ -11,6 +11,7 @@ import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.subsystem.headless.mode.StateHeadlessSetup;
 import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.world.time.WorldTime;
 import org.terasology.gestalt.naming.Name;
 
@@ -33,7 +34,8 @@ public class TestingStateHeadlessSetup extends StateHeadlessSetup {
         strictModuleRequirements = true;
     }
 
-    public TestingStateHeadlessSetup(Collection<String> dependencies, String worldGeneratorUri) {
+    public TestingStateHeadlessSetup(Collection<String> dependencies, String worldGeneratorUri, NetworkMode networkMode) {
+        super(networkMode);
         this.dependencies = dependencies;
         this.worldGeneratorUri = new SimpleUri(worldGeneratorUri);
         checkArgument(this.worldGeneratorUri.isValid(), "Not a valid URI `%s`", worldGeneratorUri);
