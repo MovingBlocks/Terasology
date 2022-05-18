@@ -13,7 +13,7 @@ import java.util.Map;
 public class ContextImpl implements Context {
     private final Context parent;
 
-    private final Map<Class<? extends Object>, Object> map = Maps.newConcurrentMap();
+    private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
 
 
     /**
@@ -41,7 +41,7 @@ public class ContextImpl implements Context {
         if (parent != null) {
             return parent.get(type);
         }
-        return result;
+        return null;
     }
 
     @Override
