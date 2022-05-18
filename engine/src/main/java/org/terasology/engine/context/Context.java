@@ -1,8 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.context;
 
 import org.terasology.gestalt.module.sandbox.API;
+
+import java.util.NoSuchElementException;
 
 /**
  * Provides classes with the utility objects that belong to the context they are running in.
@@ -23,7 +25,15 @@ public interface Context {
     /**
      * @return the object that is known in this context for this type.
      */
-    <T> T get(Class<? extends T> type);
+    <T> T get(Class<T> type);
+
+    default <T> T getValue(Class<T> type) {
+        T value = get(type);
+        if (value == null) {
+            throw new NoSuchElementException(type.toString());
+        }
+        return value;
+    }
 
     /**
      * Makes the object known in this context to be the object to work with for the given type.
