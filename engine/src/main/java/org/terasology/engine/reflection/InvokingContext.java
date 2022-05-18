@@ -10,6 +10,7 @@ import java.util.List;
 
 import static com.google.common.base.Verify.verify;
 
+@SuppressWarnings("checkstyle:MethodTypeParameterName")
 public class InvokingContext implements Context {
 
     private final Context inner;
@@ -34,6 +35,38 @@ public class InvokingContext implements Context {
         return InvokingHelpers.invokeProvidingParametersByType(
                 InvokingHelpers.getSerializedLambdaUnchecked(func),
                 inner::getValue);
+    }
+
+    public <T1, T2, T3, R> R invoke(InvokingHelpers.SerializableFunction3<T1, T2, T3, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
+    }
+
+    public <T1, T2, T3, T4, R> R invoke(InvokingHelpers.SerializableFunction4<T1, T2, T3, T4, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
+    }
+
+    public <T1, T2, T3, T4, T5, R> R invoke(InvokingHelpers.SerializableFunction5<T1, T2, T3, T4, T5, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
+    }
+
+    public <T1, T2, T3, T4, T5, T6, R> R invoke(InvokingHelpers.SerializableFunction6<T1, T2, T3, T4, T5, T6, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
+    }
+
+    public <T1, T2, T3, T4, T5, T6, T7, R> R invoke(
+            InvokingHelpers.SerializableFunction7<T1, T2, T3, T4, T5, T6, T7, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
+    }
+
+    public <T1, T2, T3, T4, T5, T6, T7, T8, R> R invoke(
+            InvokingHelpers.SerializableFunction8<T1, T2, T3, T4, T5, T6, T7, T8, R> func) {
+        return InvokingHelpers.invokeProvidingParametersByType(
+                InvokingHelpers.getSerializedLambdaUnchecked(func), inner::getValue);
     }
 
     /* *** Delegate to wrapped Context *** */

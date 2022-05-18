@@ -49,16 +49,12 @@ public final class InvokingHelpers {
         Method writeReplace;
         try {
             writeReplace = obj.getClass().getDeclaredMethod("writeReplace");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        try {
             Object replacement = AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
                 writeReplace.setAccessible(true);
                 return writeReplace.invoke(obj);
             });
             return (SerializedLambda) replacement;
-        } catch (PrivilegedActionException e) {
+        } catch (PrivilegedActionException | NoSuchMethodException e) {
             Throwables.throwIfUnchecked(e.getCause());
             Throwables.throwIfInstanceOf(e.getCause(), IllegalAccessException.class);
             throw new RuntimeException(e);
@@ -109,4 +105,21 @@ public final class InvokingHelpers {
 
     interface SerializableBiFunction<T, U, R> extends BiFunction<T, U, R>, Serializable { }
 
+    interface SerializableFunction3<T1, T2, T3, R> extends Serializable, 
+            reactor.function.Function3<T1, T2, T3, R> { }
+
+    interface SerializableFunction4<T1, T2, T3, T4, R> extends Serializable, 
+            reactor.function.Function4<T1, T2, T3, T4, R> { }
+
+    interface SerializableFunction5<T1, T2, T3, T4, T5, R> extends Serializable,
+            reactor.function.Function5<T1, T2, T3, T4, T5, R> { }
+
+    interface SerializableFunction6<T1, T2, T3, T4, T5, T6, R> extends Serializable,
+            reactor.function.Function6<T1, T2, T3, T4, T5, T6, R> { }
+
+    interface SerializableFunction7<T1, T2, T3, T4, T5, T6, T7, R> extends Serializable,
+            reactor.function.Function7<T1, T2, T3, T4, T5, T6, T7, R> { }
+
+    interface SerializableFunction8<T1, T2, T3, T4, T5, T6, T7, T8, R> extends Serializable,
+            reactor.function.Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> { }
 }
