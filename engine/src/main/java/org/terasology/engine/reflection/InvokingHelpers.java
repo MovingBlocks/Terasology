@@ -3,33 +3,106 @@
 
 package org.terasology.engine.reflection;
 
+import com.google.common.base.Throwables;
+
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class InvokingHelpers {
     private InvokingHelpers() { }
 
     /**
-     * The Class of the function's first argument.
+     * This relies on {@link Method#setAccessible} on a private final field.
      * <p>
-     * The trick here is that even if you pass no {@code ts}, the method still receives a zero-length
-     * array object, and we can read the class of that.
+     * Is that bad? You might think so, but {@link Serializable} documentation says that
+     * Serializable objects may have that method <em>even though</em> it is not defined in
+     * the interface. So it's probably okay?
+     * <p>
+     * <b>Alternatives?</b>
+     * <p>
+     * Are there APIs to get the replaced-for-serialization object without trying to do
+     * do {@link Method#setAccessible} on arbitrary objects?
+     * <p>
+     * We could do {@link java.io.ObjectStreamClass#lookup(Class) ObjectStreamClass.lookup},
+     * that's the model that {@link ObjectOutputStream} uses. It has useful methods like
+     * {@code hasWriteReplaceMethod} and {@code invokeWriteReplace}. Unfortunately, those
+     * methods aren't public, so they're no help if we're trying to avoid hacking around
+     * visibility restrictions.
+     * <p>
+     * It is also possible to run the object through an {@link ObjectOutputStream} and
+     * <a href="https://gist.github.com/keturn/180a57f2f6069470556137bd06b4025d">capture the result</a>.
+     * That's worth trying if this breaks, but otherwise it's a lot of extra hassle.
      */
-    @SafeVarargs
-    static <T, R> Class<T> argType(Function<T, R> func, T... ts) {
-        return TypedFunction.of(func, ts).getInputClass();
+    public static SerializedLambda getSerializedLambda(Serializable obj) throws IllegalAccessException {
+        Method writeReplace;
+        try {
+            writeReplace = obj.getClass().getDeclaredMethod("writeReplace");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            Object replacement = AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
+                writeReplace.setAccessible(true);
+                return writeReplace.invoke(obj);
+            });
+            return (SerializedLambda) replacement;
+        } catch (PrivilegedActionException e) {
+            Throwables.throwIfUnchecked(e.getCause());
+            Throwables.throwIfInstanceOf(e.getCause(), IllegalAccessException.class);
+            throw new RuntimeException(e);
+        }
     }
 
-    static List<Class<?>> getLambdaParameters(SerializedLambda serializedLambda) {
+    public static SerializedLambda getSerializedLambdaUnchecked(Serializable obj) {
+        try {
+            return getSerializedLambda(obj);
+        } catch (IllegalAccessException e) {
+            Throwables.throwIfUnchecked(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Class<?>> getLambdaParameters(SerializedLambda serializedLambda) {
         var methodType = MethodType.fromMethodDescriptorString(
                 serializedLambda.getImplMethodSignature(),
                 serializedLambda.getClass().getClassLoader()
         );
         return methodType.parameterList();
+    }
+
+    public static <R> R invokeProvidingParametersByType(SerializedLambda serializedLambda, Function<Class<?>, ?> provider) {
+        // For small numbers of args, we could write out `f.apply(x1, …, xN)` by hand.
+        // But to generalize, we can use a MethodHandle.
+        MethodHandle mh;
+        try {
+            mh = MethodHandleAdapters.ofLambda(serializedLambda);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+
+        var args = Arrays.stream(mh.type().parameterArray())
+                .map(provider)
+                .collect(Collectors.toUnmodifiableList());
+
+        try {
+            @SuppressWarnings("unchecked") R result = (R) mh.invokeWithArguments(args);
+            return result;
+        } catch (Throwable e) {
+            Throwables.throwIfUnchecked(e);
+            throw new RuntimeException(e);
+        }
     }
 
     interface SerializableFunction<T, R> extends Function<T, R>, Serializable { }

@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.terasology.engine.reflection.InvokingHelpers.argType;
 
 public class TestInjectInvoke {
     Integer red(String s) {
@@ -38,44 +37,16 @@ public class TestInjectInvoke {
     }
 
     @Test
-    void canGetTypeOfFunctionArgument() {
-        assertThat(argType(this::red)).isAssignableTo(String.class);
-        assertThat(argType(this::green)).isAssignableTo(File.class);
-    }
-
-    @Test
-    void canGetTypeOfFunctionArgumentThenDoStuffIfUsingReturnedFunction() throws URISyntaxException {
-        var r = TypedFunction.of(this::green);
-        URI greenResult = r.apply(new File("/dev/null"));
-        assertThat(greenResult).isEqualTo(new URI("file:/dev/null"));
-    }
-
-    @Test
-    void canSupplyArgumentFromContext() throws URISyntaxException {
-        var context = makeContext();
-
-        var greenResult = context.invoke(this::green);
-        assertThat(greenResult).isEqualTo(new URI("file:/dev/null"));
-        assertThat(greenResult.getScheme()).isEqualTo("file");
-
-        // TODO: That worked but this fails. JVM bug?
-        // --debug=verboseResolution=all looks okay on the compiler side, must be runtime.
-        // assertThat(context.invoke(this::green)).isEqualTo(new URI("file:/dev/null"));
-
-        assertThat(context.invoke(this::red)).isEqualTo(8);
-    }
-
-    @Test
     void canSupplyArgumentFromContextUsingSerialization() throws URISyntaxException {
         var context = makeContext();
-        assertThat(context.invokeS(this::red)).isEqualTo(8);
-        assertThat(context.invokeS(this::green)).isEqualTo(new URI("file:/dev/null"));
+        assertThat(context.invoke(this::red)).isEqualTo(8);
+        assertThat(context.invoke(this::green)).isEqualTo(new URI("file:/dev/null"));
     }
 
     @Test
     void canSupplyTwoArgumentsFromContextUsingSerialization() {
         var context = makeContext();
-        assertThat(context.invokeS(this::yellow)).isEqualTo("zero12345678");
+        assertThat(context.invoke(this::yellow)).isEqualTo("zero12345678");
     }
 
 }
