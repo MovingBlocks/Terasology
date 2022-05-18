@@ -6,12 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.context.internal.ContextImpl;
 
 import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class InjectionHelperTest {
 
@@ -24,23 +20,23 @@ public class InjectionHelperTest {
         serviceB = new ServiceBImpl();
         //injection helper uses the core registry, 
         //make sure the shared classes are not used over multiple tests
-        CoreRegistry.setContext(new ContextImpl());
+        CoreRegistry.setContext(new ContextImplementation());
     }
 
     @Test
     public void testSharePopulatesCoreRegistry() {
-        assertNull(CoreRegistry.get(ServiceA.class));
+        Assertions.assertNull(CoreRegistry.get(ServiceA.class));
 
         InjectionHelper.share(serviceA);
 
-        assertEquals(CoreRegistry.get(ServiceA.class), serviceA);
+        Assertions.assertEquals(CoreRegistry.get(ServiceA.class), serviceA);
     }
 
     @Test
     public void testShareRequiresShareAnnotation() {
         InjectionHelper.share(new ServiceAImplNoAnnotation());
 
-        assertNull(CoreRegistry.get(ServiceA.class));
+        Assertions.assertNull(CoreRegistry.get(ServiceA.class));
     }
 
     @Test
@@ -52,8 +48,8 @@ public class InjectionHelperTest {
         FieldInjectionAB fieldInjectionAB = new FieldInjectionAB();
         InjectionHelper.inject(fieldInjectionAB);
 
-        assertEquals(fieldInjectionAB.getServiceA(), serviceA);
-        assertEquals(fieldInjectionAB.getServiceB(), serviceB);
+        Assertions.assertEquals(fieldInjectionAB.getServiceA(), serviceA);
+        Assertions.assertEquals(fieldInjectionAB.getServiceB(), serviceB);
     }
 
     @Test
@@ -64,26 +60,26 @@ public class InjectionHelperTest {
         FieldInjectionAB fieldInjectionAB = new FieldInjectionAB();
         InjectionHelper.inject(fieldInjectionAB);
 
-        assertEquals(fieldInjectionAB.getServiceA(), serviceA);
-        assertNull(fieldInjectionAB.getServiceB());
+        Assertions.assertEquals(fieldInjectionAB.getServiceA(), serviceA);
+        Assertions.assertNull(fieldInjectionAB.getServiceB());
     }
 
     @Test
     public void testDefaultConstructorInjection() {
-        Context context = new ContextImpl();
+        Context context = new ContextImplementation();
         context.put(ServiceA.class, serviceA);
         context.put(ServiceB.class, serviceB);
 
         ConstructorAB constructorAB = InjectionHelper.createWithConstructorInjection(ConstructorAB.class, context);
 
         //the two-arg constructor should be used as it has the most parameters and all can be populated
-        assertEquals(constructorAB.getServiceA(), serviceA);
-        assertEquals(constructorAB.getServiceB(), serviceB);
+        Assertions.assertEquals(constructorAB.getServiceA(), serviceA);
+        Assertions.assertEquals(constructorAB.getServiceB(), serviceB);
     }
 
     @Test
     public void testConstructorInjectionNotAllParametersPopulated() {
-        Context context = new ContextImpl();
+        Context context = new ContextImplementation();
         context.put(ServiceA.class, serviceA);
         //context.put(ServiceB.class, serviceB);
 
@@ -91,27 +87,27 @@ public class InjectionHelperTest {
 
         //the two-arg constructor can't be populated because serviceB is not available
         //there is no fallback for a constructor with only serviceA, so the default constructor is called
-        assertNull(constructorAB.getServiceA());
-        assertNull(constructorAB.getServiceB());
+        Assertions.assertNull(constructorAB.getServiceA());
+        Assertions.assertNull(constructorAB.getServiceB());
     }
 
     @SuppressWarnings("checkstyle:LocalVariableName")
     @Test
     public void testConstructorInjectionNotAllParametersPopulatedFallback() {
-        Context context = new ContextImpl();
+        Context context = new ContextImplementation();
         context.put(ServiceA.class, serviceA);
         //context.put(ServiceB.class, serviceB);
 
         ConstructorA_AB constructorA_AB = InjectionHelper.createWithConstructorInjection(ConstructorA_AB.class, context);
 
         //the one-arg constructor is used as it can be populated  with serviceA which is available
-        assertEquals(constructorA_AB.getServiceA(), serviceA);
-        assertNull(constructorA_AB.getServiceB());
+        Assertions.assertEquals(constructorA_AB.getServiceA(), serviceA);
+        Assertions.assertNull(constructorA_AB.getServiceB());
     }
 
     @Test
     public void testConstructorInjectionNoDefaultConstructorForFallback() {
-        Context context = new ContextImpl();
+        Context context = new ContextImplementation();
         context.put(ServiceA.class, serviceA);
         //context.put(ServiceB.class, serviceB);
 
