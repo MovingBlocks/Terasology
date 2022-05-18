@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.context.internal;
 
@@ -30,7 +30,7 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public <T> T get(Class<? extends T> type) {
+    public <T> T get(Class<T> type) {
         if (type == Context.class) {
             return type.cast(this);
         }

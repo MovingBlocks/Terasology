@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.context;
 
@@ -23,7 +23,7 @@ public interface Context {
     /**
      * @return the object that is known in this context for this type.
      */
-    <T> T get(Class<? extends T> type);
+    <T> T get(Class<T> type);
 
     /**
      * Makes the object known in this context to be the object to work with for the given type.
