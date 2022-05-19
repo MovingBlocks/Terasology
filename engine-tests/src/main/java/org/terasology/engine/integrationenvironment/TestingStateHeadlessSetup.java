@@ -28,6 +28,11 @@ public class TestingStateHeadlessSetup extends StateHeadlessSetup {
 
     private final Collection<String> dependencies;
     private final SimpleUri worldGeneratorUri;
+
+    {
+        strictModuleRequirements = true;
+    }
+
     public TestingStateHeadlessSetup(Collection<String> dependencies, String worldGeneratorUri) {
         this.dependencies = dependencies;
         this.worldGeneratorUri = new SimpleUri(worldGeneratorUri);
