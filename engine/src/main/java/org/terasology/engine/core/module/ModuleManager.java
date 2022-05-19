@@ -98,7 +98,7 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
-    protected static boolean isLoadingClasspathModules() {
+    public static boolean isLoadingClasspathModules() {
         return Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
     }
 

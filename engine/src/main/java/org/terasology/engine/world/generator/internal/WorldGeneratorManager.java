@@ -49,10 +49,14 @@ public class WorldGeneratorManager {
                 try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
                     for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                         Name providedBy = tempEnvironment.getModuleProviding(generatorClass);
-                        if (providedBy == null) {
-                            // These tend to be engine-module-is-weird cases.
-                            logger.warn("{} found while inspecting {} but is not provided by any module.",
-                                    generatorClass, moduleId);
+                        if (providedBy == null) {  // These tend to be engine-module-is-weird cases.
+                            String s = "{} found while inspecting {} but is not provided by any module.";
+                            if (!ModuleManager.isLoadingClasspathModules()) {
+                                logger.warn(s, generatorClass, moduleId);  // Deserves WARNING level in production.
+                            } else {
+                                // …but happens a *lot* when loading modules from classpath, such as MTE.
+                                logger.debug(s, generatorClass, moduleId);
+                            }
                         } else if (providedBy.equals(module.getId())) {
                             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                             if (isValidWorldGenerator(generatorClass)) {
