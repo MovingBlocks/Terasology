@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
@@ -15,6 +15,7 @@ import kotlin.test.fail
 plugins {
     application
     id("terasology-dist")
+    id("terasology-metrics")
     id("facade")
 }
 

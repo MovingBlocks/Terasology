@@ -25,12 +25,6 @@ buildscript {
     }
 
     dependencies {
-        //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
-
-        // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
-
         // Protobuf plugin
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
 
@@ -51,6 +45,10 @@ plugins {
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
+
+    // Things applied by terasology-metrics
+    id("com.github.spotbugs") version "4.8.0" apply false // TODO: upgrade with gradle 7.x
+    id("org.sonarqube") version "3.3" apply false
 
     id("terasology-repositories")
 }

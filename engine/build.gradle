@@ -6,9 +6,10 @@
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
+    id "com.google.protobuf"
+    id "terasology-metrics"
 }
 
-apply plugin: 'com.google.protobuf'
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 

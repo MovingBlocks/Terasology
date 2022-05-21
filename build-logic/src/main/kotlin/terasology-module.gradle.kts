@@ -11,6 +11,7 @@ plugins {
     `java-library`
     idea
     eclipse
+    id("terasology-metrics")
 }
 
 val moduleMetadata = ModuleMetadataForGradle.forProject(project)
