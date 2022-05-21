@@ -7,7 +7,6 @@ import com.github.spotbugs.snom.SpotBugsTask
 plugins {
     java
     checkstyle
-    jacoco
     pmd
     `project-report`
     id("com.github.spotbugs")
@@ -17,17 +16,6 @@ plugins {
 dependencies {
     "pmd"("net.sourceforge.pmd:pmd-core:6.15.0")
     "pmd"("net.sourceforge.pmd:pmd-java:6.15.0")
-}
-
-the<JacocoPluginExtension>().toolVersion = "0.8.8"
-
-tasks.withType<JacocoReport> {
-    // TODO: does this need explicit `dependsOn`?
-    reports {
-        csv.isEnabled = false
-        html.isEnabled = true
-        xml.isEnabled = true
-    }
 }
 
 tasks.withType<Test> {
@@ -45,10 +33,6 @@ tasks.withType<Test> {
     // Make sure the natives have been extracted, but only for multi-workspace setups (not for solo module builds)
     if (project.name != project(":").name) {
         dependsOn(tasks.getByPath(":extractNatives"))
-    }
-
-    configure<JacocoTaskExtension> {
-        excludes = listOf("org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess")
     }
 }
 
