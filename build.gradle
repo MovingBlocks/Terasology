@@ -25,9 +25,6 @@ buildscript {
     }
 
     dependencies {
-        // Protobuf plugin
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
-
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
     }
@@ -46,10 +43,7 @@ plugins {
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 
-    // Things applied by terasology-metrics
-    id("com.github.spotbugs") version "4.8.0" apply false // TODO: upgrade with gradle 7.x
-    id("org.sonarqube") version "3.3" apply false
-
+    id("com.google.protobuf") version "0.8.16" apply false
     id("terasology-repositories")
 }
 
