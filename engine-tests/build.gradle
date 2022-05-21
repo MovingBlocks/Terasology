@@ -6,7 +6,7 @@
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
-    id "terasology-metrics"
+    id "terasology-common"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config

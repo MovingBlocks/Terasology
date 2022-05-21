@@ -15,7 +15,6 @@ import kotlin.test.fail
 plugins {
     application
     id("terasology-dist")
-    id("terasology-metrics")
     id("facade")
 }
 
