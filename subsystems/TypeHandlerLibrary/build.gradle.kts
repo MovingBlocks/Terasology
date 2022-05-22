@@ -1,9 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 plugins {
     java
     `java-library`
+    id("terasology-common")
 }
 
 apply(from = "$rootDir/config/gradle/publish.gradle")
