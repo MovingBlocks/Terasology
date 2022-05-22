@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
@@ -11,6 +11,7 @@ plugins {
     `java-library`
     idea
     eclipse
+    id("terasology-common")
 }
 
 val moduleMetadata = ModuleMetadataForGradle.forProject(project)
