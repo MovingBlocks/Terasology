@@ -4,7 +4,8 @@ If you would like to contribute code, documentation, or other assets you can do 
 
 *When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible.*
 
-Read on for an overview and [check the wiki for more details](https://github.com/MovingBlocks/Terasology/wiki). For questions please join us in our [forum](http://forum.terasology.org/forum/) or on `#terasology` (irc.freenode.net).
+Read on for an overview and [check the wiki for more details](https://github.com/MovingBlocks/Terasology/wiki).
+For questions please join us in our [forum] or [Discord].
 
 ## File an Issue
 
@@ -12,9 +13,12 @@ You can report bugs and feature requests to [GitHub Issues](https://github.com/M
 
 For finding easy to do issues to start with look at the [Good First Issue](https://github.com/MovingBlocks/Terasology/labels/Good%20First%20Issue) issues.
 
-We prefer questions and support requests be posted in the [forum](http://forum.terasology.org/forum).
+We prefer questions and support requests be posted in the [forum] or [Discord].
 
 __Please provide as much information as possible to help us solve problems and answer questions better!__
+
+[forum]: https://forum.terasology.org/forum/
+[Discord]: https://discord.gg/Terasology
 
 ## PR Title / Commit Message Guidelines
 
