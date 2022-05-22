@@ -1,7 +1,7 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.unittest.stubs;
+package org.terasology.unittest.worlds;
 
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.world.chunks.Chunk;
@@ -16,10 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RegisterWorldGenerator(id = "stub", displayName = "Stub")
 public class StubWorldGenerator implements WorldGenerator {
     private final SimpleUri uri;
-
-    public StubWorldGenerator() {
-        this(new SimpleUri("unittest", "stub"));
-    }
 
     public StubWorldGenerator(SimpleUri uri) {
         this.uri = checkNotNull(uri);

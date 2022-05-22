@@ -145,21 +145,14 @@ tasks.register<Sync>("syncDeltas") {
     into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
-// Instructions for packaging a jar file - is a manifest even needed for modules?
-tasks.named("jar") {
+tasks.register<Copy>("syncModuleInfo") {
+    from("module.txt")
+    into(mainSourceSet.output.classesDirs.first())
+}
+
+tasks.named("processResources") {
     // Make sure the assets directory is included
-    dependsOn("syncAssets")
-    dependsOn("syncOverrides")
-    dependsOn("syncDeltas")
-
-    // Jarring needs to copy module.txt and all the assets into the output
-    doFirst {
-        copy {
-            from("module.txt")
-            into(mainSourceSet.output.classesDirs.first())
-        }
-    }
-
+    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
 }
 
 tasks.named<Test>("test") {
