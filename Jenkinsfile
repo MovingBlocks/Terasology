@@ -134,7 +134,7 @@ pipeline {
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tools: [
-                            spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
+                            spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true),
                             pmdParser(pattern: '**/build/reports/pmd/*.xml')
                         ])
 
