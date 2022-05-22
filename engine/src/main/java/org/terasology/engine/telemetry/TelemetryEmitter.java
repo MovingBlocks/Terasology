@@ -1,12 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
-import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.http.ApacheHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -15,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,22 +71,7 @@ public class TelemetryEmitter extends BatchEmitter {
                 .build();
     }
 
-    private static RequestCallback getDefaultRequestCallback() {
-
-        return new RequestCallback() {
-
-            public void onSuccess(int successCount) {
-                logger.info("Success sent, successCount: " + successCount);
-            }
-
-            public void onFailure(int successCount, List<TrackerPayload> failedEvents) {
-                logger.warn("Failure, successCount: " + successCount + "\nfailedEvent:\n" + failedEvents.toString());
-            }
-        };
-    }
-
     public void changeUrl(URL url) {
-
         HttpClientAdapter httpClientAdapter = getDefaultAdapter(url);
         this.httpClientAdapter = httpClientAdapter;
     }
@@ -122,11 +104,8 @@ public class TelemetryEmitter extends BatchEmitter {
             HttpClientAdapter httpClientAdapter = getDefaultAdapter(url);
             this.httpClientAdapter(httpClientAdapter);
 
-            RequestCallback  requestCallback = getDefaultRequestCallback();
-            this.requestCallback(requestCallback);
-
-            // TODO: use the proper bufferSize, bufferSize 1 for test
-            this.bufferSize(1);
+            // TODO: use the proper batch size, 1 for test
+            this.batchSize(1);
 
             return new TelemetryEmitter(this);
         }

@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
@@ -69,7 +69,7 @@ dependencies {
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.2.0")
 
     testImplementation(platform("org.junit:junit-bom:5.7.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
