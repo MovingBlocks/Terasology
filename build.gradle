@@ -25,15 +25,6 @@ buildscript {
     }
 
     dependencies {
-        //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
-
-        // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
-
-        // Protobuf plugin
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
-
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
     }
@@ -52,6 +43,7 @@ plugins {
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 
+    id("com.google.protobuf") version "0.8.16" apply false
     id("terasology-repositories")
 }
 

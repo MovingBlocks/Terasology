@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
@@ -105,6 +105,15 @@ public class TerasologyEngine implements GameEngine {
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
 
+    /**
+     * Subsystem classes that automatically make their classpath part of the engine module.
+     * <p>
+     * You don't want to add to this! If you need a module, make a module!
+     */
+    private static final Set<String> LEGACY_ENGINE_MODULE_POLLUTERS = Set.of(
+            "org.terasology.subsystem.discordrpc.DiscordRPCSubSystem"
+    );
+
     private final List<Class<?>> classesOnClasspathsToAddToEngine = new ArrayList<>();
 
     private GameState currentState;
@@ -173,8 +182,12 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
 
-        // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
-        allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
+        for (EngineSubsystem subsystem : allSubsystems) {
+            if (LEGACY_ENGINE_MODULE_POLLUTERS.contains(subsystem.getClass().getName())) {
+                // add subsystem as engine module part. (needed for ECS classes loaded from external subsystems)
+                addToClassesOnClasspathsToAddToEngine(subsystem.getClass());
+            }
+        }
 
         // the TypeHandlerLibrary is technically not a subsystem (although it lives in the subsystem space)
         // therefore, we have to manually register the type handler classes with the engine module

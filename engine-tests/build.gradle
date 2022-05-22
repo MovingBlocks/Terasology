@@ -6,6 +6,7 @@
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
+    id "terasology-common"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
@@ -58,6 +59,9 @@ dependencies {
     implementation group: 'org.codehaus.plexus', name: 'plexus-utils', version: '3.0.16'
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.16.1'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+    runtimeOnly('org.codehaus.janino:janino:3.1.7') {
+        because("logback filters")
+    }
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
     implementation "org.terasology:reflections:0.9.12-MB"
 
@@ -107,9 +111,6 @@ task unitTest(type: Test) {
         excludeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
-
-    // Keep in sync with other exclude-lists for Jacoco, e.g., in 'common.gradle' 
-    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 task integrationTest(type: Test) {
@@ -124,8 +125,6 @@ task integrationTest(type: Test) {
         includeTags "MteTest", "TteTest"
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
-
-    jacoco.excludes = ["org.terasology.protobuf.*", "*MethodAccess", "*FieldAccess"]
 }
 
 idea {

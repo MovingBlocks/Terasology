@@ -4,6 +4,7 @@
 plugins {
     java
     `java-library`
+    id("terasology-common")
 }
 
 apply(from = "$rootDir/config/gradle/common.gradle")
