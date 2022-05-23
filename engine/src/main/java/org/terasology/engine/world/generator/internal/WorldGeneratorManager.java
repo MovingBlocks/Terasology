@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.generator.internal;
 
@@ -28,7 +28,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 public class WorldGeneratorManager {
     private static final Logger logger = LoggerFactory.getLogger(WorldGeneratorManager.class);
 
-    private Context context;
+    private final Context context;
 
     private ImmutableList<WorldGeneratorInfo> generatorInfo;
 
@@ -48,11 +48,21 @@ public class WorldGeneratorManager {
             if (resolutionResult.isSuccess()) {
                 try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
                     for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
-                        if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
+                        Name providedBy = tempEnvironment.getModuleProviding(generatorClass);
+                        if (providedBy == null) {  // These tend to be engine-module-is-weird cases.
+                            String s = "{} found while inspecting {} but is not provided by any module.";
+                            if (!ModuleManager.isLoadingClasspathModules()) {
+                                logger.warn(s, generatorClass, moduleId);  // Deserves WARNING level in production.
+                            } else {
+                                // …but happens a *lot* when loading modules from classpath, such as MTE.
+                                logger.debug(s, generatorClass, moduleId);
+                            }
+                        } else if (providedBy.equals(module.getId())) {
                             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
                             if (isValidWorldGenerator(generatorClass)) {
                                 SimpleUri uri = new SimpleUri(moduleId, annotation.id());
                                 infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
+                                logger.debug("{} added from {}", uri, generatorClass);
                             } else {
                                 logger.error("{} marked to be registered as a World Generator, " +
                                                 "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);

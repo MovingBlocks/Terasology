@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.players;
 
@@ -115,27 +115,35 @@ public class LocalPlayer {
     }
 
     /**
-     * position of camera if one is present else use {@link #getPosition(Vector3f)}
+     * position of camera if one is present else use {@link #getPosition}
      *
      * @param dest will hold the result
      * @return dest
      */
     public Vector3f getViewPosition(Vector3f dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
-        LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        return location.getWorldPosition(dest);
+        if (clientComponent.camera.exists()) {
+            LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
+            return location.getWorldPosition(dest);
+        } else {
+            return getPosition(dest);
+        }
     }
 
     /**
-     * orientation of camera if one is present else use {@link #getPosition(Vector3f)}
+     * orientation of camera if one is present else use {@link #getRotation}
      *
      * @param dest will hold the result
      * @return dest
      */
     public Quaternionf getViewRotation(Quaternionf dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
-        LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        return location.getWorldRotation(dest);
+        if (clientComponent.camera.exists()) {
+            LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
+            return location.getWorldRotation(dest);
+        } else {
+            return getRotation(dest);
+        }
     }
 
     /**

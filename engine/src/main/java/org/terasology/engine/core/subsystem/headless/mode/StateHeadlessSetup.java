@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless.mode;
 
@@ -32,6 +32,8 @@ import java.util.List;
 public class StateHeadlessSetup extends AbstractState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
+
+    protected boolean strictModuleRequirements;
 
     public StateHeadlessSetup() {
     }
@@ -68,6 +70,8 @@ public class StateHeadlessSetup extends AbstractState {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 gameManifest.addModule(module.getId(), module.getVersion());
+            } else if (strictModuleRequirements) {
+                throw new RuntimeException("ModuleRegistry has no latest version for module " + moduleName);
             } else {
                 logger.warn("ModuleRegistry has no latest version for module {}", moduleName);
             }
