@@ -24,7 +24,8 @@ tasks.withType<Test> {
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
+    // If false, the outputs are still collected and visible in the test report, but they don't spam the console.
+    testLogging.showStandardStreams = false
     reports {
         junitXml.isEnabled = true
     }
