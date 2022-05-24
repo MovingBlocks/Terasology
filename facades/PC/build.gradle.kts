@@ -71,6 +71,16 @@ dependencies {
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
 
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+        because("to configure logging with logback.xml")
+    }
+    runtimeOnly("org.codehaus.janino:janino:3.1.7") {
+        because("allows use of EvaluatorFilter in logback.xml")
+    }
+    runtimeOnly("org.slf4j:jul-to-slf4j:1.7.36") {
+        because("redirects java.util.logging from miscellaneous dependencies through slf4j")
+    }
+
     testImplementation(platform("org.junit:junit-bom:5.7.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }

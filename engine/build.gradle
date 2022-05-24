@@ -112,8 +112,15 @@ dependencies {
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
-    // Logging and audio
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    // Logging
+    implementation('org.slf4j:slf4j-api:1.7.36') {
+        because('a backend-independent Logger')
+    }
+    implementation("ch.qos.logback:logback-classic:1.2.11") {
+        because("telemetry implementation uses logback to send to logstash")
+    }
+
+    // audio
     implementation group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
@@ -143,9 +150,6 @@ dependencies {
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
-
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.2.0'
