@@ -1,0 +1,12 @@
+<!-- Copyright 2022 The Terasology Foundation -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
+<included>
+    <!-- WONTFIX: gestalt routinely builds empty configs and then adds to them later. -->
+    <denyRegex prefix="org.reflections" message="given scan urls are empty" />
+
+    <!-- WONTFIX: these classes don't need to be reflected on,
+             and they're only on the classpath during tests. -->
+    <denyRegex prefix="org.reflections"
+               message="could not get type for name org\.terasology\.benchmark" />
+</included>

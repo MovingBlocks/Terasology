@@ -1,10 +1,7 @@
-<!-- Copyright 2021 The Terasology Foundation -->
+<!-- Copyright 2022 The Terasology Foundation -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-
-<configuration>
-
-  <!-- Report all changes to this configuration on System.out -->
-  <!--statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" /-->
+<configuration debug="false">
+  <!-- debug: reports all changes to this configuration on System.out -->
 
   <!-- Propagate all log level changes to java.util.logging -->
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
@@ -48,6 +45,8 @@
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
+
+    <include resource="org/terasology/engine/logback/filter-reflections.xml" />
   </appender>
 
   <root level="${logOverrideLevel:-debug}">
