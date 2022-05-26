@@ -190,12 +190,12 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
         SelectChunkProvider(Chunk... chunks) {
             for (Chunk chunk : chunks) {
-                this.chunks.put(chunk.getPosition(new Vector3i()), chunk);
+                this.chunks.put(chunk.getPosition(), chunk);
             }
         }
 
         public void addChunk(Chunk chunk) {
-            chunks.put(chunk.getPosition(new Vector3i()), chunk);
+            chunks.put(chunk.getPosition(), chunk);
         }
 
         @Override

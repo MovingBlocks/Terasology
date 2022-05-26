@@ -38,7 +38,7 @@ public final class LineRenderer {
      * </a>
      */
     public static void draw(float x1, float y1, float x2, float y2, float width, Colorc color, Colorc background, float alpha) {
-        if(lineMesh == null) {
+        if (lineMesh == null) {
             lineMesh = Assets.generateAsset(lineMeshData, Mesh.class);
         }
         GL11.glDisable(GL11.GL_CULL_FACE);

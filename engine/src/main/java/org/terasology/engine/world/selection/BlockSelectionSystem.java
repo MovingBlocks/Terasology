@@ -6,14 +6,14 @@ import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.engine.world.selection.event.SetBlockSelectionStartingPointEvent;
-import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 /**
  * This system updates block selections based on the sender's location and the state of the block selection.

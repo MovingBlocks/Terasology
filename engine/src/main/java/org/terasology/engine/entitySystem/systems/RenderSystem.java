@@ -13,21 +13,21 @@ public interface RenderSystem extends ComponentSystem {
     /**
      * Called with an OpenGL state useful to the rendering of opaque objects. See OpaqueObjectsNode for more information.
      */
-    default void renderOpaque() {};
+    default void renderOpaque() { };
 
     /**
      * Called with an OpenGL state useful to the rendering of alpha blended objects. See SimpleBlendMaterialsNode for more information.
      */
-    default void renderAlphaBlend() {};
+    default void renderAlphaBlend() { };
 
     /**
      * Called with an OpenGL state useful to the rendering of overlays. See OverlaysNode for more information.
      */
-    default void renderOverlay() {};
+    default void renderOverlay() { };
 
     /**
      * @deprecated Currently not used.
      */
     @Deprecated
-    default void renderShadows() {};
+    default void renderShadows() { };
 }

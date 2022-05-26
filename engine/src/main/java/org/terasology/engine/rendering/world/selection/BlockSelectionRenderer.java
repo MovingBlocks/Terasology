@@ -6,21 +6,21 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
-import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.primitives.Tessellator;
-import org.terasology.engine.rendering.primitives.TessellatorHelper;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.joml.geom.Rectanglef;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -50,18 +50,120 @@ public class BlockSelectionRenderer {
         initialize();
     }
 
+
+    private static void buildBlockMesh(StandardMeshData mesh, float size, Rectanglef texRect, Colorc c) {
+        Vector3f pos = new Vector3f();
+        Vector3f norm = new Vector3f();
+        Vector2f texCoord = new Vector2f();
+        final float sizeHalf = (size / 2) + .001f;
+
+        int firstIndex = mesh.position.getPosition();
+
+        // top
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, -sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 1.0f, 0));
+            mesh.color0.put(c);
+        }
+
+        // left
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, -sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(-1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
+
+        // right
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(1.0f, 0, 0));
+            mesh.color0.put(c);
+        }
+
+        // back
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, -1.0f));
+            mesh.color0.put(c);
+        }
+
+        // front
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, sizeHalf, sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, 0, 1.0f));
+            mesh.color0.put(c);
+        }
+
+        // bottom
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, -sizeHalf));
+        mesh.position.put(pos.zero().add(sizeHalf, -sizeHalf, sizeHalf));
+        mesh.position.put(pos.zero().add(-sizeHalf, -sizeHalf, sizeHalf));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.minY));
+        mesh.uv0.put(texCoord.set(texRect.maxX, texRect.maxY));
+        mesh.uv0.put(texCoord.set(texRect.minX, texRect.maxY));
+        for (int i = 0; i < 4; i++) {
+            mesh.normal.put(norm.set(0, -1, 0f));
+            mesh.color0.put(c);
+        }
+
+
+        int lastIndex = mesh.position.getPosition();
+        for (int i = firstIndex; i < lastIndex - 2; i += 4) {
+            mesh.indices.put(i);
+            mesh.indices.put(i + 1);
+            mesh.indices.put(i + 2);
+
+            mesh.indices.put(i + 2);
+            mesh.indices.put(i + 3);
+            mesh.indices.put(i);
+        }
+    }
+
     private void initialize() {
-        Vector2f min = new Vector2f(textureRegion.minX(), textureRegion.minY());
-        Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f),
-                min, textureRegion.getSize(new Vector2f()),
-                1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-        overlayMesh = tessellator.generateMesh();
-        tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f),
-                min, textureRegion.getSize(new Vector2f()), 1.001f, 1.0f, 1.0f, 0.0f,
-                0.0f, 0.0f);
-        overlayMesh2 = tessellator.generateMesh();
+        StandardMeshData overlayMeshData = new StandardMeshData();
+        buildBlockMesh(overlayMeshData, 1.0f, textureRegion, Color.white);
+        overlayMesh = Assets.generateAsset(overlayMeshData, Mesh.class);
+
+        StandardMeshData overlayMeshData2 = new StandardMeshData();
+        buildBlockMesh(overlayMeshData2, 1.0f, textureRegion, new Color(1.0f, 1.0f, 1.0f, .2f));
+        overlayMesh2 = Assets.generateAsset(overlayMeshData2, Mesh.class);
         blockSelectionMat = Assets.getMaterial("engine:prog.blockSelection").get();
     }
 

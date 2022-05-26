@@ -1,28 +1,23 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-// Since SpotBugs and SonarQube in the legacy style have external dependencies we have to have this block here.
-// Alternatively we untangle and update the common.gradle / Kotlin Gradle plugin stuff or just remove these two
 buildscript {
     repositories {
         mavenCentral()
         google()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
         maven {
             // required to provide runtime dependencies to build-logic.
             name = "Terasology Artifactory"
             url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
             allowInsecureProtocol = true  // 😱
         }
-    }
 
-    dependencies {
-        //Spotbugs
-        classpath("gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0")
-
-        // SonarQube / Cloud scanning
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8")
+        // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
+        // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
+        maven {
+            name = "Terasology snapshot locals"
+            url = "http://artifactory.terasology.org/artifactory/terasology-snapshot-local"
+            allowInsecureProtocol = true  // 😱
+        }
     }
 }
 

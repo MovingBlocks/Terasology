@@ -28,7 +28,6 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivat
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
@@ -43,6 +42,7 @@ import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.regions.BlockRegionComponent;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.util.Collection;
