@@ -153,27 +153,27 @@ public class BlockAreaTest {
 
     static Stream<Arguments> testDistanceSquaredArgs() {
         return Stream.of(
-                Arguments.of(new BlockArea(0,0,3,3), -3 ,-3, 8),
-                Arguments.of(new BlockArea(0,0,3,3), 1 ,2, 0),
-                Arguments.of(new BlockArea(0,0,3,3), -2 ,-2, 2),
-                Arguments.of(new BlockArea(0,0,3,3), 0 ,5, 1),
+                Arguments.of(new BlockArea(0, 0, 3, 3), -3 , -3, 8),
+                Arguments.of(new BlockArea(0, 0, 3, 3), 1 , 2, 0),
+                Arguments.of(new BlockArea(0, 0, 3, 3), -2 , -2, 2),
+                Arguments.of(new BlockArea(0, 0, 3, 3), 0 , 5, 1),
 
-                Arguments.of(new BlockArea(-1,-1,4,4), 5 ,5, 0),
-                Arguments.of(new BlockArea(-1,-1,4,4), 6 ,6, 2),
-                Arguments.of(new BlockArea(-1,-1,4,4), 1 ,2, 0),
-                Arguments.of(new BlockArea(-1,-1,4,4), 0 ,6, 1)
+                Arguments.of(new BlockArea(-1, -1, 4, 4), 5 , 5, 0),
+                Arguments.of(new BlockArea(-1, -1, 4, 4), 6 , 6, 2),
+                Arguments.of(new BlockArea(-1, -1, 4, 4), 1 , 2, 0),
+                Arguments.of(new BlockArea(-1, -1, 4, 4), 0 , 6, 1)
         );
     }
 
     @ParameterizedTest
     @MethodSource("testDistanceSquaredArgs")
-    public void testDistanceSquared(BlockArea area, int x, int y, int val){
-        assertEquals(val,area.distanceSquared(x,y));
+    public void testDistanceSquared(BlockArea area, int x, int y, int val) {
+        assertEquals(val, area.distanceSquared(x, y));
     }
 
     @Test
-    public void testDistanceSquaredVector(){
+    public void testDistanceSquaredVector() {
         BlockArea area = new BlockArea(0, 0, 3, 3);
-        assertEquals(8,area.distanceSquared(new Vector2i(-3, -3)));
+        assertEquals(8, area.distanceSquared(new Vector2i(-3, -3)));
     }
 }

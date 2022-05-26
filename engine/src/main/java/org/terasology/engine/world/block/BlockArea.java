@@ -362,12 +362,12 @@ public class BlockArea implements BlockAreac {
     }
 
     @Override
-    public long distanceSquared(Vector2ic p){
+    public long distanceSquared(Vector2ic p) {
         return distanceSquared(p.x(), p.y());
     }
 
     @Override
-    public long distanceSquared(int px, int py){
+    public long distanceSquared(int px, int py) {
         //center = min + width / 2 = min + (max - min) / 2
         // 2 * center  = 2 * min + max - min = min + max
         int cx2 = minX() + maxX();
