@@ -6,6 +6,9 @@
     <LanguageOptions name="Properties">
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
+    <LanguageOptions name="XML">
+      <option name="fileTypeOverride" value="1" />
+    </LanguageOptions>
     <LanguageOptions name="__TEMPLATE__">
       <option name="block" value="false" />
     </LanguageOptions>
