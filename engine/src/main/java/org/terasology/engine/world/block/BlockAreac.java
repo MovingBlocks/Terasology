@@ -518,6 +518,25 @@ public interface BlockAreac extends Iterable<Vector2ic> {
                 && this.minX() <= other.maxX() && this.minY() <= other.maxY();
     }
 
+    // -- distance --------------------------------------------------------------------------------------------------//
+
+    /**
+     * The squared distance to a point {@code p}.
+     *
+     * @param p the coordinates of the point
+     * @return the squared distance between this area and the point {@code p}
+     */
+    long distanceSquared(Vector2ic p);
+
+    /**
+     * The squared distance to a point {@code p} given by coordinates (x, y).
+     *
+     * @param px the x coordinate of the point
+     * @param py the y coordinate of the point
+     * @return the squared distance between this area and the point {@code p}
+     */
+    long distanceSquared(int px, int py);
+
     // ---------------------------------------------------------------------------------------------------------------//
     boolean equals(Object obj);
 
