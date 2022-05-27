@@ -30,15 +30,10 @@ repositories {
 }
 
 dependencies {
-    // Needed for caching reflected data during builds
-    implementation("org.terasology:reflections:0.9.12-MB")
-
-    // Corrections for old reflections dependencies:
-    modules {
-        module("dom4j:dom4j") {
-            replacedBy("org.dom4j:dom4j")
-        }
+    implementation("org.terasology:reflections:0.9.12-MB") {
+        because("reflections-manifest.gradle.kts")
     }
+    // Additional corrections for old reflections dependencies:
     constraints {
         implementation("com.google.guava:guava:31.1-jre")
         implementation("org.javassist:javassist:3.29.0-GA")
