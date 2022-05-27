@@ -117,7 +117,8 @@ dependencies {
         because('a backend-independent Logger')
     }
     implementation("ch.qos.logback:logback-classic:1.2.11") {
-        because("telemetry implementation uses logback to send to logstash")
+        because("telemetry implementation uses logback to send to logstash " +
+                "and we bundle org.terasology.logback for the regex filter")
     }
 
     // audio
