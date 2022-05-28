@@ -30,10 +30,14 @@ repositories {
 }
 
 dependencies {
-    // Needed for caching reflected data during builds
-    implementation("org.terasology:reflections:0.9.12-MB")
-    implementation("org.javassist:javassist:3.27.0-GA")
-    implementation("dom4j:dom4j:1.6.1")
+    implementation("org.terasology:reflections:0.9.12-MB") {
+        because("reflections-manifest.gradle.kts")
+    }
+    // Additional corrections for old reflections dependencies:
+    constraints {
+        implementation("com.google.guava:guava:31.1-jre")
+        implementation("org.javassist:javassist:3.29.0-GA")
+    }
 
     // graph analysis
     implementation("org.jgrapht:jgrapht-core:1.5.0")
