@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.ServerInfo;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.modes.StateLoading;
@@ -54,11 +55,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
 
+    @In
+    private Context context;
     @In
     private Config config;
     @In
@@ -147,7 +152,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        infoService = new ServerInfoService();
+        infoService = createWithConstructorInjection(ServerInfoService.class, context);
 
         if (playerConfig.playerName.getDefaultValue().equals(playerConfig.playerName.get())) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);

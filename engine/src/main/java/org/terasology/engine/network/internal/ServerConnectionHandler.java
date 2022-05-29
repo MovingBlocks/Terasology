@@ -1,15 +1,17 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
 import com.google.protobuf.ByteString;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.identity.PublicIdentityCertificate;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.resources.ArchiveFileSource;
@@ -22,27 +24,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
 
 public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectionHandler.class);
 
-    private NetworkSystemImpl networkSystem;
+    private final Context context;
+    private final ModuleManager moduleManager;
+    private final NetworkSystemImpl networkSystem;
+
     private ServerHandler serverHandler;
     private ChannelHandlerContext channelHandlerContext;
 
-    private PublicIdentityCertificate identity;
-
-    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-
-    public ServerConnectionHandler(NetworkSystemImpl networkSystem) {
+    public ServerConnectionHandler(NetworkSystemImpl networkSystem, Context parentContext, ModuleManager moduleManager) {
         this.networkSystem = networkSystem;
+        this.context = new ContextImpl(parentContext);
+        this.moduleManager = moduleManager;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.channelHandlerContext = ctx;
+        context.put(Channel.class, ctx.channel());
         serverHandler = ctx.pipeline().get(ServerHandler.class);
     }
 
@@ -63,7 +69,7 @@ public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void channelAuthenticated(PublicIdentityCertificate id) {
-        this.identity = id;
+        context.put(PublicIdentityCertificate.class, id);
     }
 
     private void sendModules(List<NetData.ModuleRequest> moduleRequestList) {
@@ -97,7 +103,7 @@ public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private void receivedConnect(NetData.JoinMessage message) {
         logger.info("Received Start Join");
-        NetClient client = new NetClient(channelHandlerContext.channel(), networkSystem, identity);
+        NetClient client = createWithConstructorInjection(NetClient.class, context);
         client.setPreferredName(message.getName());
         client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));

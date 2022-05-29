@@ -13,7 +13,6 @@ import org.terasology.engine.identity.CertificateGenerator;
 import org.terasology.engine.identity.CertificatePair;
 import org.terasology.engine.identity.IdentityConstants;
 import org.terasology.engine.identity.PublicIdentityCertificate;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.protobuf.NetData;
 
 import javax.crypto.BadPaddingException;
@@ -33,10 +32,14 @@ import static com.google.common.base.Verify.verifyNotNull;
 public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
-    private Config config = CoreRegistry.get(Config.class);
+    private final Config config;
     private ServerConnectionHandler serverConnectionHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
     private NetData.HandshakeHello serverHello;
+
+    public ServerHandshakeHandler(Config config) {
+        this.config = config;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {

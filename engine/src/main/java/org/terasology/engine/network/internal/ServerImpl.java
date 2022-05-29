@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -18,8 +18,8 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.core.EngineTime;
-import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.network.NetMetricSource;
@@ -29,7 +29,6 @@ import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.engine.network.serialization.ClientComponentFieldCheck;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
@@ -67,8 +66,11 @@ public class ServerImpl implements Server {
 
     private int clientEntityNetId;
 
-    private NetworkSystemImpl networkSystem;
-    private Channel channel;
+    private final Channel channel;
+    private Context context;
+    private final NetworkSystemImpl networkSystem;
+    private final EngineTime time;
+
     private NetMetricSource metricsSource;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
@@ -88,24 +90,24 @@ public class ServerImpl implements Server {
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyBlockUpdates = ArrayListMultimap.create();
     private ListMultimap<Vector3i, NetData.ExtraDataChangeMessage> awaitingChunkReadyExtraDataUpdates = ArrayListMultimap.create();
 
-    private EngineTime time;
 
-
-    public ServerImpl(NetworkSystemImpl system, Channel channel) {
+    public ServerImpl(NetworkSystemImpl system, EngineTime time, Channel channel, Context context) {
         this.channel = channel;
         metricsSource = (NetMetricSource) channel.pipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
-        this.time = (EngineTime) CoreRegistry.get(Time.class);
+        this.time = time;
+        this.context = context;
     }
 
     void connectToEntitySystem(EngineEntityManager newEntityManager, NetworkEntitySerializer newEntitySerializer,
-                               EventSerializer newEventSerializer, BlockEntityRegistry newBlockEntityRegistry) {
+                               EventSerializer newEventSerializer, BlockEntityRegistry newBlockEntityRegistry, Context newContext) {
         this.entityManager = newEntityManager;
         this.eventSerializer = newEventSerializer;
         this.entitySerializer = newEntitySerializer;
         this.blockEntityRegistry = newBlockEntityRegistry;
-        blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
-        extraDataManager = CoreRegistry.get(ExtraBlockDataManager.class);
+        this.context = newContext;
+        blockManager = (BlockManagerImpl) newContext.getValue(BlockManager.class);
+        extraDataManager = newContext.getValue(ExtraBlockDataManager.class);
     }
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
@@ -284,11 +286,11 @@ public class ServerImpl implements Server {
      * Apply the block changes from the message to the local world.
      */
     private void processBlockChanges(NetData.NetMessage message) {
+        WorldProvider worldProvider = context.get(WorldProvider.class);
         for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
             Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
             logger.debug("Received block change to {}", newBlock);
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setBlock(pos, newBlock);
@@ -302,8 +304,8 @@ public class ServerImpl implements Server {
      * Apply the extra-data changes from the message to the local world.
      */
     private void processExtraDataChanges(NetData.NetMessage message) {
+        WorldProvider worldProvider = context.get(WorldProvider.class);
         for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(extraDataChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setExtraData(extraDataChange.getIndex(), pos, extraDataChange.getNewData());
@@ -399,7 +401,7 @@ public class ServerImpl implements Server {
 
     @Override
     public void onChunkReady(Vector3ic chunkPos) {
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        WorldProvider worldProvider = context.get(WorldProvider.class);
 
         List<NetData.BlockChangeMessage> updateBlockMessages = awaitingChunkReadyBlockUpdates.removeAll(new Vector3i(chunkPos));
         for (NetData.BlockChangeMessage message : updateBlockMessages) {

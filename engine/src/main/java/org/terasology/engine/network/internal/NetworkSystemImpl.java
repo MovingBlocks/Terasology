@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -31,8 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.NetworkConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.ComponentSystemManager;
-import org.terasology.engine.core.Time;
+import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationManager;
@@ -62,7 +63,6 @@ import org.terasology.engine.persistence.PlayerStore;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
@@ -88,6 +88,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
+
 /**
  * Implementation of the Network System using Netty and TCP/IP
  */
@@ -111,7 +114,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
     private TIntLongMap netIdToEntityId = new TIntLongHashMap();
-    private Time time;
+    private EngineTime time;
     private long nextNetworkTick;
     private boolean kicked;
     // Server only
@@ -132,10 +135,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ServerImpl server;
     private EventLoopGroup clientGroup;
 
-    public NetworkSystemImpl(Time time, Context context) {
+    public NetworkSystemImpl(EngineTime time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();
-        this.hibernationSettings = Optional.ofNullable(context.get(HibernationManager.class));
+        this.hibernationSettings = context.getMaybe(HibernationManager.class);
+        setContext(context);
     }
 
     @Override
@@ -161,7 +165,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         .localAddress(port)
                         .childOption(ChannelOption.TCP_NODELAY, true)
                         .childOption(ChannelOption.SO_KEEPALIVE, true)
-                        .childHandler(new TerasologyServerPipelineFactory(this));
+                        .childHandler(createWithConstructorInjection(TerasologyServerPipelineFactory.class, context));
                 // Start the server.
                 serverChannelFuture = b.bind();
 
@@ -208,7 +212,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 clientBootstrap.option(ChannelOption.SO_KEEPALIVE, true);
                 clientBootstrap.option(ChannelOption.TCP_NODELAY, true);
                 clientBootstrap.remoteAddress(new InetSocketAddress(address, port));
-                clientBootstrap.handler(new TerasologyClientPipelineFactory(this));
+                clientBootstrap.handler(createWithConstructorInjection(TerasologyClientPipelineFactory.class, context));
 
                 connectCheck = clientBootstrap.connect();
                 connectCheck.sync();
@@ -299,7 +303,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public Client joinLocal(String preferredName, Color color) {
-        Client localClient = new LocalClient(preferredName, color, entityManager);
+        Client localClient = new LocalClient(preferredName, color, entityManager, context.getValue(Config.class));
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
         connectClient(localClient);
@@ -545,7 +549,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         this.entityManager = newEntityManager;
         this.entityManager.subscribeForChanges(this);
-        this.blockManager = context.get(BlockManager.class);
+        this.blockManager = context.getValue(BlockManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = context.get(StorageManager.class);
         this.eventLibrary = newEventLibrary;
@@ -568,7 +572,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         if (server != null) {
-            server.connectToEntitySystem(newEntityManager, entitySerializer, eventSerializer, blockEntityRegistry);
+            server.connectToEntitySystem(newEntityManager, entitySerializer, eventSerializer,
+                    blockEntityRegistry, context);
         }
     }
 
@@ -771,13 +776,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     /**
-     * Sets the context within which this system should operate
-     *
-     * @param context
+     * Sets the context within which this system should operate.
      */
     @Override
-    public void setContext(Context context) {
-        this.context = context;
+    public void setContext(Context newContext) {
+        this.context = new ContextImpl(newContext);
+        // Our internal context gets internal views of some objects.
+        context.put(NetworkSystemImpl.class, this);
+        context.put(EngineTime.class, time);
     }
 
     void removeKickedClient(NetClient client) {
@@ -885,7 +891,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (worldGen != null) {
             serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
         }
-        for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+        for (Module module : context.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
                         .setModuleId(module.getId().toString())
