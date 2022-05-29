@@ -261,7 +261,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         allChannels.close().awaitUninterruptibly();
         List<Future<?>> shutdowns = new ArrayList<>(3);
         if (serverChannelFuture != null) {
-            serverChannelFuture.channel().closeFuture();
             // Wait until all threads are terminated.
             shutdowns.add(bossGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
             shutdowns.add(workerGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
@@ -269,6 +268,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (clientGroup != null) {
             shutdowns.add(clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
         }
+
         // Shut down all event loops to terminate all threads.
         // I want their timeouts to count in parallel, instead of blocking on one after the other,
         // but turning the netty Future into something we can do this with is a bit of a mess until
