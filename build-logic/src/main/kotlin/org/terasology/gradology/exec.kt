@@ -16,7 +16,7 @@ import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.the
 
-const val DEFAULT_MAX_HEAP_SIZE = "3G"
+const val DEFAULT_MAX_HEAP_SIZE = "768M"
 
 private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
 
@@ -85,6 +85,8 @@ abstract class RunTerasology : JavaExec() {
             args("--no-splash")
             jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
         }
+
+        jvmArgs("-XX:MaxDirectMemorySize=512M", "-XX:+PrintCommandLineFlags")
 
         // Any configuration that depends on the value of a task Property like jmxPort
         // should be done later, as that Property value will change between object
