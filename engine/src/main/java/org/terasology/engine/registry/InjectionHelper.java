@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.registry;
 
@@ -23,8 +23,8 @@ public final class InjectionHelper {
     private InjectionHelper() {
     }
 
-    public static void inject(final Object object, Context context) {
-        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+    public static <T> T inject(final T object, Context context) {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
                 Object value = context.get(field.getType());
                 if (value != null) {
@@ -39,6 +39,7 @@ public final class InjectionHelper {
 
             return null;
         });
+        return object;
     }
 
     public static void inject(final Object object) {
