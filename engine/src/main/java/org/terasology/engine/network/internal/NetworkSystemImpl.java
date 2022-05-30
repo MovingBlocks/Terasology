@@ -102,7 +102,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     // Shared
-    private Context context;
+    private ContextImpl context;
     private Optional<HibernationManager> hibernationSettings;
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
@@ -777,11 +777,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     /**
      * Sets the context within which this system should operate.
+     * <p>
+     * As a client transitions from connecting to loading to in-game, it moves
+     * through different {@link org.terasology.engine.core.modes.GameState GameStates},
+     * and the context changes along the way.
      */
     @Override
     public void setContext(Context newContext) {
-        this.context = new ContextImpl(newContext);
+        if (context != null && context.isDirectDescendantOf(newContext)) {
+            return;  // Already using this context!
+        }
         // Our internal context gets internal views of some objects.
+        context = new ContextImpl(newContext);
         context.put(NetworkSystemImpl.class, this);
         context.put(EngineTime.class, time);
     }

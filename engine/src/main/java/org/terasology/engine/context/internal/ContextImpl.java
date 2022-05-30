@@ -49,4 +49,7 @@ public class ContextImpl implements Context {
         map.put(type, object);
     }
 
+    public boolean isDirectDescendantOf(Context other) {
+        return parent == other;
+    }
 }
