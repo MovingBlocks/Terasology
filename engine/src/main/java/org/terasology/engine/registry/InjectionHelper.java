@@ -23,6 +23,17 @@ public final class InjectionHelper {
     private InjectionHelper() {
     }
 
+    /**
+     * Inject values from this context to annotated fields.
+     * <p>
+     * The injector looks for fields annotated with {@link In @In} and tries to set them by
+     * getting a value by looking up the field's type in the {@code context}.
+     * <p>
+     * If there is no matching value in the context, the field is silently skipped and left
+     * with its previous value.
+     *
+     * @return the input {@code object}, now with fields set
+     */
     public static <T> T inject(final T object, Context context) {
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
@@ -42,6 +53,14 @@ public final class InjectionHelper {
         return object;
     }
 
+    /**
+     * Inject values from CoreRegistry to annotated fields.
+     *
+     * @deprecated CoreRegistry-based methods are deprecated in favor of the more thread-safe Context.
+     *
+     * @see #inject(Object, Context)
+     */
+    @Deprecated(since = "5.3.0", forRemoval = true)
     public static void inject(final Object object) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
