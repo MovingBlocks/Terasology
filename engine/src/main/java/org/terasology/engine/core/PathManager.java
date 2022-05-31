@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -327,7 +328,14 @@ public final class PathManager {
         modPaths = defaultModPaths();
 
         for (Path path : getAllPaths()) {
-            Files.createDirectories(path);
+            try {
+                Files.createDirectories(path);
+            } catch (FileAlreadyExistsException e) {
+                // It's okay if it exists as a symlink to a directory.
+                if (!(Files.isSymbolicLink(path) && Files.isDirectory(path))) {
+                    throw e;
+                }
+            }
         }
 
         // --------------------------------- Setup native paths ---------------------
