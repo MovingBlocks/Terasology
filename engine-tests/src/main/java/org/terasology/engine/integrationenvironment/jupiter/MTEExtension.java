@@ -7,20 +7,19 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestInstancePostProcessor;
-import org.opentest4j.MultipleFailuresError;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.integrationenvironment.Engines;
 import org.terasology.engine.integrationenvironment.MainLoop;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
-import org.terasology.engine.integrationenvironment.Scopes;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.worlds.DummyWorldGenerator;
 
@@ -28,10 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
+
+import static org.junit.platform.commons.support.AnnotationSupport.findAnnotation;
+import static org.terasology.engine.registry.InjectionHelper.inject;
 
 /**
  * Sets up a Terasology environment for use with your {@index JUnit} 5 test.
@@ -45,7 +44,7 @@ import java.util.function.Function;
  * import org.junit.jupiter.api.Test;
  * import org.terasology.engine.registry.In;
  *
- * &#64;{@link org.junit.jupiter.api.extension.ExtendWith}(MTEExtension.class)
+ * &#64;{@link org.junit.jupiter.api.extension.ExtendWith ExtendWith}(MTEExtension.class)
  * &#64;{@link Dependencies}("MyModule")
  * &#64;{@link UseWorldGenerator}("Pathfinding:pathfinder")
  * public class ExampleTest {
@@ -80,33 +79,69 @@ import java.util.function.Function;
  * </dl>
  *
  * <p>
- * Every class annotated with this will create a single instance of {@link Engines} and use it during execution of
- * all tests in the class. This also means that all engine instances are shared between all tests in the class. If you
- * want isolated engine instances try {@link IsolatedMTEExtension}.
+ * By default, JUnit uses a {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_METHOD PER_METHOD} lifecycle
+ * for test instances. The <i>instance</i> of your test class—i.e. {@code this} when your test method executes—
+ * is re-created for every {@code @Test} method. The {@link org.terasology.engine.core.GameEngine GameEngine}
+ * created by this extension follows the same rules, created for each test instance.
  * <p>
- * Note that classes marked {@link Nested} will share the engine context with their parent.
+ * If <em>don't</em> want the engine shut down and recreated for every test method, mark your test class
+ * for {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS PER_CLASS} lifecycle.
  * <p>
- * This will configure the logger and the current implementation is not subtle or polite about it, see
- * {@link #setupLogging()} for notes.
+ * Classes marked {@link Nested} will share the engine context with their parent.
+ *<p>
+ *  * This will configure the logger and the current implementation is not subtle or polite about it, see
+ *  * {@link #setupLogging()} for notes.
+ *
+ * @see <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-instance-lifecycle"
+ *     >JUnit User Guide: Test Instance Lifecycle</a>
  */
-public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestInstancePostProcessor {
+public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
 
     static final String LOGBACK_RESOURCE = "default-logback.xml";
-    protected Function<ExtensionContext, ExtensionContext.Namespace> helperLifecycle = Scopes.PER_CLASS;
-    protected Function<ExtensionContext, Class<?>> getTestClass = Scopes::getTopTestClass;
+    private static final Logger logger = LoggerFactory.getLogger(MTEExtension.class);
 
     @Override
-    public void beforeAll(ExtensionContext context) {
-        if (context.getRequiredTestClass().isAnnotationPresent(Nested.class)) {
-            return;  // nested classes get set up in the parent
+    public void beforeEach(ExtensionContext extContext) {
+        injectTestInstances(extContext);
+    }
+
+    @Override
+    public void beforeAll(ExtensionContext extContext) {
+        extContext.getTestInstance().ifPresentOrElse(
+            o -> injectTestInstances(extContext),
+            () -> {
+                var lifecycle = extContext.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD);
+                if (!lifecycle.equals(TestInstance.Lifecycle.PER_METHOD)) {
+                    logger.warn("Unexpected: This {} test has no instance for {} in context {}",
+                            lifecycle, extContext.getUniqueId(), extContext);
+                }
+            });
+    }
+
+    private void injectTestInstances(ExtensionContext extContext) {
+        Engines engines = getEngines(extContext);
+        // Usually just one instance, but @Nested tests have one per level of nesting.
+        for (Object instance : extContext.getRequiredTestInstances().getAllInstances()) {
+            injectTestInstance(instance, engines);
         }
-        setupLogging();
+    }
+
+    protected void injectTestInstance(Object testInstance, Engines engines) {
+        var context = engines.getHostContext();
+        context.put(Engines.class, engines);
+        context.put(MainLoop.class, new MainLoop(engines));
+        context.put(ModuleTestingHelper.class, new ModuleTestingHelper(engines));
+        inject(testInstance, context);
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        Class<?> type = parameterContext.getParameter().getType();
+        if (extensionContext.getTestInstance().isEmpty()) {
+            logger.debug("Cannot provide parameters to {} before we have a test instance.", parameterContext.getDeclaringExecutable());
+            return false;
+        }
         Engines engines = getEngines(extensionContext);
+        Class<?> type = parameterContext.getParameter().getType();
         return engines.getHostContext().get(type) != null
                 || type.isAssignableFrom(Engines.class)
                 || type.isAssignableFrom(MainLoop.class)
@@ -133,40 +168,14 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
         }
     }
 
-    @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext extensionContext) {
-        Engines engines = getEngines(extensionContext);
-        List<IllegalAccessException> exceptionList = new LinkedList<>();
-        Class<?> type = testInstance.getClass();
-        while (type != null) {
-            Arrays.stream(type.getDeclaredFields())
-                    .filter((field) -> field.getAnnotation(In.class) != null)
-                    .peek((field) -> field.setAccessible(true))
-                    .forEach((field) -> {
-                        Object candidateObject = getDIInstance(engines, field.getType());
-                        try {
-                            field.set(testInstance, candidateObject);
-                        } catch (IllegalAccessException e) {
-                            exceptionList.add(e);
-                        }
-                    });
-
-            type = type.getSuperclass();
-        }
-        // It is tests, then it is legal ;)
-        if (!exceptionList.isEmpty()) {
-            throw new MultipleFailuresError("I cannot provide DI instances:", exceptionList);
-        }
-    }
-
     public String getWorldGeneratorUri(ExtensionContext context) {
-        UseWorldGenerator useWorldGenerator = getTestClass.apply(context).getAnnotation(UseWorldGenerator.class);
-        return useWorldGenerator != null ? useWorldGenerator.value() : null;
+        return findAnnotation(context.getRequiredTestClass(), UseWorldGenerator.class)
+                .map(UseWorldGenerator::value).orElse(null);
     }
 
-    public Set<String> getDependencyNames(ExtensionContext context) {
-        Dependencies dependencies = getTestClass.apply(context).getAnnotation(Dependencies.class);
-        return dependencies != null ? Sets.newHashSet(dependencies.value()) : Collections.emptySet();
+    public List<String> getDependencyNames(ExtensionContext context) {
+        return findAnnotation(context.getRequiredTestClass(), Dependencies.class)
+                .map(a -> Arrays.asList(a.value())).orElse(Collections.emptyList());
     }
 
     /**
@@ -183,11 +192,21 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
      * @return configured for this test
      */
     protected Engines getEngines(ExtensionContext context) {
-        ExtensionContext.Store store = context.getStore(helperLifecycle.apply(context));
+        ExtensionContext.Store store = context.getStore(namespaceFor(context));
         EnginesCleaner autoCleaner = store.getOrComputeIfAbsent(
                 EnginesCleaner.class, k -> new EnginesCleaner(getDependencyNames(context), getWorldGeneratorUri(context)),
                 EnginesCleaner.class);
         return autoCleaner.engines;
+    }
+
+    protected ExtensionContext.Namespace namespaceFor(ExtensionContext context) {
+        logger.debug("Seeking engines for {} : {}", context.getUniqueId(),
+                context.getTestInstance().orElse("[NO INSTANCE]"));
+        // Start with this Extension, so it's clear where this came from.
+        return ExtensionContext.Namespace.create(
+                MTEExtension.class,
+                context.getRequiredTestInstance()
+        );
     }
 
     /**
@@ -234,7 +253,7 @@ public class MTEExtension implements BeforeAllCallback, ParameterResolver, TestI
     static class EnginesCleaner implements ExtensionContext.Store.CloseableResource {
         protected Engines engines;
 
-        EnginesCleaner(Set<String> dependencyNames, String worldGeneratorUri) {
+        EnginesCleaner(List<String> dependencyNames, String worldGeneratorUri) {
             engines = new Engines(dependencyNames, worldGeneratorUri);
             engines.setup();
         }

@@ -81,7 +81,7 @@ public class Engines {
     PathManagerProvider.Cleaner pathManagerCleaner;
     TerasologyEngine host;
 
-    public Engines(Set<String> dependencies, String worldGeneratorUri) {
+    public Engines(List<String> dependencies, String worldGeneratorUri) {
         this.dependencies.addAll(dependencies);
 
         if (worldGeneratorUri != null) {
