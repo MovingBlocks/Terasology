@@ -139,6 +139,9 @@ public class Engines {
         connectToHost(terasologyEngine, mainLoop);
         Context context = terasologyEngine.getState().getContext();
         context.put(ScreenGrabber.class, hostContext.get(ScreenGrabber.class));
+
+        logger.info("Created client: {}", terasologyEngine);
+
         return terasologyEngine.getState().getContext();
     }
 
@@ -282,6 +285,9 @@ public class Engines {
                 ));
             }
         }
+
+        logger.info("Created host: {}", terasologyEngine);
+
         return terasologyEngine;
     }
 
