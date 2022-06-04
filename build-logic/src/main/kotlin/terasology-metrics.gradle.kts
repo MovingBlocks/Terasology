@@ -66,6 +66,8 @@ tasks.withType<Test> {
 configure<CheckstyleExtension> {
     isIgnoreFailures = false
 
+    toolVersion = "10.2"
+
     val checkstyleDir = rootDir.resolve("config/metrics/checkstyle")
     configDirectory.set(checkstyleDir)
     setConfigProperties("samedir" to checkstyleDir)
