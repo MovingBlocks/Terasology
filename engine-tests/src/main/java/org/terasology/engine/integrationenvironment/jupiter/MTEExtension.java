@@ -3,10 +3,6 @@
 
 package org.terasology.engine.integrationenvironment.jupiter;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -23,8 +19,6 @@ import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.worlds.DummyWorldGenerator;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -87,17 +81,14 @@ import static org.terasology.engine.registry.InjectionHelper.inject;
  * If <em>don't</em> want the engine shut down and recreated for every test method, mark your test class
  * for {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS PER_CLASS} lifecycle.
  * <p>
+ * Note that classes marked {@link Nested} will share the engine context with their parent.
  * Classes marked {@link Nested} will share the engine context with their parent.
- *<p>
- *  * This will configure the logger and the current implementation is not subtle or polite about it, see
- *  * {@link #setupLogging()} for notes.
  *
  * @see <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-instance-lifecycle"
  *     >JUnit User Guide: Test Instance Lifecycle</a>
  */
 public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
 
-    static final String LOGBACK_RESOURCE = "default-logback.xml";
     private static final Logger logger = LoggerFactory.getLogger(MTEExtension.class);
 
     @Override
@@ -207,41 +198,6 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
                 MTEExtension.class,
                 context.getRequiredTestInstance()
         );
-    }
-
-    /**
-     * Apply our default logback configuration to the logger.
-     * <p>
-     * Modules won't generally have their own logback-test.xml, so we'll install ours from {@value LOGBACK_RESOURCE}.
-     * <p>
-     * <b>TODO:</b>
-     * <ul>
-     *   <li>Only reset the current LoggerContext if it really hasn't been customized by elsewhere.
-     *   <li>When there are multiple classes with MTEExtension, do we end up doing this repeatedly
-     *       in the same process?
-     *   <li>Provide a way to add/change/override what this is doing that doesn't require checking
-     *       out the MTE sources and editing default-logback.xml.
-     * </ul>
-     */
-    void setupLogging() {
-        // This is mostly right out of the book:
-        //   http://logback.qos.ch/xref/chapters/configuration/MyApp3.html
-        JoranConfigurator cfg = new JoranConfigurator();
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        context.reset();
-        cfg.setContext(context);
-        try (InputStream i = getClass().getResourceAsStream(LOGBACK_RESOURCE)) {
-            if (i == null) {
-                throw new RuntimeException("Failed to find " + LOGBACK_RESOURCE);
-            }
-            cfg.doConfigure(i);
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading " + LOGBACK_RESOURCE, e);
-        } catch (JoranException e) {
-            throw new RuntimeException("Error during logger configuration", e);
-        } finally {
-            StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-        }
     }
 
     /**

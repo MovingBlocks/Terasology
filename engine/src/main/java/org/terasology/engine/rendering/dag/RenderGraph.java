@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.dag;
 
@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
 import org.terasology.gestalt.naming.Name;
-import org.terasology.engine.rendering.ShaderManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +71,8 @@ public class RenderGraph {
     public void replaceNode(Node aNode, Node byNode) {
         // Add connections from a node being replaced; This should in theory be sufficient and once we call setDep over
         // all new nodes again, everything should be set
-         aNode.getInputConnections().forEach((k, v)->byNode.getInputConnections().replace(k, v));
-         aNode.getOutputConnections().forEach((k, v)->byNode.getOutputConnections().replace(k, v));
+         aNode.getInputConnections().forEach((k, v)-> byNode.getInputConnections().replace(k, v));
+         aNode.getOutputConnections().forEach((k, v)-> byNode.getOutputConnections().replace(k, v));
 
         nodeMap.replace(aNode.getUri(), byNode);
         akaNodeMap.replace(aNode.getAka(), byNode);
@@ -224,7 +224,7 @@ public class RenderGraph {
             throw new RuntimeException("Cycle detected in the DAG: topological sorting not possible!");
         }
 
-        topologicalList.forEach((key)->key.postInit(context));
+        topologicalList.forEach((key)-> key.postInit(context));
 
         return topologicalList;
     }

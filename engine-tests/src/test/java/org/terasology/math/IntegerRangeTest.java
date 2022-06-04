@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.math;
 
@@ -80,7 +80,7 @@ public class IntegerRangeTest {
         validateRange(range, Integer.MAX_VALUE - 3, Integer.MAX_VALUE - 2, Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
     }
 
-    private void validateRange(IntegerRange range, Integer...numbers) {
+    private void validateRange(IntegerRange range, Integer... numbers) {
         Iterator<Integer> iterator = range.iterator();
         for (Integer number : numbers) {
             assertTrue(iterator.hasNext());

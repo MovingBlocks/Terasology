@@ -54,6 +54,7 @@ pipeline {
                     gradlew,
                     gradle/wrapper/*,
                     templates/build.gradle,
+                    templates/module.logback-test.xml,
                     config/**,
                     facades/PC/build/distributions/Terasology.zip,
                     engine/build/resources/main/org/terasology/engine/version/versionInfo.properties,
@@ -76,6 +77,9 @@ pipeline {
                     //
                     // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
                     junit testResults: '**/build/test-results/unitTest/*.xml'
+                    // Jenkins truncates large test outputs, so archive it as well.
+                    tar file: 'build/unitTest-results.tgz', archive: true, compress: true, overwrite: true,
+                        glob: '**/build/test-results/unitTest/*.xml'
                 }
             }
         }
@@ -165,6 +169,9 @@ pipeline {
                     //
                     // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
                     junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
+                    // Jenkins truncates large test outputs, so archive it as well.
+                    tar file: 'build/integrationTest-results.tgz', archive: true, compress: true, overwrite: true,
+                        glob: '**/build/test-results/integrationTest/*.xml'
                 }
             }
         }
