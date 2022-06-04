@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.documentation;
 
@@ -6,9 +6,9 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -95,9 +95,9 @@ public final class ApiScraper {
             }
         }
         sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()
-                .map(clazz->clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
+                .map(clazz -> clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
         sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
-                .map(packagee->packagee + " (PACKAGE)").collect(Collectors.toSet()));
+                .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
         System.out.println("# Modding API:\n");
         for (String key : sortedApi.keySet()) {
