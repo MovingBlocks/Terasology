@@ -24,9 +24,8 @@ public class ClientConnectionTest {
 
     @Test
     public void testClientConnection(ModuleTestingHelper helper) throws IOException {
-        List<TerasologyEngine> engines = helper.getEngines();
         Context clientContext = helper.createClient();
-        engines = helper.getEngines();
+        List<TerasologyEngine> engines = helper.getEngines();
         Assertions.assertEquals(2, engines.size());
         logger.info("Engine 0 is {}", engines.get(0));
         logger.info("Engine 1 is {}", engines.get(1));
