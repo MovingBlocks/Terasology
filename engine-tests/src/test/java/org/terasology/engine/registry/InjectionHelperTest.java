@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.registry;
 
@@ -44,6 +44,7 @@ public class InjectionHelperTest {
     }
 
     @Test
+    @SuppressWarnings("removal")
     public void testDefaultFieldInjection() {
         InjectionHelper.share(serviceA);
         InjectionHelper.share(serviceB);
@@ -57,6 +58,7 @@ public class InjectionHelperTest {
     }
 
     @Test
+    @SuppressWarnings("removal")
     public void testInjectUnavailableObject() {
         InjectionHelper.share(serviceA);
         //  InjectionHelper.share(serviceB);
