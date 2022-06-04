@@ -67,18 +67,7 @@ dependencies {
         }
     }
 
-    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.21")
-
-    add("testImplementation", platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
-    testImplementation("org.mockito:mockito-inline:3.12.4")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
-
-    testImplementation("com.google.truth:truth:1.1.3")
-    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.3")
+    // see terasology-metrics for test dependencies
 }
 
 
