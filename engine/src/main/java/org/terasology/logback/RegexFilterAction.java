@@ -107,6 +107,7 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
         EvaluatorFilter<E> filter;
 
         if (top instanceof EvaluatorFilter) {
+            // ignore Java warning about cast from Object to EvaluatorFilter<E>
             //noinspection unchecked
             filter = (EvaluatorFilter<E>) top;
             // Remove the filter from the stack now that the parser is at the end of it.
