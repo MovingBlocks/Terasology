@@ -74,20 +74,20 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
     protected final BiFunction<String, String, EventEvaluator<E>> evaluatorConstructor = RegexEvaluator::new;
 
     @Override
-    public void begin(InterpretationContext ic, String elementName, Attributes attributes) throws ActionException {
-        if (peekFilterContainer(ic) == null) {
+    public void begin(InterpretationContext context, String elementName, Attributes attributes) throws ActionException {
+        if (peekFilterContainer(context) == null) {
             return;
         }
 
         var evaluator = evaluatorConstructor.apply(
-                findAndSubst(ic, attributes, PREFIX_ATTRIBUTE),
-                findAndSubst(ic, attributes, MESSAGE_ATTRIBUTE)
+                findAndSubst(context, attributes, PREFIX_ATTRIBUTE),
+                findAndSubst(context, attributes, MESSAGE_ATTRIBUTE)
         );
 
         EvaluatorFilter<E> filter = new RegexFilter<>(
                 getContext(),
                 evaluator,
-                makeFilterName(ic, attributes));
+                makeFilterName(context, attributes));
 
         if (elementName.startsWith(REQUIRE_ELEMENT)) {
             filter.setOnMatch(FilterReply.NEUTRAL);
@@ -98,26 +98,26 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
         }
 
         // Push the new filter to the stack, in case anyone wants to configure it further.
-        ic.pushObject(filter);
+        context.pushObject(filter);
     }
 
     @Override
-    public void end(InterpretationContext ic, String name) throws ActionException {
-        Object top = ic.peekObject();
+    public void end(InterpretationContext context, String name) throws ActionException {
+        Object top = context.peekObject();
         EvaluatorFilter<E> filter;
 
         if (top instanceof EvaluatorFilter) {
             //noinspection unchecked
             filter = (EvaluatorFilter<E>) top;
             // Remove the filter from the stack now that the parser is at the end of it.
-            ic.popObject();
+            context.popObject();
         } else {
             addError("Top of stack does not have Filter, but this thing: " + top);
             return;
         }
 
         // We expect the stack to be back at the parent container now.
-        FilterAttachable<E> filterContainer = peekFilterContainer(ic);
+        FilterAttachable<E> filterContainer = peekFilterContainer(context);
         if (filterContainer == null) {
             return;
         }
@@ -132,8 +132,8 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
         addInfo(String.format("Added %s to %s", filter, filterContainer));
     }
 
-    protected FilterAttachable<E> peekFilterContainer(InterpretationContext ic) {
-        Object parentObject = ic.peekObject();
+    protected FilterAttachable<E> peekFilterContainer(InterpretationContext context) {
+        Object parentObject = context.peekObject();
         if (parentObject instanceof FilterAttachable) {
             @SuppressWarnings("unchecked") FilterAttachable<E> container =
                     (FilterAttachable<E>) parentObject;
@@ -144,8 +144,8 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
         }
     }
 
-    protected String makeFilterName(InterpretationContext ic, Attributes attributes) {
-        String filterName = findAndSubst(ic, attributes, NAME_ATTRIBUTE);
+    protected String makeFilterName(InterpretationContext context, Attributes attributes) {
+        String filterName = findAndSubst(context, attributes, NAME_ATTRIBUTE);
 
         if (Strings.isNullOrEmpty(filterName)) {
             // If a name wasn't provided, make one from the attributes
@@ -157,8 +157,8 @@ public class RegexFilterAction<E extends ILoggingEvent> extends Action {
         return filterName;
     }
 
-    private String findAndSubst(InterpretationContext ic, Attributes attributes, String name) {
-        return ic.subst(attributes.getValue(name));
+    private String findAndSubst(InterpretationContext context, Attributes attributes, String name) {
+        return context.subst(attributes.getValue(name));
     }
 
     public static class RegexFilter<EE> extends EvaluatorFilter<EE> {
