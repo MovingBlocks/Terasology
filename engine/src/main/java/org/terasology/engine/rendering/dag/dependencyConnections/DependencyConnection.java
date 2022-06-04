@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.dag.dependencyConnections;
@@ -105,7 +105,7 @@ public abstract class DependencyConnection<T> {
      * Remove connections
      */
     public void disconnect() {
-        this.connectedConnections.forEach((k, v)->v.connectedConnections.remove(this.getName()));
+        this.connectedConnections.forEach((k, v) -> v.connectedConnections.remove(this.getName()));
         this.connectedConnections.clear();
         if (this.connectionType == Type.INPUT) {
             this.data = null;

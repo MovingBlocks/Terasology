@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.world.generation.facets;
@@ -46,7 +46,7 @@ public abstract class BooleanFacetTest {
     @Test
     public void testRelBounds() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                ()->facet.set(-15, -15, -15, true));
+                ()-> facet.set(-15, -15, -15, true));
     }
 
     @Test
