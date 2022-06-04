@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.context.internal;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.terasology.engine.context.Context;
 
@@ -51,5 +52,13 @@ public class ContextImpl implements Context {
 
     public boolean isDirectDescendantOf(Context other) {
         return parent == other;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("#", Integer.toHexString(hashCode()))
+                .add("parent", parent)
+                .toString();
     }
 }
