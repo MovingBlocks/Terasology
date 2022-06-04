@@ -135,14 +135,19 @@ public class Engines {
      * @return the created client's context object
      */
     public Context createClient(MainLoop mainLoop) throws IOException {
-        TerasologyEngine terasologyEngine = createHeadlessEngine();
-        terasologyEngine.getFromEngineContext(Config.class).getRendering().setViewDistance(ViewDistance.LEGALLY_BLIND);
+        TerasologyEngine client = createHeadlessEngine();
+        client.getFromEngineContext(Config.class).getRendering().setViewDistance(ViewDistance.LEGALLY_BLIND);
 
-        terasologyEngine.changeState(new StateMainMenu());
-        connectToHost(terasologyEngine, mainLoop);
-        Context context = terasologyEngine.getState().getContext();
+        client.changeState(new StateMainMenu());
+        if (!connectToHost(client, mainLoop)) {
+            throw new RuntimeException(String.format("Could not connect client %s to local host - timeout.", client));
+        }
+        Context context = client.getState().getContext();
         context.put(ScreenGrabber.class, hostContext.get(ScreenGrabber.class));
-        return terasologyEngine.getState().getContext();
+
+        logger.info("Created client: {}", client);
+
+        return client.getState().getContext();
     }
 
     /**
@@ -255,15 +260,15 @@ public class Engines {
     }
 
     TerasologyEngine createHost(NetworkMode networkMode) throws IOException {
-        TerasologyEngine terasologyEngine = createHeadlessEngine();
-        terasologyEngine.getFromEngineContext(SystemConfig.class).writeSaveGamesEnabled.set(false);
-        terasologyEngine.subscribeToStateChange(new HeadlessStateChangeListener(terasologyEngine));
-        terasologyEngine.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri, networkMode));
+        TerasologyEngine host = createHeadlessEngine();
+        host.getFromEngineContext(SystemConfig.class).writeSaveGamesEnabled.set(false);
+        host.subscribeToStateChange(new HeadlessStateChangeListener(host));
+        host.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri, networkMode));
 
         doneLoading = false;
-        terasologyEngine.subscribeToStateChange(() -> {
-            GameState newState = terasologyEngine.getState();
-            logger.debug("New engine state is {}", terasologyEngine.getState());
+        host.subscribeToStateChange(() -> {
+            GameState newState = host.getState();
+            logger.debug("New engine state is {}", host.getState());
             if (newState instanceof StateIngame) {
                 hostContext = newState.getContext();
                 if (hostContext == null) {
@@ -271,24 +276,34 @@ public class Engines {
                 }
                 doneLoading = true;
             } else if (newState instanceof StateLoading) {
-                CoreRegistry.put(GameEngine.class, terasologyEngine);
+                CoreRegistry.put(GameEngine.class, host);
             }
         });
 
         boolean keepTicking;
         while (!doneLoading) {
-            keepTicking = terasologyEngine.tick();
+            keepTicking = host.tick();
             if (!keepTicking) {
                 throw new RuntimeException(String.format(
                         "Engine stopped ticking before we got in game. Current state: %s",
-                        terasologyEngine.getState()
+                        host.getState()
                 ));
             }
         }
-        return terasologyEngine;
+
+        logger.info("Created host: {}", host);
+
+        return host;
     }
 
-    void connectToHost(TerasologyEngine client, MainLoop mainLoop) {
+    /**
+     *
+     * @param client the client engine to connect to the local host
+     * @param mainLoop
+     *
+     * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
+     */
+    boolean connectToHost(TerasologyEngine client, MainLoop mainLoop) {
         CoreRegistry.put(Config.class, client.getFromEngineContext(Config.class));
         JoinStatus joinStatus = null;
         try {
@@ -302,6 +317,6 @@ public class Engines {
 
         // TODO: subscribe to state change and return an asynchronous result
         //     so that we don't need to pass mainLoop to here.
-        mainLoop.runUntil(() -> client.getState() instanceof StateIngame);
+        return !mainLoop.runUntil(() -> client.getState() instanceof StateIngame);
     }
 }

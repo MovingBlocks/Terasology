@@ -37,7 +37,8 @@ public interface Context {
     default <T> T getValue(Class<T> type) {
         T value = get(type);
         if (value == null) {
-            throw new NoSuchElementException(type.toString());
+            throw new NoSuchElementException(
+                    String.format("%s has no %s", this, type.getName()));
         }
         return value;
     }

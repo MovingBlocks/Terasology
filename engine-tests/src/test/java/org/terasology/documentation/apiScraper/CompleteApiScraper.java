@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.documentation.apiScraper;
 
@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -101,9 +101,9 @@ final class CompleteApiScraper {
             }
         }
         api.putAll(EXTERNAL, ExternalApiWhitelist.CLASSES.stream()
-                .map(clazz->clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
+                .map(clazz -> clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
         api.putAll(EXTERNAL, ExternalApiWhitelist.PACKAGES.stream()
-                .map(packagee->packagee + " (PACKAGE)").collect(Collectors.toSet()));
+                .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
         //Puts the information in the StringBuffer
         StringBuffer stringApi = new StringBuffer();
