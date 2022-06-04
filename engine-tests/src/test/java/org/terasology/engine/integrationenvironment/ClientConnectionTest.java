@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.integrationenvironment;
 
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,9 @@ public class ClientConnectionTest {
 
     @Test
     public void testClientConnection(ModuleTestingHelper helper) throws IOException {
-        Context clientContext = helper.createClient();
         List<TerasologyEngine> engines = helper.getEngines();
+        Context clientContext = helper.createClient();
+        engines = helper.getEngines();
         Assertions.assertEquals(2, engines.size());
         logger.info("Engine 0 is {}", engines.get(0));
         logger.info("Engine 1 is {}", engines.get(1));
