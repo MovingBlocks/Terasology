@@ -31,6 +31,7 @@ public class ClientConnectionTest {
         Assertions.assertAll(engines
                 .stream()
                 .map((engine) ->
-                        () -> Assertions.assertEquals(StateIngame.class, engine.getState().getClass(), "Unexpected engine state: " + engine + " is in state " + engine.getState().toString())));
+                        () -> Assertions.assertEquals(StateIngame.class, engine.getState().getClass(),
+                                "Unexpected engine state: " + engine + " is in state " + engine.getState().toString())));
     }
 }
