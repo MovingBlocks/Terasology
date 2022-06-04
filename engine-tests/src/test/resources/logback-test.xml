@@ -1,23 +1,25 @@
-<!-- Copyright 2021 The Terasology Foundation -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+<configuration debug="false">
+  <!-- debug: reports all changes to this configuration on System.out -->
 
-<configuration>
-
-  <!-- Report all changes to this configuration on System.out -->
-  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+  <include resource="org/terasology/engine/logback/setup.xml" />
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are assigned the type PatternLayoutEncoder by default -->
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
+
+    <include resource="org/terasology/engine/logback/filter-reflections.xml" />
   </appender>
 
+  <!-- JUnit collects console output during test execution
+       and include it in the report for the test. -->
   <root level="${logOverrideLevel:-debug}">
     <appender-ref ref="CONSOLE" />
   </root>
 
   <logger name="org.terasology" level="${logOverrideLevel:-info}" />
+  <logger name="org.terasology.engine.i18n" level="warn" />
   <logger name="org.reflections.Reflections" level="warn" />
 
 </configuration>
