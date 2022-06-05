@@ -35,7 +35,14 @@ public class StateHeadlessSetup extends AbstractState {
 
     protected boolean strictModuleRequirements;
 
+    private final NetworkMode networkMode;
+
     public StateHeadlessSetup() {
+        this(NetworkMode.LISTEN_SERVER);
+    }
+
+    public StateHeadlessSetup(NetworkMode networkMode) {
+        this.networkMode = networkMode;
     }
 
     @Override
@@ -58,7 +65,7 @@ public class StateHeadlessSetup extends AbstractState {
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(gameManifest.getSeed());
 
-        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
+        gameEngine.changeState(new StateLoading(gameManifest, networkMode));
     }
 
     public GameManifest createGameManifest() {

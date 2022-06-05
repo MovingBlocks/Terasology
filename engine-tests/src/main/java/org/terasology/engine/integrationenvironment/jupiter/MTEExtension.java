@@ -16,12 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.integrationenvironment.Engines;
 import org.terasology.engine.integrationenvironment.MainLoop;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.worlds.DummyWorldGenerator;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.platform.commons.support.AnnotationSupport.findAnnotation;
 import static org.terasology.engine.registry.InjectionHelper.inject;
@@ -169,6 +171,17 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
                 .map(a -> Arrays.asList(a.value())).orElse(Collections.emptyList());
     }
 
+    public NetworkMode getNetworkMode(ExtensionContext context) {
+        return getAnnotationWithDefault(context, IntegrationEnvironment::networkMode);
+    }
+
+    private <T> T getAnnotationWithDefault(ExtensionContext context, Function<IntegrationEnvironment, T> method) {
+        var ann =
+                findAnnotation(context.getRequiredTestClass(), IntegrationEnvironment.class)
+                .orElseGet(ToReadDefaultValuesFrom::getDefaults);
+        return method.apply(ann);
+    }
+
     /**
      * Get the Engines for this test.
      * <p>
@@ -185,7 +198,11 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
     protected Engines getEngines(ExtensionContext context) {
         ExtensionContext.Store store = context.getStore(namespaceFor(context));
         EnginesCleaner autoCleaner = store.getOrComputeIfAbsent(
-                EnginesCleaner.class, k -> new EnginesCleaner(getDependencyNames(context), getWorldGeneratorUri(context)),
+                EnginesCleaner.class, k -> new EnginesCleaner(
+                        getDependencyNames(context),
+                        getWorldGeneratorUri(context),
+                        getNetworkMode(context)
+                ),
                 EnginesCleaner.class);
         return autoCleaner.engines;
     }
@@ -209,8 +226,8 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
     static class EnginesCleaner implements ExtensionContext.Store.CloseableResource {
         protected Engines engines;
 
-        EnginesCleaner(List<String> dependencyNames, String worldGeneratorUri) {
-            engines = new Engines(dependencyNames, worldGeneratorUri);
+        EnginesCleaner(List<String> dependencyNames, String worldGeneratorUri, NetworkMode networkMode) {
+            engines = new Engines(dependencyNames, worldGeneratorUri, networkMode);
             engines.setup();
         }
 
@@ -218,6 +235,13 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
         public void close() {
             engines.tearDown();
             engines = null;
+        }
+    }
+
+    @IntegrationEnvironment
+    private static final class ToReadDefaultValuesFrom {
+        static IntegrationEnvironment getDefaults() {
+            return ToReadDefaultValuesFrom.class.getDeclaredAnnotation(IntegrationEnvironment.class);
         }
     }
 }
