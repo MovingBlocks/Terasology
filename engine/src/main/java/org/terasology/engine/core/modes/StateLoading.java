@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes;
@@ -52,6 +52,7 @@ import org.terasology.engine.game.Game;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
@@ -110,6 +111,7 @@ public class StateLoading implements GameState {
         headless = context.get(DisplayDevice.class).isHeadless();
         
         CoreRegistry.setContext(context);
+        context.getValue(NetworkSystem.class).setContext(context);
         systemConfig = context.get(SystemConfig.class);
 
         if (!headless) {

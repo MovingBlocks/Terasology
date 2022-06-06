@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
@@ -17,7 +17,6 @@ import org.terasology.engine.identity.PublicIdentityCertificate;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.protobuf.NetData;
-import org.terasology.engine.registry.CoreRegistry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -37,8 +36,9 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandshakeHandler.class);
     private static final String AUTHENTICATION_FAILURE = "Authentication failure";
 
-    private Config config = CoreRegistry.get(Config.class);
-    private JoinStatusImpl joinStatus;
+    private final Config config;
+    private final StorageServiceWorker storageServiceWorker;
+    private final JoinStatusImpl joinStatus;
 
     private byte[] serverRandom;
     private byte[] clientRandom;
@@ -50,7 +50,9 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
     private ClientIdentity identity;
     private PublicIdentityCertificate serverCertificate;
 
-    public ClientHandshakeHandler(JoinStatusImpl joinStatus) {
+    public ClientHandshakeHandler(Config config, StorageServiceWorker storageServiceWorker, JoinStatusImpl joinStatus) {
+        this.config = config;
+        this.storageServiceWorker = storageServiceWorker;
         this.joinStatus = joinStatus;
     }
 
@@ -151,7 +153,6 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
             config.save();
 
             //Try to upload the new identity to the identity storage service (if user is logged in)
-            StorageServiceWorker storageServiceWorker = CoreRegistry.get(StorageServiceWorker.class);
             if (storageServiceWorker != null && storageServiceWorker.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
                 storageServiceWorker.putIdentity(serverCertificate, identity);
             }
