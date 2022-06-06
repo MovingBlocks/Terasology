@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -38,7 +38,6 @@ import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.serialization.ServerComponentFieldCheck;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.WorldChangeListener;
 import org.terasology.engine.world.WorldProvider;
@@ -71,9 +70,13 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
     private static final float NET_TICK_RATE = 0.05f;
 
-    private Time time;
-    private NetworkSystemImpl networkSystem;
-    private Channel channel;
+    private final Channel channel;
+    private final NetworkSystemImpl networkSystem;
+    private final PredictionSystem predictionSystem;
+    private final PublicIdentityCertificate identity;
+    private final Time time;
+    private final WorldProvider worldProvider;
+
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private EventLibrary eventLibrary;
@@ -98,8 +101,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private float chunkSendRate = 0.05469f;
 
-    private PublicIdentityCertificate identity;
-
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.ExtraDataChangeMessage> queuedOutgoingExtraDataChanges = Queues.newLinkedBlockingQueue();
@@ -122,19 +123,20 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     /**
      * Sets up a new net client with metrics, time, identity, and a world provider.
-     * @param channel
-     * @param networkSystem
-     * @param identity Publice certificate for the client.
+     *
+     * @param identity Public certificate for the client.
      */
-    public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
+    public NetClient(Channel channel, NetworkSystemImpl networkSystem, PredictionSystem predictionSystem,
+                     PublicIdentityCertificate identity, Time time, WorldProvider worldProvider) {
+        this.predictionSystem = predictionSystem;
+        this.time = time;
+        this.worldProvider = worldProvider;
         this.channel = channel;
         metricSource = (NetMetricSource) channel.pipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
-        this.time = CoreRegistry.get(Time.class);
         this.identity = identity;
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-        if (worldProvider != null) {
-            worldProvider.registerListener(this);
+        if (this.worldProvider != null) {
+            this.worldProvider.registerListener(this);
         }
     }
 
@@ -196,7 +198,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             channel.close().awaitUninterruptibly();
         }
 
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.unregisterListener(this);
         }
@@ -504,7 +505,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void processEvents(NetData.NetMessage message) {
         boolean lagCompensated = false;
-        PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
         for (NetData.EventMessage eventMessage : message.getEventList()) {
             try {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());

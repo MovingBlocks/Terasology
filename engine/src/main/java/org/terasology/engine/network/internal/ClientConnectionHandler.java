@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
@@ -10,12 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.network.JoinStatus;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 import org.terasology.protobuf.NetData;
@@ -29,15 +29,20 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.Timer;
 
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
 public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
 
+    private final Config config;
+    private final Context context;
     private final JoinStatusImpl joinStatus;
-    private NetworkSystemImpl networkSystem;
-    private ServerImpl server;
-    private ModuleManager moduleManager;
+    private final ModuleManager moduleManager;
+    private final PlayerConfig playerConfig;
+    private final EngineTime time;
 
+    private ServerImpl server;
     private Set<String> missingModules = Sets.newHashSet();
     private NetData.ModuleDataHeader receivingModule;
     private Path tempModuleLocation;
@@ -50,15 +55,17 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * Initialises: network system, join status, and module manager.
-     * @param joinStatus
-     * @param networkSystem
      */
-    public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
-        this.networkSystem = networkSystem;
+    public ClientConnectionHandler(JoinStatusImpl joinStatus, Config config, Context parentContext, ModuleManager moduleManager,
+                                   PlayerConfig playerConfig, EngineTime time) {
+        this.config = config;
+        this.context = new ContextImpl(parentContext);
+        this.moduleManager = moduleManager;
+        this.playerConfig = playerConfig;
+        this.time = time;
         this.joinStatus = joinStatus;
         // TODO: implement translation of errorMessage in messageReceived once context is available
         // See https://github.com/MovingBlocks/Terasology/pull/3332#discussion_r187081375
-        this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
     /**
@@ -83,6 +90,12 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 Thread.currentThread().stop();
             }
         }, timeoutThreshold + 200);
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        context.put(Channel.class, ctx.channel());
     }
 
     @Override
@@ -257,8 +270,8 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
      */
     private void receivedServerInfo(ChannelHandlerContext channelHandlerContext, NetData.ServerInfoMessage message) {
         logger.info("Received server info");
-        ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
-        this.server = new ServerImpl(networkSystem, channelHandlerContext.channel());
+        time.setGameTime(message.getTime());
+        this.server = createWithConstructorInjection(ServerImpl.class, context);
         server.setServerInfo(message);
 
         // Request missing modules
@@ -287,8 +300,6 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
      * @param channelHandlerContext
      */
     private void sendJoin(ChannelHandlerContext channelHandlerContext) {
-        Config config = CoreRegistry.get(Config.class);
-        PlayerConfig playerConfig = CoreRegistry.get(PlayerConfig.class);
         NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
         NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
 
