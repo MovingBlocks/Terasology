@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
@@ -11,6 +11,7 @@ import org.terasology.engine.audio.nullAudio.NullAudioManager;
 import org.terasology.engine.audio.nullAudio.NullSound;
 import org.terasology.engine.audio.nullAudio.NullStreamingSound;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
@@ -28,6 +29,7 @@ import org.terasology.engine.core.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.internal.NetworkSystemImpl;
@@ -256,6 +258,8 @@ public class HeadlessEnvironment extends Environment {
         Config config = new Config(context);
         config.loadDefaults();
         context.put(Config.class, config);
+        context.put(StorageServiceWorker.class, mock(StorageServiceWorker.class));
+        context.put(PlayerConfig.class, mock(PlayerConfig.class));
     }
 
     @Override
