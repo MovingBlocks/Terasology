@@ -77,7 +77,7 @@ public class MTEExtensionTestWithPerMethodLifecycle {
     @Order(2)
     public void thingsDoNotPolluteSecondTest() {
         List<EntityRef> entities = Lists.newArrayList(entityManager.getEntitiesWith(DummyComponent.class));
-        // There should be one entity, created by the @BeforeAll method
+        // There should be one entity, created by the @BeforeEach method for this one test
         assertEquals(1, entities.size());
 
         // Make sure that this is the same one that the first test saw.

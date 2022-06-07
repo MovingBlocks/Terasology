@@ -80,11 +80,10 @@ import static org.terasology.engine.registry.InjectionHelper.inject;
  * is re-created for every {@code @Test} method. The {@link org.terasology.engine.core.GameEngine GameEngine}
  * created by this extension follows the same rules, created for each test instance.
  * <p>
- * If <em>don't</em> want the engine shut down and recreated for every test method, mark your test class
+ * If you <em>don't</em> want the engine shut down and recreated for every test method, mark your test class
  * for {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS PER_CLASS} lifecycle.
  * <p>
  * Note that classes marked {@link Nested} will share the engine context with their parent.
- * Classes marked {@link Nested} will share the engine context with their parent.
  *
  * @see <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-instance-lifecycle"
  *     >JUnit User Guide: Test Instance Lifecycle</a>
