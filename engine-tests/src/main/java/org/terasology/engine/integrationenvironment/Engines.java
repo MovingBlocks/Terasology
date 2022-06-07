@@ -33,6 +33,7 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
@@ -131,6 +132,11 @@ public class Engines {
 
     /**
      * Creates a new client and connects it to the host.
+     * <p>
+     * Requires the host to have a {@link NetworkMode} that accepts connections.
+     * Configure the host's network mode using
+     * {@link IntegrationEnvironment#networkMode @IntegrationEnvironment#networkmode}
+     * on your test class.
      *
      * @return the created client's context object
      */

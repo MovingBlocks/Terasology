@@ -15,16 +15,19 @@ import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.integrationenvironment.TestEventReceiver;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.delay.DelayManager;
 import org.terasology.engine.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 
 import java.io.IOException;
 
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
+@IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 public class DelayManagerTest {
     private static final Logger logger = LoggerFactory.getLogger(DelayManagerTest.class);
 
