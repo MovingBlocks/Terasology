@@ -60,12 +60,12 @@ public class MTEExtensionTestWithPerMethodLifecycle {
     @Order(1)
     public void firstTestFindsThings() {
         List<EntityRef> entities = Lists.newArrayList(entityManager.getEntitiesWith(DummyComponent.class));
-        // There should be one entity, created by the @BeforeAll method
+        // There should be one entity, created by the @BeforeEach method
         assertEquals(1, entities.size());
 
         DummyComponent component = entities.get(0).getComponent(DummyComponent.class);
         assertThat(component.eventReceived).isTrue();
-        assertThat(seenNames.isEmpty());
+        assertThat(seenNames).isEmpty();
 
         // Remember that a test has seen this one.
         assertThat(component.name).isNotNull();
@@ -80,10 +80,11 @@ public class MTEExtensionTestWithPerMethodLifecycle {
         // There should be one entity, created by the @BeforeEach method for this one test
         assertEquals(1, entities.size());
 
-        // Make sure that this is the same one that the first test saw.
+        // FIXME: what to assert here does this make sense or should we drop the whole thing
+        //     and say it's covered by LifecyclePerMethodInjectionTest?
         DummyComponent component = entities.get(0).getComponent(DummyComponent.class);
         assertThat(component.eventReceived).isTrue();
         assertThat(component.name).isNotNull();
-        assertThat(seenNames.isEmpty());
+        assertThat(seenNames).isEmpty();
     }
 }
