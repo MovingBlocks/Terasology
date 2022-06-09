@@ -12,6 +12,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.config.UniverseConfig;
 import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
@@ -36,9 +37,6 @@ import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.utilities.FilesUtil;
-import org.terasology.engine.utilities.concurrency.ShutdownTask;
-import org.terasology.engine.utilities.concurrency.Task;
-import org.terasology.engine.utilities.concurrency.TaskMaster;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.Chunk;
@@ -53,6 +51,7 @@ import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,7 +69,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
-    private final TaskMaster<Task> saveThreadManager;
     private final SaveTransactionHelper saveTransactionHelper;
 
     /**
@@ -85,7 +83,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private final ReadWriteLock worldDirectoryLock = new ReentrantReadWriteLock(true);
     private final Lock worldDirectoryReadLock = worldDirectoryLock.readLock();
     private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
-    private SaveTransaction saveTransaction;
+    private Mono<Object> saveTransaction;
     private final Config config;
     private final SystemConfig systemConfig;
 
@@ -131,7 +129,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
-        this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
         this.systemConfig = CoreRegistry.get((SystemConfig.class));
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
@@ -155,24 +152,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             recordAndReplayUtils.setShutdownRequested(true);
         }
-        saveThreadManager.shutdown(new ShutdownTask(), true);
-        checkSaveTransactionAndClearUpIfItIsDone();
-    }
-
-    private void checkSaveTransactionAndClearUpIfItIsDone() {
         if (saveTransaction != null) {
-            SaveTransactionResult result = saveTransaction.getResult();
-            if (result != null) {
-                Throwable t = saveTransaction.getResult().getCatchedThrowable();
-                if (t != null) {
-                    throw new RuntimeException("Saving failed", t);
-                }
-                saveTransaction = null;
-            }
-            unloadedAndSavingChunkMap.clear();
+            saveTransaction.block();
         }
     }
-
 
     private void addGlobalStoreBuilderToSaveTransaction(SaveTransactionBuilder transactionBuilder) {
         GlobalStoreBuilder globalStoreBuilder = new GlobalStoreBuilder(getEntityManager(), getPrefabSerializer());
@@ -248,11 +231,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
             recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         }
-        if (saveTransaction != null && saveTransaction.getResult() == null) {
-            saveThreadManager.shutdown(new ShutdownTask(), true);
-            saveThreadManager.restart();
+        if (saveTransaction != null) {
+            saveTransaction.block();
         }
-        checkSaveTransactionAndClearUpIfItIsDone();
     }
 
     private SaveTransaction createSaveTransaction() {
@@ -391,7 +372,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             return;
         }
 
-        checkSaveTransactionAndClearUpIfItIsDone();
         if (saveRequested) {
             startSaving();
         } else if (isSavingNecessary()) {
@@ -413,8 +393,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             }
 
             saveRequested = false;
-            saveTransaction = createSaveTransaction();
-            saveThreadManager.offer(saveTransaction);
+            saveTransaction = Mono.fromRunnable(createSaveTransaction())
+                    .subscribeOn(GameScheduler.parallel())
+                    .doFinally(unused -> this.saveComplete())
+                    .share();
+            saveTransaction.subscribe();
 
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
                 saveGamePreviewImage();
@@ -436,8 +419,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
                 sys.preAutoSave();
             }
 
-            saveTransaction = createSaveTransaction();
-            saveThreadManager.offer(saveTransaction);
+            saveTransaction = Mono.fromRunnable(createSaveTransaction())
+                    .subscribeOn(GameScheduler.parallel())
+                    .doFinally(unused -> this.saveComplete())
+                    .share();
+            saveTransaction.subscribe();
 
             for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
                 sys.postAutoSave();
@@ -447,6 +433,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         }
         entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         logger.info("Auto Saving - Snapshot created: Writing phase starts");
+    }
+
+    private void saveComplete() {
+        saveTransaction = null;
+        unloadedAndSavingChunkMap.clear();
+        unloadedAndSavingPlayerMap.clear();
     }
 
     private boolean isSavingNecessary() {
@@ -482,7 +474,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
     @Override
     public boolean isSaving() {
-        return saveTransaction != null && saveTransaction.getResult() == null;
+        return saveTransaction != null;
     }
 
     @Override
