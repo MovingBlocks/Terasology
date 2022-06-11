@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.integrationenvironment.Engines;
 import org.terasology.engine.integrationenvironment.MainLoop;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
@@ -174,6 +175,12 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
         return getAnnotationWithDefault(context, IntegrationEnvironment::networkMode);
     }
 
+    public List<Class<? extends EngineSubsystem>> getSubsystems(ExtensionContext context) {
+        var subsystem = getAnnotationWithDefault(context, IntegrationEnvironment::subsystem);
+        return subsystem.equals(IntegrationEnvironment.NO_SUBSYSTEM.class)
+                ? Collections.emptyList() : List.of(subsystem);
+    }
+
     private <T> T getAnnotationWithDefault(ExtensionContext context, Function<IntegrationEnvironment, T> method) {
         var ann =
                 findAnnotation(context.getRequiredTestClass(), IntegrationEnvironment.class)
@@ -200,7 +207,8 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
                 EnginesCleaner.class, k -> new EnginesCleaner(
                         getDependencyNames(context),
                         getWorldGeneratorUri(context),
-                        getNetworkMode(context)
+                        getNetworkMode(context),
+                        getSubsystems(context)
                 ),
                 EnginesCleaner.class);
         return autoCleaner.engines;
@@ -225,8 +233,9 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
     static class EnginesCleaner implements ExtensionContext.Store.CloseableResource {
         protected Engines engines;
 
-        EnginesCleaner(List<String> dependencyNames, String worldGeneratorUri, NetworkMode networkMode) {
-            engines = new Engines(dependencyNames, worldGeneratorUri, networkMode);
+        EnginesCleaner(List<String> dependencyNames, String worldGeneratorUri, NetworkMode networkMode,
+                       List<Class<? extends EngineSubsystem>> subsystems) {
+            engines = new Engines(dependencyNames, worldGeneratorUri, networkMode, subsystems);
             engines.setup();
         }
 
