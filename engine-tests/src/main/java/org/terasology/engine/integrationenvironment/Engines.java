@@ -84,7 +84,7 @@ public class Engines {
     TerasologyEngine host;
     private final NetworkMode networkMode;
 
-    public Engines(Set<String> dependencies, String worldGeneratorUri, NetworkMode networkMode) {
+    public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode) {
         this.networkMode = networkMode;
         this.dependencies.addAll(dependencies);
 
