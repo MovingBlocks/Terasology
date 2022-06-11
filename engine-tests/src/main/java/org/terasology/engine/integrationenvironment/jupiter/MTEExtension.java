@@ -67,6 +67,8 @@ import static org.terasology.engine.registry.InjectionHelper.inject;
  * <p>
  * You can configure the environment with these additional annotations:
  * <dl>
+ *     <dt>{@link IntegrationEnvironment @IntegrationEnvironment}</dt>
+ *     <dd>Configure the network mode and add subsystems.</dd>
  *     <dt>{@link Dependencies @Dependencies}</dt>
  *     <dd>Specify which modules to include in the environment. Put the name of your module under test here.
  *         Any dependencies these modules declare in <code>module.txt</code> will be pulled in as well.</dd>
