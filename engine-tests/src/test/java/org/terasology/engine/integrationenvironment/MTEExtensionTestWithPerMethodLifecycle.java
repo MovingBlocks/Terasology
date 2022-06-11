@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MTEExtensionTestWithPerMethodLifecycle {
     @SuppressWarnings("checkstyle:ConstantName")
-    private static final ConcurrentHashMap.KeySetView<Object, Boolean> seenNames = ConcurrentHashMap.newKeySet();
+    private final ConcurrentHashMap.KeySetView<Object, Boolean> seenNames = ConcurrentHashMap.newKeySet();
 
     @In
     public EntityManager entityManager;
