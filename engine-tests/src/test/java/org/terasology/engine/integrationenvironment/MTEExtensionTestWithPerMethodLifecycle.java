@@ -35,11 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)  // The default, but here for explicitness.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MTEExtensionTestWithPerMethodLifecycle {
-    @SuppressWarnings("checkstyle:ConstantName")
-    private final ConcurrentHashMap.KeySetView<Object, Boolean> seenNames = ConcurrentHashMap.newKeySet();
 
     @In
     public EntityManager entityManager;
+
+    private final ConcurrentHashMap.KeySetView<Object, Boolean> seenNames = ConcurrentHashMap.newKeySet();
 
     @BeforeEach
     void createEntity(TestInfo testInfo) {
