@@ -33,8 +33,10 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
@@ -80,8 +82,10 @@ public class Engines {
     PathManager pathManager;
     PathManagerProvider.Cleaner pathManagerCleaner;
     TerasologyEngine host;
+    private final NetworkMode networkMode;
 
-    public Engines(Set<String> dependencies, String worldGeneratorUri) {
+    public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode) {
+        this.networkMode = networkMode;
         this.dependencies.addAll(dependencies);
 
         if (worldGeneratorUri != null) {
@@ -97,7 +101,7 @@ public class Engines {
     public void setup() {
         mockPathManager();
         try {
-            host = createHost();
+            host = createHost(networkMode);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -128,6 +132,11 @@ public class Engines {
 
     /**
      * Creates a new client and connects it to the host.
+     * <p>
+     * Requires the host to have a {@link NetworkMode} that accepts connections.
+     * Configure the host's network mode using
+     * {@link IntegrationEnvironment#networkMode @IntegrationEnvironment#networkmode}
+     * on your test class.
      *
      * @return the created client's context object
      */
@@ -256,11 +265,11 @@ public class Engines {
         PathManagerProvider.setPathManager(pathManager);
     }
 
-    TerasologyEngine createHost() throws IOException {
+    TerasologyEngine createHost(NetworkMode networkMode) throws IOException {
         TerasologyEngine host = createHeadlessEngine();
         host.getFromEngineContext(SystemConfig.class).writeSaveGamesEnabled.set(false);
         host.subscribeToStateChange(new HeadlessStateChangeListener(host));
-        host.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri));
+        host.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri, networkMode));
 
         doneLoading = false;
         host.subscribeToStateChange(() -> {
