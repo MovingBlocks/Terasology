@@ -71,7 +71,7 @@ public class Engines {
 
     private static final Logger logger = LoggerFactory.getLogger(Engines.class);
 
-    protected final Set<String> dependencies = Sets.newHashSet("engine");
+    protected final Set<String> dependencies = Sets.newHashSet();
     protected String worldGeneratorUri = DEFAULT_WORLD_GENERATOR;
     protected boolean doneLoading;
     protected Context hostContext;
