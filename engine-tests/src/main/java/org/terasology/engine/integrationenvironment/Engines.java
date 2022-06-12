@@ -67,10 +67,12 @@ import static org.junit.platform.commons.support.ReflectionSupport.newInstance;
  * host. Currently all engine instances are headless, though it is possible to use headed engines in the future.
  */
 public class Engines {
+    public static final String DEFAULT_WORLD_GENERATOR = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+
     private static final Logger logger = LoggerFactory.getLogger(Engines.class);
 
     protected final Set<String> dependencies = Sets.newHashSet("engine");
-    protected String worldGeneratorUri = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+    protected String worldGeneratorUri = DEFAULT_WORLD_GENERATOR;
     protected boolean doneLoading;
     protected Context hostContext;
     protected final List<TerasologyEngine> engines = Lists.newArrayList();

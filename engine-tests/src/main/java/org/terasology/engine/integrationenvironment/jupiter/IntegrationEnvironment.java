@@ -6,6 +6,7 @@ package org.terasology.engine.integrationenvironment.jupiter;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.integrationenvironment.Engines;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkMode;
 
@@ -43,6 +44,13 @@ public @interface IntegrationEnvironment {
      * make changes to the configuration <em>before</em> it would otherwise be available.
      */
     Class<? extends EngineSubsystem> subsystem() default NO_SUBSYSTEM.class;
+
+    /**
+     * The URN of the world generator.
+     * <p>
+     * For example, {@code "CoreWorlds:facetedSimplex"}
+     */
+    String worldGenerator() default Engines.DEFAULT_WORLD_GENERATOR;
 
     /**
      * Do not add an extra subsystem to the integration environment.
