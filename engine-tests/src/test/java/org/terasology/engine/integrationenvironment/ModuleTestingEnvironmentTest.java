@@ -7,16 +7,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
+@IntegrationEnvironment
 public class ModuleTestingEnvironmentTest {
 
     public static final int THE_ANSWER = 42;

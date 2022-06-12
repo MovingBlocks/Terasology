@@ -7,15 +7,13 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.stubs.DummyComponent;
 import org.terasology.unittest.stubs.DummyEvent;
@@ -30,10 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Ensure a test class with a per-method Jupiter lifecycle does not share data between tests.
  */
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)  // The default, but here for explicitness.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@IntegrationEnvironment
 public class MTEExtensionTestWithPerMethodLifecycle {
 
     @In

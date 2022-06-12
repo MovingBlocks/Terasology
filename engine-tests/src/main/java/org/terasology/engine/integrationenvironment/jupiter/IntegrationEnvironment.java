@@ -3,10 +3,13 @@
 
 package org.terasology.engine.integrationenvironment.jupiter;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkMode;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,6 +17,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Tag("MteTest")
+@ExtendWith(MTEExtension.class)
 public @interface IntegrationEnvironment {
     /**
      * The network mode the host engine starts with.

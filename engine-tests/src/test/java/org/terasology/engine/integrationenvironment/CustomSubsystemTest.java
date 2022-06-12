@@ -3,22 +3,17 @@
 
 package org.terasology.engine.integrationenvironment;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.terasology.engine.testUtil.Correspondences.instanceOfExpected;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(subsystem = CustomSubsystemTest.MySubsystem.class)
 public class CustomSubsystemTest {
 

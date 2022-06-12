@@ -7,15 +7,13 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.registry.In;
 import org.terasology.unittest.stubs.DummyComponent;
 import org.terasology.unittest.stubs.DummyEvent;
@@ -33,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Ensure a test class with a per-class Jupiter lifecycle can share an engine between tests.
  */
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
+@IntegrationEnvironment
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)  // Lifecycle of the test instance
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MTEExtensionTestWithPerClassLifecycle {
