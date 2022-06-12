@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.testUtil;
@@ -30,6 +30,10 @@ public class WithUnittestModule implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         EngineSubsystem.super.initialise(engine, rootContext);
         ModuleManager manager = rootContext.get(ModuleManager.class);
+        registerUnittestModule(manager);
+    }
+
+    public static void registerUnittestModule(ModuleManager manager) {
         Module unittestModule = manager.registerPackageModule("org.terasology.unittest");
         manager.resolveAndLoadEnvironment(unittestModule.getId());
     }
