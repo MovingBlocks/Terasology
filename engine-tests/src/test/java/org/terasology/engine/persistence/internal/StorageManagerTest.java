@@ -22,7 +22,7 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
@@ -312,13 +312,7 @@ public class StorageManagerTest {
         assertTrue(character.isActive());
     }
 
-    static class EnableWritingSaveGames implements EngineSubsystem {
-
-        @Override
-        public String getName() {
-            return this.getClass().getCanonicalName();
-        }
-
+    static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
         @Override
         public void initialise(GameEngine engine, Context rootContext) {
             rootContext.getValue(SystemConfig.class).writeSaveGamesEnabled.set(true);
