@@ -1,14 +1,12 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.asset;
 
 import com.google.common.base.Charsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
@@ -29,15 +27,16 @@ import java.util.List;
  */
 @RegisterAssetFileFormat
 public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData> {
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorTreeFormat.class);
+    private final Context context;
 
 
-    public BehaviorTreeFormat() {
+    public BehaviorTreeFormat(Context context) {
         super("behavior");
+        this.context = context;
     }
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
-        BehaviorTreeBuilder builder = CoreRegistry.get(BehaviorTreeBuilder.class);
+        BehaviorTreeBuilder builder = context.get(BehaviorTreeBuilder.class);
         OutputStreamWriter writer = new OutputStreamWriter(stream, Charsets.UTF_8);
         writer.write(builder.toJson(data.getRoot()));
         writer.close();
@@ -46,10 +45,10 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
 
     @Override
     public BehaviorTreeData load(ResourceUrn resourceUrn, List<AssetDataFile> list) throws IOException {
-        BehaviorTreeBuilder builder = CoreRegistry.get(BehaviorTreeBuilder.class);
+        BehaviorTreeBuilder builder = context.getValue(BehaviorTreeBuilder.class);
         if (builder == null) {
-            builder = new BehaviorTreeBuilder();
-            CoreRegistry.put(BehaviorTreeBuilder.class, builder);
+            builder = new BehaviorTreeBuilder(context);
+            context.put(BehaviorTreeBuilder.class, builder);
         }
         try (InputStream stream = list.get(0).openStream()) {
             return load(stream);
@@ -58,11 +57,11 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
 
 
     public BehaviorTreeData load(InputStream stream) {
-        BehaviorTreeBuilder builder = CoreRegistry.get(BehaviorTreeBuilder.class);
+        BehaviorTreeBuilder builder = context.getValue(BehaviorTreeBuilder.class);
 
         if (builder == null) {
-            builder = new BehaviorTreeBuilder();
-            CoreRegistry.put(BehaviorTreeBuilder.class, builder);
+            builder = new BehaviorTreeBuilder(context);
+            context.put(BehaviorTreeBuilder.class, builder);
         }
         BehaviorNode node = builder.fromJson(stream);
 

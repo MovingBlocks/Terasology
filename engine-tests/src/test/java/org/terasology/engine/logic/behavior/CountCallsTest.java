@@ -1,10 +1,11 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.core.BehaviorState;
@@ -30,7 +31,7 @@ public class CountCallsTest {
         nextId2 = 1;
 
         gsonBuilder = new GsonBuilder();
-        BehaviorTreeBuilder builder = new BehaviorTreeBuilder() {
+        BehaviorTreeBuilder builder = new BehaviorTreeBuilder(new ContextImpl()) {
             @Override
             public BehaviorNode createNode(BehaviorNode node) {
                 return new CountDelegate(node);
