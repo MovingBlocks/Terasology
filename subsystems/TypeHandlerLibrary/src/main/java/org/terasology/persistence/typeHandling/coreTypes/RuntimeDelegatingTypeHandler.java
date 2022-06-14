@@ -1,7 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +35,10 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeDelegatingTypeHandler.class);
 
-    private TypeHandler<T> delegateHandler;
-    private TypeInfo<T> typeInfo;
-    private TypeHandlerLibrary typeHandlerLibrary;
-    private SerializationSandbox sandbox;
+    private final TypeHandler<T> delegateHandler;
+    private final TypeInfo<T> typeInfo;
+    private final TypeHandlerLibrary typeHandlerLibrary;
+    private final SerializationSandbox sandbox;
 
     public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerContext context) {
         this.delegateHandler = delegateHandler;
@@ -242,4 +243,11 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                    );
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("delegate", delegateHandler)
+                .add("type", typeInfo)
+                .toString();
+    }
 }
