@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
@@ -11,7 +11,6 @@ import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.ReflectionUtil;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.CollectionCopyConstructor;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 
 import java.lang.reflect.Type;
@@ -24,11 +23,7 @@ import java.util.Optional;
 public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTypeHandlerFactory.class);
 
-    private ConstructorLibrary constructorLibrary;
-
-    public CollectionTypeHandlerFactory(ConstructorLibrary constructorLibrary) {
-        this.constructorLibrary = constructorLibrary;
-    }
+    public CollectionTypeHandlerFactory() { }
 
     @Override
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
@@ -45,22 +40,18 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        TypeInfo<?> elementTypeInfo = TypeInfo.of(elementType);
-
-        Optional<TypeHandler<?>> declaredElementTypeHandler =
+        var declaredElementTypeHandler =
                 context.getTypeHandlerLibrary().getTypeHandler(elementType);
 
-        @SuppressWarnings("unchecked")
-        TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
+        var elementTypeHandler = new RuntimeDelegatingTypeHandler<>(
                 declaredElementTypeHandler.orElse(null),
-                elementTypeInfo,
+                TypeInfo.of(elementType),
                 context
         );
 
-        CollectionCopyConstructor constructor = ConstructorLibrary.getCollectionCopyConstructor((TypeInfo) typeInfo);
+        var constructor = ConstructorLibrary.getCollectionCopyConstructor((TypeInfo) typeInfo);
 
-        @SuppressWarnings("unchecked")
-        TypeHandler<T> typeHandler = new CollectionTypeHandler(elementTypeHandler, constructor);
+        TypeHandler<T> typeHandler = new CollectionTypeHandler<>(elementTypeHandler, constructor);
 
         return Optional.of(typeHandler);
     }

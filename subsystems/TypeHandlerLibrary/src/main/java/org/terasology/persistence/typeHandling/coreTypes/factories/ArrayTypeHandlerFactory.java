@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
@@ -30,20 +30,17 @@ public class ArrayTypeHandlerFactory implements TypeHandlerFactory {
                 ? ((GenericArrayType) type).getGenericComponentType()
                 : ((Class<?>) type).getComponentType();
 
-        TypeInfo<?> elementTypeInfo = TypeInfo.of(elementType);
-
-        Optional<TypeHandler<?>> declaredElementTypeHandler =
+        var declaredElementTypeHandler =
                 context.getTypeHandlerLibrary().getTypeHandler(elementType);
 
-        @SuppressWarnings("unchecked")
-        TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
+        var elementTypeHandler = new RuntimeDelegatingTypeHandler<>(
                 declaredElementTypeHandler.orElse(null),
-                elementTypeInfo,
+                TypeInfo.of(elementType),
                 context
         );
 
-        @SuppressWarnings("unchecked")
-        TypeHandler<T> typeHandler = new ArrayTypeHandler(elementTypeHandler, elementTypeInfo);
+        @SuppressWarnings("unchecked") TypeHandler<T> typeHandler = (TypeHandler<T>)
+                new ArrayTypeHandler<>(elementTypeHandler, TypeInfo.of(elementType));
 
         return Optional.of(typeHandler);
     }

@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling;
@@ -306,7 +306,7 @@ class InMemorySerializerTest {
 
         Assertions.assertEquals(PersistedBytes.class, data.getClass());
         Assertions.assertTrue(data.isBytes());
-        Assertions.assertEquals(value, data.getAsBytes());
+        Assertions.assertArrayEquals(value, data.getAsBytes());
         Assertions.assertEquals(ByteBuffer.wrap(value), data.getAsByteBuffer());
 
         Assertions.assertFalse(data.isString());
@@ -335,7 +335,7 @@ class InMemorySerializerTest {
         Assertions.assertEquals(PersistedBytes.class, data.getClass());
         Assertions.assertTrue(data.isBytes());
 
-        Assertions.assertEquals(value, data.getAsBytes());
+        Assertions.assertArrayEquals(value, data.getAsBytes());
         Assertions.assertEquals(ByteBuffer.wrap(value), data.getAsByteBuffer());
 
         Assertions.assertFalse(data.isString());

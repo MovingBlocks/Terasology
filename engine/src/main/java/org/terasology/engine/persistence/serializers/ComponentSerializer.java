@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.persistence.serializers;
@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.entitySystem.metadata.ComponentFieldMetadata;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
-import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.gestalt.entitysystem.component.Component;
@@ -22,6 +22,7 @@ import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.metadata.FieldMetadata;
+import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import java.util.Map;
  * When serializing, a FieldSerializeCheck can be provided to determine whether each field should be serialized or not
  *
  */
+@SuppressWarnings("UnusedReturnValue")
 public class ComponentSerializer {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);
@@ -82,23 +84,21 @@ public class ComponentSerializer {
     }
 
     /**
-     * @param componentData
      * @return The component described by the componentData, or null if it couldn't be deserialized
      */
-    public Component deserialize(EntityData.Component componentData) {
+    public <T extends Component<T>> T deserialize(EntityData.Component componentData) {
         return deserialize(componentData, null);
     }
 
     /**
-     * @param componentData
      * @param context       The module this component belongs to, or null if it is not being loaded from a module
      * @return The component described by the componentData, or null if it couldn't be deserialized
      */
-    public Component deserialize(EntityData.Component componentData, Module context) {
-        ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData, context);
+    public <T extends Component<T>> T deserialize(EntityData.Component componentData, Module context) {
+        ComponentMetadata<T> componentMetadata = getComponentMetadata(componentData, context);
         if (componentMetadata != null) {
-            Component component = componentMetadata.newInstance();
-            return deserializeOnto(component, componentData, componentMetadata, FieldSerializeCheck.NullCheck.<Component>newInstance());
+            T component = componentMetadata.newInstance();
+            return deserializeOnto(component, componentData, componentMetadata, FieldSerializeCheck.NullCheck.newInstance());
         } else {
             logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
         }
@@ -109,37 +109,30 @@ public class ComponentSerializer {
      * Deserializes the componentData on top of the target component. Any fields that are not present in the componentData,
      * or which cannot be deserialized, are left unaltered.
      *
-     * @param target
-     * @param componentData
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData) {
-        return deserializeOnto(target, componentData, FieldSerializeCheck.NullCheck.<Component>newInstance(), null);
+    public <T extends Component<T>> T deserializeOnto(T target, EntityData.Component componentData) {
+        return deserializeOnto(target, componentData, FieldSerializeCheck.NullCheck.newInstance(), null);
     }
 
     /**
      * Deserializes the componentData on top of the target component. Any fields that are not present in the componentData,
      * or which cannot be deserialized, are left unaltered.
      *
-     * @param target
-     * @param componentData
      * @param context       The module that contains the component being deserialized. May be null if it is not contained in a module.
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData, Module context) {
-        return deserializeOnto(target, componentData, FieldSerializeCheck.NullCheck.<Component>newInstance(), context);
+    public <T extends Component<T>> T deserializeOnto(T target, EntityData.Component componentData, Module context) {
+        return deserializeOnto(target, componentData, FieldSerializeCheck.NullCheck.newInstance(), context);
     }
 
     /**
      * Deserializes the componentData on top of the target component. Any fields that are not present in the componentData,
      * or which cannot be deserialized, are left unaltered.
      *
-     * @param target
-     * @param componentData
-     * @param fieldCheck
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData, FieldSerializeCheck<Component> fieldCheck) {
+    public <T extends Component<T>> T deserializeOnto(T target, EntityData.Component componentData, FieldSerializeCheck<T> fieldCheck) {
         return deserializeOnto(target, componentData, fieldCheck, null);
     }
 
@@ -147,15 +140,12 @@ public class ComponentSerializer {
      * Deserializes the componentData on top of the target component. Any fields that are not present in the componentData,
      * or which cannot be deserialized, are left unaltered.
      *
-     * @param target
-     * @param componentData
-     * @param fieldCheck
      * @param context       The module this component is being deserialized from, or null if it isn't within a module
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData,
-                                     FieldSerializeCheck<Component> fieldCheck, Module context) {
-        ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData, context);
+    public <T extends Component<T>> T deserializeOnto(T target, EntityData.Component componentData,
+                                     FieldSerializeCheck<T> fieldCheck, Module context) {
+        ComponentMetadata<T> componentMetadata = getComponentMetadata(componentData, context);
         if (componentMetadata != null) {
             return deserializeOnto(target, componentData, componentMetadata, fieldCheck);
         } else {
@@ -165,12 +155,12 @@ public class ComponentSerializer {
     }
 
 
-    private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
-                                                            ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
-        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
-        Map<FieldMetadata<?, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
+    private <T extends Component<T>> T deserializeOnto(T targetComponent, EntityData.Component componentData,
+                                                            ComponentMetadata<T> componentMetadata, FieldSerializeCheck<T> fieldCheck) {
+        Serializer<T> serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
+        Map<FieldMetadata<T, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
         for (EntityData.NameValue field : componentData.getFieldList()) {
-            FieldMetadata<?, ?> fieldInfo = null;
+            FieldMetadata<T, ?> fieldInfo = null;
             if (field.hasNameIndex()) {
                 fieldInfo = componentMetadata.getField(field.getNameIndex());
             } else if (field.hasName()) {
@@ -190,22 +180,21 @@ public class ComponentSerializer {
     /**
      * Serializes a component.
      *
-     * @param component
      * @return The serialized component, or null if it could not be serialized.
      */
-    public EntityData.Component serialize(Component component) {
-        return serialize(component, FieldSerializeCheck.NullCheck.<Component>newInstance());
+    public <T extends Component<T>> EntityData.Component serialize(T component) {
+        return serialize(component, FieldSerializeCheck.NullCheck.newInstance());
     }
 
     /**
      * Serializes a component.
      *
-     * @param component
      * @param check     A check to use to see if each field should be serialized.
      * @return The serialized component, or null if it could not be serialized.
      */
-    public EntityData.Component serialize(Component component, FieldSerializeCheck<Component> check) {
-        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
+    public <T extends Component<T>> EntityData.Component serialize(T component, FieldSerializeCheck<T> check) {
+        @SuppressWarnings("unchecked") ComponentMetadata<T> componentMetadata = (ComponentMetadata<T>)
+                componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
             return null;
@@ -213,20 +202,20 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(componentMetadata, componentMessage);
 
-        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
-        for (ReplicatedFieldMetadata<?, ?> field : componentMetadata.getFields()) {
-            if (check.shouldSerializeField(field, component)) {
-                PersistedData result = serializer.serialize(field, component, serializationContext);
-                if (!result.isNull()) {
-                    EntityData.Value itemValue = ((ProtobufPersistedData) result).getValue();
-                    if (usingFieldIds) {
-                        componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(itemValue));
-                    } else {
-                        componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(itemValue));
-                    }
+        Serializer<T> serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
+        componentMetadata.getFields().stream()
+                .filter(field -> check.shouldSerializeField(field, component))
+                .forEach(field -> {
+            PersistedData result = serializer.serialize(field, component, serializationContext);
+            if (!result.isNull()) {
+                EntityData.Value itemValue = ((ProtobufPersistedData) result).getValue();
+                if (usingFieldIds) {
+                    componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(itemValue));
+                } else {
+                    componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(itemValue));
                 }
             }
-        }
+        });
 
         return componentMessage.build();
     }
@@ -247,8 +236,8 @@ public class ComponentSerializer {
      * @param delta The component whose differences will be serialized
      * @return The serialized component, or null if it could not be serialized
      */
-    public EntityData.Component serialize(Component base, Component delta) {
-        return serialize(base, delta, FieldSerializeCheck.NullCheck.<Component>newInstance());
+    public <T extends Component<T>> EntityData.Component serialize(T base, T delta) {
+        return serialize(base, delta, FieldSerializeCheck.NullCheck.newInstance());
     }
 
     /**
@@ -259,8 +248,8 @@ public class ComponentSerializer {
      * @param check A check to use to see if each field should be serialized.
      * @return The serialized component, or null if it could not be serialized
      */
-    public EntityData.Component serialize(Component base, Component delta, FieldSerializeCheck<Component> check) {
-        ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
+    public <T extends Component<T>> EntityData.Component serialize(T base, T delta, FieldSerializeCheck<T> check) {
+        @SuppressWarnings("unchecked") ComponentMetadata<T> componentMetadata = (ComponentMetadata<T>) componentLibrary.getMetadata(base.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", base.getClass());
             return null;
@@ -269,57 +258,66 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(componentMetadata, componentMessage);
 
-        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
-        boolean changed = false;
-        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
-            if (check.shouldSerializeField(field, delta) && serializer.getHandlerFor(field) != null) {
-                Object origValue = field.getValue(base);
-                Object deltaValue = field.getValue(delta);
+        Serializer<T> serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
+        var changedFields = Flux.fromIterable(componentMetadata.getFields())
+                .filter(field -> check.shouldSerializeField(field, delta) && serializer.getHandlerFor(field) != null)
+                .mapNotNull(field -> extracted(base, delta, serializer, field))
+                .collectList()
+                .block();
+        if (changedFields == null || changedFields.isEmpty()) {
+            return null;
+        }
+        componentMessage.addAllField(changedFields);
+        return componentMessage.build();
+    }
 
-                if (!Objects.equal(origValue, deltaValue)) {
-                    PersistedData value = serializer.serializeValue(field, deltaValue, serializationContext);
-                    if (!value.isNull()) {
-                        EntityData.Value dataValue = ((ProtobufPersistedData) value).getValue();
-                        if (usingFieldIds) {
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(dataValue).build());
-                        } else {
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(dataValue).build());
-                        }
-                        changed = true;
-                    }
-                }
+    private <T extends Component<T>, F> EntityData.NameValue extracted(T base, T delta, Serializer<T> serializer,
+                                                                       ComponentFieldMetadata<T, F> field) {
+        F origValue = field.getValue(base);
+        F deltaValue = field.getValue(delta);
+
+        if (!Objects.equal(origValue, deltaValue)) {
+            PersistedData value = serializer.serializeValue(field, deltaValue, serializationContext);
+            if (!value.isNull()) {
+                EntityData.Value dataValue = ((ProtobufPersistedData) value).getValue();
+                EntityData.NameValue.Builder nameValueBuilder = getNameValueBuilder(field);
+                nameValueBuilder.setValue(dataValue);
+                return nameValueBuilder.build();
             }
         }
-
-        if (changed) {
-            return componentMessage.build();
-        }
-
         return null;
+    }
+
+    private <T extends Component<T>, F> EntityData.NameValue.Builder getNameValueBuilder(ComponentFieldMetadata<T, F> field) {
+        var nameValueBuilder = EntityData.NameValue.newBuilder();
+        if (usingFieldIds) {
+            nameValueBuilder.setNameIndex(field.getId());
+        } else {
+            nameValueBuilder.setName(field.getName());
+        }
+        return nameValueBuilder;
     }
 
     /**
      * Determines the component class that the serialized component is for.
      *
-     * @param componentData
      * @return The component class the given componentData describes, or null if it is unknown.
      */
-    public ComponentMetadata<? extends Component> getComponentMetadata(EntityData.Component componentData) {
+    public <T extends Component<T>> ComponentMetadata<T> getComponentMetadata(EntityData.Component componentData) {
         return getComponentMetadata(componentData, null);
     }
 
     /**
      * Determines the component class that the serialized component is for.
      *
-     * @param componentData
      * @param context       the module this component is being loaded from
      * @return The component class the given componentData describes, or null if it is unknown.
      */
-    public ComponentMetadata<? extends Component> getComponentMetadata(EntityData.Component componentData, Module context) {
+    public <T extends Component<T>> ComponentMetadata<T> getComponentMetadata(EntityData.Component componentData, Module context) {
         if (componentData.hasTypeIndex()) {
-            ComponentMetadata<? extends Component> metadata = null;
+            ComponentMetadata<T> metadata = null;
             if (!idTable.isEmpty()) {
-                Class<? extends Component> componentClass = idTable.inverse().get(componentData.getTypeIndex());
+                @SuppressWarnings("unchecked") Class<T> componentClass = (Class<T>) idTable.inverse().get(componentData.getTypeIndex());
                 if (componentClass != null) {
                     metadata = componentLibrary.getMetadata(componentClass);
                 }
@@ -330,11 +328,13 @@ public class ComponentSerializer {
             }
             return metadata;
         } else if (componentData.hasType()) {
-            ComponentMetadata<? extends Component> metadata;
+            ComponentMetadata<T> metadata;
             if (context != null) {
-                metadata = componentLibrary.resolve(componentData.getType(), context);
+                //noinspection unchecked
+                metadata = (ComponentMetadata<T>) componentLibrary.resolve(componentData.getType(), context);
             } else {
-                metadata = componentLibrary.resolve(componentData.getType());
+                //noinspection unchecked
+                metadata = (ComponentMetadata<T>) componentLibrary.resolve(componentData.getType());
             }
             if (metadata == null) {
                 logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());

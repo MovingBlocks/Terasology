@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling;
@@ -57,14 +57,14 @@ public class TypeHandlerLibrary {
     private final List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
     private final Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
     private final Map<TypeInfo<?>, TypeHandler<?>> typeHandlerCache = Maps.newHashMap();
-    private final Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
+    private final Map<ClassMetadata<?, ?>, Serializer<?>> serializerMap = Maps.newHashMap();
 
     protected TypeHandlerLibrary(SerializationSandbox sandbox) {
         this.sandbox = sandbox;
         ConstructorLibrary constructorLibrary = new ConstructorLibrary(instanceCreators);
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
         TypeHandlerLibrary.populateBuiltInHandlers(this);
-        addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
+        addTypeHandlerFactory(new CollectionTypeHandlerFactory());
     }
     
     public TypeHandlerLibrary(Reflections reflections) {
@@ -122,11 +122,11 @@ public class TypeHandlerLibrary {
      * @param type The ClassMetadata for the type of interest
      * @return A serializer for serializing/deserializing the type
      */
-    public Serializer getSerializerFor(ClassMetadata<?, ?> type) {
-        Serializer serializer = serializerMap.get(type);
+    public <C> Serializer<C> getSerializerFor(ClassMetadata<C, ? extends FieldMetadata<C, ?>> type) {
+        @SuppressWarnings("unchecked") Serializer<C> serializer = (Serializer<C>) serializerMap.get(type);
         if (serializer == null) {
-            Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlerMap = getFieldHandlerMap(type);
-            serializer = new Serializer(type, fieldHandlerMap);
+            var fieldHandlerMap = getFieldHandlerMap(type);
+            serializer = new Serializer<>(type, fieldHandlerMap);
             serializerMap.put(type, serializer);
         }
         return serializer;
@@ -209,10 +209,9 @@ public class TypeHandlerLibrary {
      * @param type The {@link Type} describing the type for which to retrieve the {@link TypeHandler}.
      * @return The {@link TypeHandler} for the specified type, if available.
      */
-    @SuppressWarnings("unchecked")
-    public Optional<TypeHandler<?>> getTypeHandler(Type type) {
-        TypeInfo typeInfo = TypeInfo.of(type);
-        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo);
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Type type) {
+        TypeInfo<T> typeInfo = TypeInfo.of(type);
+        return getTypeHandler(typeInfo);
     }
 
     /**
@@ -310,17 +309,17 @@ public class TypeHandlerLibrary {
         return new RuntimeDelegatingTypeHandler<>(delegateHandler, typeInfo, context);
     }
 
-    private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
-        Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
-        for (FieldMetadata<?, ?> field : type.getFields()) {
-            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType());
-
-            if (handler.isPresent()) {
-                handlerMap.put(field, handler.get());
-            } else {
-                logger.error("Unsupported field: '{}.{}'", type.getId(), field.getName());
-            }
-        }
+    private <C> Map<FieldMetadata<C, ?>, TypeHandler<?>> getFieldHandlerMap(ClassMetadata<C, ? extends FieldMetadata<C, ?>> type) {
+        Map<FieldMetadata<C, ?>, TypeHandler<?>> handlerMap = new HashMap<>();
+        type.getFields().forEach(field ->
+            getFmConsumer(field).ifPresentOrElse(
+                handler -> handlerMap.put(field, handler),
+                () -> logger.error("Unsupported field: '{}.{}'", type.getId(), field.getName())
+        ));
         return handlerMap;
+    }
+
+    private <T> Optional<TypeHandler<T>> getFmConsumer(FieldMetadata<?, T> field) {
+        return getTypeHandler(field.getField().getGenericType());
     }
 }

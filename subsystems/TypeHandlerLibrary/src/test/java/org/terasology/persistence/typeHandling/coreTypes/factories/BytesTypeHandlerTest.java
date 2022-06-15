@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling.coreTypes.factories;
@@ -39,10 +39,10 @@ class BytesTypeHandlerTest {
         byte[] expectedObj = new byte[]{(byte) 0xFF};
 
         PersistedBytes data = serialize(expectedObj, new ByteArrayTypeHandler());
-        Assertions.assertEquals(expectedObj, data.getAsBytes());
+        Assertions.assertArrayEquals(expectedObj, data.getAsBytes());
 
         byte[] obj = deserialize(data, new ByteArrayTypeHandler());
-        Assertions.assertEquals(expectedObj, obj);
+        Assertions.assertArrayEquals(expectedObj, obj);
     }
 
     private <R extends PersistedData, T> R serialize(T obj, TypeHandler<T> typeHandler) {
