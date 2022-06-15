@@ -1,7 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.inMemory;
 
+import com.google.common.base.MoreObjects;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
@@ -79,5 +80,12 @@ public class PersistedMap extends AbstractPersistedData implements PersistedData
     @Override
     public Set<Map.Entry<String, PersistedData>> entrySet() {
         return map.entrySet();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .addValue(map)
+                .toString();
     }
 }

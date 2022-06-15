@@ -1,7 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.reflection.reflect;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -64,6 +65,13 @@ public class ConstructorLibrary {
                     throw new RuntimeException("Unable to create an instance of " + typeInfo.getType() + ". " +
                             "Register an InstanceCreator for this type to fix this problem.", e);
                 }
+            }
+
+            @Override
+            public String toString() {
+                return MoreObjects.toStringHelper(this)
+                        .add("type", typeInfo)
+                        .toString();
             }
         };
     }
