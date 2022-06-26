@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
@@ -13,6 +13,8 @@ import org.terasology.engine.rendering.world.WorldRenderer;
  * Loops until world is pre-generated or 5 seconds elapsed.
  */
 public class PrepareWorld extends VariableStepLoadProcess {
+
+    public static int maximumWaitMs = 5000;
 
     private final Context context;
     private long startTime;
@@ -33,9 +35,10 @@ public class PrepareWorld extends VariableStepLoadProcess {
         if (worldRenderer.pregenerateChunks()) {
             return true;
         }
+        Thread.onSpinWait();
         EngineTime time = (EngineTime) context.get(Time.class);
         timeElapsed = time.getRealTimeInMs() - startTime;
-        return timeElapsed > 5000;
+        return timeElapsed > maximumWaitMs;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class PrepareWorld extends VariableStepLoadProcess {
 
     @Override
     public float getProgress() {
-        return (1 / Math.max(1f, 5000f / (float) timeElapsed));
+        return ((float) timeElapsed) / maximumWaitMs;
     }
 
     @Override
