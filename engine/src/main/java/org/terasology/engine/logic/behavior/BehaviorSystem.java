@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
@@ -83,6 +83,9 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void update(float delta) {
+        if (delta == 0) {
+            return;  // paused
+        }
         Iterable<EntityRef> entities = entityManager.getEntitiesWith(BehaviorComponent.class);
         for (EntityRef entity : entities) {
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
