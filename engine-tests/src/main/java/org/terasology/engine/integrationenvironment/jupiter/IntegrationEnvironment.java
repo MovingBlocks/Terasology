@@ -23,6 +23,13 @@ import java.lang.annotation.Target;
 @ExtendWith(MTEExtension.class)
 public @interface IntegrationEnvironment {
     /**
+     * Modules to include in the environment.
+     * <p>
+     * Names of modules, as defined by the {@code id} in their {@code module.txt}.
+     */
+    String[] dependencies() default { };
+
+    /**
      * The network mode the host engine starts with.
      * <p>
      * See {@link NetworkMode} for details on the options.
