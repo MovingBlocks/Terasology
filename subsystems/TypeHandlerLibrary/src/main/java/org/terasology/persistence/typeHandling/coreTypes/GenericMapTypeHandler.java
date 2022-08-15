@@ -61,7 +61,12 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
     @Override
     public Optional<Map<K, V>> deserialize(PersistedData data) {
-        if (!data.isArray()) {
+        if (!data.isArray() || data.isValueMap()) {
+            logger.warn("Incorrect map format detected. Expected\n" +
+                    "  \"mapName\": [\n" +
+                    "    { \"key\": \"...\", \"value\": \"...\" }\n" +
+                    "  ]\n" +
+                    "but found \n'{}'", data);
             return Optional.empty();
         }
 
@@ -69,14 +74,24 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
         for (PersistedData entry : data.getAsArray()) {
             PersistedDataMap kvEntry = entry.getAsValueMap();
-            final Optional<K> key = keyHandler.deserialize(kvEntry.get(KEY));
+            PersistedData rawKey = kvEntry.get(KEY);
+            if (rawKey != null) {
+                final Optional<K> key = keyHandler.deserialize(rawKey);
 
-            if (key.isPresent()) {
-                final Optional<V> value = valueHandler.deserialize(kvEntry.get(VALUE));
-                if (value.isPresent()) {
-                    result.put(key.get(), value.get());
+                if (key.isPresent()) {
+                    PersistedData rawValue = kvEntry.get(VALUE);
+                    if (rawValue != null) {
+                        final Optional<V> value = valueHandler.deserialize(kvEntry.get(VALUE));
+                        if (value.isPresent()) {
+                            result.put(key.get(), value.get());
+                        } else {
+                            logger.warn("Could not deserialize value '{}' as '{}'", rawValue, valueHandler.getClass().getSimpleName());
+                        }
+                    } else {
+                        logger.warn("Missing value for key '{}' with {} given entry '{}'", key.get(), valueHandler, kvEntry.get(VALUE));
+                    }
                 } else {
-                    logger.warn("Missing value for key '{}' with {} given entry '{}'", key.get(), valueHandler, kvEntry.get(VALUE));
+                    logger.warn("Could not deserialize key '{}' as '{}'", rawKey, keyHandler.getClass().getSimpleName());
                 }
             } else {
                 logger.warn("Missing field '{}' for entry '{}'", KEY, kvEntry);
