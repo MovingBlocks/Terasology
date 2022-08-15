@@ -18,12 +18,14 @@ import org.joml.Vector4fc;
 import org.joml.Vector4i;
 import org.joml.Vector4ic;
 import org.reflections.Reflections;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.math.IntegerRange;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ChunkMeshTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorcTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.NameTypeHandler;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.SimpleUriTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
@@ -113,6 +115,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
 
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
+        serializationLibrary.addTypeHandler(SimpleUri.class, new SimpleUriTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
         serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
         serializationLibrary.addTypeHandler(ChunkMesh.class, new ChunkMeshTypeHandler());
