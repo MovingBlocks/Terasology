@@ -74,6 +74,7 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
             PersistedData rawValue = kvEntry.get(VALUE);
             if (rawKey == null || rawValue == null) {
                 logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n" + getUsageInfo(data));
+                return Optional.empty();
             }
 
             final Optional<K> key = keyHandler.deserialize(rawKey);
