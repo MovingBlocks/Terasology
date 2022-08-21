@@ -32,6 +32,39 @@ class GenericMapTypeHandlerTest {
             ))
     ));
 
+    private final PersistedData testDataMalformatted = new PersistedValueArray(List.of(
+            new PersistedMap(Map.of(
+                    "testmap", new PersistedMap(Map.of(
+                            TEST_KEY, new PersistedLong(TEST_VALUE)
+                    ))
+            ))
+    ));
+
+    private final PersistedData testDataMissingKeyEntry = new PersistedValueArray(List.of(
+            new PersistedMap(Map.of(
+                    "not key", new PersistedString(TEST_KEY),
+                    GenericMapTypeHandler.VALUE, new PersistedLong(TEST_VALUE)
+            ))
+    ));
+
+    private final PersistedData testDataMissingValueEntry = new PersistedValueArray(List.of(
+            new PersistedMap(Map.of(
+                    GenericMapTypeHandler.KEY, new PersistedString(TEST_KEY),
+                    "not value", new PersistedLong(TEST_VALUE)
+            ))
+    ));
+
+    private final PersistedData testDataValidAndInvalidMix = new PersistedValueArray(List.of(
+            new PersistedMap(Map.of(
+                    GenericMapTypeHandler.KEY, new PersistedString(TEST_KEY),
+                    GenericMapTypeHandler.VALUE, new PersistedLong(TEST_VALUE)
+            )),
+            new PersistedMap(Map.of(
+                    "not key", new PersistedString(TEST_KEY),
+                    "not value", new PersistedLong(TEST_VALUE)
+            ))
+    ));
+
     @Test
     void testDeserialize() {
         var th = new GenericMapTypeHandler<>(
@@ -50,7 +83,7 @@ class GenericMapTypeHandlerTest {
                 new UselessTypeHandler<>()
         );
 
-        assertThat(th.deserialize(testData)).hasValue(Collections.emptyMap());
+        assertThat(th.deserialize(testData)).isEmpty();
     }
 
     @Test
@@ -60,7 +93,47 @@ class GenericMapTypeHandlerTest {
                 new LongTypeHandler()
         );
 
-        assertThat(th.deserialize(testData)).hasValue(Collections.emptyMap());
+        assertThat(th.deserialize(testData)).isEmpty();
+    }
+    
+    @Test
+    void testDeserializeWithObjectInsteadOfArray() {
+        var th = new GenericMapTypeHandler<>(
+                new StringTypeHandler(),
+                new LongTypeHandler()
+        );
+
+        assertThat(th.deserialize(testDataMalformatted)).isEmpty();
+    }
+
+    @Test
+    void testDeserializeWithMissingKeyEntry() {
+        var th = new GenericMapTypeHandler<>(
+                new StringTypeHandler(),
+                new LongTypeHandler()
+        );
+
+        assertThat(th.deserialize(testDataMissingKeyEntry)).isEmpty();
+    }
+
+    @Test
+    void testDeserializeWithMissingValueEntry() {
+        var th = new GenericMapTypeHandler<>(
+                new StringTypeHandler(),
+                new LongTypeHandler()
+        );
+
+        assertThat(th.deserialize(testDataMissingValueEntry)).isEmpty();
+    }
+
+    @Test
+    void testDeserializeWithValidAndInvalidEntries() {
+        var th = new GenericMapTypeHandler<>(
+                new StringTypeHandler(),
+                new LongTypeHandler()
+        );
+
+        assertThat(th.deserialize(testDataValidAndInvalidMix)).isEmpty();
     }
 
     /** Never returns a value. */
