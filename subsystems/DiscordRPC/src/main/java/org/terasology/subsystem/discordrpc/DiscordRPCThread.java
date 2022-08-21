@@ -7,6 +7,7 @@ import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.IPCListener;
 import com.jagrosh.discordipc.entities.RichPresence;
 import com.jagrosh.discordipc.exceptions.NoDiscordClientException;
+import org.newsclub.net.unix.AFUNIXSocketException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,6 +189,9 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
 
                             // Retry to connect again
                         }
+                    } catch (RuntimeException e) {
+                        logger.error("Could not create or connect Discord client: {}", e.getMessage());
+                        return;
                     }
                 }
             }
