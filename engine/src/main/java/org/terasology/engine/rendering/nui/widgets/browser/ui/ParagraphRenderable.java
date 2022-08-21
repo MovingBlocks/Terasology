@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.widgets.browser.ui;
 
@@ -43,7 +43,7 @@ public interface ParagraphRenderable {
     void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace, int leftIndent, int rightIndent,
                         ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister);
 
-    public interface HyperlinkRegister {
+    interface HyperlinkRegister {
         void registerHyperlink(Rectanglei region, String hyperlink);
     }
 }

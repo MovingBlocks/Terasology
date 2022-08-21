@@ -1,20 +1,10 @@
-<!-- Copyright 2021 The Terasology Foundation -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+<configuration debug="false">
+  <!-- debug: reports all changes to this configuration on System.out -->
 
-<configuration>
-
-  <!-- Report all changes to this configuration on System.out -->
-  <!--statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" /-->
-
-  <!-- Propagate all log level changes to java.util.logging -->
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-    <resetJUL>true</resetJUL>
-  </contextListener>
+  <include resource="org/terasology/engine/logback/setup.xml" />
 
   <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <!-- in the absence of the class attribute, it is assumed that the
-         desired discriminator type is MDCBasedDiscriminator -->
-    <discriminator>
+    <discriminator class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
       <key>phase</key>
       <defaultValue>init</defaultValue>
     </discriminator>
@@ -37,10 +27,11 @@
   </appender>
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type PatternLayoutEncoder by default -->
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
+
+    <include resource="org/terasology/engine/logback/filter-reflections.xml" />
   </appender>
 
   <root level="${logOverrideLevel:-debug}">

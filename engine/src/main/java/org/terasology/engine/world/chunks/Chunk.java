@@ -5,7 +5,6 @@ package org.terasology.engine.world.chunks;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.gestalt.module.sandbox.API;
@@ -13,6 +12,7 @@ import org.terasology.protobuf.EntityData;
 
 /**
  * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons.
+ *
  * <p>
  * For example the renderer renders a single mesh for all opaque blocks in a chunk rather
  * than rendering each block as a separate mesh.
@@ -386,10 +386,4 @@ public interface Chunk extends RenderableChunk {
     boolean isDirty();
 
     void setDirty(boolean dirty);
-
-    void setPendingMesh(ChunkMesh newPendingMesh);
-
-    boolean hasPendingMesh();
-
-    ChunkMesh getPendingMesh();
 }

@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
@@ -11,6 +11,7 @@ plugins {
     `java-library`
     idea
     eclipse
+    id("terasology-common")
 }
 
 val moduleMetadata = ModuleMetadataForGradle.forProject(project)
@@ -66,18 +67,7 @@ dependencies {
         }
     }
 
-    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.21")
-
-    add("testImplementation", platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
-    testImplementation("org.mockito:mockito-inline:3.12.4")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
-
-    testImplementation("com.google.truth:truth:1.1.3")
-    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.3")
+    // see terasology-metrics for test dependencies
 }
 
 
@@ -144,21 +134,14 @@ tasks.register<Sync>("syncDeltas") {
     into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
-// Instructions for packaging a jar file - is a manifest even needed for modules?
-tasks.named("jar") {
+tasks.register<Copy>("syncModuleInfo") {
+    from("module.txt")
+    into(mainSourceSet.output.classesDirs.first())
+}
+
+tasks.named("processResources") {
     // Make sure the assets directory is included
-    dependsOn("syncAssets")
-    dependsOn("syncOverrides")
-    dependsOn("syncDeltas")
-
-    // Jarring needs to copy module.txt and all the assets into the output
-    doFirst {
-        copy {
-            from("module.txt")
-            into(mainSourceSet.output.classesDirs.first())
-        }
-    }
-
+    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
 }
 
 tasks.named<Test>("test") {

@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless.mode;
 
@@ -33,7 +33,16 @@ public class StateHeadlessSetup extends AbstractState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
 
+    protected boolean strictModuleRequirements;
+
+    private final NetworkMode networkMode;
+
     public StateHeadlessSetup() {
+        this(NetworkMode.LISTEN_SERVER);
+    }
+
+    public StateHeadlessSetup(NetworkMode networkMode) {
+        this.networkMode = networkMode;
     }
 
     @Override
@@ -56,7 +65,7 @@ public class StateHeadlessSetup extends AbstractState {
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(gameManifest.getSeed());
 
-        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
+        gameEngine.changeState(new StateLoading(gameManifest, networkMode));
     }
 
     public GameManifest createGameManifest() {
@@ -68,6 +77,8 @@ public class StateHeadlessSetup extends AbstractState {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 gameManifest.addModule(module.getId(), module.getVersion());
+            } else if (strictModuleRequirements) {
+                throw new RuntimeException("ModuleRegistry has no latest version for module " + moduleName);
             } else {
                 logger.warn("ModuleRegistry has no latest version for module {}", moduleName);
             }

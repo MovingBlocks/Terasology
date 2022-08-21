@@ -1,11 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.config.flexible.constraints;
 
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,6 @@ public class StringConstraint implements SettingConstraint<String> {
         return new PredicateWithDescription<>("matches regex: \"" + regex + "\"", s -> pattern.matcher(s).matches());
     }
 
-    @NotNull
     private static String getDescription(Predicate<String> p) {
         if (p instanceof PredicateWithDescription) {
             return ((PredicateWithDescription<String>) p).getDescription();

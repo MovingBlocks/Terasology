@@ -1,20 +1,12 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2022 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 
 import groovy.json.JsonSlurper
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 class module {
     def excludedItems = ["engine", "Index", "out", "build"]
@@ -58,12 +50,6 @@ class module {
     }
 
     def copyInTemplateFiles(File targetDir) {
-        // Copy in the template build.gradle for modules
-        println "In copyInTemplateFiles for module $targetDir.name - copying in a build.gradle then next checking for module.txt"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
-        targetBuildGradle.delete()
-        targetBuildGradle << new File('templates/build.gradle').text
-
         // Copy in the template module.txt for modules (if one doesn't exist yet)
         File moduleManifest = new File(targetDir, 'module.txt')
         if (!moduleManifest.exists()) {
@@ -73,8 +59,9 @@ class module {
             println "WARNING: the module ${targetDir.name} did not have a module.txt! One was created, please review and submit to GitHub"
         }
 
+        refreshGradle(targetDir)
+
         // TODO: Copy in a module readme template soon
-        // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
     }
 
     /**
@@ -94,14 +81,28 @@ class module {
     }
 
     def refreshGradle(File targetDir) {
-        // Copy in the template build.gradle for modules
-        if (!new File(targetDir, "module.txt").exists()) {
-            println "$targetDir has no module.txt, it must not want a fresh build.gradle"
+        if (!(targetDir.canRead() && targetDir.canWrite())) {
+            println "$targetDir: ⛔ not accessible"
             return
         }
-        println "In refreshGradle for module $targetDir - copying in a fresh build.gradle"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
-        targetBuildGradle.delete()
-        targetBuildGradle << new File('templates/build.gradle').text
+        Path targetPath = targetDir.toPath()
+        if (Files.notExists(targetPath.resolve('module.txt'))) {
+            println "$targetDir/module.txt: ❓ not present, it must not want a fresh build.gradle"
+            return
+        }
+
+        Path templates = Path.of('templates')
+        Files.copy(templates.resolve('build.gradle'), targetPath.resolve('build.gradle'),
+                StandardCopyOption.REPLACE_EXISTING)
+        println "$targetDir/build.gradle: ✨ refreshed"
+
+        Path logbackXml = targetPath.resolve('src/test/resources/logback-test.xml')
+        if (Files.notExists(logbackXml)) {
+            Files.createDirectories(logbackXml.parent)
+            Files.copy(templates.resolve('module.logback-test.xml'), logbackXml)
+            println "$logbackXml: ✨ added"
+        } else {
+            println "$logbackXml: already there"
+        }
     }
 }

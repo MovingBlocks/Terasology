@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.logic.chat;
@@ -66,6 +66,9 @@ public class ChatSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onMessage(MessageEvent event, EntityRef entity) {
+        if (overlay == null) {
+            return;
+        }
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
             Message message = event.getFormattedMessage();

@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 import org.terasology.gradology.JAR_COLLECTION
@@ -6,6 +6,7 @@ import org.terasology.gradology.namedAttribute
 
 plugins {
     application
+    id("terasology-common")
 }
 
 val dirNatives: String by rootProject.extra

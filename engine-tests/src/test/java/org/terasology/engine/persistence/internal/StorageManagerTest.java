@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
@@ -6,15 +6,18 @@ import com.google.common.collect.Lists;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
@@ -55,13 +58,12 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.EntityRefComponent;
 import org.terasology.unittest.stubs.StringComponent;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,12 +73,14 @@ import static org.mockito.Mockito.when;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Tag("TteTest")
+@ExtendWith(MockitoExtension.class)
+// TODO: Re-evaluate Mockito strictness settings after replacing TerasologyTestingEnvironment (#5010)
+//   Mockito is currently in LENIENT mode because some of the mocked objects or methods are only used
+//   by a subset of the tests.
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class StorageManagerTest extends TerasologyTestingEnvironment {
-
     public static final String PLAYER_ID = "someId";
     public static final Vector3ic CHUNK_POS = new Vector3i(1, 2, 3);
-
-    private static File temporaryFolder;
 
     private ModuleEnvironment moduleEnvironment;
     private ReadWriteStorageManager esm;
@@ -91,21 +95,17 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private RecordAndReplayUtils recordAndReplayUtils;
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
-    @BeforeAll
-    static void createFolder() throws IOException {
-        File createdFolder = File.createTempFile("junit", "", null);
-        createdFolder.delete();
-        createdFolder.mkdir();
-        temporaryFolder = createdFolder;
-    }
-
     @BeforeEach
-    public void setup(@TempDir Path tempHome) throws Exception {
+    public void setup(TestInfo testInfo) throws Exception {
         super.setup();
-        PathManager.getInstance().useOverrideHomePath(tempHome);
-        savePath = PathManager.getInstance().getSavePath("testSave");
 
-        assert !Files.isRegularFile(tempHome.resolve("global.dat"));
+        String saveName = "testSave-" + testInfo.getTestMethod().map(Method::getName)
+                .orElseGet(() -> UUID.randomUUID().toString());
+        savePath = PathManager.getInstance().getSavePath(saveName);
+
+        assertWithMessage("Leftover files in %s", savePath)
+                .that(savePath.resolve("global.dat").toFile().exists())
+                .isFalse();
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);
@@ -134,7 +134,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         Client client = createClientMock(PLAYER_ID, character);
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
+        when(networkSystem.getPlayers()).thenReturn(List.of(client));
         context.put(NetworkSystem.class, networkSystem);
 
         AssetManager assetManager = context.get(AssetManager.class);
@@ -163,8 +163,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         ClientComponent clientComponent = new ClientComponent();
         clientComponent.local = true;
         clientComponent.character = charac;
-        EntityRef clientEntity = entityManager.create(clientComponent);
-        return clientEntity;
+        return entityManager.create(clientComponent);
     }
 
     @Test
@@ -267,7 +266,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
-        when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
+        when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
@@ -287,7 +286,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
-        when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
+        when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
         when(chunkProvider.getChunk(ArgumentMatchers.any(Vector3ic.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         boolean storeChunkInZips = true;
@@ -318,7 +317,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
-        when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
+        when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         EntityRef entity = entityManager.create();
         long id = entity.getId();
@@ -349,7 +348,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void testCanSavePlayerWithoutUnloading() throws Exception {
+    public void testCanSavePlayerWithoutUnloading() {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 

@@ -48,5 +48,10 @@ workspace.xml
 # Automatically created when the checkout directy name is different from git origin?
 /.name
 
-# Discord files. It's user-specific and not-for-sharing
-discord.xml
+# Git Toolbox https://plugins.jetbrains.com/plugin/7499-gittoolbox
+# Settings appear to be user-specific.
+/git_toolbox_prj.xml
+
+# Grep Console https://plugins.jetbrains.com/plugin/7125-grep-console
+# Settings appear to be workspace-specific.
+/GrepConsole.xml

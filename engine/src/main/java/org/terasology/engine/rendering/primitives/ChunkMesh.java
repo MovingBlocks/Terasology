@@ -53,8 +53,6 @@ public interface ChunkMesh {
 
     int render(ChunkMesh.RenderPhase type);
 
-
-
     /**
      * Possible rendering types.
      */

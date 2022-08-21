@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling.coreTypes;
@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
  */
 public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericMapTypeHandler.class);
+    static final String KEY = "key";
+    static final String VALUE = "value";
 
-    private static final String KEY = "key";
-    private static final String VALUE = "value";
+    private static final Logger logger = LoggerFactory.getLogger(GenericMapTypeHandler.class);
 
     private final TypeHandler<K> keyHandler;
     private final TypeHandler<V> valueHandler;
@@ -67,17 +68,18 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
         Map<K, V> result = Maps.newLinkedHashMap();
 
         for (PersistedData entry : data.getAsArray()) {
-            final Optional<K> key = keyHandler.deserialize(entry.getAsValueMap().get(KEY));
-            final Optional<V> value = valueHandler.deserialize(entry.getAsValueMap().get(VALUE));
+            PersistedDataMap kvEntry = entry.getAsValueMap();
+            final Optional<K> key = keyHandler.deserialize(kvEntry.get(KEY));
 
             if (key.isPresent()) {
+                final Optional<V> value = valueHandler.deserialize(kvEntry.get(VALUE));
                 if (value.isPresent()) {
                     result.put(key.get(), value.get());
                 } else {
-                    logger.warn("Missing field '{}' for entry '{}'", VALUE, data.getAsString());
+                    logger.warn("Missing value for key '{}' with {} given entry '{}'", key.get(), valueHandler, kvEntry.get(VALUE));
                 }
             } else {
-                logger.warn("Missing field '{}' for entry '{}'", KEY, data.getAsString());
+                logger.warn("Missing field '{}' for entry '{}'", KEY, kvEntry);
             }
         }
 
