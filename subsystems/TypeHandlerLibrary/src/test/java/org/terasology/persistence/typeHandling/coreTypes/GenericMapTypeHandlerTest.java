@@ -3,6 +3,7 @@
 
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -24,6 +25,17 @@ class GenericMapTypeHandlerTest {
     private static final String TEST_KEY = "health:baseRegen";
     private static final long TEST_VALUE = -1;
 
+    /**
+     * JSON equivalent:
+     * ```json5
+     * [
+     *   {
+     *       "key": "health:baseRegen",
+     *       "value": -1
+     *   }
+     * ]
+     * ```
+     */
     private final PersistedData testData = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
                     GenericMapTypeHandler.KEY, new PersistedString(TEST_KEY),
@@ -31,14 +43,31 @@ class GenericMapTypeHandlerTest {
             ))
     ));
 
+    /**
+     * JSON equivalent:
+     * ```json5
+     * {
+     *   "health:baseRegen": -1"
+     * }
+     * ```
+     */
     private final PersistedData testDataMalformatted = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
-                    "testmap", new PersistedMap(Map.of(
-                            TEST_KEY, new PersistedLong(TEST_VALUE)
-                    ))
+                    TEST_KEY, new PersistedLong(TEST_VALUE)
             ))
     ));
 
+    /**
+     * JSON equivalent:
+     * ```json5
+     * [
+     *   {
+     *       "not key": "health:baseRegen",
+     *       "value": -1
+     *   }
+     * ]
+     * ```
+     */
     private final PersistedData testDataMissingKeyEntry = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
                     "not key", new PersistedString(TEST_KEY),
@@ -46,6 +75,17 @@ class GenericMapTypeHandlerTest {
             ))
     ));
 
+    /**
+     * JSON equivalent:
+     * ```json5
+     * [
+     *   {
+     *       "key": "health:baseRegen",
+     *       "not value": -1
+     *   }
+     * ]
+     * ```
+     */
     private final PersistedData testDataMissingValueEntry = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
                     GenericMapTypeHandler.KEY, new PersistedString(TEST_KEY),
@@ -53,6 +93,21 @@ class GenericMapTypeHandlerTest {
             ))
     ));
 
+    /**
+     * JSON equivalent:
+     * ```json5
+     * [
+     *   {
+     *       "key": "health:baseRegen",
+     *       "value": -1
+     *   },
+     *   {
+     *       "not key": "health:baseRegen",
+     *       "not value": -1
+     *   },
+     * ]
+     * ```
+     */
     private final PersistedData testDataValidAndInvalidMix = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
                     GenericMapTypeHandler.KEY, new PersistedString(TEST_KEY),
@@ -65,6 +120,7 @@ class GenericMapTypeHandlerTest {
     ));
 
     @Test
+    @DisplayName("Data with valid formatting can be deserialized successfully.")
     void testDeserialize() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
@@ -76,6 +132,7 @@ class GenericMapTypeHandlerTest {
     }
 
     @Test
+    @DisplayName("Deserializing valid data with a mismatching value type handler fails deserialization (returns empty `Optional`)")
     void testDeserializeWithMismatchedValueHandler() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
@@ -86,6 +143,7 @@ class GenericMapTypeHandlerTest {
     }
 
     @Test
+    @DisplayName("Deserializing valid data with a mismatching key type handler fails deserialization (returns empty `Optional`)")
     void testDeserializeWithMismatchedKeyHandler() {
         var th = new GenericMapTypeHandler<>(
                 new UselessTypeHandler<>(),
@@ -96,6 +154,7 @@ class GenericMapTypeHandlerTest {
     }
     
     @Test
+    @DisplayName("Incorrectly formatted data (without an outer array) fails deserialization (returns empty `Optional`)")
     void testDeserializeWithObjectInsteadOfArray() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
@@ -106,6 +165,7 @@ class GenericMapTypeHandlerTest {
     }
 
     @Test
+    @DisplayName("Incorrectly formatted data (without a map entry with key \"key\") fails deserialization (returns empty `Optional`)")
     void testDeserializeWithMissingKeyEntry() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
@@ -116,6 +176,7 @@ class GenericMapTypeHandlerTest {
     }
 
     @Test
+    @DisplayName("Incorrectly formatted data (without a map entry with key \"value\") fails deserialization (returns empty `Optional`)")
     void testDeserializeWithMissingValueEntry() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
@@ -126,6 +187,7 @@ class GenericMapTypeHandlerTest {
     }
 
     @Test
+    @DisplayName("A map containing both, correctly and incorrectly formatted data, fails deserialization (returns empty `Optional`)")
     void testDeserializeWithValidAndInvalidEntries() {
         var th = new GenericMapTypeHandler<>(
                 new StringTypeHandler(),
