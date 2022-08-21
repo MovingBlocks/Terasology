@@ -5,7 +5,6 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.world.block.BlockUri;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 

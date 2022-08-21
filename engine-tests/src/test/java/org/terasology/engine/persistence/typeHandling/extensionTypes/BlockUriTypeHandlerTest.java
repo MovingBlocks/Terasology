@@ -5,7 +5,6 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.BlockUriParseException;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -16,7 +15,6 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BlockUriTypeHandlerTest {
