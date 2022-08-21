@@ -25,6 +25,8 @@ public class SimpleUriTypeHandler extends StringRepresentationTypeHandler<Simple
         SimpleUri uri = new SimpleUri(representation);
         if (!uri.isValid()) {
             logger.error("Failed to create valid SimpleURI from string '{}'", representation);
+            // StringRepresentationTypeHandler will turn this 'null' value into an empty Optional
+            return null;
         }
 
         return uri;
