@@ -12,7 +12,6 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.persistence.typeHandling.inMemory.arrays.PersistedValueArray;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
