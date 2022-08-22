@@ -3,6 +3,7 @@
 
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -101,5 +102,13 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
                 "    { \"key\": \"...\", \"value\": \"...\" }\n" +
                 "  ]\n" +
                 "but found \n'{}'" + data + "'";
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("key", keyHandler)
+                .add("value", valueHandler)
+                .toString();
     }
 }
