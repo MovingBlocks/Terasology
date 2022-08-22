@@ -105,7 +105,7 @@ public class BlockManagerImpl extends BlockManager {
                     }
                     registerFamily(family.get());
                 } else {
-                    logger.warn("No black family found for '{}', skipping.", rawFamilyUri);
+                    logger.warn("No block family found for '{}', skipping.", rawFamilyUri);
                 }
             } catch (BlockUriParseException e) {
                 logger.error("Failed to parse block family '{}', skipping", rawFamilyUri, e);
