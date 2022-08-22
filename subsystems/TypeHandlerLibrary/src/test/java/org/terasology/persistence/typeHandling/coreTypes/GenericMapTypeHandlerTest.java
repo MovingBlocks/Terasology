@@ -47,7 +47,7 @@ class GenericMapTypeHandlerTest {
      * JSON equivalent:
      * <pre><code>
      * {
-     *   "health:baseRegen": -1"
+     *   "health:baseRegen": -1
      * }
      * </code></pre>
      */
