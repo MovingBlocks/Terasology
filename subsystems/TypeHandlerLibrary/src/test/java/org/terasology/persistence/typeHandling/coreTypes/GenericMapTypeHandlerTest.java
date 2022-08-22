@@ -27,14 +27,14 @@ class GenericMapTypeHandlerTest {
 
     /**
      * JSON equivalent:
-     * ```json5
+     * <pre><code>
      * [
      *   {
      *       "key": "health:baseRegen",
      *       "value": -1
      *   }
      * ]
-     * ```
+     * </code></pre>
      */
     private final PersistedData testData = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
@@ -45,11 +45,11 @@ class GenericMapTypeHandlerTest {
 
     /**
      * JSON equivalent:
-     * ```json5
+     * <pre><code>
      * {
      *   "health:baseRegen": -1"
      * }
-     * ```
+     * </code></pre>
      */
     private final PersistedData testDataMalformatted = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
@@ -59,14 +59,14 @@ class GenericMapTypeHandlerTest {
 
     /**
      * JSON equivalent:
-     * ```json5
+     * <pre><code>
      * [
      *   {
      *       "not key": "health:baseRegen",
      *       "value": -1
      *   }
      * ]
-     * ```
+     * </code></pre>
      */
     private final PersistedData testDataMissingKeyEntry = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
@@ -77,14 +77,14 @@ class GenericMapTypeHandlerTest {
 
     /**
      * JSON equivalent:
-     * ```json5
+     * <pre><code>
      * [
      *   {
      *       "key": "health:baseRegen",
      *       "not value": -1
      *   }
      * ]
-     * ```
+     * </code></pre>
      */
     private final PersistedData testDataMissingValueEntry = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
@@ -95,7 +95,7 @@ class GenericMapTypeHandlerTest {
 
     /**
      * JSON equivalent:
-     * ```json5
+     * <pre><code>
      * [
      *   {
      *       "key": "health:baseRegen",
@@ -106,7 +106,7 @@ class GenericMapTypeHandlerTest {
      *       "not value": -1
      *   },
      * ]
-     * ```
+     * </code></pre>
      */
     private final PersistedData testDataValidAndInvalidMix = new PersistedValueArray(List.of(
             new PersistedMap(Map.of(
