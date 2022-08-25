@@ -187,14 +187,8 @@ public final class Assets {
     }
 
     public static Optional<UISkin> getSkin(String uri) {
-        Optional<UISkinAsset> skinAsset = get(uri, UISkinAsset.class);
-        if (skinAsset.isPresent()) {
-            return Optional.of(skinAsset.get().getSkin());
-        } else {
-            return Optional.empty();
-        }
+        return get(uri, UISkinAsset.class).map(UISkinAsset::getSkin);
     }
-
 
     public static Optional<UIElement> getUIElement(String uri) {
         return get(uri, UIElement.class);
@@ -210,10 +204,6 @@ public final class Assets {
     }
 
     public static Optional<TextureRegionAsset> getTextureRegion(String simpleUri) {
-        if (simpleUri.isEmpty()) {
-            return Optional.empty();
-        }
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        return assetManager.getAsset(simpleUri, TextureRegionAsset.class);
+        return CoreRegistry.get(AssetManager.class).getAsset(simpleUri, TextureRegionAsset.class);
     }
 }
