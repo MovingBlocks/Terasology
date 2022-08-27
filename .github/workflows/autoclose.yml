@@ -18,6 +18,7 @@ jobs:
           stale-issue-label: "Status: Stale"
           stale-issue-message: "This issue is stale because the author @${{ github.event.issue.user.login }} has not responded for 30 days."
           close-issue-message: "This issue was closed because the author @${{ github.event.issue.user.login }} has not responded for 90 days since the issue was marked as stale."
+          close-issue-reason: "not_planned"
           days-before-pr-stale: -1
           days-before-pr-close: -1
           repo-token: ${{ secrets.GITHUB_TOKEN }}
