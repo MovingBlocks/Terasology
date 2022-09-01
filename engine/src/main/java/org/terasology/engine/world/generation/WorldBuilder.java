@@ -45,7 +45,7 @@ public class WorldBuilder extends ProviderStore {
         this.pluginLibrary = pluginLibrary;
     }
 
-    public WorldBuilder addProvider(FacetProvider provider) {
+    public WorldBuilder  addProvider(FacetProvider provider) {
         providersList.add(provider);
         return this;
     }
@@ -186,6 +186,9 @@ public class WorldBuilder extends ProviderStore {
                 }
             }
         }
+
+        checkProviderRequirements(facets);
+
         for (Class<? extends WorldFacet> facet : facets) {
             if (!result.containsKey(facet)) {
                 Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
@@ -207,6 +210,18 @@ public class WorldBuilder extends ProviderStore {
         }
 
         return result;
+    }
+
+
+    private void checkProviderRequirements(Set<Class<? extends WorldFacet>> availableFacets) {
+        for(FacetProvider provider : providersList) {
+            Requires providerRequirement = provider.getClass().getAnnotation(Requires.class);
+            for(Facet facet : providerRequirement.value()) {
+                if(!availableFacets.contains(facet)) {
+                    logger.error("Facet " + facet.getClass().getCanonicalName() + " is not provided");
+                }
+            }
+        }
     }
 
     /**
