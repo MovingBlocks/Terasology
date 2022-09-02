@@ -229,6 +229,7 @@ public class WorldBuilder extends ProviderStore {
 
         if (producer == null) {
            logger.error("Facet {} has no provider", facet);
+           System.exit(-1);
         }
 
         for (FacetProvider provider : providersList) {
