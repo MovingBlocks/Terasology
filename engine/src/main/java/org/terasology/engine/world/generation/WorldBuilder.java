@@ -187,8 +187,6 @@ public class WorldBuilder extends ProviderStore {
             }
         }
 
-        checkProviderRequirements(facets);
-
         for (Class<? extends WorldFacet> facet : facets) {
             if (!result.containsKey(facet)) {
                 Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
@@ -213,22 +211,6 @@ public class WorldBuilder extends ProviderStore {
     }
 
     /**
-     * Checks if all @Require facets have been provided by others
-     *
-     * @param availableFacets - the list of facets that are provided by others
-     */
-    private void checkProviderRequirements(Set<Class<? extends WorldFacet>> availableFacets) {
-        for (FacetProvider provider : providersList) {
-            Requires providerRequirement = provider.getClass().getAnnotation(Requires.class);
-            for (Facet facet : providerRequirement.value()) {
-                if (!availableFacets.contains(facet.value())) {
-                    logger.error("Facet " + facet.getClass().getCanonicalName() + " is not provided");
-                }
-            }
-        }
-    }
-
-    /**
      * Adds all facet providers and updaters for {@code facet} which have priority greater than {@code minPriority} to {@code orderedProviders}.
      */
     private void addProviderChain(Class<? extends WorldFacet> facet, boolean scalable, int minPriority,
@@ -243,6 +225,10 @@ public class WorldBuilder extends ProviderStore {
                 addRequirements(facet, provider, scalable, orderedProviders);
                 producer = provider;
             }
+        }
+
+        if (producer == null) {
+           logger.error("Facet {} has no provider", facet);
         }
 
         for (FacetProvider provider : providersList) {
