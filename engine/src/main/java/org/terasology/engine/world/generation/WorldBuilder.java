@@ -212,12 +212,16 @@ public class WorldBuilder extends ProviderStore {
         return result;
     }
 
-
+    /**
+     * Checks if all @Require facets have been provided by others
+     *
+     * @param availableFacets - the list of facets that are provided by others
+     */
     private void checkProviderRequirements(Set<Class<? extends WorldFacet>> availableFacets) {
-        for(FacetProvider provider : providersList) {
+        for (FacetProvider provider : providersList) {
             Requires providerRequirement = provider.getClass().getAnnotation(Requires.class);
-            for(Facet facet : providerRequirement.value()) {
-                if(!availableFacets.contains(facet)) {
+            for (Facet facet : providerRequirement.value()) {
+                if (!availableFacets.contains(facet.value())) {
                     logger.error("Facet " + facet.getClass().getCanonicalName() + " is not provided");
                 }
             }
