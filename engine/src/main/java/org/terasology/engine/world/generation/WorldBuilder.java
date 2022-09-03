@@ -179,6 +179,16 @@ public class WorldBuilder extends ProviderStore {
             if (produces != null) {
                 facets.addAll(Arrays.asList(produces.value()));
             }
+
+            Requires requires = provider.getClass().getAnnotation(Requires.class);
+            if (requires != null) {
+                for (Facet facet : requires.value()) {
+                    if (!facets.contains(facet.value())) {
+                        logger.error("Facet {} has no provider. It is required by {}", facet, provider);
+                    }
+                }
+            }
+
             Updates updates = provider.getClass().getAnnotation(Updates.class);
             if (updates != null) {
                 for (Facet facet : updates.value()) {
@@ -225,11 +235,6 @@ public class WorldBuilder extends ProviderStore {
                 addRequirements(facet, provider, scalable, orderedProviders);
                 producer = provider;
             }
-        }
-
-        if (producer == null) {
-           logger.error("Facet {} has no provider", facet);
-           System.exit(-1);
         }
 
         for (FacetProvider provider : providersList) {
