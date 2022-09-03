@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.physics.engine;
@@ -238,4 +238,19 @@ public interface PhysicsEngine extends Physics {
      *                                  ShapeComponent.
      */
     boolean updateTrigger(EntityRef entity);
+
+
+    /**
+     * Recompute the character collider for the given entity.
+     *
+     * The entity must have a {@link org.terasology.engine.logic.location.LocationComponent LocationComponent}
+     * and a {@link org.terasology.engine.logic.characters.CharacterMovementComponent CharacterMovementComponent}.
+     *
+     * @param entity the entity to recompute the character collider for.
+     * @return the updated character collider of the entity
+     */
+    default CharacterCollider recomputeCharacterCollider(EntityRef entity) {
+        removeCharacterCollider(entity);
+        return getCharacterCollider(entity);
+    }
 }

@@ -1,11 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.gestalt.module.sandbox.API;
@@ -13,6 +12,7 @@ import org.terasology.protobuf.EntityData;
 
 /**
  * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons.
+ *
  * <p>
  * For example the renderer renders a single mesh for all opaque blocks in a chunk rather
  * than rendering each block as a separate mesh.
@@ -35,7 +35,9 @@ public interface Chunk extends RenderableChunk {
      * @deprecated use {@link #getPosition()}
      */
     @Deprecated
-    Vector3i getPosition(Vector3i dest);
+    default Vector3i getPosition(Vector3i dest) {
+        return dest.set(getPosition());
+    }
 
     /**
      * Returns block at given position relative to the chunk.
@@ -43,7 +45,9 @@ public interface Chunk extends RenderableChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Block at given position
      */
-    Block getBlock(Vector3ic pos);
+    default Block getBlock(Vector3ic pos) {
+        return getBlock(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns block at given position relative to the chunk.
@@ -73,7 +77,9 @@ public interface Chunk extends RenderableChunk {
      * @param block Block to set block at given position to
      * @return Old Block at given position
      */
-    Block setBlock(Vector3ic pos, Block block);
+    default Block setBlock(Vector3ic pos, Block block) {
+        return setBlock(pos.x(), pos.y(), pos.z(), block);
+    }
 
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.
@@ -97,7 +103,9 @@ public interface Chunk extends RenderableChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @param value New value to set the block to
      */
-    void setExtraData(int index, Vector3ic pos, int value);
+    default void setExtraData(int index, Vector3ic pos, int value) {
+        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
+    }
 
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
@@ -117,7 +125,9 @@ public interface Chunk extends RenderableChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @return Selected extra data value at the given location
      */
-    int getExtraData(int index, Vector3ic pos);
+    default int getExtraData(int index, Vector3ic pos) {
+        return getExtraData(index, pos.x(), pos.y(), pos.z());
+    }
 
 
     /**
@@ -160,7 +170,9 @@ public interface Chunk extends RenderableChunk {
      * @param dest Position in this chunk you want to transform
      * @return Transformed position
      */
-    Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest);
+    default Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest) {
+        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
+    }
 
 
     /**
@@ -202,29 +214,38 @@ public interface Chunk extends RenderableChunk {
     /**
      * @return Size of the chunk along the X axis.
      */
-    int getChunkSizeX();
+    default int getChunkSizeX() {
+        return Chunks.SIZE_X;
+    }
 
     /**
      * @return Size of the chunk along the Y axis.
      */
-    int getChunkSizeY();
+    default int getChunkSizeY() {
+        return Chunks.SIZE_Y;
+    }
 
     /**
      * @return Size of the chunk along the Z axis.
      */
-    int getChunkSizeZ();
+    default int getChunkSizeZ() {
+        return Chunks.SIZE_Z;
+    }
 
     /**
      * @return Chunk's Region
      */
     BlockRegionc getRegion();
+
     /**
      * Returns the current amount of sunlight at given position relative to the chunk.
      *
      * @param pos Position of the block relative to corner of the chunk
      * @return Current sunlight
      */
-    byte getSunlight(Vector3ic pos);
+    default byte getSunlight(Vector3ic pos) {
+        return getSunlight(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns the current amount of sunlight at given position relative to the chunk.
@@ -243,7 +264,9 @@ public interface Chunk extends RenderableChunk {
      * @param amount Amount of sunlight to set this block to
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setSunlight(Vector3ic pos, byte amount);
+    default boolean setSunlight(Vector3ic pos, byte amount) {
+        return setSunlight(pos.x(), pos.y(), pos.z(), amount);
+    }
 
     /**
      * Sets the amount of sunlight at given position relative to the chunk.
@@ -261,7 +284,9 @@ public interface Chunk extends RenderableChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Current sunlight regeneration
      */
-    byte getSunlightRegen(Vector3ic pos);
+    default byte getSunlightRegen(Vector3ic pos) {
+        return getSunlightRegen(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns current value of sunlight regeneration for given block relative to the chunk.
@@ -280,7 +305,9 @@ public interface Chunk extends RenderableChunk {
      * @param amount Sunlight regeneration amount
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setSunlightRegen(Vector3ic pos, byte amount);
+    default boolean setSunlightRegen(Vector3ic pos, byte amount) {
+        return setSunlightRegen(pos.x(), pos.y(), pos.z(), amount);
+    }
 
     /**
      * Sets sunlight regeneration for given block relative to the chunk.
@@ -299,7 +326,9 @@ public interface Chunk extends RenderableChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Current lightness
      */
-    byte getLight(Vector3ic pos);
+    default byte getLight(Vector3ic pos) {
+        return getLight(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns current amount of light for given block relative to the chunk.
@@ -318,7 +347,9 @@ public interface Chunk extends RenderableChunk {
      * @param amount Lightness value
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setLight(Vector3ic pos, byte amount);
+    default boolean setLight(Vector3ic pos, byte amount) {
+        return setLight(pos.x(), pos.y(), pos.z(), amount);
+    }
 
     /**
      * Sets lightness for given block relative to the chunk.
@@ -355,10 +386,4 @@ public interface Chunk extends RenderableChunk {
     boolean isDirty();
 
     void setDirty(boolean dirty);
-
-    void setPendingMesh(ChunkMesh newPendingMesh);
-
-    boolean hasPendingMesh();
-
-    ChunkMesh getPendingMesh();
 }

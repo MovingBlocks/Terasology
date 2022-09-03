@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal.pipelineFactory;
@@ -12,22 +12,24 @@ import io.netty.handler.codec.compression.Lz4FrameDecoder;
 import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.network.internal.MetricRecordingHandler;
-import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.engine.network.internal.ServerConnectionHandler;
 import org.terasology.engine.network.internal.ServerHandler;
 import org.terasology.engine.network.internal.ServerHandshakeHandler;
 import org.terasology.protobuf.NetData;
 
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
 /**
  * Netty Pipeline for the server
  */
-public class TerasologyServerPipelineFactory extends ChannelInitializer {
+public class TerasologyServerPipelineFactory extends ChannelInitializer<Channel> {
 
-    private NetworkSystemImpl networkSystem;
+    private final Context context;
 
-    public TerasologyServerPipelineFactory(NetworkSystemImpl networkSystem) {
-        this.networkSystem = networkSystem;
+    public TerasologyServerPipelineFactory(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -43,8 +45,8 @@ public class TerasologyServerPipelineFactory extends ChannelInitializer {
         p.addLast("frameLengthEncoder", new LengthFieldPrepender(3));
         p.addLast("protobufEncoder", new ProtobufEncoder());
 
-        p.addLast("authenticationHandler", new ServerHandshakeHandler());
-        p.addLast("connectionHandler", new ServerConnectionHandler(networkSystem));
-        p.addLast("handler", new ServerHandler(networkSystem));
+        p.addLast("authenticationHandler", createWithConstructorInjection(ServerHandshakeHandler.class, context));
+        p.addLast("connectionHandler", createWithConstructorInjection(ServerConnectionHandler.class, context));
+        p.addLast("handler", createWithConstructorInjection(ServerHandler.class, context));
     }
 }

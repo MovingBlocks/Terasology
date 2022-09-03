@@ -4,7 +4,7 @@
 package org.terasology.engine.rendering.nui;
 
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class FocusChangedEvent implements Event {
 }

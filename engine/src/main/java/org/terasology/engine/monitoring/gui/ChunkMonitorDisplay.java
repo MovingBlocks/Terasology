@@ -9,6 +9,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.logic.players.LocalPlayer;
@@ -60,7 +61,7 @@ public class ChunkMonitorDisplay extends JPanel {
 
     private final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
     private final List<ChunkMonitorEntry> chunks = Lists.newArrayList();
-    private final Map<Vector3i, ChunkMonitorEntry> map = Maps.newHashMap();
+    private final Map<Vector3ic, ChunkMonitorEntry> map = Maps.newHashMap();
     private final ImageBuffer image = new ImageBuffer();
 
     private int refreshInterval;
@@ -128,12 +129,12 @@ public class ChunkMonitorDisplay extends JPanel {
         int max = 0;
         int y = renderY;
         for (ChunkMonitorEntry chunk : chunks) {
-            final Vector3i pos = chunk.getPosition();
-            if (pos.y < min) {
-                min = pos.y;
+            final Vector3ic pos = chunk.getPosition();
+            if (pos.y() < min) {
+                min = pos.y();
             }
-            if (pos.y > max) {
-                max = pos.y;
+            if (pos.y() > max) {
+                max = pos.y();
             }
         }
         if (y < min) {
@@ -456,16 +457,16 @@ public class ChunkMonitorDisplay extends JPanel {
                 recomputeRenderY();
             } else if (event instanceof ChunkMonitorEvent.BasicChunkEvent) {
                 final ChunkMonitorEvent.BasicChunkEvent bEvent = (ChunkMonitorEvent.BasicChunkEvent) event;
-                final Vector3i pos = bEvent.getPosition();
+                final Vector3ic pos = bEvent.getPosition();
                 final ChunkMonitorEntry entry;
                 if (event instanceof ChunkMonitorEvent.Created) {
                     final ChunkMonitorEvent.Created cEvent = (ChunkMonitorEvent.Created) event;
                     entry = cEvent.getEntry();
-                    if (pos.y < minRenderY) {
-                        minRenderY = pos.y;
+                    if (pos.y() < minRenderY) {
+                        minRenderY = pos.y();
                     }
-                    if (pos.y > maxRenderY) {
-                        maxRenderY = pos.y;
+                    if (pos.y() > maxRenderY) {
+                        maxRenderY = pos.y();
                     }
                     chunks.add(entry);
                     map.put(pos, entry);
@@ -581,21 +582,21 @@ public class ChunkMonitorDisplay extends JPanel {
             int ymin = Integer.MAX_VALUE;
             int ymax = Integer.MIN_VALUE;
             for (ChunkMonitorEntry entry : chunkEntries) {
-                final Vector3i pos = entry.getPosition();
-                if (pos.y != renderY) {
+                final Vector3ic pos = entry.getPosition();
+                if (pos.y() != renderY) {
                     continue;
                 }
-                if (pos.x < xmin) {
-                    xmin = pos.x;
+                if (pos.x() < xmin) {
+                    xmin = pos.x();
                 }
-                if (pos.x > xmax) {
-                    xmax = pos.x;
+                if (pos.x() > xmax) {
+                    xmax = pos.x();
                 }
-                if (pos.z < ymin) {
-                    ymin = pos.z;
+                if (pos.z() < ymin) {
+                    ymin = pos.z();
                 }
-                if (pos.z > ymax) {
-                    ymax = pos.z;
+                if (pos.z() > ymax) {
+                    ymax = pos.z();
                 }
             }
             return new Rectangle(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
@@ -638,13 +639,13 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunkEntries) {
-            chunkEntries.stream().filter(entry -> entry.getPosition().y == renderY).forEach(entry ->
+            chunkEntries.stream().filter(entry -> entry.getPosition().y() == renderY).forEach(entry ->
                     renderChunk(g, offsetx, offsety, entry.getPosition(), entry));
         }
 
-        private void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
+        private void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3ic pos, ChunkMonitorEntry entry) {
             g.setColor(calcChunkColor(entry));
-            g.fillRect(pos.x * chunkSize + offsetx + 1, pos.z * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
+            g.fillRect(pos.x() * chunkSize + offsetx + 1, pos.z() * chunkSize + offsety + 1, chunkSize - 2, chunkSize - 2);
         }
 
         private void render(Graphics2D g, int offsetx, int offsety, int width, int height, List<ChunkMonitorEntry> chunkEntries) {

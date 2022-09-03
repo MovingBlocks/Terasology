@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -25,14 +25,16 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.NetworkConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.ComponentSystemManager;
-import org.terasology.engine.core.Time;
+import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationManager;
@@ -40,7 +42,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
@@ -63,7 +64,6 @@ import org.terasology.engine.persistence.PlayerStore;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
@@ -71,6 +71,7 @@ import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.module.Module;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -78,28 +79,41 @@ import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.FutureMono;
 
 import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
+
 
 /**
  * Implementation of the Network System using Netty and TCP/IP
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {
+    public static int shutdownQuietMs = 2_000;
+    public static int shutdownTimeoutMs = 15_000;
+
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystemImpl.class);
     private static final int OWNER_DEPTH_LIMIT = 50;
     private static final int NET_TICK_RATE = 50;
     private static final int NULL_NET_ID = 0;
+
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     // Shared
-    private Context context;
+    private ContextImpl context;
     private Optional<HibernationManager> hibernationSettings;
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
@@ -111,7 +125,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
     private TIntLongMap netIdToEntityId = new TIntLongHashMap();
-    private Time time;
+    private EngineTime time;
     private long nextNetworkTick;
     private boolean kicked;
     // Server only
@@ -132,10 +146,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ServerImpl server;
     private EventLoopGroup clientGroup;
 
-    public NetworkSystemImpl(Time time, Context context) {
+    public NetworkSystemImpl(EngineTime time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();
-        this.hibernationSettings = Optional.ofNullable(context.get(HibernationManager.class));
+        this.hibernationSettings = context.getMaybe(HibernationManager.class);
+        setContext(context);
     }
 
     @Override
@@ -161,7 +176,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         .localAddress(port)
                         .childOption(ChannelOption.TCP_NODELAY, true)
                         .childOption(ChannelOption.SO_KEEPALIVE, true)
-                        .childHandler(new TerasologyServerPipelineFactory(this));
+                        .childHandler(createWithConstructorInjection(TerasologyServerPipelineFactory.class, context));
                 // Start the server.
                 serverChannelFuture = b.bind();
 
@@ -208,7 +223,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 clientBootstrap.option(ChannelOption.SO_KEEPALIVE, true);
                 clientBootstrap.option(ChannelOption.TCP_NODELAY, true);
                 clientBootstrap.remoteAddress(new InetSocketAddress(address, port));
-                clientBootstrap.handler(new TerasologyClientPipelineFactory(this));
+                clientBootstrap.handler(createWithConstructorInjection(TerasologyClientPipelineFactory.class, context));
 
                 connectCheck = clientBootstrap.connect();
                 connectCheck.sync();
@@ -227,7 +242,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     } else {
                         logger.warn("Failed to connect to server", connectCheck.cause());
                         connectCheck.channel().closeFuture().awaitUninterruptibly();
-                        clientGroup.shutdownGracefully().syncUninterruptibly();
+                        clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS)
+                                .syncUninterruptibly();
                         return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
                     }
                 }
@@ -247,24 +263,28 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public void shutdown() {
         allChannels.close().awaitUninterruptibly();
+        List<Future<?>> shutdowns = new ArrayList<>(3);
         if (serverChannelFuture != null) {
-            serverChannelFuture.channel().closeFuture();
             // Wait until all threads are terminated.
-            try {
-                bossGroup.shutdownGracefully().sync();
-                workerGroup.shutdownGracefully().sync();
-                bossGroup.terminationFuture().sync();
-                workerGroup.terminationFuture().sync();
-            } catch (InterruptedException e) {
-                logger.error("Cannot terminateFuture - interrupted");
-                throw new RuntimeException(e);
-            }
-
+            shutdowns.add(bossGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
+            shutdowns.add(workerGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
         }
         if (clientGroup != null) {
-            clientGroup.shutdownGracefully().syncUninterruptibly();
+            shutdowns.add(clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
         }
+
         // Shut down all event loops to terminate all threads.
+        // I want their timeouts to count in parallel, instead of blocking on one after the other,
+        // but turning the netty Future into something we can do this with is a bit of a mess until
+        // we switch to using reactor-netty consistently.
+        Mono.whenDelayError(
+            Flux.fromIterable(shutdowns)
+                    .map(x -> {
+                        @SuppressWarnings("unchecked") Future<Void> f = (Future<Void>) x;
+                        return FutureMono.from(f);
+                    })
+                    .collectList()
+        ).block(Duration.ofMillis(shutdownTimeoutMs));
 
         processPendingDisconnects();
         clientList.forEach(this::processRemovedClient);
@@ -299,7 +319,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public Client joinLocal(String preferredName, Color color) {
-        Client localClient = new LocalClient(preferredName, color, entityManager);
+        Client localClient = new LocalClient(preferredName, color, entityManager, context.getValue(Config.class));
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
         connectClient(localClient);
@@ -545,7 +565,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         this.entityManager = newEntityManager;
         this.entityManager.subscribeForChanges(this);
-        this.blockManager = context.get(BlockManager.class);
+        this.blockManager = context.getValue(BlockManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = context.get(StorageManager.class);
         this.eventLibrary = newEventLibrary;
@@ -568,7 +588,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
 
         if (server != null) {
-            server.connectToEntitySystem(newEntityManager, entitySerializer, eventSerializer, blockEntityRegistry);
+            server.connectToEntitySystem(newEntityManager, entitySerializer, eventSerializer,
+                    blockEntityRegistry, context);
         }
     }
 
@@ -771,13 +792,21 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     /**
-     * Sets the context within which this system should operate
-     *
-     * @param context
+     * Sets the context within which this system should operate.
+     * <p>
+     * As a client transitions from connecting to loading to in-game, it moves
+     * through different {@link org.terasology.engine.core.modes.GameState GameStates},
+     * and the context changes along the way.
      */
     @Override
-    public void setContext(Context context) {
-        this.context = context;
+    public void setContext(Context newContext) {
+        if (context != null && context.isDirectDescendantOf(newContext)) {
+            return;  // Already using this context!
+        }
+        // Our internal context gets internal views of some objects.
+        context = new ContextImpl(newContext);
+        context.put(NetworkSystemImpl.class, this);
+        context.put(EngineTime.class, time);
     }
 
     void removeKickedClient(NetClient client) {
@@ -885,7 +914,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (worldGen != null) {
             serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
         }
-        for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+        for (Module module : context.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
                         .setModuleId(module.getId().toString())

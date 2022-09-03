@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -7,14 +7,13 @@ import org.joml.Vector3ic;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.ColorComponent;
-import org.terasology.nui.Color;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.nui.Color;
 
 /**
  * A local client.
@@ -22,15 +21,18 @@ import org.terasology.engine.world.chunks.Chunk;
  */
 public class LocalClient extends AbstractClient {
 
-    private Config config = CoreRegistry.get(Config.class);
+    private final Config config;
 
     /**
      * Creates an entity for the new local client.
+     *
      * @param preferredName Clients preferred name.
      * @param color Clients preferred color.
      * @param entityManager Entity manager for the clients entity creation.
+     * @param config
      */
-    public LocalClient(String preferredName, Color color, EntityManager entityManager) {
+    public LocalClient(String preferredName, Color color, EntityManager entityManager, Config config) {
+        this.config = config;
         createEntity(preferredName, color, entityManager);
     }
 

@@ -3,8 +3,8 @@
 
 package org.terasology.engine.rendering.logic;
 
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 public class AnimEndEvent implements Event {
     private MeshAnimation animation;

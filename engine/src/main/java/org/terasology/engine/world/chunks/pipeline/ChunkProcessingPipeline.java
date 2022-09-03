@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.world.chunks.pipeline;
@@ -34,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.google.common.primitives.Ints.constrainToRange;
+
 /**
  * Manages execution of chunk processing.
  * <p>
@@ -41,7 +43,9 @@ import java.util.function.Supplier;
  */
 public class ChunkProcessingPipeline {
 
-    private static final int NUM_TASK_THREADS = 4;
+    @SuppressWarnings("UnstableApiUsage")
+    private static final int NUM_TASK_THREADS = constrainToRange(
+            Runtime.getRuntime().availableProcessors() - 1, 1, 8);
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
@@ -71,6 +75,7 @@ public class ChunkProcessingPipeline {
                 return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
             }
         };
+        logger.debug("allocated {} threads", NUM_TASK_THREADS);
         chunkProcessor = new ExecutorCompletionService<>(executor,
                 new PriorityBlockingQueue<>(800, comparable));
         reactor = new Thread(this::chunkTaskHandler);

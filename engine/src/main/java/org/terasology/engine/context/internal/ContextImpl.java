@@ -1,7 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.context.internal;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.terasology.engine.context.Context;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 public class ContextImpl implements Context {
     private final Context parent;
 
-    private final Map<Class<? extends Object>, Object> map = Maps.newConcurrentMap();
+    private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
 
 
     /**
@@ -30,7 +31,7 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public <T> T get(Class<? extends T> type) {
+    public <T> T get(Class<T> type) {
         if (type == Context.class) {
             return type.cast(this);
         }
@@ -41,7 +42,7 @@ public class ContextImpl implements Context {
         if (parent != null) {
             return parent.get(type);
         }
-        return result;
+        return null;
     }
 
     @Override
@@ -49,4 +50,15 @@ public class ContextImpl implements Context {
         map.put(type, object);
     }
 
+    public boolean isDirectDescendantOf(Context other) {
+        return parent == other;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("#", Integer.toHexString(hashCode()))
+                .add("parent", parent)
+                .toString();
+    }
 }

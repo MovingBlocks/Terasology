@@ -3,7 +3,7 @@
 
 package org.terasology.engine.logic.console;
 
-import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 @FunctionalInterface
 public interface MessageEvent extends Event {

@@ -3,9 +3,9 @@
 package org.terasology.engine.network;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.world.chunks.remoteChunkProvider.ChunkReadyListener;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.protobuf.NetData;
 
 public interface Server extends ChunkReadyListener {

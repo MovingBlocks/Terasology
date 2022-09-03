@@ -25,15 +25,6 @@ buildscript {
     }
 
     dependencies {
-        //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
-
-        // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
-
-        // Protobuf plugin
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
-
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
     }
@@ -52,12 +43,14 @@ plugins {
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 
+    id("com.google.protobuf") version "0.8.16" apply false
     id("terasology-repositories")
 }
 
 
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.jetbrains.gradle.ext.ActionDelegationConfig
+import org.terasology.gradology.CopyButNeverOverwrite
 
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
@@ -80,12 +73,12 @@ located at ${System.getProperty("java.home")}
 ext {
     dirNatives = 'natives'
     dirConfigMetrics = 'config/metrics'
-    templatesDir = 'templates'
+    templatesDir = file('templates')
 
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
 
-    LwjglVersion = '3.2.3'
+    LwjglVersion = '3.3.1'
 }
 
 
@@ -230,15 +223,26 @@ tasks.named('wrapper') {
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-task copyInMissingTemplates {
+tasks.register("copyInMissingTemplates", CopyButNeverOverwrite) {
     description = "Copies in placeholders from the /templates dir to project root if not present yet"
-    File gradlePropsFile = new File(rootDir, 'gradle.properties')
-    File OverrideCfgFile = new File(rootDir, 'override.cfg')
-    if (!gradlePropsFile.exists()) {
-        new File(rootDir, 'gradle.properties') << new File(templatesDir, 'gradle.properties').text
-    }
-    if (!OverrideCfgFile.exists()) {
-        new File(rootDir, 'override.cfg') << new File(templatesDir, 'override.cfg').text
+    from(templatesDir)
+    into(rootDir)
+    include('gradle.properties', 'override.cfg')
+}
+
+tasks.register("jmxPassword", CopyButNeverOverwrite) {
+    description = "Create config/jmxremote.password from a template."
+
+    setFileMode(0600)  // passwords must be accessible only by owner
+
+    // there is a template file in $JAVA_HOME/conf/management
+    from(java.nio.file.Path.of(System.getProperty("java.home"), "conf", "management"))
+    include("jmxremote.password.template")
+    rename("(.*).template", '$1')
+    into("config")
+
+    doLast {
+        logger.warn("${it.outputs.files.singleFile}/jmxremote.password:100: Edit this to set your password.")
     }
 }
 

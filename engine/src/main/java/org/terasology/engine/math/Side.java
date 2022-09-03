@@ -8,7 +8,9 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -18,12 +20,12 @@ import java.util.List;
  *
  */
 public enum Side {
-    TOP(new Vector3i(0, 1, 0), (byte) 0b000001),
-    LEFT(new Vector3i(-1, 0, 0), (byte) 0b000010),
-    FRONT(new Vector3i(0, 0, -1), (byte) 0b000100),
-    BOTTOM(new Vector3i(0, -1, 0), (byte) 0b001000),
-    RIGHT(new Vector3i(1, 0, 0), (byte) 0b010000),
-    BACK(new Vector3i(0, 0, 1), (byte) 0b100000);
+    TOP(new Vector3i(0, 1, 0), (byte) 0b000001),            //  1
+    LEFT(new Vector3i(-1, 0, 0), (byte) 0b000010),          //  2
+    FRONT(new Vector3i(0, 0, -1), (byte) 0b000100),         //  4
+    BOTTOM(new Vector3i(0, -1, 0), (byte) 0b001000),        //  8
+    RIGHT(new Vector3i(1, 0, 0), (byte) 0b010000),          // 16
+    BACK(new Vector3i(0, 0, 1), (byte) 0b100000);           // 32
 
     public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
     public static final ImmutableList<Side> Y_TANGENT_SIDE = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
@@ -40,6 +42,44 @@ public enum Side {
     Side(Vector3i vector3i, byte flag) {
         this.direction = vector3i;
         this.flag = flag;
+    }
+
+    public static byte toFlags(Set<Side> sides) {
+        byte result = 0;
+        for (Side side : sides) {
+            result |= side.getFlag();
+        }
+        return result;
+    }
+
+    public static byte toFlags(Side... sides) {
+        byte result = 0;
+        for (Side side : sides) {
+            result |= side.getFlag();
+        }
+        return result;
+    }
+
+    public static byte setFlags(byte flags, Side... sides) {
+        byte result = flags;
+        for (Side side : sides) {
+            result |= side.getFlag();
+        }
+        return result;
+    }
+
+    public static EnumSet<Side> getSides(final byte data) {
+        final EnumSet<Side> result = EnumSet.noneOf(Side.class);
+        for (Side side : ALL_SIDES) {
+            if ((data & side.getFlag()) > 0) {
+                result.add(side);
+            }
+        }
+        return result;
+    }
+
+    public static byte reverseSides(byte sides) {
+        return (byte) ((sides / 8) + ((sides % 8) * 8));
     }
 
     /**
@@ -144,6 +184,10 @@ public enum Side {
      */
     public byte getFlag() {
         return this.flag;
+    }
+
+    public boolean hasFlag(byte flags) {
+        return (flags & this.getFlag()) > 0;
     }
 
     /**

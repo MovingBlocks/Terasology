@@ -51,6 +51,7 @@ public class BlockArea implements BlockAreac {
 
     // -- reset ------------------------------------------------------------------------------------------------------//
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea set(int minX, int minY, int maxX, int maxY) {
         Preconditions.checkArgument(minX <= maxX || (minX == INVALID.minX() && maxX == INVALID.maxX()));
         Preconditions.checkArgument(minY <= maxY || (minY == INVALID.minY() && maxY == INVALID.maxY()));
@@ -358,5 +359,25 @@ public class BlockArea implements BlockAreac {
     @Override
     public String toString() {
         return "BlockArea[(" + this.minX + ", " + this.minY + ")...(" + this.maxX + ", " + this.maxY + ")]";
+    }
+
+    @Override
+    public long distanceSquared(Vector2ic p) {
+        return distanceSquared(p.x(), p.y());
+    }
+
+    @Override
+    public long distanceSquared(int px, int py) {
+        //center = min + width / 2 = min + (max - min) / 2
+        // 2 * center  = 2 * min + max - min = min + max
+        int cx2 = minX() + maxX();
+        int cy2 = minY() + maxY();
+
+        //     dx = p - center - width / 2
+        // 2 * dx = 2 * px - 2 * center - width
+        //     dx = (2 * px - 2 * center - width) / 2
+        long dx = Math.max(Math.abs(2 * px - cx2) - getSizeX(), 0) / 2;
+        long dy = Math.max(Math.abs(2 * py - cy2) - getSizeY(), 0) / 2;
+        return dx * dx + dy * dy;
     }
 }

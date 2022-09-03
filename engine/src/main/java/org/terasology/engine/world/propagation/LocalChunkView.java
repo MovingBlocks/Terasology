@@ -16,12 +16,12 @@ public class LocalChunkView implements PropagatorWorldView {
     private PropagationRules rules;
     private Chunk[] chunks;
 
-    private final Vector3i topLeft;
+    private final Vector3i topLeft = new Vector3i();
 
     public LocalChunkView(Chunk[] chunks, PropagationRules rules) {
         this.chunks = chunks;
         this.rules = rules;
-        topLeft = chunks[0].getPosition(new Vector3i());
+        topLeft.set(chunks[0].getPosition());
     }
 
     /**
