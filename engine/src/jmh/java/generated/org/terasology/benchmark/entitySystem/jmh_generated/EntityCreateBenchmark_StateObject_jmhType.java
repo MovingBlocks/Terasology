@@ -1,4 +1,0 @@
-package org.terasology.benchmark.entitySystem.jmh_generated;
-public class EntityCreateBenchmark_StateObject_jmhType extends EntityCreateBenchmark_StateObject_jmhType_B3 {
-}
-
