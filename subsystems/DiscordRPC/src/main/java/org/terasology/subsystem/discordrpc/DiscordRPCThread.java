@@ -188,6 +188,9 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
 
                             // Retry to connect again
                         }
+                    } catch (RuntimeException e) {
+                        logger.error("Could not create or connect Discord client: {}", e.getMessage());
+                        return;
                     }
                 }
             }
