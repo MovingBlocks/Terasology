@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -11,58 +12,48 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
+import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.network.Client;
-import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.PlayerStore;
 import org.terasology.engine.persistence.StorageManager;
-import org.terasology.engine.recording.CharacterStateEventPositionMap;
-import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;
-import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.family.SymmetricFamily;
-import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
-import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
-import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.EntityRefComponent;
 import org.terasology.unittest.stubs.StringComponent;
 
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.UUID;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,21 +63,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Tag("TteTest")
-@ExtendWith(MockitoExtension.class)
-// TODO: Re-evaluate Mockito strictness settings after replacing TerasologyTestingEnvironment (#5010)
-//   Mockito is currently in LENIENT mode because some of the mocked objects or methods are only used
-//   by a subset of the tests.
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class StorageManagerTest extends TerasologyTestingEnvironment {
-    public static final String PLAYER_ID = "someId";
+@Tag("MteTest")
+@ExtendWith({MockitoExtension.class, MTEExtension.class})
+@IntegrationEnvironment(
+        networkMode = NetworkMode.NONE,  // A mode with a LocalPlayer.
+        subsystem = StorageManagerTest.EnableWritingSaveGames.class
+)
+public class StorageManagerTest {
     public static final Vector3ic CHUNK_POS = new Vector3i(1, 2, 3);
 
+    @In
+    EngineEntityManager entityManager;
+
+    private String playerId;
     private ModuleEnvironment moduleEnvironment;
-    private ReadWriteStorageManager esm;
-    private EngineEntityManager entityManager;
-    private BlockManager blockManager;
-    private ExtraBlockDataManager extraDataManager;
     private Block testBlock;
     private Block testBlock2;
     private EntityRef character;
@@ -96,125 +86,89 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @BeforeEach
-    public void setup(TestInfo testInfo) throws Exception {
-        super.setup();
+    void setupLocals(
+            StorageManager storageManager, LocalPlayer player, NetworkSystem network, BlockManager blockManager,
+            ModuleManager moduleManager, Config config, Context context) {
+        assertThat(storageManager).isInstanceOf(ReadWriteStorageManager.class);
+        context.put(ReadWriteStorageManager.class, (ReadWriteStorageManager) storageManager);
 
-        String saveName = "testSave-" + testInfo.getTestMethod().map(Method::getName)
-                .orElseGet(() -> UUID.randomUUID().toString());
-        savePath = PathManager.getInstance().getSavePath(saveName);
+        savePath = getSavePath(config);
 
         assertWithMessage("Leftover files in %s", savePath)
                 .that(savePath.resolve("global.dat").toFile().exists())
                 .isFalse();
 
-        entityManager = context.get(EngineEntityManager.class);
-        moduleEnvironment = mock(ModuleEnvironment.class);
-        blockManager = context.get(BlockManager.class);
-        extraDataManager = context.get(ExtraBlockDataManager.class);
+        character = player.getCharacterEntity();
+        assertThat(character).isNotEqualTo(EntityRef.NULL);
 
-        ModuleManager moduleManager = mock(ModuleManager.class);
+        var clients = ImmutableList.copyOf(network.getPlayers());
+        assertThat(clients).hasSize(1);
+        playerId = clients.get(0).getId();
 
-        when(moduleManager.getEnvironment()).thenReturn(moduleEnvironment);
+        testBlock = blockManager.getBlock("test:testblock");
+        testBlock2 = blockManager.getBlock("test:testblock2");
 
-        RecordedEventStore recordedEventStore = new RecordedEventStore();
-        recordAndReplayUtils = new RecordAndReplayUtils();
-        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
-        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore,
-                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList,
-                moduleManager, mock(TypeRegistry.class));
-        recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
-
-
-        esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, blockManager, extraDataManager,
-                false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
-        context.put(StorageManager.class, esm);
-
-        this.character = entityManager.create();
-        Client client = createClientMock(PLAYER_ID, character);
-        NetworkSystem networkSystem = mock(NetworkSystem.class);
-        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        when(networkSystem.getPlayers()).thenReturn(List.of(client));
-        context.put(NetworkSystem.class, networkSystem);
-
-        AssetManager assetManager = context.get(AssetManager.class);
-        BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(SymmetricFamily.class);
-        assetManager.loadAsset(new ResourceUrn("test:testblock"), data, BlockFamilyDefinition.class);
-        assetManager.loadAsset(new ResourceUrn("test:testblock2"), data, BlockFamilyDefinition.class);
-        testBlock = context.get(BlockManager.class).getBlock("test:testblock");
-        testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
-
-        context.put(ChunkProvider.class, mock(ChunkProvider.class));
-        WorldProvider worldProvider = mock(WorldProvider.class);
-        when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
-        context.put(WorldProvider.class, worldProvider);
+        moduleEnvironment = moduleManager.getEnvironment();
     }
 
-    private Client createClientMock(String clientId, EntityRef charac) {
-        EntityRef clientEntity = createClientEntity(charac);
-        Client client = mock(Client.class);
-        when(client.getEntity()).thenReturn(clientEntity);
-        when(client.getId()).thenReturn(clientId);
-        return client;
-    }
-
-    private EntityRef createClientEntity(EntityRef charac) {
-        ClientComponent clientComponent = new ClientComponent();
-        clientComponent.local = true;
-        clientComponent.character = charac;
-        return entityManager.create(clientComponent);
+    Path getSavePath(Config config) {
+        // TODO: add a more direct way of inspecting StorageManager's path.
+        //   This way of getting the game title (and thus the path) is a bit brittle,
+        //   because world title and game title are not _required_ to be identical.
+        String gameTitle = config.getWorldGeneration().getWorldTitle();
+        return PathManager.getInstance().getSavePath(gameTitle);
     }
 
     @Test
     @Order(1)
-    public void testGetUnstoredPlayerReturnsNewStor() {
-        PlayerStore store = esm.loadPlayerStore(PLAYER_ID);
+    public void testGetUnstoredPlayerReturnsNewStor(StorageManager esm) {
+        PlayerStore store = esm.loadPlayerStore(playerId);
         assertNotNull(store);
         assertEquals(new Vector3f(), store.getRelevanceLocation());
         assertFalse(store.hasCharacter());
-        assertEquals(PLAYER_ID, store.getId());
+        assertEquals(playerId, store.getId());
     }
 
     @Test
-    public void testStoreAndRestoreOfPlayerWithoutCharacter() {
+    public void testStoreAndRestoreOfPlayerWithoutCharacter(StorageManager esm) {
         // remove character from player:
         character.destroy();
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        PlayerStore restoredStore = esm.loadPlayerStore(PLAYER_ID);
+        PlayerStore restoredStore = esm.loadPlayerStore(playerId);
         assertNotNull(restoredStore);
         assertFalse(restoredStore.hasCharacter());
         assertEquals(new Vector3f(), restoredStore.getRelevanceLocation());
     }
 
     @Test
-    public void testPlayerRelevanceLocationSurvivesStorage() {
+    public void testPlayerRelevanceLocationSurvivesStorage(StorageManager esm) {
         Vector3f loc = new Vector3f(1, 2, 3);
         character.addComponent(new LocationComponent(loc));
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
+        PlayerStore restored = esm.loadPlayerStore(playerId);
         assertEquals(loc, restored.getRelevanceLocation());
     }
 
     @Test
-    public void testCharacterSurvivesStorage() {
+    public void testCharacterSurvivesStorage(StorageManager esm) {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
+        PlayerStore restored = esm.loadPlayerStore(playerId);
         restored.restoreEntities();
         assertTrue(restored.hasCharacter());
         assertEquals(character, restored.getCharacter());
     }
 
     @Test
-    public void testGlobalEntitiesStoredAndRestored() throws Exception {
+    public void testGlobalEntitiesStoredAndRestored(
+            ReadWriteStorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager, Context context) throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
         long entityId = entity.getId();
 
@@ -226,7 +180,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
 
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -236,7 +190,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void testReferenceRemainsValidOverStorageRestoral() throws Exception {
+    public void testReferenceRemainsValidOverStorageRestoral(
+            StorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager, Context context) throws Exception {
         EntityRef someEntity = entityManager.create();
         character.addComponent(new EntityRefComponent(someEntity));
 
@@ -250,18 +205,19 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
+        PlayerStore restored = newSM.loadPlayerStore(playerId);
         restored.restoreEntities();
         assertTrue(restored.getCharacter().getComponent(EntityRefComponent.class).entityRef.exists());
     }
 
     @Test
-    public void testGetUnstoredChunkReturnsNothing() {
-        esm.loadChunkStore(CHUNK_POS);
+    public void testGetUnstoredChunkReturnsNothing(StorageManager esm) {
+        assertThat(esm.loadChunkStore(CHUNK_POS)).isNull();
     }
 
     @Test
-    public void testStoreAndRestoreChunkStore() {
+    public void testStoreAndRestoreChunkStore(
+            StorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
@@ -280,18 +236,17 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void testChunkSurvivesStorageSaveAndRestore() throws Exception {
+    public void testChunkSurvivesStorageSaveAndRestore(
+            ReadWriteStorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager,
+            Context context) throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
-        when(chunkProvider.getChunk(ArgumentMatchers.any(Vector3ic.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
-        boolean storeChunkInZips = true;
 
-        esm.setStoreChunksInZips(storeChunkInZips);
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
@@ -299,7 +254,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils,
+                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils,
                 recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
@@ -312,7 +267,9 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void testEntitySurvivesStorageInChunkStore() throws Exception {
+    public void testEntitySurvivesStorageInChunkStore(
+            ReadWriteStorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager,
+            Context context) throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
@@ -336,7 +293,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -348,10 +305,17 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void testCanSavePlayerWithoutUnloading() {
+    public void testCanSavePlayerWithoutUnloading(StorageManager esm) {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
         assertTrue(character.isActive());
+    }
+
+    static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
+        @Override
+        public void initialise(GameEngine engine, Context rootContext) {
+            rootContext.getValue(SystemConfig.class).writeSaveGamesEnabled.set(true);
+        }
     }
 }
