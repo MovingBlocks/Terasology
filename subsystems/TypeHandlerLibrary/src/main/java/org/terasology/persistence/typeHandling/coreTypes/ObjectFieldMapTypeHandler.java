@@ -1,8 +1,9 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.base.Defaults;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,5 +111,13 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
             logger.error("Unable to deserialize {}", data, e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("fields", fieldByName.keySet())
+                .add("constructor", constructor)
+                .toString();
     }
 }

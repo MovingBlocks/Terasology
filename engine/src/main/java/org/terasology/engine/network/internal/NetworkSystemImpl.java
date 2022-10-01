@@ -102,12 +102,13 @@ import static org.terasology.engine.registry.InjectionHelper.createWithConstruct
  * Implementation of the Network System using Netty and TCP/IP
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {
+    public static int shutdownQuietMs = 2_000;
+    public static int shutdownTimeoutMs = 15_000;
+
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystemImpl.class);
     private static final int OWNER_DEPTH_LIMIT = 50;
     private static final int NET_TICK_RATE = 50;
     private static final int NULL_NET_ID = 0;
-    private static final int SHUTDOWN_QUIET_MS = 2_000;
-    private static final int SHUTDOWN_TIMEOUT_MS = 15_000;
 
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
@@ -241,7 +242,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     } else {
                         logger.warn("Failed to connect to server", connectCheck.cause());
                         connectCheck.channel().closeFuture().awaitUninterruptibly();
-                        clientGroup.shutdownGracefully(SHUTDOWN_QUIET_MS, SHUTDOWN_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                        clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS)
                                 .syncUninterruptibly();
                         return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
                     }
@@ -265,11 +266,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         List<Future<?>> shutdowns = new ArrayList<>(3);
         if (serverChannelFuture != null) {
             // Wait until all threads are terminated.
-            shutdowns.add(bossGroup.shutdownGracefully(SHUTDOWN_QUIET_MS, SHUTDOWN_TIMEOUT_MS, TimeUnit.MILLISECONDS));
-            shutdowns.add(workerGroup.shutdownGracefully(SHUTDOWN_QUIET_MS, SHUTDOWN_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+            shutdowns.add(bossGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
+            shutdowns.add(workerGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
         }
         if (clientGroup != null) {
-            shutdowns.add(clientGroup.shutdownGracefully(SHUTDOWN_QUIET_MS, SHUTDOWN_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+            shutdowns.add(clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS));
         }
 
         // Shut down all event loops to terminate all threads.
@@ -283,7 +284,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         return FutureMono.from(f);
                     })
                     .collectList()
-        ).block(Duration.ofMillis(SHUTDOWN_TIMEOUT_MS));
+        ).block(Duration.ofMillis(shutdownTimeoutMs));
 
         processPendingDisconnects();
         clientList.forEach(this::processRemovedClient);

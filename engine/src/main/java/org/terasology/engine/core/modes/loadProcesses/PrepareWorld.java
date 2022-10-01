@@ -14,7 +14,7 @@ import org.terasology.engine.rendering.world.WorldRenderer;
  */
 public class PrepareWorld extends VariableStepLoadProcess {
 
-    private static final int MAXIMUM_WAIT_MS = 5000;
+    public static int maximumWaitMs = 5000;
 
     private final Context context;
     private long startTime;
@@ -38,7 +38,7 @@ public class PrepareWorld extends VariableStepLoadProcess {
         Thread.onSpinWait();
         EngineTime time = (EngineTime) context.get(Time.class);
         timeElapsed = time.getRealTimeInMs() - startTime;
-        return timeElapsed > MAXIMUM_WAIT_MS;
+        return timeElapsed > maximumWaitMs;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PrepareWorld extends VariableStepLoadProcess {
 
     @Override
     public float getProgress() {
-        return ((float) timeElapsed) / MAXIMUM_WAIT_MS;
+        return ((float) timeElapsed) / maximumWaitMs;
     }
 
     @Override
