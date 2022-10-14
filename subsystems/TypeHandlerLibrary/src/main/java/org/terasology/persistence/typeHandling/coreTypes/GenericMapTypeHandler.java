@@ -1,13 +1,15 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
@@ -25,10 +27,10 @@ import java.util.stream.Collectors;
  */
 public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericMapTypeHandler.class);
+    static final String KEY = "key";
+    static final String VALUE = "value";
 
-    private static final String KEY = "key";
-    private static final String VALUE = "value";
+    private static final Logger logger = LoggerFactory.getLogger(GenericMapTypeHandler.class);
 
     private final TypeHandler<K> keyHandler;
     private final TypeHandler<V> valueHandler;
@@ -60,27 +62,53 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
     @Override
     public Optional<Map<K, V>> deserialize(PersistedData data) {
-        if (!data.isArray()) {
+        if (!data.isArray() || data.isValueMap()) {
+            logger.warn("Incorrect map format detected: object instead of array.\n" + getUsageInfo(data));
             return Optional.empty();
         }
 
         Map<K, V> result = Maps.newLinkedHashMap();
 
         for (PersistedData entry : data.getAsArray()) {
-            final Optional<K> key = keyHandler.deserialize(entry.getAsValueMap().get(KEY));
-            final Optional<V> value = valueHandler.deserialize(entry.getAsValueMap().get(VALUE));
-
-            if (key.isPresent()) {
-                if (value.isPresent()) {
-                    result.put(key.get(), value.get());
-                } else {
-                    logger.warn("Missing field '{}' for entry '{}'", VALUE, data.getAsString());
-                }
-            } else {
-                logger.warn("Missing field '{}' for entry '{}'", KEY, data.getAsString());
+            PersistedDataMap kvEntry = entry.getAsValueMap();
+            PersistedData rawKey = kvEntry.get(KEY);
+            PersistedData rawValue = kvEntry.get(VALUE);
+            if (rawKey == null || rawValue == null) {
+                logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n" + getUsageInfo(data));
+                return Optional.empty();
             }
+
+            final Optional<K> key = keyHandler.deserialize(rawKey);
+            if (key.isEmpty()) {
+                logger.warn("Could not deserialize key '{}' as '{}'", rawKey, keyHandler.getClass().getSimpleName());
+                return Optional.empty();
+            }
+
+            final Optional<V> value = valueHandler.deserialize(kvEntry.get(VALUE));
+            if (value.isEmpty()) {
+                logger.warn("Could not deserialize value '{}' as '{}'", rawValue, valueHandler.getClass().getSimpleName());
+                return Optional.empty();
+            }
+
+            result.put(key.get(), value.get());
         }
 
         return Optional.of(result);
+    }
+
+    private String getUsageInfo(PersistedData data) {
+        return "Expected\n" +
+                "  \"mapName\": [\n" +
+                "    { \"key\": \"...\", \"value\": \"...\" }\n" +
+                "  ]\n" +
+                "but found \n'{}'" + data + "'";
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("key", keyHandler)
+                .add("value", valueHandler)
+                .toString();
     }
 }

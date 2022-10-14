@@ -8,14 +8,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-// Analytics
-apply plugin: 'project-report'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
-apply plugin: 'jacoco'
-apply plugin: 'org.sonarqube'
-
 apply plugin: 'terasology-repositories'
 
 java {
@@ -26,12 +18,6 @@ javadoc.options.encoding = 'UTF-8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-}
-
-dependencies {
-    pmd('net.sourceforge.pmd:pmd-core:6.15.0')
-    pmd('net.sourceforge.pmd:pmd-java:6.15.0')
-    // the FindBugs version is set in the configuration
 }
 
 task sourceJar(type: Jar) {
@@ -45,78 +31,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     description = "Create a JAR with the JavaDoc for the java sources"
     from javadoc.destinationDir
     archiveClassifier = 'javadoc'
-}
-
-// Extra details provided for unit tests
-test {
-    useJUnitPlatform()
-
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-    reports {
-        junitXml.enabled = true
-    }
-    // Arguments to include while running tests
-    jvmArgs '-Xms512m', '-Xmx1024m'
-
-    // Make sure the natives have been extracted, but only for multi-workspace setups (not for solo module builds)
-    if (project.name != project(':').name) {
-        dependsOn rootProject.extractNatives
-    }
-
-    jacoco {
-        excludes = ["org.terasology.protobuf.*",
-                    "*MethodAccess","*FieldAccess"]
-    }
-}
-
-jacoco {
-    toolVersion = "0.8.5"
-}
-
-jacocoTestReport {
-    dependsOn test // Despite doc saying this should be automatic we need to explicitly add it anyway :-(
-    reports {
-        // Used to be exec, but that had a binary incompatibility between JaCoCo 0.7.4 and 0.7.5 and issues with some plugins
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
-    }
-}
-
-// The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds
-// Solo module builds in Jenkins get a copy of the config dir from the engine harness so it still lives at root/config
-// TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
-checkstyle {
-    ignoreFailures = false
-
-    def checkstyleDir = rootProject.file('config/metrics/checkstyle')
-    configDirectory = checkstyleDir
-    configProperties.samedir = checkstyleDir
-}
-
-pmd {
-    ignoreFailures = true
-    ruleSetFiles = files("$rootDir/config/metrics/pmd/pmd.xml")
-    // By default, gradle uses both ruleset file AND the rulesets. Override the ruleSets to use only those from the file
-    ruleSets = []
-}
-
-spotbugs {
-    toolVersion = '4.0.0'
-    ignoreFailures = true
-    excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
-}
-
-spotbugsMain {
-    reports {
-        xml {
-            enabled = true
-            destination = file("$buildDir/reports/spotbugs/main/spotbugs.xml")
-        }
-    }
 }
 
 tasks.javadoc {

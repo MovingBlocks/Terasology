@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network;
@@ -11,11 +11,14 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.network.internal.ServerInfoRequestHandler;
 import org.terasology.engine.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Future;
+
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
 
 /**
  * Performs temporary connections to one or more game servers.
@@ -25,12 +28,12 @@ public class ServerInfoService implements AutoCloseable {
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
 
-    public ServerInfoService() {
+    public ServerInfoService(Context context) {
         eventLoopGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup);
         bootstrap.channel(NioSocketChannel.class);
-        bootstrap.handler(new InfoRequestPipelineFactory());
+        bootstrap.handler(createWithConstructorInjection(InfoRequestPipelineFactory.class, context));
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);

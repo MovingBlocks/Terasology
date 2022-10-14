@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal;
@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateMainMenu;
-import org.terasology.engine.registry.CoreRegistry;
+
+import java.util.Optional;
 
 import static org.terasology.protobuf.NetData.NetMessage;
 
@@ -21,16 +22,19 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
-    private NetworkSystemImpl networkSystem;
+    private final GameEngine gameEngine;
+    private final NetworkSystemImpl networkSystem;
+
     private ServerImpl server;
 
-    public ClientHandler(NetworkSystemImpl networkSystem) {
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public ClientHandler(NetworkSystemImpl networkSystem, Optional<GameEngine> gameEngine) {
+        this.gameEngine = gameEngine.orElse(null);
         this.networkSystem = networkSystem;
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
         if (gameEngine != null) {
             gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
         }

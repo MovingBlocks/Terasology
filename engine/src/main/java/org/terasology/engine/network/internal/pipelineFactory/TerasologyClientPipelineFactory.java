@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network.internal.pipelineFactory;
@@ -12,29 +12,33 @@ import io.netty.handler.codec.compression.Lz4FrameDecoder;
 import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.network.internal.ClientConnectionHandler;
 import org.terasology.engine.network.internal.ClientHandler;
 import org.terasology.engine.network.internal.ClientHandshakeHandler;
 import org.terasology.engine.network.internal.JoinStatusImpl;
 import org.terasology.engine.network.internal.MetricRecordingHandler;
-import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
+
+import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
 
 
 /**
  * Netty pipeline for Clients
  */
-public class TerasologyClientPipelineFactory extends ChannelInitializer {
+public class TerasologyClientPipelineFactory extends ChannelInitializer<Channel> {
 
-    private NetworkSystemImpl networkSystem;
+    private final Context parentContext;
 
-    public TerasologyClientPipelineFactory(NetworkSystemImpl networkSystem) {
-        this.networkSystem = networkSystem;
+    public TerasologyClientPipelineFactory(Context parentContext) {
+        this.parentContext = parentContext;
     }
 
     @Override
     protected void initChannel(Channel ch) throws Exception {
-        JoinStatusImpl joinStatus = new JoinStatusImpl();
+        var context = new ContextImpl(parentContext);
+        context.put(JoinStatusImpl.class, new JoinStatusImpl());
         ChannelPipeline p = ch.pipeline();
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
@@ -46,8 +50,8 @@ public class TerasologyClientPipelineFactory extends ChannelInitializer {
         p.addLast("frameLengthEncoder", new LengthFieldPrepender(3));
         p.addLast("protobufEncoder", new ProtobufEncoder());
 
-        p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
-        p.addLast("connectionHandler", new ClientConnectionHandler(joinStatus, networkSystem));
-        p.addLast("handler", new ClientHandler(networkSystem));
+        p.addLast("authenticationHandler", createWithConstructorInjection(ClientHandshakeHandler.class, context));
+        p.addLast("connectionHandler", createWithConstructorInjection(ClientConnectionHandler.class, context));
+        p.addLast("handler", createWithConstructorInjection(ClientHandler.class, context));
     }
 }

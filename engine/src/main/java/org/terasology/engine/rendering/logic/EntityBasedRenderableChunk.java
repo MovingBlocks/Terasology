@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.logic;
@@ -34,9 +34,10 @@ public class EntityBasedRenderableChunk implements RenderableChunk {
 
     @Override
     public void setMesh(ChunkMesh newMesh) {
-        ChunkMeshComponent component = entity.getComponent(ChunkMeshComponent.class);
-        component.mesh = newMesh;
-        entity.saveComponent(component);
+        entity.updateComponent(ChunkMeshComponent.class, c -> {
+            c.setMesh(newMesh);
+            return c;
+        });
     }
 
     @Override
@@ -65,10 +66,10 @@ public class EntityBasedRenderableChunk implements RenderableChunk {
 
     @Override
     public void disposeMesh() {
-        ChunkMeshComponent component = entity.getComponent(ChunkMeshComponent.class);
-        if (component != null && component.mesh != null) {
-            component.mesh.dispose();
-        }
+        entity.updateComponent(ChunkMeshComponent.class, c -> {
+            c.setMesh(null);
+            return c;
+        });
     }
 
     @Override

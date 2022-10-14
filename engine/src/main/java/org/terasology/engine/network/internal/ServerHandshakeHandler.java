@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
@@ -13,7 +13,6 @@ import org.terasology.engine.identity.CertificateGenerator;
 import org.terasology.engine.identity.CertificatePair;
 import org.terasology.engine.identity.IdentityConstants;
 import org.terasology.engine.identity.PublicIdentityCertificate;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.protobuf.NetData;
 
 import javax.crypto.BadPaddingException;
@@ -25,24 +24,30 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 /**
  * Authentication handler for the server end of the handshake
  */
 public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
-    private Config config = CoreRegistry.get(Config.class);
+    private final Config config;
     private ServerConnectionHandler serverConnectionHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
     private NetData.HandshakeHello serverHello;
+
+    public ServerHandshakeHandler(Config config) {
+        this.config = config;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         serverConnectionHandler = ctx.pipeline().get(ServerConnectionHandler.class);
 
-
-        PublicIdentityCertificate serverPublicCert = config.getSecurity().getServerPublicCertificate();
+        PublicIdentityCertificate serverPublicCert = verifyNotNull(config.getSecurity(), "config.security")
+                .getServerPublicCertificate();
         new SecureRandom().nextBytes(serverRandom);
 
         serverHello = NetData.HandshakeHello.newBuilder()
