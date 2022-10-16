@@ -184,7 +184,8 @@ public class WorldBuilder extends ProviderStore {
             if (requires != null) {
                 for (Facet facet : requires.value()) {
                     if (!facets.contains(facet.value())) {
-                        logger.error("Facet {} has no provider. It is required by {}", facet, provider);
+                        logger.error("Facet provider for {} is missing. It is required by {}", facet.value(), provider.getClass());
+                        throw new IllegalStateException("Missing facet provider");
                     }
                 }
             }
