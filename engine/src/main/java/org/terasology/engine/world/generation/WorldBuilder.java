@@ -45,7 +45,7 @@ public class WorldBuilder extends ProviderStore {
         this.pluginLibrary = pluginLibrary;
     }
 
-    public WorldBuilder  addProvider(FacetProvider provider) {
+    public WorldBuilder addProvider(FacetProvider provider) {
         providersList.add(provider);
         return this;
     }
