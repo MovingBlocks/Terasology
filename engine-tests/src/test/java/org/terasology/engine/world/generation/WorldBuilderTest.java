@@ -108,6 +108,17 @@ public class WorldBuilderTest {
         assertTrue(regionData.getFacet(Facet4.class).updated);
     }
 
+    @Test
+    public void testIncorrectProviderOrder() {
+        WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
+        worldBuilder.setSeed(12);
+        // Facet1Provider requires Facet2Provider, add them in incorrect order
+        worldBuilder.addProvider(new Facet1Provider());
+        worldBuilder.addProvider(new Facet2Provider());
+
+        assertThrows(IllegalStateException.class, worldBuilder::build);
+    }
+
     public static class Facet1 extends BaseFacet3D {
         public boolean updated;
 
