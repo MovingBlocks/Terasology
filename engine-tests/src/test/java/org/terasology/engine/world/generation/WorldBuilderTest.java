@@ -21,8 +21,8 @@ public class WorldBuilderTest {
     public void testBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
-        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
+        worldBuilder.addProvider(new Facet1Provider());
 
         World world = worldBuilder.build();
         BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
@@ -39,8 +39,8 @@ public class WorldBuilderTest {
     public void testCumulativeBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
-        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
+        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet3Provider());
 
         World world = worldBuilder.build();
@@ -61,8 +61,8 @@ public class WorldBuilderTest {
     public void testMultiplePathsBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
-        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
+        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet4Provider());
 
         World world = worldBuilder.build();
@@ -84,8 +84,8 @@ public class WorldBuilderTest {
     public void testUpdating() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
-        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
+        worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet3Provider());
         worldBuilder.addProvider(new Facet4Provider());
         worldBuilder.addProvider(new FacetUpdater());
