@@ -84,6 +84,9 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void update(float delta) {
+        if (delta == 0) {
+            return;  // paused
+        }
         Iterable<EntityRef> entities = entityManager.getEntitiesWith(BehaviorComponent.class);
         for (EntityRef entity : entities) {
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);

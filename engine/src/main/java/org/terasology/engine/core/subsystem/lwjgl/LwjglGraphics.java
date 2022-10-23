@@ -18,6 +18,7 @@ import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
 import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.engine.utilities.OS;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 
@@ -156,23 +157,26 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             GLFW.glfwSwapInterval(0);
         }
 
-        try {
-            String root = "org/terasology/engine/icons/";
-            ClassLoader classLoader = getClass().getClassLoader();
+        if (OS.get() != OS.MACOSX) {
+            try {
+                String root = "org/terasology/engine/icons/";
+                ClassLoader classLoader = getClass().getClassLoader();
 
-            BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));
-            BufferedImage icon32 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_32.png"));
-            BufferedImage icon64 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_64.png"));
-            BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
-            GLFWImage.Buffer buffer = GLFWImage.create(4);
-            buffer.put(0, LwjglGraphicsUtil.convertToGLFWFormat(icon16));
-            buffer.put(1, LwjglGraphicsUtil.convertToGLFWFormat(icon32));
-            buffer.put(2, LwjglGraphicsUtil.convertToGLFWFormat(icon64));
-            buffer.put(3, LwjglGraphicsUtil.convertToGLFWFormat(icon128));
-            GLFW.glfwSetWindowIcon(window, buffer);
+                BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));
+                BufferedImage icon32 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_32.png"));
+                BufferedImage icon64 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_64.png"));
+                BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
+                GLFWImage.Buffer buffer = GLFWImage.create(4);
+                buffer.put(0, LwjglGraphicsUtil.convertToGLFWFormat(icon16));
+                buffer.put(1, LwjglGraphicsUtil.convertToGLFWFormat(icon32));
+                buffer.put(2, LwjglGraphicsUtil.convertToGLFWFormat(icon64));
+                buffer.put(3, LwjglGraphicsUtil.convertToGLFWFormat(icon128));
+                // Not supported on Mac: Code: 65548, Description: Cocoa: Regular windows do not have icons on macOS
+                GLFW.glfwSetWindowIcon(window, buffer);
 
-        } catch (IOException | IllegalArgumentException e) {
-            logger.warn("Could not set icon", e);
+            } catch (IOException | IllegalArgumentException e) {
+                logger.warn("Could not set icon", e);
+            }
         }
 
         lwjglDisplay.setDisplayModeSetting(config.getDisplayModeSetting(), false);

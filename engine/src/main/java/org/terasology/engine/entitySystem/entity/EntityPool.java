@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity;
 
@@ -130,9 +130,31 @@ public interface EntityPool {
     Iterable<EntityRef> getAllEntities();
 
     /**
+     * All entities containing every one of the given components.
+     * <p>
+     * Implementation note:
+     * <a href="http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#Topic5"
+     *     title="Designing Generic Methods">Java generic types are a mess</a>, especially where
+     * varargs are involved. We can't use {@link SafeVarargs @SafeVarargs} on any interface methods
+     * because there is no way to know the <em>implementations</em> of the interface are safe.
+     * <p>
+     * In this case, in practice, there are few (if any) callers that pass more than two values.
+     * By adding methods that explicitly take one and two values, we can present an interface the
+     * compiler doesn't need to complain about at every call site.
+     *
      * @return An iterable over all entities with the provided component types.
      */
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
+
+    @SuppressWarnings("unchecked")
+    default Iterable<EntityRef> getEntitiesWith(Class<? extends Component> componentClass) {
+        return getEntitiesWith(new Class[] {componentClass});
+    }
+
+    @SuppressWarnings("unchecked")
+    default Iterable<EntityRef> getEntitiesWith(Class<? extends Component> componentClass, Class<? extends Component> componentClass2) {
+        return getEntitiesWith(new Class[] {componentClass, componentClass2});
+    }
 
     /**
      * @return A count of entities with the provided component types
