@@ -4,7 +4,7 @@
 package org.terasology.engine.integrationenvironment;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
@@ -23,30 +23,26 @@ import org.terasology.unittest.stubs.DummyEvent;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Ensure a test class with a per-method Jupiter lifecycle can share an engine between tests.
+ * Ensure a test class with a per-method Jupiter lifecycle does not share data between tests.
  */
 @Tag("MteTest")
 @ExtendWith(MTEExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)  // The default, but here for explicitness.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MTEExtensionTestWithPerMethodLifecycle {
-    // java 8 doesn't have ConcurrentSet
-    @SuppressWarnings("checkstyle:constantname")
-    private static final ConcurrentMap<String, Integer> seenNames = new ConcurrentHashMap<>();
 
     @In
     public EntityManager entityManager;
 
-    @BeforeAll
-    public static void createEntity(EntityManager entityManager, TestInfo testInfo) {
+    private final ConcurrentHashMap.KeySetView<Object, Boolean> seenNames = ConcurrentHashMap.newKeySet();
+
+    @BeforeEach
+    void createEntity(TestInfo testInfo) {
         // Create some entity to be shared by all the tests.
         EntityRef entity = entityManager.create(new DummyComponent());
 
@@ -64,33 +60,31 @@ public class MTEExtensionTestWithPerMethodLifecycle {
     @Order(1)
     public void firstTestFindsThings() {
         List<EntityRef> entities = Lists.newArrayList(entityManager.getEntitiesWith(DummyComponent.class));
-        // There should be one entity, created by the @BeforeAll method
+        // There should be one entity, created by the @BeforeEach method
         assertEquals(1, entities.size());
 
         DummyComponent component = entities.get(0).getComponent(DummyComponent.class);
-        assertTrue(component.eventReceived);
+        assertThat(component.eventReceived).isTrue();
+        assertThat(seenNames).isEmpty();
 
         // Remember that a test has seen this one.
-        assertNotNull(component.name);
-        assertFalse(seenNames.containsKey(component.name));
-        seenNames.put(component.name, 1);
+        assertThat(component.name).isNotNull();
+        assertThat(seenNames).isEmpty();
+        seenNames.add(component.name);
     }
 
     @Test
     @Order(2)
-    public void thingsStillExistForSecondTest() {
+    public void thingsDoNotPolluteSecondTest() {
         List<EntityRef> entities = Lists.newArrayList(entityManager.getEntitiesWith(DummyComponent.class));
-        // There should be one entity, created by the @BeforeAll method
+        // There should be one entity, created by the @BeforeEach method for this one test
         assertEquals(1, entities.size());
 
-        // Make sure that this is the same one that the first test saw.
+        // FIXME: what to assert here does this make sense or should we drop the whole thing
+        //     and say it's covered by LifecyclePerMethodInjectionTest?
         DummyComponent component = entities.get(0).getComponent(DummyComponent.class);
-        assertTrue(component.eventReceived);
-        assertNotNull(component.name);
-        assertTrue(seenNames.containsKey(component.name), () ->
-                String.format("This is not the same entity as seen in the first test!%n"
-                        + "Current entity: %s%n"
-                        + "Previously seen: %s",
-                        component.name, seenNames.keySet()));
+        assertThat(component.eventReceived).isTrue();
+        assertThat(component.name).isNotNull();
+        assertThat(seenNames).isEmpty();
     }
 }

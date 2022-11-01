@@ -9,12 +9,10 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.PathManagerProvider;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.modes.GameState;
@@ -33,25 +31,24 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
-import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
-import org.terasology.engine.testUtil.WithUnittestModule;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
-import org.terasology.gestalt.module.ModuleRegistry;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.platform.commons.support.ReflectionSupport.newInstance;
 
 /**
  * Manages game engines for tests.
@@ -77,15 +74,18 @@ public class Engines {
     protected boolean doneLoading;
     protected Context hostContext;
     protected final List<TerasologyEngine> engines = Lists.newArrayList();
+    protected final List<Class<? extends EngineSubsystem>> subsystems = Lists.newArrayList();
 
     PathManager pathManager;
     PathManagerProvider.Cleaner pathManagerCleaner;
     TerasologyEngine host;
     private final NetworkMode networkMode;
 
-    public Engines(Set<String> dependencies, String worldGeneratorUri, NetworkMode networkMode) {
+    public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode,
+                   List<Class<? extends EngineSubsystem>> subsystems) {
         this.networkMode = networkMode;
         this.dependencies.addAll(dependencies);
+        this.subsystems.addAll(subsystems);
 
         if (worldGeneratorUri != null) {
             this.worldGeneratorUri = worldGeneratorUri;
@@ -131,12 +131,16 @@ public class Engines {
 
     /**
      * Creates a new client and connects it to the host.
+     * <p>
+     * Requires the host to have a {@link NetworkMode} that accepts connections.
+     * Configure the host's network mode using
+     * {@link IntegrationEnvironment#networkMode @IntegrationEnvironment#networkmode}
+     * on your test class.
      *
      * @return the created client's context object
      */
     public Context createClient(MainLoop mainLoop) throws IOException {
         TerasologyEngine client = createHeadlessEngine();
-        client.getFromEngineContext(Config.class).getRendering().setViewDistance(ViewDistance.LEGALLY_BLIND);
 
         client.changeState(new StateMainMenu());
         if (!connectToHost(client, mainLoop)) {
@@ -176,11 +180,12 @@ public class Engines {
     TerasologyEngine createHeadlessEngine() throws IOException {
         TerasologyEngineBuilder terasologyEngineBuilder = new TerasologyEngineBuilder();
         terasologyEngineBuilder
-                .add(new WithUnittestModule())
+                .add(new IntegrationEnvironmentSubsystem())
                 .add(new HeadlessGraphics())
                 .add(new HeadlessTimer())
                 .add(new HeadlessAudio())
                 .add(new HeadlessInput());
+        createExtraSubsystems().forEach(terasologyEngineBuilder::add);
 
         return createEngine(terasologyEngineBuilder);
     }
@@ -189,14 +194,29 @@ public class Engines {
     TerasologyEngine createHeadedEngine() throws IOException {
         EngineSubsystem audio = new LwjglAudio();
         TerasologyEngineBuilder terasologyEngineBuilder = new TerasologyEngineBuilder()
-                .add(new WithUnittestModule())
+                .add(new IntegrationEnvironmentSubsystem())
                 .add(audio)
                 .add(new LwjglGraphics())
                 .add(new LwjglTimer())
                 .add(new LwjglInput())
                 .add(new OpenVRInput());
+        createExtraSubsystems().forEach(terasologyEngineBuilder::add);
 
         return createEngine(terasologyEngineBuilder);
+    }
+
+    List<EngineSubsystem> createExtraSubsystems()  {
+        List<EngineSubsystem> instances = new ArrayList<>();
+        for (Class<? extends EngineSubsystem> clazz : subsystems) {
+            try {
+                EngineSubsystem subsystem = newInstance(clazz);
+                instances.add(subsystem);
+                logger.debug("Created new {}", subsystem);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Failed creating new " + clazz.getName(), e);
+            }
+        }
+        return instances;
     }
 
     TerasologyEngine createEngine(TerasologyEngineBuilder terasologyEngineBuilder) throws IOException {
@@ -214,41 +234,9 @@ public class Engines {
 
         TerasologyEngine terasologyEngine = terasologyEngineBuilder.build();
         terasologyEngine.initialize();
-        registerCurrentDirectoryIfModule(terasologyEngine);
 
         engines.add(terasologyEngine);
         return terasologyEngine;
-    }
-
-    /**
-     * In standalone module environments (i.e. Jenkins CI builds) the CWD is the module under test. When it uses MTE it very likely needs to
-     * load itself as a module, but it won't be loadable from the typical path such as ./modules. This means that modules using MTE would
-     * always fail CI tests due to failing to load themselves.
-     * <p>
-     * For these cases we try to load the CWD (via the installPath) as a module and put it in the global module registry.
-     * <p>
-     * This process is based on how ModuleManagerImpl uses ModulePathScanner to scan for available modules.
-     */
-    protected void registerCurrentDirectoryIfModule(TerasologyEngine terasologyEngine) {
-        Path installPath = PathManager.getInstance().getInstallPath();
-        ModuleManager moduleManager = terasologyEngine.getFromEngineContext(ModuleManager.class);
-        ModuleRegistry registry = moduleManager.getRegistry();
-        ModuleMetadataJsonAdapter metadataReader = moduleManager.getModuleMetadataReader();
-        moduleManager.getModuleFactory().getModuleMetadataLoaderMap()
-                .put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-
-
-        try {
-            Module module = moduleManager.getModuleFactory().createModule(installPath.toFile());
-            if (module != null) {
-                registry.add(module);
-                logger.info("Added install path as module: {}", installPath);
-            } else {
-                logger.info("Install path does not appear to be a module: {}", installPath);
-            }
-        } catch (IOException e) {
-            logger.warn("Could not read install path as module at " + installPath);
-        }
     }
 
     protected void mockPathManager() {
@@ -259,11 +247,10 @@ public class Engines {
         PathManagerProvider.setPathManager(pathManager);
     }
 
-    TerasologyEngine createHost(NetworkMode networkMode) throws IOException {
+    TerasologyEngine createHost(NetworkMode hostNetworkMode) throws IOException {
         TerasologyEngine host = createHeadlessEngine();
-        host.getFromEngineContext(SystemConfig.class).writeSaveGamesEnabled.set(false);
         host.subscribeToStateChange(new HeadlessStateChangeListener(host));
-        host.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri, networkMode));
+        host.changeState(new TestingStateHeadlessSetup(dependencies, worldGeneratorUri, hostNetworkMode));
 
         doneLoading = false;
         host.subscribeToStateChange(() -> {

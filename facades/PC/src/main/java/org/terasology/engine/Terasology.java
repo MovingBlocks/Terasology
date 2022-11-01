@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
@@ -9,12 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
-import org.terasology.engine.core.GameScheduler;
+import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
+import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
@@ -177,41 +178,77 @@ public final class Terasology implements Callable<Integer> {
 
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
-                engine.run(new StateHeadlessSetup());
-            } else if (loadLastGame) {
-                engine.initialize(); //initialize the managers first
-                GameScheduler.scheduleParallel("loadGame", () -> {
-                    GameManifest gameManifest = getLatestGameManifest();
-                    if (gameManifest != null) {
-                        engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
-                    }
-                });
-            } else {
-                if (createLastGame) {
-                    engine.initialize();
-                    GameScheduler.scheduleParallel("createLastGame", () -> {
-                        GameManifest gameManifest = getLatestGameManifest();
-                        if (gameManifest != null) {
-                            String title = gameManifest.getTitle();
-                            if (!title.startsWith("New Created")) { //if first time run
-                                gameManifest.setTitle("New Created " + title + " 1");
-                            } else { //if not first time run
-                                gameManifest.setTitle(getNewTitle(title));
-                            }
-                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
-                        }
-                    });
-                }
-
-                engine.run(new StateMainMenu());
             }
+
+            engine.initialize(); //initialize the managers first
+
+            GameState nextState = chainMainMenuToWorkAroundBug1127(selectNextGameState());
+            if (nextState == null) {
+                return 1;
+            }
+
+            engine.run(nextState);
         } catch (Throwable e) {
             // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
             splashScreen.close();
             reportException(e);
+            return 1;
         }
 
         return 0;
+    }
+
+    private GameState selectNextGameState() {
+        GameState nextState;
+
+        GameManifest gameManifest = getLatestGameManifest();
+
+        if (isHeadless) {
+            nextState = new StateHeadlessSetup();
+        } else if (loadLastGame) {
+            if (gameManifest == null) {
+                logger.error("Failed --load-last-game: last game not found.");
+                return null;
+            }
+            nextState = new StateLoading(gameManifest, NetworkMode.NONE);
+        } else if (createLastGame) {
+            if (gameManifest == null) {
+                logger.error("Failed --create-last-game: last game not found.");
+                return null;
+            }
+            String title = gameManifest.getTitle();
+            if (!title.startsWith("New Created")) { //if first time run
+                gameManifest.setTitle("New Created " + title + " 1");
+            } else { //if not first time run
+                gameManifest.setTitle(getNewTitle(title));
+            }
+            nextState = new StateLoading(gameManifest, NetworkMode.NONE);
+        } else {
+            nextState = new StateMainMenu();
+        }
+
+        return nextState;
+    }
+
+    /**
+     * Chain states to load after MainMenu.
+     * <p>
+     * Things are broken when we're not headless and try to skip MainMenu entirely.
+     *
+     * @see <a href="https://github.com/MovingBlocks/Terasology/issues/1126">#1126</a>
+     * @see <a href="https://github.com/MovingBlocks/Terasology/issues/1127">#1127</a>
+     */
+    private GameState chainMainMenuToWorkAroundBug1127(GameState nextState) {
+        if (isHeadless || nextState == null || nextState instanceof StateMainMenu) {
+            return nextState;
+        }
+        return new StateMainMenu() {
+            @Override
+            public void init(GameEngine gameEngine) {
+                super.init(gameEngine);
+                gameEngine.changeState(nextState);
+            }
+        };
     }
 
     private static String getNewTitle(String title) {
