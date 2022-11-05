@@ -1,0 +1,55 @@
+name: Auto Assign to Projects
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, labeled]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  assign_one_project:
+    runs-on: ubuntu-latest
+    name: Assign to One Project
+    steps:
+
+    - name: Assign NEW issues and issues to bug/inbox board's inbox
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: github.event.action == 'opened'
+      with:
+        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/26'
+        column_name: 'New (Inbox)'
+
+    - name: Assign issues and pull requests with `Type: Bug` label to bug board backlog
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        contains(github.event.issue.labels.*.name, 'Type: Bug') ||
+        contains(github.event.pull_request.labels.*.name, 'Type: Bug')
+      with:
+        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/26'
+        column_name: 'Backlog'
+
+    - name: Assign stabilization / refactoring / maintenance issues and pull requests to stabilization board backlog
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        github.event.action != 'opened' && 
+        ( contains(github.event.issue.labels.*.name, 'Type: Refactoring') ||
+        contains(github.event.pull_request.labels.*.name, 'Type: Refactoring') ||
+        contains(github.event.issue.labels.*.name, 'Type: Chore') ||
+        contains(github.event.pull_request.labels.*.name, 'Type: Chore') ||
+        contains(github.event.issue.labels.*.name, 'Topic: Stabilization') && !contains(github.event.issue.labels.*.name, 'Type: Bug') ||
+        contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization') && !contains(github.event.pull_request.labels.*.name, 'Type: Bug') )
+      with:
+        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/25'
+        column_name: 'Backlog'
+
+    - name: Assign issues and pull requests with `Type: Improvement` label to feature board backlog
+      uses: srggrs/assign-one-project-github-action@1.2.1
+      if: |
+        github.event.action != 'opened' && 
+        contains(github.event.issue.labels.*.name, 'Type: Improvement') && !contains(github.event.issue.labels.*.name, 'Topic: Stabilization') ||
+        contains(github.event.pull_request.labels.*.name, 'Type: Improvement') && !contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization')
+      with:
+        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/27'
+        column_name: 'Backlog'
