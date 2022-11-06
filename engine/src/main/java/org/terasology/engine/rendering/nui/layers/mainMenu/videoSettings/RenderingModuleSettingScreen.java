@@ -1,16 +1,20 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.StartPlayingScreen;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
@@ -22,10 +26,6 @@ import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.dag.ModuleRendering;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.StartPlayingScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +62,11 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
         moduleEnvironment = subContext.get(ModuleEnvironment.class);
 
         renderingModuleRegistry = context.get(RenderingModuleRegistry.class);
+        if (renderingModuleRegistry == null) {
+            //FIXME: Ideally, we want to do 'InitialiseRendering' earlier than usual here to ensure the rendering module registry is present
+            renderingModuleRegistry = new RenderingModuleRegistry();
+            context.put(RenderingModuleRegistry.class, renderingModuleRegistry);
+        }
 
         orderedModuleRenderingInstances = renderingModuleRegistry.updateRenderingModulesOrder(moduleEnvironment, subContext);
 

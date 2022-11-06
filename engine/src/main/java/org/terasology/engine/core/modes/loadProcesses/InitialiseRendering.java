@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
@@ -23,7 +23,6 @@ public class InitialiseRendering extends SingleStepLoadProcess {
         this.context = context;
     }
 
-
     @Override
     public String getMessage() {
         return "Initialising Rendering System...";
@@ -31,7 +30,11 @@ public class InitialiseRendering extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        context.put(RenderingModuleRegistry.class, new RenderingModuleRegistry());
+        // NOTE: a {@link RenderingModuleRegistry} is also required during game setup to configure rendering.
+        // Thus, the rendering module registry might already be added to the context beforehand.
+        if (context.get(RenderingModuleRegistry.class) != null) {
+            context.put(RenderingModuleRegistry.class, new RenderingModuleRegistry());
+        }
         return true;
     }
 
