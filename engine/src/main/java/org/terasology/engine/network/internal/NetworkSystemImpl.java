@@ -53,6 +53,7 @@ import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.Server;
+import org.terasology.engine.network.events.BeforeDisconnectEvent;
 import org.terasology.engine.network.events.ConnectedEvent;
 import org.terasology.engine.network.events.DisconnectedEvent;
 import org.terasology.engine.network.exceptions.HostingFailedException;
@@ -354,7 +355,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (!disconnectedClients.isEmpty()) {
             List<NetClient> removedPlayers = Lists.newArrayListWithExpectedSize(disconnectedClients.size());
             disconnectedClients.drainTo(removedPlayers);
-            removedPlayers.forEach(this::processRemovedClient);
+            for (NetClient client : removedPlayers) {
+                client.getEntity().send(new BeforeDisconnectEvent());
+                processRemovedClient(client);
+            }
         }
     }
 
