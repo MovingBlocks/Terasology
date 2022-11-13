@@ -21,7 +21,7 @@ jobs:
         project: 'https://github.com/srggrs/assign-one-project-github-action/projects/26'
         column_name: 'New (Inbox)'
 
-    - name: Assign issues and pull requests with `Type: Bug` label to bug board backlog
+    - name: Assign bug report issues and pull requests to bug board backlog
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: |
         contains(github.event.issue.labels.*.name, 'Type: Bug') ||
@@ -44,7 +44,7 @@ jobs:
         project: 'https://github.com/srggrs/assign-one-project-github-action/projects/25'
         column_name: 'Backlog'
 
-    - name: Assign issues and pull requests with `Type: Improvement` label to feature board backlog
+    - name: Assign improvement issues and pull requests to feature board backlog
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: |
         github.event.action != 'opened' && 
