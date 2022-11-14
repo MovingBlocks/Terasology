@@ -23,7 +23,7 @@ jobs:
         with:
           organization: MovingBlocks
           project_number: 26
-          content_id: ${{ github.event.client_payload.command.resource.id }}
+          content_id: ${{ steps.add-to-inbox-project.outputs.itemId }}
           field: Status
           value: New (Inbox)
           github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
         with:
           organization: MovingBlocks
           project_number: 29
-          content_id: ${{ github.event.client_payload.command.resource.id }}
+          content_id: ${{ steps.add-to-bug-project.outputs.itemId }}
           field: Status
           value: Backlog
           github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
         with:
           organization: MovingBlocks
           project_number: 25
-          content_id: ${{ github.event.client_payload.command.resource.id }}
+          content_id: ${{ steps.add-to-stabilization-project.outputs.itemId }}
           field: Status
           value: Backlog
           github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
@@ -95,7 +95,7 @@ jobs:
         with:
           organization: MovingBlocks
           project_number: 27
-          content_id: ${{ github.event.client_payload.command.resource.id }}
+          content_id: ${{ steps.add-to-feature-project.outputs.itemId }}
           field: Status
           value: Backlog
           github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
