@@ -18,7 +18,7 @@ jobs:
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: github.event.action == 'opened'
       with:
-        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/26'
+        project: 'https://github.com/orgs/MovingBlocks/projects/26'
         column_name: 'New (Inbox)'
 
     - name: Assign bug report issues and pull requests to bug board backlog
@@ -27,7 +27,7 @@ jobs:
         contains(github.event.issue.labels.*.name, 'Type: Bug') ||
         contains(github.event.pull_request.labels.*.name, 'Type: Bug')
       with:
-        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/26'
+        project: 'https://github.com/orgs/MovingBlocks/projects/26'
         column_name: 'Backlog'
 
     - name: Assign stabilization / refactoring / maintenance issues and pull requests to stabilization board backlog
@@ -41,7 +41,7 @@ jobs:
         contains(github.event.issue.labels.*.name, 'Topic: Stabilization') && !contains(github.event.issue.labels.*.name, 'Type: Bug') ||
         contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization') && !contains(github.event.pull_request.labels.*.name, 'Type: Bug') )
       with:
-        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/25'
+        project: 'https://github.com/orgs/MovingBlocks/projects/25'
         column_name: 'Backlog'
 
     - name: Assign improvement issues and pull requests to feature board backlog
@@ -51,5 +51,5 @@ jobs:
         contains(github.event.issue.labels.*.name, 'Type: Improvement') && !contains(github.event.issue.labels.*.name, 'Topic: Stabilization') ||
         contains(github.event.pull_request.labels.*.name, 'Type: Improvement') && !contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization')
       with:
-        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/27'
+        project: 'https://github.com/orgs/MovingBlocks/projects/27'
         column_name: 'Backlog'
