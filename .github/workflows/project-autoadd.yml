@@ -17,7 +17,7 @@ jobs:
         uses: actions/add-to-project@v0.3.0
         with:
           project-url: 'https://github.com/orgs/MovingBlocks/projects/26'
-          github-token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
       - name: Set board item fields
         uses: github/update-project-action@v2
         with:
@@ -26,7 +26,7 @@ jobs:
           content_id: ${{ steps.add-to-inbox-project.outputs.itemId }}
           field: Status
           value: New (Inbox)
-          github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github_token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_bug_labeled_to_bug_board:
     name: Assign bug report issues and pull requests to bug board backlog
     if: |
@@ -39,7 +39,7 @@ jobs:
         uses: actions/add-to-project@v0.3.0
         with:
           project-url: 'https://github.com/orgs/MovingBlocks/projects/29'
-          github-token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
       - name: Set board item fields
         uses: github/update-project-action@v2
         with:
@@ -48,7 +48,7 @@ jobs:
           content_id: ${{ steps.add-to-bug-project.outputs.itemId }}
           field: Status
           value: Backlog
-          github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github_token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_maintenance_to_stabilization_board:
     name: Assign stabilization / refactoring / chore issues and pull requests to stabilization board backlog
     if: |
@@ -66,7 +66,7 @@ jobs:
         uses: actions/add-to-project@v0.3.0
         with:
           project-url: 'https://github.com/orgs/MovingBlocks/projects/25'
-          github-token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
       - name: Set board item fields
         uses: github/update-project-action@v2
         with:
@@ -75,7 +75,7 @@ jobs:
           content_id: ${{ steps.add-to-stabilization-project.outputs.itemId }}
           field: Status
           value: Backlog
-          github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github_token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_features_to_feature_board:
     name: Assign improvement issues and pull requests to feature board backlog
     if: |
@@ -89,7 +89,7 @@ jobs:
         uses: actions/add-to-project@v0.3.0
         with:
           project-url: 'https://github.com/orgs/MovingBlocks/projects/27'
-          github-token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
       - name: Set board item fields
         uses: github/update-project-action@v2
         with:
@@ -98,4 +98,4 @@ jobs:
           content_id: ${{ steps.add-to-feature-project.outputs.itemId }}
           field: Status
           value: Backlog
-          github_token: ${{ secrets.ORG_GITHUB_TOKEN }}
+          github_token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
