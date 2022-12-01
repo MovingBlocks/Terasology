@@ -99,11 +99,6 @@
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#rendering-settings}",
-            "id": "renderingSettings"
-          },
-          {
-            "type": "UIButton",
             "text": "${engine:menu#start-playing}",
             "id": "play"
           }
