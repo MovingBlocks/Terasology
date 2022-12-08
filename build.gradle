@@ -95,7 +95,7 @@ configurations {
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
     natives platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
-    ["natives-linux","natives-windows","natives-macos"].forEach {
+    ["natives-linux","natives-windows","natives-macos","natives-macos-arm64"].forEach {
         natives "org.lwjgl:lwjgl::$it"
         natives "org.lwjgl:lwjgl-assimp::$it"
         natives "org.lwjgl:lwjgl-glfw::$it"
@@ -109,10 +109,10 @@ dependencies {
     codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.6.3', ext: 'zip'
 
     // Natives for JNLua (Kallisti, KComputers)
-    natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+    natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.1-SNAPSHOT', ext: 'zip'
 
     // Natives for JNBullet
-    natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
+    natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.4-SNAPSHOT', ext: 'zip'
 
 }
 

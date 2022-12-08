@@ -14,6 +14,8 @@ repositories {
         }
     }
 
+    mavenLocal()
+
     google {
         // gestalt uses an annotation library from Google
         content {

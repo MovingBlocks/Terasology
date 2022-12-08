@@ -143,8 +143,8 @@ dependencies {
 
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
-    api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
-    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
+    api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.1-SNAPSHOT'
+    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.4-SNAPSHOT'
     api group: 'org.terasology.nui', name: 'nui', version: '3.0.0'
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0'
     api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0'
@@ -161,7 +161,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.17.0'
+        artifact = 'com.google.protobuf:protoc:3.17.3'
     }
     plugins {
     }
