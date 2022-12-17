@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
@@ -17,7 +17,6 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.RenderingModuleSettingScreen;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
@@ -49,7 +48,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
     private WorldSetupWrapper targetWorld;
-    private Context subContext;
 
     @Override
     public void initialise() {
@@ -91,21 +89,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
                     : NetworkMode.NONE));
         });
 
-        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
-            getManager().pushScreen("engine:mainMenuScreen");
-        });
-
-        WidgetUtil.trySubscribe(this, "renderingSettings", button -> {
-            RenderingModuleSettingScreen renderingModuleSettingScreen = (RenderingModuleSettingScreen) getManager()
-                    .getScreen(RenderingModuleSettingScreen.ASSET_URI);
-            if (renderingModuleSettingScreen == null) {
-                renderingModuleSettingScreen = getManager()
-                        .createScreen(RenderingModuleSettingScreen.ASSET_URI, RenderingModuleSettingScreen.class);
-                renderingModuleSettingScreen.setSubContext(this.subContext);
-                renderingModuleSettingScreen.postInit();
-            }
-            triggerForwardAnimation(renderingModuleSettingScreen);
-        });
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> getManager().pushScreen("engine:mainMenuScreen"));
     }
 
     @Override
@@ -120,8 +104,8 @@ public class StartPlayingScreen extends CoreScreenLayer {
     }
 
     /**
-     * This method is called before the screen comes to the forefront to set the world
-     * in which the player is about to spawn.
+     * This method is called before the screen comes to the forefront to set the world in which the player is about to spawn.
+     *
      * @param worldSetupWrapperList The world in which the player is going to spawn.
      * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this screen.
      */
@@ -131,7 +115,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
         worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
         targetWorld = spawnWorld;
-        subContext = context;
     }
 
     @Override
