@@ -5,14 +5,11 @@ package org.terasology.engine.integrationenvironment;
 import com.google.common.collect.Lists;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;
@@ -23,8 +20,6 @@ import org.terasology.engine.world.block.BlockManager;
 
 import java.io.IOException;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 public class ExampleTest {
 
