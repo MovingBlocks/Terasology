@@ -62,6 +62,14 @@ goto fail
 
 <% if ( mainClassName.startsWith('--module ') ) { %>set MODULE_PATH=$modulePath<% } %>
 
+@rem Terasology-specific changes - Re-enable SecurityManager on Java 18+
+@rem According to https://openjdk.org/jeps/223, this string is intentionally parsable.
+for /f "tokens=4 delims= " %%a in ('"%JAVA_EXE%" -fullversion 2^>^&1 1^>nul') do ( for /f "delims=." %%b in ('echo %%a') do set JAVA_VERSION="%%b" )
+set JAVA_VERSION=%JAVA_VERSION:"=%
+if %JAVA_VERSION% gtr 17 (
+    set DEFAULT_JVM_OPTS=%DEFAULT_JVM_OPTS% -Djava.security.manager=allow
+)
+
 @rem Execute ${applicationName}
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %${optsEnvironmentVar}% <% if ( appNameSystemProperty ) { %>"-D${appNameSystemProperty}=%APP_BASE_NAME%"<% } %> <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "%MODULE_PATH%" <% } %>-jar lib\\Terasology.jar %*
 
