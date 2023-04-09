@@ -9,11 +9,14 @@
     <a href="http://creativecommons.org/licenses/by/4.0/">
         <img src="https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg" alt="License (Art)" />
     </a>
-    <a href="https://lgtm.com/projects/g/MovingBlocks/Terasology/alerts/">
-        <img src="https://img.shields.io/lgtm/alerts/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18" alt="LGTM Alerts" />
+    <a href="https://codeclimate.com/" target="_blank" alt="Code climate">
+        <img src="https://img.shields.io/codeclimate/maintainability/MovingBlocks/Terasology" alt="Code climate maintainability" />
     </a>
-    <a href="https://lgtm.com/projects/g/MovingBlocks/Terasology/context:java">
-        <img src="https://img.shields.io/lgtm/grade/java/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18" alt="Java Grade" />
+    <a href="https://codeclimate.com/" target="_blank" alt="Code climate" >
+        <img src="https://img.shields.io/codeclimate/tech-debt/MovingBlocks/Terasology" alt="Code climate tech debt" />
+    </a>
+     <a href="https://codeclimate.com/" target="_blank" alt="Code climate">
+        <img src="https://img.shields.io/codeclimate/issues/MovingBlocks/Terasology" alt="Code climate issues" />
     </a>
 </div>
 
