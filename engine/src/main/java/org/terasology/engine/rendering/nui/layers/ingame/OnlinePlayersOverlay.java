@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2023 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.ingame;
 
@@ -10,16 +10,19 @@ import org.terasology.engine.logic.afk.AfkComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.logic.players.PlayerUtil;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.engine.network.PingStockComponent;
+import org.terasology.engine.network.PingComponent;
 import org.terasology.engine.network.events.SubscribePingEvent;
 import org.terasology.engine.network.events.UnSubscribePingEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.Color;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,68 +46,41 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         text.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                PingStockComponent pingComponent = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
+                PingComponent pingComponent = localPlayer.getClientEntity().getComponent(PingComponent.class);
                 if (pingComponent == null) {
-                    String playerListText = determinePlayerListText();
+                    Map<EntityRef, Long> pings = new HashMap<>();
+                    for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+                        pings.put(client, null);
+                    }
+                    String playerListText = determinePlayerList(pings);
                     return playerListText;
                 } else {
-                    String playerAndPing = determinePlayerAndPing(pingComponent);
+                    String playerAndPing = determinePlayerList(pingComponent.getValues());
                     return playerAndPing;
                 }
             }
         });
     }
 
-    private String determinePlayerListText() {
-        Iterable<EntityRef> allClients = entityManager.getEntitiesWith(ClientComponent.class);
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (EntityRef clientEntity : allClients) {
-            if (!first) {
-                sb.append("\n");
-            }
-            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
-            first = false;
+    private String determinePlayerList(Map<EntityRef, Long> pings) {
+        List<String> lines = new ArrayList<>();
+        for (Map.Entry<EntityRef, Long> entry : pings.entrySet()) {
+            lines.add(determinePlayerLine(entry.getKey(), entry.getValue()));
         }
-        return sb.toString();
+        return String.join("\n", lines);
     }
 
-    private String determinePlayerAndPing(PingStockComponent pingStockComponent) {
-        Map<EntityRef, Long> pingMap = pingStockComponent.getValues();
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Map.Entry<EntityRef, Long> entry : pingMap.entrySet()) {
-            EntityRef clientEntity = entry.getKey();
-            if (clientEntity == null || clientEntity.getComponent(ClientComponent.class) == null) {
-                logger.warn("OnlinePlayersOverlay skipping a null client entity or component");
-                continue;
-            }
+    private String determinePlayerLine(EntityRef client, Long ping) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        AfkComponent afkComponent = client.getComponent(AfkComponent.class);
 
-            if (!first) {
-                sb.append("\n");
-            }
+        String prefix = (afkComponent != null && afkComponent.afk) ? FontColor.getColored("[AFK]", Color.red) : "";
 
-            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            AfkComponent afkComponent = clientEntity.getComponent(AfkComponent.class);
-            if (afkComponent != null) {
-                if (afkComponent.afk) {
-                    sb.append(FontColor.getColored("[AFK]", Color.red));
-                    sb.append(" ");
-                }
-            }
-            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
-            sb.append(" ");
-            Long pingValue = pingMap.get(clientEntity);
-            if (pingValue == null) {
-                sb.append("-");
-            } else {
-                sb.append(pingValue.toString());
-                sb.append("ms");
-            }
-            first = false;
-        }
-        return sb.toString();
+        String displayName = PlayerUtil.getColoredPlayerName(clientComp.clientInfo);
+
+        String displayPing = (ping != null) ? ping + "ms" : FontColor.getColored("---", Color.grey);
+
+        return String.format("%-12s%-32s%8s", prefix, displayName, displayPing);
     }
 
     @Override

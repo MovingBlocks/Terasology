@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2023 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * <p>
  * Might be used to stock ping information and display it in future.
  */
-public final class PingStockComponent implements Component<PingStockComponent> {
+public final class PingComponent implements Component<PingComponent> {
 
     @Replicate
     private Map<EntityRef,Long> pings = new HashMap<>();
@@ -28,7 +28,7 @@ public final class PingStockComponent implements Component<PingStockComponent> {
     }
 
     @Override
-    public void copyFrom(PingStockComponent other) {
+    public void copyFrom(PingComponent other) {
         this.setValues(other.getValues());
     }
 }

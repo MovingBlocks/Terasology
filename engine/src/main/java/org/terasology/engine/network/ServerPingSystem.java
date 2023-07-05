@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2023 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network;
 
@@ -8,7 +8,6 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.events.DisconnectedEvent;
 import org.terasology.engine.network.events.PingFromClientEvent;
 import org.terasology.engine.network.events.PingFromServerEvent;
@@ -25,6 +24,11 @@ import java.util.Map;
 /**
  * This system implement the server ping to clients on need base.
  * It runs on the server, pings to all clients who subscribe this function.
+ *
+ * @see PingFromServerEvent
+ * @see PingFromClientEvent
+ * @see SubscribePingEvent
+ * @see UnSubscribePingEvent
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -34,9 +38,6 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @In
     private EntityManager entityManager;
-
-    @In
-    private LocalPlayer localPlayer;
 
     private Map<EntityRef, Instant> startMap = new HashMap<>();
 
@@ -57,33 +58,36 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
         long time = Duration.between(lastPingTime, now).toMillis();
         if (time > PING_PERIOD) {
             // only collect ping information if anybody is interested
-            if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) != 0) {
+            if (entityManager.getCountOfEntitiesWith(PingComponent.class) > 0) {
                 startPings();
                 updateSubscribers();
+            } else {
+                clear();
             }
             lastPingTime = now;
         }
     }
 
     /**
+     * Clear internal maps, for instance, when there are no more subscribers.
+     */
+    private void clear() {
+        startMap.clear();
+        endMap.clear();
+        pingMap.clear();
+    }
+
+    /**
      * Send a ping signal ({@link PingFromServerEvent}) from the server to all
      * clients.
      * 
-     * Any entity with a {@link PingSubscriberComponent} is considered as
-     * subscriber.
+     * Any entity with a {@link PingComponent} is considered as subscriber.
      * 
      * Clients are supposed to answer with {@link PingFromClientEvent} to confirm
      * the ping.
-     * 
-     * @see PingFromServerEvent
-     * @see PingFromClientEvent
      */
     private void startPings() {
-        Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
-        for (EntityRef client : clients) {
-            if (client.equals(localPlayer.getClientEntity())) {
-                continue;
-            }
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             sendPingToClient(client);
         }
     }
@@ -95,41 +99,32 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
         Instant lastPingFromClient = endMap.get(client);
         Instant lastPingToClient = startMap.get(client);
         // Send ping only if the client has replied to the last ping. This happens when
-        // there is still a ping in-flight, that is, the server hasn't receive an answer
+        // there is still a ping in-flight, that is, the server hasn't received an answer
         // from this client yet.
         if (lastPingFromClient != null && lastPingToClient != null
                 && lastPingFromClient.isBefore(lastPingToClient)) {
             return;
         }
 
-        Instant start = Instant.now();
-        startMap.put(client, start);
+        startMap.put(client, Instant.now());
         client.send(new PingFromServerEvent());
     }
 
     /**
-     * Update the ping stock ({@link PingStockComponent}) on all subscribers
+     * Update the ping stock ({@link PingComponent}) on all subscribers
      */
     private void updateSubscribers() {
-        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
-            PingStockComponent pingStockComponent;
-            if (!client.hasComponent(PingStockComponent.class)) {
-                pingStockComponent = new PingStockComponent();
-            } else {
-                pingStockComponent = client.getComponent(PingStockComponent.class);
-            }
-            if (localPlayer != null && localPlayer.getClientEntity() != null) {
-                pingMap.put(localPlayer.getClientEntity(), new Long(5));
-            }
-            pingStockComponent.setValues(pingMap);
-            client.addOrSaveComponent(pingStockComponent);
+        for (EntityRef client : entityManager.getEntitiesWith(PingComponent.class)) {
+            client.updateComponent(PingComponent.class, pingComponent -> {
+                pingComponent.setValues(pingMap);
+                return pingComponent;
+            });
         }
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onPingFromClient(PingFromClientEvent event, EntityRef entity) {
-        Instant end = Instant.now();
-        endMap.put(entity, end);
+        endMap.put(entity, Instant.now());
         updatePing(entity);
     }
 
@@ -149,19 +144,11 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onSubscribePing(SubscribePingEvent event, EntityRef entity) {
-        entity.addOrSaveComponent(new PingSubscriberComponent());
+        entity.addOrSaveComponent(new PingComponent());
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onUnSubscribePing(UnSubscribePingEvent event, EntityRef entity) {
-        entity.removeComponent(PingSubscriberComponent.class);
-        entity.removeComponent(PingStockComponent.class);
-
-        // if there is no pingSubscriber, then clean the map
-        if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) == 0) {
-            startMap.clear();
-            endMap.clear();
-            pingMap.clear();
-        }
+        entity.removeComponent(PingComponent.class);
     }
 }
