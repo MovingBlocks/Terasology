@@ -43,9 +43,8 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         text.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                logger.info("localPlayer is: {}", localPlayer);
-                PingStockComponent pingStockComp = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
-                if (pingStockComp == null) {
+                PingSubscriberComponent pingComponent = localPlayer.getClientEntity().getComponent(PingSubscriberComponent.class);
+                if (pingComponent == null) {
                     String playerListText = determinePlayerListText();
                     return playerListText;
                 } else {
