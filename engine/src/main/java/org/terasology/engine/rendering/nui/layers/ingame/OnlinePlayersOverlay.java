@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.ingame;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.afk.AfkComponent;
@@ -26,11 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Overlay that lists all players that are currently online.
+ * Overlay that lists all players that are currently online and their pings.
  */
 public class OnlinePlayersOverlay extends CoreScreenLayer {
-
-    private static final Logger logger = LoggerFactory.getLogger(OnlinePlayersOverlay.class);
 
     private UIText text;
 
@@ -47,21 +43,37 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             @Override
             public String get() {
                 PingComponent pingComponent = localPlayer.getClientEntity().getComponent(PingComponent.class);
-                if (pingComponent == null) {
-                    Map<EntityRef, Long> pings = new HashMap<>();
-                    for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-                        pings.put(client, null);
-                    }
-                    String playerListText = determinePlayerList(pings);
-                    return playerListText;
-                } else {
-                    String playerAndPing = determinePlayerList(pingComponent.getValues());
-                    return playerAndPing;
-                }
+                return determinePlayerList(getPingMap(pingComponent));
             }
         });
     }
 
+    /**
+     * Assemble a map from connected players (or clients) to their ping.
+     *
+     * If the ping component is null, the connected clients are determined by looking at entities with the {@link ClientComponent}.
+     * In this case, the ping values are {@code null}.
+     *
+     * @param pingComponent component with information on connected players, or {@code null} if not present
+     * @return a mapping from connected clients to their respective ping (or {@code null} if the ping cannot be determined)
+     */
+    private Map<EntityRef, Long> getPingMap(PingComponent pingComponent){
+        //TODO: There's a noticeable delay when opening the overlay before the first ping comes in and all players are shown.
+        //      We could either try to match the entity refs here, or pre-fill the component sooner in the ServerPingSystem.
+        if (pingComponent != null) {
+            return pingComponent.getValues();
+        } else {
+            Map<EntityRef, Long> pings = new HashMap<>();
+            for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+                pings.put(client, null);
+            }
+            return pings;
+        }
+    }
+
+    /**
+     * Create multi-line string, containing one line per connected player.
+     */
     private String determinePlayerList(Map<EntityRef, Long> pings) {
         List<String> lines = new ArrayList<>();
         for (Map.Entry<EntityRef, Long> entry : pings.entrySet()) {
@@ -70,17 +82,25 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         return String.join("\n", lines);
     }
 
+    /**
+     * Create a single-line string with the player name and their ping.
+     *
+     * <pre>
+     *      [AFK]    Player4612                           42ms
+     *      -------- -------------------------------- --------
+     *         8                  32                      8
+     * </pre>
+     */
     private String determinePlayerLine(EntityRef client, Long ping) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         AfkComponent afkComponent = client.getComponent(AfkComponent.class);
 
         String prefix = (afkComponent != null && afkComponent.afk) ? FontColor.getColored("[AFK]", Color.red) : "";
-
         String displayName = PlayerUtil.getColoredPlayerName(clientComp.clientInfo);
-
         String displayPing = (ping != null) ? ping + "ms" : FontColor.getColored("---", Color.grey);
-
-        return String.format("%-12s%-32s%8s", prefix, displayName, displayPing);
+        //TODO: the formatting does not work well since we're not using a mono-spaced font. we should investigate whether we can use
+        //      a different UI element or at least a monospaced font to align prefix, player name, and ping better.
+        return String.format("%-8s%-32s%8s", prefix, displayName, displayPing);
     }
 
     @Override
