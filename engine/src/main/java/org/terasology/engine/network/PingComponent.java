@@ -16,7 +16,7 @@ import java.util.Map;
 public final class PingComponent implements Component<PingComponent> {
 
     @Replicate
-    private Map<EntityRef,Long> pings = new HashMap<>();
+    private Map<EntityRef, Long> pings = new HashMap<>();
 
     public void setValues(Map<EntityRef, Long> values) {
         pings.clear();
