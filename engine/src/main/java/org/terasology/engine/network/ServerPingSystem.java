@@ -29,6 +29,7 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
+    /** The interval in which pings are send, in milliseconds. */
     private static final long PING_PERIOD = 200;
 
     @In
@@ -52,47 +53,76 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @Override
     public void update(float delta) {
-        long time = Duration.between(lastPingTime, Instant.now()).toMillis();
+        Instant now = Instant.now();
+        long time = Duration.between(lastPingTime, now).toMillis();
         if (time > PING_PERIOD) {
-
-            // Server ping to all clients only if there are clients who subscribe
+            // only collect ping information if anybody is interested
             if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) != 0) {
-                Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
-                for (EntityRef client : clients) {
-                    if (client.equals(localPlayer.getClientEntity())) {
-                        continue;
-                    }
-
-                    // send ping only if client replied the last ping
-                    Instant lastPingFromClient = endMap.get(client);
-                    Instant lastPingToClient = startMap.get(client);
-                    // Only happens when server doesn't receive ping back yet
-                    if (lastPingFromClient != null && lastPingToClient != null && lastPingFromClient.isBefore(lastPingToClient)) {
-                        continue;
-                    }
-
-                    Instant start = Instant.now();
-                    startMap.put(client, start);
-                    client.send(new PingFromServerEvent());
-                }
+                startPings();
+                updateSubscribers();
             }
+            lastPingTime = now;
+        }
+    }
 
-            //update ping data for all clients
-            for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
-                PingStockComponent pingStockComponent;
-                if (!client.hasComponent(PingStockComponent.class)) {
-                    pingStockComponent = new PingStockComponent();
-                } else {
-                    pingStockComponent = client.getComponent(PingStockComponent.class);
-                }
-                if (localPlayer != null && localPlayer.getClientEntity() != null) {
-                    pingMap.put(localPlayer.getClientEntity(), new Long(5));
-                }
-                pingStockComponent.setValues(pingMap);
-                client.addOrSaveComponent(pingStockComponent);
+    /**
+     * Send a ping signal ({@link PingFromServerEvent}) from the server to all
+     * clients.
+     * 
+     * Any entity with a {@link PingSubscriberComponent} is considered as
+     * subscriber.
+     * 
+     * Clients are supposed to answer with {@link PingFromClientEvent} to confirm
+     * the ping.
+     * 
+     * @see PingFromServerEvent
+     * @see PingFromClientEvent
+     */
+    private void startPings() {
+        Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
+        for (EntityRef client : clients) {
+            if (client.equals(localPlayer.getClientEntity())) {
+                continue;
             }
+            sendPingToClient(client);
+        }
+    }
 
-            lastPingTime = Instant.now();
+    /**
+     * Send a ping signal to the client.
+     */
+    private void sendPingToClient(EntityRef client) {
+        Instant lastPingFromClient = endMap.get(client);
+        Instant lastPingToClient = startMap.get(client);
+        // Send ping only if the client has replied to the last ping. This happens when
+        // there is still a ping in-flight, that is, the server hasn't receive an answer
+        // from this client yet.
+        if (lastPingFromClient != null && lastPingToClient != null
+                && lastPingFromClient.isBefore(lastPingToClient)) {
+            return;
+        }
+
+        Instant start = Instant.now();
+        startMap.put(client, start);
+        client.send(new PingFromServerEvent());
+    }
+
+    /**
+     * Update the ping stock ({@link PingStockComponent}) on all subscribers
+     */
+    private void updateSubscribers() {
+        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
+            PingStockComponent pingStockComponent;
+            if (!client.hasComponent(PingStockComponent.class)) {
+                pingStockComponent = new PingStockComponent();
+            } else {
+                pingStockComponent = client.getComponent(PingStockComponent.class);
+            }
+            if (localPlayer != null && localPlayer.getClientEntity() != null) {
+                pingMap.put(localPlayer.getClientEntity(), new Long(5));
+            }
+            pingStockComponent.setValues(pingMap);
+            client.addOrSaveComponent(pingStockComponent);
         }
     }
 
@@ -127,7 +157,7 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
         entity.removeComponent(PingSubscriberComponent.class);
         entity.removeComponent(PingStockComponent.class);
 
-        //if there is no pingSubscriber, then clean the map
+        // if there is no pingSubscriber, then clean the map
         if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) == 0) {
             startMap.clear();
             endMap.clear();
