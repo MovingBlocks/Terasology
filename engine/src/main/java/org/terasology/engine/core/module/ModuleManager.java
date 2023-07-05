@@ -272,8 +272,13 @@ public class ModuleManager {
             permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
         }
 
-        Policy.setPolicy(new ModuleSecurityPolicy());
-        System.setSecurityManager(new ModuleSecurityManager());
+        if (Runtime.version().feature() < 18 || "allow".equals(System.getProperty("java.security.manager"))) {
+            Policy.setPolicy(new ModuleSecurityPolicy());
+            System.setSecurityManager(new ModuleSecurityManager());
+        } else {
+            logger.warn("SecurityManager is disabled starting with Java 18 - module sandbox functionality is limited!");
+            logger.warn("To enable SecurityManager, use the \"-Djava.security.manager=allow\" JVM option.");
+        }
     }
 
     /**
