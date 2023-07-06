@@ -50,7 +50,7 @@ tasks.withType<Test> {
     // If false, the outputs are still collected and visible in the test report, but they don't spam the console.
     testLogging.showStandardStreams = false
     reports {
-        junitXml.isEnabled = true
+        junitXml.required.set(true)
     }
     jvmArgs("-Xms512m", "-Xmx1024m")
 
