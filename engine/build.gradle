@@ -45,7 +45,7 @@ sourceSets {
         }
         java {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-            outputDir = new File("$buildDir/classes")
+            destinationDirectory = new File("$buildDir/classes")
         }
     }
 }
@@ -268,10 +268,6 @@ task copyResourcesToClasses(type: Copy) {
 
     dependsOn processResources
     mustRunAfter compileJava
-}
-
-tasks.named("classes") {
-    dependsOn(tasks.named("copyResourcesToClasses"))
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
