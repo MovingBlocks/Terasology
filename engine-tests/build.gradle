@@ -45,8 +45,8 @@ println "Version for $project.name loaded as $version for group $group"
 
 sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main.java.outputDir = new File("$buildDir/classes")
-    test.java.outputDir = new File("$buildDir/testClasses")
+    main.java.destinationDirectory = new File("$buildDir/classes")
+    test.java.destinationDirectory = new File("$buildDir/testClasses")
 }
 
 // Primary dependencies definition
