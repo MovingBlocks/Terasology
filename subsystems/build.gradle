@@ -9,7 +9,7 @@ subprojects {
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
 
 
-    sourceSets.main.java.outputDir = new File("$buildDir/classes")
+    sourceSets.main.java.destinationDirectory.set(new File("$buildDir/classes"))
     idea {
         module {
             // Change around the output a bit

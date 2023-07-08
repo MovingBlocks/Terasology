@@ -45,7 +45,7 @@ sourceSets {
         }
         java {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-            outputDir = new File("$buildDir/classes")
+            destinationDirectory.set(new File("$buildDir/classes"))
         }
     }
 }

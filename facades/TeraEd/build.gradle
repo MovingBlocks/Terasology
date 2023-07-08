@@ -19,8 +19,8 @@ group = 'org.terasology.facades'
 
 sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main.java.outputDir = new File("$buildDir/classes")
-    test.java.outputDir = new File("$buildDir/testClasses")
+    main.java.destinationDirectory.set(new File("$buildDir/classes"))
+    test.java.destinationDirectory.set(new File("$buildDir/testClasses"))
 }
 
 dependencies {
