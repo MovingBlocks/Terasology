@@ -5,6 +5,7 @@ package org.terasology.engine.core.subsystem.lwjgl;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.glfw.GLFWNativeX11;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.engine.utilities.OS;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
+import org.terasology.engine.rust.TeraRusty;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -140,18 +142,31 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
                 "video card)");
 
-        // set opengl core profile to 3.3
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
-
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
+
+//        GLFWNativeX11.glfwGetX11Window(window)
+        switch(GLFW.glfwGetPlatform()) {
+            case GLFW.GLFW_PLATFORM_X11:
+                TeraRusty.initializeWindowX11(GLFWNativeX11.glfwGetX11Display(),
+                        GLFWNativeX11.glfwGetX11Window(window));
+                break;
+            case GLFW.GLFW_PLATFORM_WAYLAND:
+                break;
+            case GLFW.GLFW_PLATFORM_WIN32:
+                break;
+            case GLFW.GLFW_PLATFORM_COCOA:
+                break;
+            default:
+                break;
+        }
+
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
 
         GLFW.glfwMakeContextCurrent(window);
+
 
         if (!config.isVSync()) {
             GLFW.glfwSwapInterval(0);
