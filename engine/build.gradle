@@ -265,11 +265,13 @@ tasks.named("processResources", Copy) {
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
-    from sourceSets.main.output.resourcesDir
+    from processResources
     into sourceSets.main.output.classesDirs.first()
 
-    dependsOn processResources
-    mustRunAfter compileJava
+}
+
+tasks.named("compileJava") {
+    dependsOn(tasks.named("copyResourcesToClasses"))
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
