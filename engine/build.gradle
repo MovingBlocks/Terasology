@@ -47,6 +47,7 @@ sourceSets {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
             destinationDirectory = new File("$buildDir/classes")
         }
+        test.java.destinationDirectory = new File("$buildDir/testClasses")
     }
 }
 

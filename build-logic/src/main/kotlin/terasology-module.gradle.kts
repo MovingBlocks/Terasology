@@ -144,6 +144,10 @@ tasks.named("processResources") {
     dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
 }
 
+tasks.named("compileJava") {
+    dependsOn("processResources")
+}
+
 tasks.named<Test>("test") {
     description = "Runs all tests (slow)"
     useJUnitPlatform ()
