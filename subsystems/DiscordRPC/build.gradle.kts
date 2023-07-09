@@ -9,6 +9,12 @@ plugins {
 
 apply(from = "$rootDir/config/gradle/common.gradle")
 
+configure<SourceSetContainer> {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main { java.destinationDirectory.set(File("$buildDir/classes")) }
+    test { java.destinationDirectory.set(File("$buildDir/testClasses")) }
+}
+
 dependencies {
     implementation(project(":engine"))
     api("com.jagrosh:DiscordIPC:0.4")

@@ -60,6 +60,18 @@ tasks.withType<Test> {
     }
 }
 
+tasks.withType<Checkstyle> {
+    dependsOn(tasks.getByPath(":extractConfig"))
+}
+
+tasks.withType<Pmd> {
+    dependsOn(tasks.getByPath(":extractConfig"))
+}
+
+tasks.withType<SpotBugsTask> {
+    dependsOn(tasks.getByPath(":extractConfig"))
+}
+
 // The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds
 // Solo module builds in Jenkins get a copy of the config dir from the engine harness so it still lives at root/config
 // TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
