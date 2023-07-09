@@ -44,7 +44,6 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String LIGHT_SHAFTS = "LightShafts";
     public static final String EYE_ADAPTATION = "EyeAdaptation";
     public static final String BLOOM = "Bloom";
-    public static final String VR_SUPPORT = "VrSupport";
     public static final String MAX_TEXTURE_ATLAS_RESOLUTION = "MaxTextureAtlasResolution";
     public static final String MAX_CHUNKS_USED_FOR_SHADOW_MAPPING = "MaxChunksUsedForShadowMapping";
     public static final String SHADOW_MAP_RESOLUTION = "ShadowMapResolution";
@@ -95,7 +94,6 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean eyeAdaptation;
     private boolean bloom;
     private boolean dynamicShadows;
-    private boolean vrSupport;
     private int maxTextureAtlasResolution;
     private int maxChunksUsedForShadowMapping;
     private int shadowMapResolution;
@@ -387,7 +385,7 @@ public class RenderingConfig extends AbstractSubscribable {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur && !isVrSupport();
+        return motionBlur;
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -454,16 +452,6 @@ public class RenderingConfig extends AbstractSubscribable {
         boolean oldValue = this.bloom;
         this.bloom = bloom;
         propertyChangeSupport.firePropertyChange(BLOOM, oldValue, this.bloom);
-    }
-
-    public boolean isVrSupport() {
-        return vrSupport;
-    }
-
-    public void setVrSupport(boolean vrSupport) {
-        boolean oldValue = this.vrSupport;
-        this.vrSupport = vrSupport;
-        propertyChangeSupport.firePropertyChange(VR_SUPPORT, oldValue, this.vrSupport);
     }
 
     public int getMaxTextureAtlasResolution() {
