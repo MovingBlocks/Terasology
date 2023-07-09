@@ -131,29 +131,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.shaderManager = context.get(ShaderManager.class);
         // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
         vrProvider = OpenVRProvider.getInstance();
-        if (renderingConfig.isVrSupport()) {
-            context.put(OpenVRProvider.class, vrProvider);
-            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
-            // reason (for example, no HMD is connected). In that case, even though the configuration requests
-            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
-            // the log.
-            if (vrProvider.init()) {
-                /*
-                 * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
-                 * such that the ground plane of the rendering system and the ground plane of the room the VR user is
-                 * in match.
-                 */
-                vrProvider.getState().setGroundPlaneYOffset(
-                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
-                currentRenderingStage = RenderingStage.LEFT_EYE;
-            } else {
-                playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-                currentRenderingStage = RenderingStage.MONO;
-            }
-        } else {
-            playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-            currentRenderingStage = RenderingStage.MONO;
-        }
+        playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
+        currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
