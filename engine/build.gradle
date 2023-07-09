@@ -8,6 +8,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext"
     id "com.google.protobuf"
     id "terasology-common"
+
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
@@ -149,6 +150,7 @@ dependencies {
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0'
     api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0'
 
+    api group: 'org.terasology.rust', name: 'core', version: rustCoreVersion
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')

@@ -79,6 +79,7 @@ ext {
     subDirLibs = 'libs'
 
     LwjglVersion = '3.3.1'
+    rustCoreVersion = '0.0.1'
 }
 
 
@@ -113,6 +114,9 @@ dependencies {
 
     // Natives for JNBullet
     natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
+
+    // Natives for core
+    natives group: 'org.terasology.rust', name: 'core', version: rustCoreVersion, ext: 'zip'
 
 }
 
@@ -160,6 +164,15 @@ task extractNativeBulletNatives(type:Copy) {
 }
 
 
+task extractRustCoreNatives(type:Copy) {
+    description = "Extracts the JNBullet natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('core') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
@@ -167,6 +180,7 @@ task extractNatives {
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
     dependsOn extractNativeBulletNatives
+    dependsOn extractRustCoreNatives
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
