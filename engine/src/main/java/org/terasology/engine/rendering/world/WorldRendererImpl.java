@@ -7,7 +7,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -36,7 +35,6 @@ import org.terasology.engine.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
-import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.utilities.Assets;
@@ -59,8 +57,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with
  * elsewhere.
- * <p>
- * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
  * <p>
  * This implementation works closely with a number of support objects, in particular:
  * <p>
@@ -85,8 +81,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
-
-    private final OpenVRProvider vrProvider;
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
@@ -129,8 +123,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
-        // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
-        vrProvider = OpenVRProvider.getInstance();
         playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
         currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
