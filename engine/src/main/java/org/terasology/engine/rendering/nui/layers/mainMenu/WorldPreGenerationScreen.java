@@ -148,7 +148,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            startPlayingScreen.setTargetWorld(worldList, findWorldByName(selectedWorld), texture, context);
+            startPlayingScreen.setTargetWorld(findWorldByName(selectedWorld), texture, context);
             triggerForwardAnimation(startPlayingScreen);
         });
 
