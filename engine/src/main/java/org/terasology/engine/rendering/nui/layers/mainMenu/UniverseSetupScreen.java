@@ -192,6 +192,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("HeightMap not supported",
                                 "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
+            } else if (!worlds.isEmpty()) {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("World Already Created", "You can only add one world.");
             } else {
                 addNewWorld(worldGenerator.getSelection());
                 worldsDropdown.setOptions(worldNames());
@@ -396,24 +399,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             worldNamesList.add(world.getWorldName().toString());
         }
         return worldNamesList;
-    }
-
-    /**
-     * This method takes the name of the selected world as String and return the corresponding
-     * WorldSetupWrapper object.
-     * @return {@link WorldSetupWrapper} object.
-     */
-    public WorldSetupWrapper findWorldByName() {
-        for (WorldSetupWrapper world : worlds) {
-            if (world.getWorldName().toString().equals(selectedWorld)) {
-                return world;
-            }
-        }
-        return null;
-    }
-
-    public List<WorldSetupWrapper> getWorldsList() {
-        return worlds;
     }
 
     /**
