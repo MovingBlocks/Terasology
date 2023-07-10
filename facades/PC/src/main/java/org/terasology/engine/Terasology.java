@@ -31,7 +31,6 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
-import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -313,8 +312,7 @@ public final class Terasology implements Callable<Integer> {
                     .add(new LwjglGraphics())
                     .add(new LwjglTimer())
                     .add(new LwjglInput())
-                    .add(new BindsSubsystem())
-                    .add(new OpenVRInput());
+                    .add(new BindsSubsystem());
             builder.add(new DiscordRPCSubSystem());
         }
         builder.add(new HibernationSubsystem());

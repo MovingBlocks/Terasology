@@ -363,16 +363,6 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#oculus-rift-support}: ",
-                                    "enabled": false
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "oculusVrSupport",
-                                    "enabled": false
-                                },
-                                {
-                                    "type": "UILabel",
                                     "text": "${engine:menu#ssao}: "
                                 },
                                 {
