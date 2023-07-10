@@ -116,7 +116,9 @@ dependencies {
     natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
 
     // Natives for core
-    natives group: 'org.terasology.rust', name: 'core', version: rustCoreVersion, ext: 'zip'
+    natives(group: 'org.terasology.rust', name: 'core-rust', version: rustCoreVersion){
+        transitive = true
+    }
 
 }
 
@@ -163,14 +165,15 @@ task extractNativeBulletNatives(type: Copy) {
     into("$dirNatives")
 }
 
-
 task extractRustCoreNatives(type:Copy) {
     description = "Extracts the JNBullet natives from the downloaded zip"
+    from configurations.natives
     from {
-        configurations.natives.collect { it.getName().contains('core') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains('core-rust') ? zipTree(it) : [] }
     }
     into ("$dirNatives")
 }
+
 
 
 task extractNatives {

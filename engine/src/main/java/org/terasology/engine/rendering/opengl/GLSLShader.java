@@ -118,22 +118,22 @@ public class GLSLShader extends Shader {
 
     // made package-private after CheckStyle suggestion
     int linkShaderProgram(int featureHash) {
-        int shaderProgram = GL20.glCreateProgram();
-
-        GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
-        GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
-        if (shaderProgramBase.getGeometryProgram() != null) {
-            GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
-        }
-        GL20.glLinkProgram(shaderProgram);
-        GL20.glValidateProgram(shaderProgram);
-        return shaderProgram;
+//        int shaderProgram = GL20.glCreateProgram();
+//
+//        GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
+//        GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
+//        if (shaderProgramBase.getGeometryProgram() != null) {
+//            GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
+//        }
+//        GL20.glLinkProgram(shaderProgram);
+//        GL20.glValidateProgram(shaderProgram);
+        return 0;
     }
 
     @Override
     public void recompile() {
         graphicsProcessing.asynchToDisplayThread(() -> {
-            registerAllShaderPermutations();
+//            registerAllShaderPermutations();
         });
     }
 
@@ -257,29 +257,6 @@ public class GLSLShader extends Shader {
         }
     }
 
-    /**
-     * Compiles all combination of available features and stores them in two maps for
-     * lookup based on a unique hash of features.
-     */
-    private void registerAllShaderPermutations() {
-        Set<Set<ShaderProgramFeature>> allPermutations = Sets.powerSet(availableFeatures);
-
-        for (Set<ShaderProgramFeature> permutation : allPermutations) {
-            int featureHash = ShaderProgramFeature.getBitset(permutation);
-
-            int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
-            int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
-            if (shaderProgramBase.getGeometryProgram() != null) {
-                int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
-                disposalAction.geometryPrograms.put(featureHash, geomShaderId);
-            }
-
-            disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
-            disposalAction.vertexPrograms.put(featureHash, vertShaderId);
-        }
-
-        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
-    }
 
     private String assembleShader(int type, Set<ShaderProgramFeature> features) {
         StringBuilder shader = createShaderBuilder();
@@ -365,19 +342,20 @@ public class GLSLShader extends Shader {
         try {
             GameThread.synch(() -> {
                 logger.debug("Recompiling shader {}.", getUrn());
-
-                disposalAction.disposeData();
-                shaderProgramBase = data;
-                parameters.clear();
-                for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
-                    parameters.put(metadata.getName(), metadata);
-                }
-                updateAvailableFeatures();
-                try {
-                    registerAllShaderPermutations();
-                } catch (RuntimeException e) {
-                    logger.warn(e.getMessage());
-                }
+                //TODO implement shader
+//
+//                disposalAction.disposeData();
+//                shaderProgramBase = data;
+//                parameters.clear();
+//                for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
+//                    parameters.put(metadata.getName(), metadata);
+//                }
+//                updateAvailableFeatures();
+//                try {
+//                    registerAllShaderPermutations();
+//                } catch (RuntimeException e) {
+//                    logger.warn(e.getMessage());
+//                }
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);

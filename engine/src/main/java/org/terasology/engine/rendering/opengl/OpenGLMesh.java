@@ -92,26 +92,26 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
 
 
     private void buildMesh(MeshData newData) {
-        if (this.disposalAction.vao == 0) {
-            this.disposalAction.vao = GL30.glGenVertexArrays();
-            this.disposalAction.vbo = GL30.glGenBuffers();
-            this.disposalAction.ebo = GL30.glGenBuffers();
-        }
-
-        allocationType = newData.allocationType();
-        drawMode = newData.getMode();
-
-        GL30.glBindVertexArray(this.disposalAction.vao);
-        positions = newData.positions();
-        this.state = buildVBO(this.disposalAction.vbo, allocationType, newData.vertexResources());
-
-        IndexResource indexResource = newData.indexResource();
-        this.indexCount = indexResource.indices();
-        GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
-        indexResource.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
-
-        GL30.glBindVertexArray(0);
-        getBound(aabb);
+//        if (this.disposalAction.vao == 0) {
+//            this.disposalAction.vao = GL30.glGenVertexArrays();
+//            this.disposalAction.vbo = GL30.glGenBuffers();
+//            this.disposalAction.ebo = GL30.glGenBuffers();
+//        }
+//
+//        allocationType = newData.allocationType();
+//        drawMode = newData.getMode();
+//
+//        GL30.glBindVertexArray(this.disposalAction.vao);
+//        positions = newData.positions();
+//        this.state = buildVBO(this.disposalAction.vbo, allocationType, newData.vertexResources());
+//
+//        IndexResource indexResource = newData.indexResource();
+//        this.indexCount = indexResource.indices();
+//        GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
+//        indexResource.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
+//
+//        GL30.glBindVertexArray(0);
+//        getBound(aabb);
     }
 
     private static class DisposalAction implements DisposableResource {
@@ -127,18 +127,18 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
         }
 
         public void dispose() {
-            if (vao != 0) {
-                GL30.glDeleteVertexArrays(vao);
-            }
-            if (vbo != 0) {
-                GL30.glDeleteBuffers(vbo);
-            }
-            if (ebo != 0) {
-                GL30.glDeleteBuffers(ebo);
-            }
-            vao = 0;
-            vbo = 0;
-            ebo = 0;
+//            if (vao != 0) {
+//                GL30.glDeleteVertexArrays(vao);
+//            }
+//            if (vbo != 0) {
+//                GL30.glDeleteBuffers(vbo);
+//            }
+//            if (ebo != 0) {
+//                GL30.glDeleteBuffers(ebo);
+//            }
+//            vao = 0;
+//            vbo = 0;
+//            ebo = 0;
         }
 
         @Override
