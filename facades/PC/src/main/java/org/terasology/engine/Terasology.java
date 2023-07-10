@@ -15,6 +15,7 @@ import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
+import org.terasology.engine.core.schedulers.ThreadCaptureScheduler;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
@@ -49,8 +50,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -135,7 +134,27 @@ public final class Terasology implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        new CommandLine(new Terasology()).execute(args);
+
+        //Switch threads.
+        // Main thread became graphics threads - requring by MacOS.
+        // New Thread became main logic thread.
+
+        ThreadCaptureScheduler graphics = new ThreadCaptureScheduler(Thread.currentThread());
+
+        Thread thread = new Thread(()-> {
+            try {
+                new CommandLine(new Terasology()).execute(args);
+            } finally {
+                 graphics.dispose();
+            }
+        },
+            "MAIN_LOGIC"
+        );
+        thread.start();
+
+        Thread.currentThread().setName("GRAPHICS");
+        GameScheduler.setupGraphicsScheduler(graphics);
+        graphics.start();
     }
 
     @Override
@@ -145,18 +164,8 @@ public final class Terasology implements Callable<Integer> {
 
         SplashScreen splashScreen;
         if (splashEnabled) {
-            CountDownLatch splashInitLatch = new CountDownLatch(1);
-            GLFWSplashScreen glfwSplash = new GLFWSplashScreen(splashInitLatch);
-            Thread thread = new Thread(glfwSplash, "splashscreen-loop");
-            thread.setDaemon(true);
-            thread.start();
-            try {
-                // wait splash initialize... we will lose some post messages otherwise.
-                //noinspection ResultOfMethodCallIgnored
-                splashInitLatch.await(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                // ignore
-            }
+            GLFWSplashScreen glfwSplash = new GLFWSplashScreen();
+            glfwSplash.run();
             splashScreen = glfwSplash;
         } else {
             splashScreen = SplashScreenBuilder.createStub();

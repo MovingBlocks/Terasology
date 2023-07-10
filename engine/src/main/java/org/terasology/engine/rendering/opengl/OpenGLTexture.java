@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -24,7 +25,7 @@ public class OpenGLTexture extends Texture {
 
     private final TextureResources resources;
 
-    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data,  TextureResources textureResources) {
+    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, TextureResources textureResources) {
         super(urn, assetType, textureResources);
         this.resources = textureResources;
         reload(data);
@@ -41,40 +42,41 @@ public class OpenGLTexture extends Texture {
 
     @Override
     protected void doReload(TextureData data) {
-        switch (data.getType()) {
-            // TODO: reconsider how 3D textures handled (probably separate asset implementation with common interface?
-            case TEXTURE3D:
-                if (data.getWidth() % data.getHeight() != 0 || data.getWidth() / data.getHeight() != data.getHeight()) {
-                    throw new RuntimeException("3D texture must be cubic (height^3) - width must thus be a multiple of height");
-                }
-                int size = data.getHeight();
+        GameScheduler.runBlockingGraphics("reload texture", () -> {
+            switch (data.getType()) {
+                // TODO: reconsider how 3D textures handled (probably separate asset implementation with common interface?
+                case TEXTURE3D:
+                    if (data.getWidth() % data.getHeight() != 0 || data.getWidth() / data.getHeight() != data.getHeight()) {
+                        throw new RuntimeException("3D texture must be cubic (height^3) - width must thus be a multiple of height");
+                    }
+                    int size = data.getHeight();
 
-                final int byteLength = 4 * 16 * 16 * 16;
-                final int strideX = 16 * 4;
-                final int strideY = 16 * 16 * 4;
-                final int strideZ = 4;
+                    final int byteLength = 4 * 16 * 16 * 16;
+                    final int strideX = 16 * 4;
+                    final int strideY = 16 * 16 * 4;
+                    final int strideZ = 4;
 
-                ByteBuffer alignedBuffer = ByteBuffer.allocateDirect(byteLength);
-                for (int x = 0; x < size; x++) {
-                    for (int y = 0; y < size; y++) {
-                        for (int z = 0; z < size; z++) {
-                            final int index = x * strideX + z * strideZ + strideY * y;
+                    ByteBuffer alignedBuffer = ByteBuffer.allocateDirect(byteLength);
+                    for (int x = 0; x < size; x++) {
+                        for (int y = 0; y < size; y++) {
+                            for (int z = 0; z < size; z++) {
+                                final int index = x * strideX + z * strideZ + strideY * y;
 
-                            alignedBuffer.put(data.getBuffers()[0].get(index));
-                            alignedBuffer.put(data.getBuffers()[0].get(index + 1));
-                            alignedBuffer.put(data.getBuffers()[0].get(index + 2));
-                            alignedBuffer.put(data.getBuffers()[0].get(index + 3));
+                                alignedBuffer.put(data.getBuffers()[0].get(index));
+                                alignedBuffer.put(data.getBuffers()[0].get(index + 1));
+                                alignedBuffer.put(data.getBuffers()[0].get(index + 2));
+                                alignedBuffer.put(data.getBuffers()[0].get(index + 3));
+                            }
                         }
                     }
-                }
-                alignedBuffer.flip();
+                    alignedBuffer.flip();
 
-                resources.loadedTextureInfo = new LoadedTextureInfo(size, size, size, data);
+                    resources.loadedTextureInfo = new LoadedTextureInfo(size, size, size, data);
 
-                if (resources.id == 0) {
-                    resources.graphicsManager.createTexture3D(alignedBuffer, getWrapMode(), getFilterMode(),
-                            size, (newId) -> {
-                                synchronized (this) {
+                    if (resources.id == 0) {
+                        resources.graphicsManager.createTexture3D(alignedBuffer, getWrapMode(), getFilterMode(),
+                                size, (newId) -> {
+
                                     if (resources.id != 0) {
                                         resources.graphicsManager.disposeTexture(resources.id);
                                     }
@@ -84,19 +86,19 @@ public class OpenGLTexture extends Texture {
                                         resources.id = newId;
                                         logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
                                     }
-                                }
-                            });
-                } else {
-                    resources.graphicsManager.reloadTexture3D(resources.id, alignedBuffer, getWrapMode(), getFilterMode(), size);
-                }
-                break;
-            default:
-                int width = data.getWidth();
-                int height = data.getHeight();
-                resources.loadedTextureInfo = new LoadedTextureInfo(width, height, 1, data);
-                if (resources.id == 0) {
-                    resources.graphicsManager.createTexture2D(data.getBuffers(), getWrapMode(), getFilterMode(), width, height, (newId) -> {
-                        synchronized (this) {
+
+                                });
+                    } else {
+                        resources.graphicsManager.reloadTexture3D(resources.id, alignedBuffer, getWrapMode(), getFilterMode(), size);
+                    }
+                    break;
+                default:
+                    int width = data.getWidth();
+                    int height = data.getHeight();
+                    resources.loadedTextureInfo = new LoadedTextureInfo(width, height, 1, data);
+                    if (resources.id == 0) {
+                        resources.graphicsManager.createTexture2D(data.getBuffers(), getWrapMode(), getFilterMode(), width, height, (newId) -> {
+
                             if (resources.id != 0) {
                                 resources.graphicsManager.disposeTexture(resources.id);
                             }
@@ -106,13 +108,14 @@ public class OpenGLTexture extends Texture {
                                 resources.id = newId;
                                 logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
                             }
-                        }
-                    });
-                } else {
-                    resources.graphicsManager.reloadTexture2D(resources.id, data.getBuffers(), getWrapMode(), getFilterMode(), width, height);
-                }
-                break;
-        }
+
+                        });
+                    } else {
+                        resources.graphicsManager.reloadTexture2D(resources.id, data.getBuffers(), getWrapMode(), getFilterMode(), width, height);
+                    }
+                    break;
+            }
+        });
     }
 
     @Override
@@ -202,7 +205,7 @@ public class OpenGLTexture extends Texture {
         private final Texture.FilterMode filterMode;
         private final TextureData textureData;
 
-         LoadedTextureInfo(int width, int height, int depth, TextureData data) {
+        LoadedTextureInfo(int width, int height, int depth, TextureData data) {
             this.width = width;
             this.height = height;
             this.depth = depth;
@@ -244,18 +247,19 @@ public class OpenGLTexture extends Texture {
 
         private final List<DisposableResource> disposalSubscribers = Lists.newArrayList();
 
-         TextureResources(LwjglGraphicsManager graphicsManager) {
+        TextureResources(LwjglGraphicsManager graphicsManager) {
             this.graphicsManager = graphicsManager;
         }
-
 
         @Override
         public void close() {
             if (loadedTextureInfo != null) {
-                disposalSubscribers.forEach(DisposableResource::close);
-                graphicsManager.disposeTexture(id);
-                loadedTextureInfo = null;
-                id = 0;
+                GameScheduler.runBlockingGraphics("dispose texture", () -> {
+                    disposalSubscribers.forEach(DisposableResource::close);
+                    graphicsManager.disposeTexture(id);
+                    loadedTextureInfo = null;
+                    id = 0;
+                });
             }
         }
     }

@@ -5,6 +5,7 @@ package org.terasology.editor.subsystem;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.Resolution;
@@ -111,7 +112,7 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
     }
 
     protected void updateViewport(int width, int height) {
-        graphics.asynchToDisplayThread(() -> {
+        GameScheduler.runOnGraphics("updateViewPort", () -> {
             GL11.glViewport(0, 0, width, height);
             propertyChangeSupport.firePropertyChange(LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE, 0, 1);
         });

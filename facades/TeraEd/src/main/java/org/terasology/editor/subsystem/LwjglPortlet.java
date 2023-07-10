@@ -11,6 +11,8 @@ import org.lwjgl.opengl.awt.GLData;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
+import org.terasology.engine.core.schedulers.ExternalTickScheduler;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
@@ -18,7 +20,6 @@ import org.terasology.engine.context.Context;
 import org.terasology.editor.input.AwtKeyboardDevice;
 import org.terasology.editor.input.AwtMouseDevice;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
@@ -27,10 +28,8 @@ import org.terasology.engine.core.subsystem.lwjgl.DebugCallback;
 import org.terasology.engine.core.subsystem.lwjgl.GLFWErrorCallback;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsManager;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
-import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.nui.canvas.CanvasRenderer;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
 import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
@@ -50,6 +49,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     private Context context;
     private RenderingConfig config;
+    private ExternalTickScheduler scheduler;
 
     private GameEngine engine;
     private AWTGLCanvas canvas;
@@ -70,7 +70,6 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
 
-        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.DISPLAY_THREAD);
         display = new LwjglPortletDisplayDevice(canvas, graphics);
         context.put(DisplayDevice.class, display);
         logger.info("Initial initialization complete");
@@ -93,7 +92,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     @Override
     public void postUpdate(GameState currentState, float delta) {
-        graphics.processActions();
+        scheduler.processTasks();
 
         currentState.render();
 
@@ -109,14 +108,8 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     }
 
     public void setupThreads() {
-        GameThread.reset();
-        GameThread.setToCurrentThread();
-        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.GAME_THREAD);
-
-        EventSystem eventSystem = CoreRegistry.get(EventSystem.class);
-        if (eventSystem != null) {
-            eventSystem.setToCurrentThread();
-        }
+        scheduler = new ExternalTickScheduler(Thread.currentThread());
+        GameScheduler.setupGraphicsScheduler(scheduler);
     }
 
     public void createCanvas() {

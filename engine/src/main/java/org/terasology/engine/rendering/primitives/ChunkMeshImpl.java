@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.primitives;
 
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
@@ -66,40 +67,42 @@ public class ChunkMeshImpl implements ChunkMesh {
     }
 
     private void generateVBO(ChunkMesh.RenderType type) {
-        VertexElements elements = vertexElements[type.ordinal()];
-        int id = type.getIndex();
-        if (!disposed && elements.buffer.elements() > 0) {
-            vertexBuffers[id] = GL30.glGenBuffers();
-            idxBuffers[id] = GL30.glGenBuffers();
-            vaoCount[id] = GL30.glGenVertexArrays();
+        GameScheduler.runBlockingGraphics("generateVBO", () -> {
+            VertexElements elements = vertexElements[type.ordinal()];
+            int id = type.getIndex();
+            if (!disposed && elements.buffer.elements() > 0) {
+                vertexBuffers[id] = GL30.glGenBuffers();
+                idxBuffers[id] = GL30.glGenBuffers();
+                vaoCount[id] = GL30.glGenVertexArrays();
 
-            GL30.glBindVertexArray(vaoCount[id]);
+                GL30.glBindVertexArray(vaoCount[id]);
 
-            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
-            elements.buffer.writeBuffer(buffer -> GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
+                GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
+                elements.buffer.writeBuffer(buffer -> GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
-            for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
-                GL30.glEnableVertexAttribArray(definition.location);
-                if (definition.location == VertexElements.FLAGS_INDEX) {
-                    GL30.glVertexAttribIPointer(definition.location, definition.attribute.count,
-                            definition.attribute.mapping.glType, elements.buffer.inStride(), definition.offset);
-                } else {
-                    GL30.glVertexAttribPointer(definition.location, definition.attribute.count,
-                            definition.attribute.mapping.glType, false, elements.buffer.inStride(), definition.offset);
+                for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
+                    GL30.glEnableVertexAttribArray(definition.location);
+                    if (definition.location == VertexElements.FLAGS_INDEX) {
+                        GL30.glVertexAttribIPointer(definition.location, definition.attribute.count,
+                                definition.attribute.mapping.glType, elements.buffer.inStride(), definition.offset);
+                    } else {
+                        GL30.glVertexAttribPointer(definition.location, definition.attribute.count,
+                                definition.attribute.mapping.glType, false, elements.buffer.inStride(), definition.offset);
+                    }
                 }
+
+                GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
+                elements.indices.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
+                vertexCount[id] = elements.indices.indices();
+
+                GL30.glBindVertexArray(0);
+
+            } else {
+                vertexBuffers[id] = 0;
+                idxBuffers[id] = 0;
+                vertexCount[id] = 0;
             }
-
-            GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
-            elements.indices.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
-            vertexCount[id] = elements.indices.indices();
-
-            GL30.glBindVertexArray(0);
-
-        } else {
-            vertexBuffers[id] = 0;
-            idxBuffers[id] = 0;
-            vertexCount[id] = 0;
-        }
+        });
     }
 
     /**
@@ -158,29 +161,31 @@ public class ChunkMeshImpl implements ChunkMesh {
      */
     @Override
     public void dispose() {
-        if (!disposed) {
-            for (int i = 0; i < vertexBuffers.length; i++) {
-                int id = vertexBuffers[i];
-                if (id != 0) {
-                    GL30.glDeleteBuffers(id);
-                    vertexBuffers[i] = 0;
+        GameScheduler.runBlockingGraphics("ChunkMesh dispose", () -> {
+            if (!disposed) {
+                for (int i = 0; i < vertexBuffers.length; i++) {
+                    int id = vertexBuffers[i];
+                    if (id != 0) {
+                        GL30.glDeleteBuffers(id);
+                        vertexBuffers[i] = 0;
+                    }
+
+                    id = idxBuffers[i];
+                    if (id != 0) {
+                        GL30.glDeleteBuffers(id);
+                        idxBuffers[i] = 0;
+                    }
+
+                    id = vaoCount[i];
+                    if (id != 0) {
+                        GL30.glDeleteVertexArrays(id);
+                        vaoCount[i] = 0;
+                    }
                 }
 
-                id = idxBuffers[i];
-                if (id != 0) {
-                    GL30.glDeleteBuffers(id);
-                    idxBuffers[i] = 0;
-                }
-
-                id = vaoCount[i];
-                if (id != 0) {
-                    GL30.glDeleteVertexArrays(id);
-                    vaoCount[i] = 0;
-                }
+                disposed = true;
             }
-
-            disposed = true;
-        }
+        });
     }
 
     public boolean isDisposed() {
@@ -211,20 +216,20 @@ public class ChunkMeshImpl implements ChunkMesh {
         return triangleCount == 0;
     }
 
-    void setTimeToGenerateBlockVertices(int timeToGenerateBlockVertices) {
-        this.timeToGenerateBlockVertices = timeToGenerateBlockVertices;
-    }
-
     public int getTimeToGenerateBlockVertices() {
         return timeToGenerateBlockVertices;
     }
 
-    void setTimeToGenerateOptimizedBuffers(int timeToGenerateOptimizedBuffers) {
-        this.timeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
+    void setTimeToGenerateBlockVertices(int timeToGenerateBlockVertices) {
+        this.timeToGenerateBlockVertices = timeToGenerateBlockVertices;
     }
 
     public int getTimeToGenerateOptimizedBuffers() {
         return timeToGenerateOptimizedBuffers;
+    }
+
+    void setTimeToGenerateOptimizedBuffers(int timeToGenerateOptimizedBuffers) {
+        this.timeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
     }
 
 }

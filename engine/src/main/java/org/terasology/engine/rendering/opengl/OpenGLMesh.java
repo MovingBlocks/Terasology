@@ -7,8 +7,7 @@ import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
@@ -36,26 +35,21 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     private VBOContext state = null;
 
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
-                      DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
+                      DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
-        graphicsProcessing.asynchToDisplayThread(() -> {
-            reload(data);
-        });
+        reload(data);
     }
 
-    public static OpenGLMesh create(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
-                                    LwjglGraphicsProcessing graphicsProcessing) {
-        return new OpenGLMesh(urn, assetType, data, new DisposalAction(urn), graphicsProcessing);
+    public static OpenGLMesh create(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data) {
+        return new OpenGLMesh(urn, assetType, data, new DisposalAction(urn));
     }
 
     @Override
     protected void doReload(MeshData newData) {
-        try {
-            GameThread.synch(() -> buildMesh(newData));
-        } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
-        }
+        GameScheduler.runBlockingGraphics("build meshes", () -> {
+            buildMesh(newData);
+        });
     }
 
     @Override
@@ -143,13 +137,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
 
         @Override
         public void close() {
-            try {
-                GameThread.synch(() -> {
-                    dispose();
-                });
-            } catch (InterruptedException e) {
-                logger.error("Failed to dispose {}", urn, e);
-            }
+            GameScheduler.runBlockingGraphics("dispose mesh", this::dispose);
         }
     }
 }

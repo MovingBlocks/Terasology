@@ -9,8 +9,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -43,19 +43,15 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
-                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing,
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data,
                               OpenGLSkeletalMesh.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
-        graphicsProcessing.asynchToDisplayThread(() -> {
-            reload(data);
-        });
+        reload(data);
     }
 
-    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
-                                            SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
-        return new OpenGLSkeletalMesh(urn, assetType, data, graphicsProcessing, new DisposalAction(urn));
+    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data) {
+        return new OpenGLSkeletalMesh(urn, assetType, data, new DisposalAction(urn));
     }
 
 
@@ -66,54 +62,52 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     @Override
     protected void doReload(SkeletalMeshData newData) {
-        try {
-            GameThread.synch(() -> {
-                this.data = newData;
+        GameScheduler.runBlockingGraphics("opengl skeletal mesh reload", () -> {
 
-                if (this.disposalAction.vao == 0) {
-                    this.disposalAction.vao = GL30.glGenVertexArrays();
-                    this.disposalAction.vbo = GL30.glGenBuffers();
-                    this.disposalAction.ebo = GL30.glGenBuffers();
-                }
-                // bind vertex array and buffer
-                GL30.glBindVertexArray(this.disposalAction.vao);
-                GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
+            this.data = newData;
 
-                GL30.glEnableVertexAttribArray(StandardMeshData.VERTEX_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,
-                        VERTEX_NORMAL_SIZE, 0);
+            if (this.disposalAction.vao == 0) {
+                this.disposalAction.vao = GL30.glGenVertexArrays();
+                this.disposalAction.vbo = GL30.glGenBuffers();
+                this.disposalAction.ebo = GL30.glGenBuffers();
+            }
+            // bind vertex array and buffer
+            GL30.glBindVertexArray(this.disposalAction.vao);
+            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
 
-                GL30.glEnableVertexAttribArray(StandardMeshData.NORMAL_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false,
-                        VERTEX_NORMAL_SIZE, VERTEX_SIZE);
+            GL30.glEnableVertexAttribArray(StandardMeshData.VERTEX_INDEX);
+            GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,
+                    VERTEX_NORMAL_SIZE, 0);
 
-                GL30.glEnableVertexAttribArray(StandardMeshData.UV0_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false,
-                        UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
+            GL30.glEnableVertexAttribArray(StandardMeshData.NORMAL_INDEX);
+            GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false,
+                    VERTEX_NORMAL_SIZE, VERTEX_SIZE);
 
-                int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
-                ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);
+            GL30.glEnableVertexAttribArray(StandardMeshData.UV0_INDEX);
+            GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false,
+                    UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
 
-                buffer.position(newData.getVertexCount() * VERTEX_NORMAL_SIZE);
+            int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
+            ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);
 
-                for (Vector2f uv : newData.getUVs()) {
-                    buffer.putFloat(uv.x);
-                    buffer.putFloat(uv.y);
-                }
-                buffer.flip();
-                GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_DYNAMIC_DRAW);
+            buffer.position(newData.getVertexCount() * VERTEX_NORMAL_SIZE);
 
-                IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
-                indexBuffer.put(newData.getIndices().toArray());
-                indexBuffer.flip();
-                GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
-                GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
+            for (Vector2f uv : newData.getUVs()) {
+                buffer.putFloat(uv.x);
+                buffer.putFloat(uv.y);
+            }
+            buffer.flip();
+            GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_DYNAMIC_DRAW);
 
-                GL30.glBindVertexArray(0);
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
-        }
+            IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
+            indexBuffer.put(newData.getIndices().toArray());
+            indexBuffer.flip();
+            GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
+            GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
+
+            GL30.glBindVertexArray(0);
+        });
+
     }
 
 

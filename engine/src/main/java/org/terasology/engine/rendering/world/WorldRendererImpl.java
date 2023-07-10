@@ -10,6 +10,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
@@ -357,9 +358,11 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Override
     public void dispose() {
-        renderableWorld.dispose();
-        worldProvider.dispose();
-        renderGraph.dispose();
+        GameScheduler.runBlockingGraphics("dispose world renderer", ()-> {
+            renderableWorld.dispose();
+            worldProvider.dispose();
+            renderGraph.dispose();
+        });
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
         SetViewportToSizeOf.disposeDefaultInstance();
     }

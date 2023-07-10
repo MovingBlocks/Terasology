@@ -3,6 +3,10 @@
 
 package org.terasology.engine.core;
 
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
+import org.terasology.engine.core.schedulers.ThreadAwareScheduler;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.monitoring.ThreadActivity;
 import org.terasology.engine.monitoring.ThreadMonitor;
 import org.terasology.gestalt.module.sandbox.API;
@@ -14,12 +18,14 @@ import reactor.core.scheduler.Schedulers;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.concurrent.Callable;
 
 /** Schedulers to asynchronously run tasks on other threads. */
 @API
 public final class GameScheduler {
 
     private static final Scheduler MAIN;
+    private static ThreadAwareScheduler graphicsScheduler;
 
     static {
         // doPriviledged in case this class isn't initialized before the security policy is installed.
@@ -44,6 +50,13 @@ public final class GameScheduler {
      */
     public static Scheduler gameMain() {
         return MAIN;
+    }
+
+    public static Scheduler graphics() {
+        if (graphicsScheduler == null) {
+            throw new IllegalStateException("You should setup graphic scheduler firsts. Use `GameScheduler.setupGraphicsScheduler`");
+        }
+        return graphicsScheduler;
     }
 
     /**
@@ -73,12 +86,122 @@ public final class GameScheduler {
      */
     @SuppressWarnings("UnusedReturnValue")
     public static Disposable scheduleParallel(String name, Runnable task) {
-        Mono<?> mono = Mono.using(
-                        () -> ThreadMonitor.startThreadActivity(name),
-                        activity -> Mono.fromRunnable(task),
-                        ThreadActivity::close
-                )
-            .subscribeOn(Schedulers.parallel());
+        return wrapActivity(name, Mono.fromRunnable(task))
+                .subscribeOn(parallel())
+                .subscribe();
+    }
+
+    /**
+     * Wraps {@link Mono} with activity monitor.
+     * @param name activity name.
+     * @param mono {@link Mono} to wraps.
+     * @param <T> {@link Mono}'s value type.
+     * @return Wrapped Mono
+     */
+    public static <T> Mono<T> wrapActivity(String name, Mono<T> mono) {
+        return Mono.using(
+                () -> ThreadMonitor.startThreadActivity(name),
+                activity -> mono,
+                ThreadActivity::close
+        );
+    }
+
+    /**
+     * Wraps {@link Flux} with activity monitor.
+     * @param name activity name.
+     * @param mono {@link Flux} to wraps.
+     * @param <T> {@link Flux}'s value type.
+     * @return Wrapped Flux
+     */
+    public static <T> Flux<T> wrapActivity(Scheduler scheduler, String name, Flux<T> mono) {
+        return Flux.using(
+                () -> ThreadMonitor.startThreadActivity(name),
+                activity -> mono,
+                ThreadActivity::close
+        );
+    }
+
+    /**
+     * Run {@link Callable} in blocking manner at {@link this#graphics()} scheduler.
+     * @param name activity name.
+     * @param callable callable to run at {@link this#graphics()}.
+     * @param <T> type of callable/return value
+     * @return value after running {@link Callable}.
+     */
+    public static <T> T runBlockingGraphics(String name, Callable<T> callable) {
+        Mono<T> mono = wrapActivity(name, Mono.fromCallable(callable));
+        if (!graphicsScheduler.isSchedulerThread(Thread.currentThread())) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(graphicsScheduler);
+        }
+        return mono.block();
+    }
+
+    /**
+     * Run {@link Runnable} in blocking manner at {@link this#graphics()} scheduler.
+     * @param name activity name.
+     * @param callable runnable to run at {@link this#graphics()}.
+     * @return value after running {@link Runnable}.
+     */
+    public static void runBlockingGraphics(String name, Runnable callable) {
+        Mono<?> mono = wrapActivity(name, Mono.fromRunnable(callable));
+        if (!graphicsScheduler.isSchedulerThread(Thread.currentThread())) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(graphicsScheduler);
+        }
+        mono.block();
+    }
+
+    /**
+     * Runs {@link Runnable} at {@link this#graphics()}. non-blocking.
+     * @param name activity name.
+     * @param runnable {@link Runnable} to run.
+     * @return {@link Disposable} from Mono subscriber.
+     */
+    public static Disposable runOnGraphics(String name, Runnable runnable) {
+        Mono<?> mono = wrapActivity(name, Mono.fromRunnable(runnable));
+        if (!graphicsScheduler.isSchedulerThread(Thread.currentThread())) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(graphicsScheduler);
+        }
         return mono.subscribe();
+    }
+
+    /**
+     * Runs {@link Callable} at {@link this#graphics()}. non-blocking.
+     * @param name activity name.
+     * @param callable {@link Callable} to run.
+     * @param <T> type of callable.
+     * @return {@link Disposable} from Mono subscriber.
+     */
+    // TODO idk what to with returned value..
+    public static <T> Disposable runOnGraphics(String name, Callable<T> callable) {
+        Mono<T> mono = wrapActivity(name, Mono.fromCallable(callable));
+        if (!graphicsScheduler.isSchedulerThread(Thread.currentThread())) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(graphicsScheduler);
+        }
+        return mono.subscribe();
+    }
+
+    /**
+     * Setups graphics scheduler.
+     * @param scheduler new graphics scheduler.
+     * @return scheduler from params.
+     */
+    public static Scheduler setupGraphicsScheduler(ThreadAwareScheduler scheduler) {
+        if (graphicsScheduler != null) {
+            throw new IllegalStateException("Graphics scheduler is setup already");
+        }
+        graphicsScheduler = scheduler;
+        return scheduler;
     }
 }

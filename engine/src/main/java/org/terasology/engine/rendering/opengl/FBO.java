@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.SimpleUri;
 
 import java.nio.ByteBuffer;
@@ -522,10 +523,11 @@ public final class FBO {
     public ByteBuffer getColorBufferRawData() {
         ByteBuffer buffer = BufferUtils.createByteBuffer(this.width() * this.height() * 4);
 
-        this.bindTexture();
-        GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        FBO.unbindTexture();
-
+        GameScheduler.runBlockingGraphics("getColorBuffer by FBO", ()-> {
+            this.bindTexture();
+            GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+            FBO.unbindTexture();
+        });
         return buffer;
     }
 

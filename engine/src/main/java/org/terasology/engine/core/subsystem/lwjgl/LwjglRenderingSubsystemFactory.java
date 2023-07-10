@@ -3,6 +3,7 @@
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRendererImpl;
@@ -16,6 +17,6 @@ public class LwjglRenderingSubsystemFactory implements RenderingSubsystemFactory
 
     @Override
     public WorldRenderer createWorldRenderer(Context context) {
-        return new WorldRendererImpl(context);
+        return GameScheduler.runBlockingGraphics("createWorldRenderer", ()->new WorldRendererImpl(context));
     }
 }
