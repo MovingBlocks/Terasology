@@ -83,7 +83,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
     private WorldSetupWrapper selectedWorld;
-    private WorldSetupWrapper copyOfSelectedWorld;
 
     @Override
     public void initialise() {
@@ -278,7 +277,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      */
     public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
         worldsDropdown.setOptions(worldNames());
-        copyOfSelectedWorld = selectedWorld;
     }
 
     /**
@@ -351,7 +349,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * @return the selcted world in the drop-down.
+     * @return the selected world in the drop-down.
      */
     public WorldSetupWrapper getSelectedWorld() {
         return selectedWorld;
