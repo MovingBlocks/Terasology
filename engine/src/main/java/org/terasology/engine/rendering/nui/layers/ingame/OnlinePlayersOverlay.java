@@ -57,7 +57,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
      * @param pingComponent component with information on connected players, or {@code null} if not present
      * @return a mapping from connected clients to their respective ping (or {@code null} if the ping cannot be determined)
      */
-    private Map<EntityRef, Long> getPingMap(PingComponent pingComponent){
+    private Map<EntityRef, Long> getPingMap(PingComponent pingComponent) {
         //TODO: There's a noticeable delay when opening the overlay before the first ping comes in and all players are shown.
         //      We could either try to match the entity refs here, or pre-fill the component sooner in the ServerPingSystem.
         if (pingComponent != null) {
