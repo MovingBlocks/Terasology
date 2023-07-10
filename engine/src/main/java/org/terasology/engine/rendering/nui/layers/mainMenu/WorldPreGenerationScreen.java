@@ -63,7 +63,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     private UIImage previewImage;
     private Context context;
     private PreviewGenerator previewGen;
-    private List<WorldSetupWrapper> worldList;
     private WorldSetupWrapper selectedWorld;
     private List<String> worldNames;
     private int seedNumber;
@@ -81,11 +80,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         context = subContext;
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-        worldList = context.get(UniverseSetupScreen.class).getWorldsList();
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
         worldNames = context.get(UniverseSetupScreen.class).worldNames();
 
-        setWorldGenerators();
+        ensureWorldGeneratorIsSet();
+        selectedWorld.getWorldGenerator().setWorldSeed(createSeed(selectedWorld.getWorldName().toString()));
 
         worldGenerator = selectedWorld.getWorldGenerator();
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
@@ -254,21 +253,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     }
 
     /**
-     * This method takes the name of the world selected in the worldsDropdown
-     * as String and return the corresponding WorldSetupWrapper object.
-     *
-     * @return {@link WorldSetupWrapper} object of the selected world.
-     */
-    private WorldSetupWrapper findWorldByName(String searchWorld) {
-        for (WorldSetupWrapper world : worldList) {
-            if (world.getWorldName().toString().equals(searchWorld)) {
-                return world;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Creates a unique world seed by appending the world name with an incrementing number, on top of the universe seed.
      *
      * @param world {@link WorldSetupWrapper} object whose seed is to be set.
@@ -279,17 +263,15 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         return seed + world + seedNumber++;
     }
 
-    private void setWorldGenerators() {
-        for (WorldSetupWrapper worldSetupWrapper : worldList) {
-            if (worldSetupWrapper.getWorldGenerator() == null) {
-                try {
-                    worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName(
-                            worldSetupWrapper.getWorldName().toString()).getWorldGeneratorInfo().getUri(), context, environment));
-                } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
-                }
+    private void ensureWorldGeneratorIsSet() {
+        if (selectedWorld.getWorldGenerator() == null) {
+            try {
+                selectedWorld.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(
+                        selectedWorld.getWorldGeneratorInfo().getUri(), context, environment));
+            } catch (UnresolvedWorldGeneratorException e) {
+                //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
+                e.printStackTrace();
             }
-            worldSetupWrapper.getWorldGenerator().setWorldSeed(createSeed(worldSetupWrapper.getWorldName().toString()));
         }
     }
 
