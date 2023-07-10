@@ -79,7 +79,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private WorldSetupWrapper world;
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
@@ -170,7 +169,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
             final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
-                if (world != null || !selectedWorld.getWorldName().isEmpty()) {
+                if (selectedWorld != null || !selectedWorld.getWorldName().isEmpty()) {
                     worldSetupScreen.setWorld(context, selectedWorld, worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
@@ -189,7 +188,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("HeightMap not supported",
                                 "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-            } else if (world != null) {
+            } else if (selectedWorld != null) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("World Already Created", "You can only add one world.");
             } else {
@@ -201,7 +200,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen =
                     getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-            if (world != null) {
+            if (selectedWorld != null) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
                 loadPopup.onSuccess(result -> {
@@ -235,13 +234,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        world = null;
+        selectedWorld = null;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         if (worldsDropdown != null) {
             worldsDropdown.setOptions(worldNames());
-        }
-        if (selectedWorld != null) {
-            selectedWorld.setWorldName(new Name(""));
         }
     }
 
@@ -274,7 +270,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
         selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
-        world = selectedWorld;
     }
 
     /**
@@ -283,8 +278,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      */
     public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
         worldsDropdown.setOptions(worldNames());
-        copyOfSelectedWorld = world;
-        selectedWorld = copyOfSelectedWorld;
+        copyOfSelectedWorld = selectedWorld;
     }
 
     /**
@@ -350,8 +344,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      */
     public List<String> worldNames() {
         final List<String> worldNamesList = Lists.newArrayList();
-        if (world != null) {
-            worldNamesList.add(world.getWorldName().toString());
+        if (selectedWorld != null) {
+            worldNamesList.add(selectedWorld.getWorldName().toString());
         }
         return worldNamesList;
     }
