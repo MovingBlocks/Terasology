@@ -6,7 +6,6 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWNativeX11;
-import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,9 @@ import java.io.IOException;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
+
+    // we don't use context so we need to
+    public static long primaryWindow = 0;
 
     private Context context;
     private RenderingConfig config;
@@ -76,9 +78,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void postUpdate(GameState currentState, float delta) {
         graphics.processActions();
 
-        boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+        boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
         if (!gameWindowIsMinimized) {
-            currentState.render();
+//            currentState.render();
+            TeraRusty.dispatch();
         }
 
         lwjglDisplay.update();
@@ -93,17 +96,17 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void preShutdown() {
-        long window = GLFW.glfwGetCurrentContext();
-        if (window != MemoryUtil.NULL) {
-            boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
+//        long window = GLFW.glfwGetCurrentContext();
+        if (primaryWindow != MemoryUtil.NULL) {
+            boolean isVisible = GLFW.glfwGetWindowAttrib(primaryWindow, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
             boolean isFullScreen = lwjglDisplay.isFullscreen();
             if (!isFullScreen && isVisible) {
                 int[] xBuffer = new int[1];
                 int[] yBuffer = new int[1];
-                GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
+                GLFW.glfwGetWindowPos(primaryWindow, xBuffer, yBuffer);
                 int[] widthBuffer = new int[1];
                 int[] heightBuffer = new int[1];
-                GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
+                GLFW.glfwGetWindowSize(primaryWindow, widthBuffer, heightBuffer);
 
                 if (widthBuffer[0] > 0 && heightBuffer[0] > 0 && xBuffer[0] > 0 && yBuffer[0] > 0) {
                     config.setWindowWidth(widthBuffer[0]);
@@ -145,33 +148,21 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
 
-//        GLFWNativeX11.glfwGetX11Window(window)
         switch(GLFW.glfwGetPlatform()) {
             case GLFW.GLFW_PLATFORM_X11:
                 TeraRusty.initializeWindowX11(GLFWNativeX11.glfwGetX11Display(),
                         GLFWNativeX11.glfwGetX11Window(window));
                 break;
-            case GLFW.GLFW_PLATFORM_WAYLAND:
-                break;
-            case GLFW.GLFW_PLATFORM_WIN32:
-                break;
-            case GLFW.GLFW_PLATFORM_COCOA:
-                break;
             default:
-                break;
+                throw new RuntimeException("missing platform: " + GLFW.glfwGetPlatform());
         }
 
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
+        primaryWindow = window;
 
-        GLFW.glfwMakeContextCurrent(window);
-
-
-        if (!config.isVSync()) {
-            GLFW.glfwSwapInterval(0);
-        }
-
+        TeraRusty.windowSizeChanged(lwjglDisplay.getWidth(), lwjglDisplay.getHeight());
         if (OS.get() != OS.MACOSX) {
             try {
                 String root = "org/terasology/engine/icons/";
@@ -200,21 +191,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private void initOpenGL() {
-        logger.info("Initializing OpenGL");
-        LwjglGraphicsUtil.checkOpenGL();
-        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
+        GLFW.glfwSetFramebufferSizeCallback(LwjglGraphics.primaryWindow, new GLFWFramebufferSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
                 lwjglDisplay.updateViewport(width, height);
+                TeraRusty.windowSizeChanged(width, height);
             }
         });
-        LwjglGraphicsUtil.initOpenGLParams();
-        if (config.getDebug().isEnabled()) {
-            try {
-                GL43.glDebugMessageCallback(new DebugCallback(), MemoryUtil.NULL);
-            } catch (IllegalStateException e) {
-                logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
-            }
-        }
     }
 }

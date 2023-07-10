@@ -103,7 +103,7 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
     }
 
     public void processActions() {
-        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+//        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
 
         if (!displayThreadActions.isEmpty()) {
             List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
@@ -122,68 +122,68 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
 
     public void createTexture3D(ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
                                 int size, Consumer<Integer> idConsumer) {
-        asynchToDisplayThread(() -> {
-            int id = glGenTextures();
-            reloadTexture3D(id, alignedBuffer, wrapMode, filterMode, size);
-            idConsumer.accept(id);
-        });
+//        asynchToDisplayThread(() -> {
+//            int id = glGenTextures();
+//            reloadTexture3D(id, alignedBuffer, wrapMode, filterMode, size);
+//            idConsumer.accept(id);
+//        });
     }
 
     public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode,
                                 Texture.FilterMode filterMode, int size) {
-        asynchToDisplayThread(() -> {
-            glBindTexture(GL12.GL_TEXTURE_3D, id);
-
-            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
-            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
-            glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, LwjglGraphicsUtil.getGLMode(wrapMode));
-
-            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER,
-                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
-            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER,
-                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
-
-            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
-            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
-
-            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA,
-                    GL11.GL_UNSIGNED_BYTE, alignedBuffer);
-        });
+//        asynchToDisplayThread(() -> {
+//            glBindTexture(GL12.GL_TEXTURE_3D, id);
+//
+//            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
+//            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
+//            glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, LwjglGraphicsUtil.getGLMode(wrapMode));
+//
+//            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER,
+//                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
+//            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER,
+//                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
+//
+//            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+//            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
+//
+//            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA,
+//                    GL11.GL_UNSIGNED_BYTE, alignedBuffer);
+//        });
     }
 
     public void createTexture2D(ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
                                 int width, int height, Consumer<Integer> idConsumer) {
-        asynchToDisplayThread(() -> {
-            int id = glGenTextures();
-            reloadTexture2D(id, buffers, wrapMode, filterMode, width, height);
-            idConsumer.accept(id);
-        });
+//        asynchToDisplayThread(() -> {
+//            int id = glGenTextures();
+//            reloadTexture2D(id, buffers, wrapMode, filterMode, width, height);
+//            idConsumer.accept(id);
+//        });
     }
 
     public void reloadTexture2D(int id, ByteBuffer[] buffers, Texture.WrapMode wrapMode,
                                 Texture.FilterMode filterMode, int width, int height) {
-        asynchToDisplayThread(() -> {
-            glBindTexture(GL11.GL_TEXTURE_2D, id);
-
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
-            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
-                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
-            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
-                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
-            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, buffers.length - 1);
-
-            if (buffers.length > 0) {
-                for (int i = 0; i < buffers.length; i++) {
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA,
-                            GL11.GL_UNSIGNED_BYTE, buffers[i]);
-                }
-            } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA,
-                        GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
-            }
-        });
+//        asynchToDisplayThread(() -> {
+//            glBindTexture(GL11.GL_TEXTURE_2D, id);
+//
+//            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
+//            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
+//            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
+//                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
+//            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
+//                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
+//            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+//            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, buffers.length - 1);
+//
+//            if (buffers.length > 0) {
+//                for (int i = 0; i < buffers.length; i++) {
+//                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA,
+//                            GL11.GL_UNSIGNED_BYTE, buffers[i]);
+//                }
+//            } else {
+//                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA,
+//                        GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+//            }
+//        });
     }
 
     public void disposeTexture(int id) {
