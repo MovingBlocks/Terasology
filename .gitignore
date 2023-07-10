@@ -17,6 +17,7 @@ extensions
 /facades/*
 !/facades/PC
 !/facades/TeraEd
+!/facades/WorkspaceValidation
 !/facades/subprojects.gradle
 /modules/*
 !/modules/subprojects.gradle
