@@ -84,7 +84,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
     private int worldNumber;
-    private String selectedWorld = "";
+    private WorldSetupWrapper selectedWorld;
     private int indexOfSelectedWorld;
     private WorldSetupWrapper copyOfSelectedWorld;
 
@@ -152,13 +152,17 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         worldsDropdown.bindSelection(new Binding<String>() {
             @Override
             public String get() {
-                return selectedWorld;
+                if (selectedWorld != null) {
+                    return selectedWorld.getWorldName().toString();
+                } else {
+                    return "";
+                }
             }
 
             @Override
             public void set(String value) {
-                selectedWorld = value;
-                indexOfSelectedWorld = findIndex(worlds, selectedWorld);
+                selectedWorld.setWorldName(new Name(value));
+                indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
             }
         });
 
@@ -169,8 +173,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
             final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
-                if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
+                if (!worlds.isEmpty() || !selectedWorld.getWorldName().isEmpty()) {
+                    worldSetupScreen.setWorld(context, selectedWorld, worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -237,8 +241,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         if (worldsDropdown != null) {
             worldsDropdown.setOptions(worldNames());
         }
-        selectedWorld = "";
-        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
+        if (selectedWorld != null) {
+            selectedWorld.setWorldName(new Name(""));
+            indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
+        }
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -290,9 +296,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             ++worldNumber;
         }
 
-        selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
-        worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
-        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
+        selectedWorld = new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo);
+        worlds.add(selectedWorld);
+        indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
         ++worldNumber;
     }
 
@@ -303,7 +309,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
         worldsDropdown.setOptions(worldNames());
         copyOfSelectedWorld = worlds.get(indexOfSelectedWorld);
-        selectedWorld = copyOfSelectedWorld.getWorldName().toString();
+        selectedWorld = copyOfSelectedWorld;
     }
 
     /**
@@ -413,7 +419,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     /**
      * @return the selcted world in the drop-down.
      */
-    public String getSelectedWorld() {
+    public WorldSetupWrapper getSelectedWorld() {
         return selectedWorld;
     }
 

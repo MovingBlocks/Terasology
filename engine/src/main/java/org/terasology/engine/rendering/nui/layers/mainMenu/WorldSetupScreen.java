@@ -96,7 +96,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 newWorldName = new Name(customWorldName.getText());
                 world.setWorldName(newWorldName);
                 universeSetupScreen.refreshWorldDropdown(worldsDropdown);
-                worldPreGenerationScreen.setName(newWorldName);
                 triggerBackAnimation();
             }
         });
