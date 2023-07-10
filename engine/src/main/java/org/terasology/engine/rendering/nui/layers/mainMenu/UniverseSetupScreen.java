@@ -83,7 +83,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
-    private int worldNumber;
     private WorldSetupWrapper selectedWorld;
     private WorldSetupWrapper copyOfSelectedWorld;
 
@@ -237,7 +236,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         super.onOpened();
 
         world = null;
-        worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         if (worldsDropdown != null) {
             worldsDropdown.setOptions(worldNames());
@@ -275,9 +273,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
-        selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName + '-' + worldNumber), worldGeneratorInfo);
+        selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
         world = selectedWorld;
-        ++worldNumber;
     }
 
     /**
