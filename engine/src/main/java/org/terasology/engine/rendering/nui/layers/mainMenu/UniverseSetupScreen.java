@@ -79,13 +79,12 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private List<WorldSetupWrapper> worlds = Lists.newArrayList();
+    private WorldSetupWrapper world;
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
     private int worldNumber;
     private WorldSetupWrapper selectedWorld;
-    private int indexOfSelectedWorld;
     private WorldSetupWrapper copyOfSelectedWorld;
 
     @Override
@@ -162,7 +161,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld.setWorldName(new Name(value));
-                indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
             }
         });
 
@@ -173,7 +171,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
             final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
-                if (!worlds.isEmpty() || !selectedWorld.getWorldName().isEmpty()) {
+                if (world != null || !selectedWorld.getWorldName().isEmpty()) {
                     worldSetupScreen.setWorld(context, selectedWorld, worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
@@ -192,7 +190,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("HeightMap not supported",
                                 "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-            } else if (!worlds.isEmpty()) {
+            } else if (world != null) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("World Already Created", "You can only add one world.");
             } else {
@@ -204,7 +202,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen =
                     getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-            if (!worlds.isEmpty()) {
+            if (world != null) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
                 loadPopup.onSuccess(result -> {
@@ -238,7 +236,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        worlds.clear();
+        world = null;
         worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         if (worldsDropdown != null) {
@@ -246,7 +244,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
         if (selectedWorld != null) {
             selectedWorld.setWorldName(new Name(""));
-            indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
         }
     }
 
@@ -272,36 +269,14 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * returns true if 'name' matches (case-insensitive) with another world already present
-     * @param name The world name to be checked
-     */
-    public boolean worldNameMatchesAnother(String name) {
-        boolean taken = false;
-
-        for (WorldSetupWrapper worldTaken: worlds) {
-            if (worldTaken.getWorldName().toString().equalsIgnoreCase(name)) {
-                taken = true;
-                break;
-            }
-        }
-
-        return taken;
-    }
-
-    /**
      * Called whenever the user decides to add a new world.
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
-        while (worldNameMatchesAnother(selectedWorldName + "-" + worldNumber)) {
-            ++worldNumber;
-        }
-
-        selectedWorld = new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo);
-        worlds.add(selectedWorld);
-        indexOfSelectedWorld = findIndex(worlds, selectedWorld.getWorldName().toString());
+        selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName + '-' + worldNumber), worldGeneratorInfo);
+        world = selectedWorld;
         ++worldNumber;
     }
 
@@ -311,7 +286,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      */
     public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
         worldsDropdown.setOptions(worldNames());
-        copyOfSelectedWorld = worlds.get(indexOfSelectedWorld);
+        copyOfSelectedWorld = world;
         selectedWorld = copyOfSelectedWorld;
     }
 
@@ -351,23 +326,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
     }
 
-    /**
-     * Looks for the index of a selected world from the given list.
-     * @param worldsList the list to search
-     * @param worldName the name of the world to find
-     * @return the found index value or -1 if not found
-     */
-    private int findIndex(List<WorldSetupWrapper> worldsList, String worldName) {
-        for (int i = 0; i < worldsList.size(); i++) {
-            WorldSetupWrapper currentWorldFromList = worldsList.get(i);
-            Name customName = currentWorldFromList.getWorldName();
-            if (customName.toString().equals(worldName)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private void initAssets() {
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
@@ -395,7 +353,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      */
     public List<String> worldNames() {
         final List<String> worldNamesList = Lists.newArrayList();
-        for (WorldSetupWrapper world : worlds) {
+        if (world != null) {
             worldNamesList.add(world.getWorldName().toString());
         }
         return worldNamesList;
