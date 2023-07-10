@@ -337,7 +337,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
         // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
-        LwjglGraphicsUtil.initOpenGLParams();
+//        LwjglGraphicsUtil.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }

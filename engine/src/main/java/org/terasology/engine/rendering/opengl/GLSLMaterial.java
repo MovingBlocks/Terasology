@@ -252,25 +252,25 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void setFloat(String desc, float f, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform1f(id, f);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform1f(id, f);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform1f(id, f);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform1f(id, f);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
@@ -298,282 +298,283 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void setFloat2(String desc, float f1, float f2, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform2f(id, f1, f2);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform2f(id, f1, f2);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        return;
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform2f(id, f1, f2);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform2f(id, f1, f2);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setFloat2(String desc, FloatBuffer buffer, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform2fv(id, buffer);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform2fv(id, buffer);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform2fv(id, buffer);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform2fv(id, buffer);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setFloat3(String desc, float f1, float f2, float f3, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform3f(id, f1, f2, f3);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform3f(id, f1, f2, f3);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform3f(id, f1, f2, f3);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform3f(id, f1, f2, f3);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setFloat3(String desc, FloatBuffer buffer, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform3fv(id, buffer);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform3fv(id, buffer);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform3fv(id, buffer);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform3fv(id, buffer);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setFloat4(String desc, float f1, float f2, float f3, float f4, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform4f(id, f1, f2, f3, f4);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform4f(id, f1, f2, f3, f4);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform4f(id, f1, f2, f3, f4);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform4f(id, f1, f2, f3, f4);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setFloat4(String desc, FloatBuffer buffer, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform4fv(id, buffer);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform4fv(id, buffer);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform4fv(id, buffer);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform4fv(id, buffer);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setInt(String desc, int i, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform1i(id, i);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform1i(id, i);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform1i(id, i);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform1i(id, i);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setBoolean(String desc, boolean value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform1i(id, value ? 1 : 0);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform1i(id, value ? 1 : 0);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniform1i(id, value ? 1 : 0);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniform1i(id, value ? 1 : 0);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setMatrix3(String desc, Matrix3fc value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        matrixBuffer.rewind();
-        value.get(matrixBuffer);
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, matrixBuffer);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, matrixBuffer);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        matrixBuffer.rewind();
+//        value.get(matrixBuffer);
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniformMatrix3fv(id, false, matrixBuffer);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniformMatrix3fv(id, false, matrixBuffer);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setMatrix3(String desc, FloatBuffer value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, value);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, value);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniformMatrix3fv(id, false, value);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniformMatrix3fv(id, false, value);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setMatrix4(String desc, Matrix4fc value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        matrixBuffer.rewind();
-        value.get(matrixBuffer);
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, matrixBuffer);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, matrixBuffer);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        matrixBuffer.rewind();
+//        value.get(matrixBuffer);
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniformMatrix4fv(id, false, matrixBuffer);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniformMatrix4fv(id, false, matrixBuffer);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     @Override
     public void setMatrix4(String desc, FloatBuffer value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, value);
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, value);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+//        if (isDisposed()) {
+//            return;
+//        }
+//        if (currentOnly) {
+//            enable();
+//            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+//            GL20.glUniformMatrix4fv(id, false, value);
+//        } else {
+//            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+//            while (it.hasNext()) {
+//                it.advance();
+//
+//                GL20.glUseProgram(it.value());
+//                int id = getUniformLocation(it.value(), desc);
+//                GL20.glUniformMatrix4fv(id, false, value);
+//            }
+//
+//            restoreStateAfterUniformsSet();
+//        }
     }
 
     private int getActiveShaderProgramId() {

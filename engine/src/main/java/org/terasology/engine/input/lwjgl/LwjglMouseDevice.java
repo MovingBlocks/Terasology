@@ -11,6 +11,7 @@ import org.joml.Vector2i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
@@ -55,11 +56,11 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public void update() {
-        long window = GLFW.glfwGetCurrentContext();
+//        long window = GLFW.glfwGetCurrentContext();
         DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
         DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
-        GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+        GLFW.glfwGetCursorPos(LwjglGraphics.primaryWindow, mouseX, mouseY);
 
         double x = mouseX.get(0);
         double y = mouseY.get(0);
@@ -95,7 +96,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     public void setGrabbed(boolean newGrabbed) {
         if (newGrabbed != mouseGrabbed) {
             mouseGrabbed = newGrabbed;
-            GLFW.glfwSetInputMode(GLFW.glfwGetCurrentContext(), GLFW.GLFW_CURSOR,
+            GLFW.glfwSetInputMode(LwjglGraphics.primaryWindow, GLFW.GLFW_CURSOR,
                     newGrabbed ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
         }
     }

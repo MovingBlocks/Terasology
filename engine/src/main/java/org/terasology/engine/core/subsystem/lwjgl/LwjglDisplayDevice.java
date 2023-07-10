@@ -46,17 +46,17 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public boolean hasFocus() {
-        return GLFW.GLFW_TRUE == GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_FOCUSED);
+        return GLFW.GLFW_TRUE == GLFW.glfwGetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_FOCUSED);
     }
 
     @Override
     public boolean isCloseRequested() {
-        return GLFW.glfwWindowShouldClose(GLFW.glfwGetCurrentContext());
+        return GLFW.glfwWindowShouldClose(LwjglGraphics.primaryWindow);
     }
 
     @Override
     public boolean isFullscreen() {
-        return MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext());
+        return MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(LwjglGraphics.primaryWindow);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting, boolean resize) {
-        long window = GLFW.glfwGetCurrentContext();
+//        long window = GLFW.glfwGetCurrentContext();
         switch (displayModeSetting) {
             case FULLSCREEN:
                 updateFullScreenDisplay();
@@ -88,21 +88,21 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 break;
             case WINDOWED_FULLSCREEN:
                 GLFWVidMode vidMode = desktopResolution.get();
-                GLFW.glfwSetWindowMonitor(window,
+                GLFW.glfwSetWindowMonitor(LwjglGraphics.primaryWindow,
                         MemoryUtil.NULL,
                         0,
                         0,
                         vidMode.width(),
                         vidMode.height(),
                         GLFW.GLFW_DONT_CARE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                GLFW.glfwSetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
                 config.setDisplayModeSetting(displayModeSetting);
                 config.setWindowedFullscreen(true);
                 break;
             case WINDOWED:
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_TRUE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
-                GLFW.glfwSetWindowMonitor(window,
+                GLFW.glfwSetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_DECORATED, GLFW.GLFW_TRUE);
+                GLFW.glfwSetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
+                GLFW.glfwSetWindowMonitor(LwjglGraphics.primaryWindow,
                         MemoryUtil.NULL,
                         config.getWindowPosX(),
                         config.getWindowPosY(),
@@ -150,7 +150,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
         if (isWindowDirty) {
             int[] windowWidth = new int[1];
             int[] windowHeight = new int[1];
-            GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
+            GLFW.glfwGetWindowSize(LwjglGraphics.primaryWindow, windowWidth, windowHeight);
             this.windowWidth = windowWidth[0];
             this.windowHeight = windowHeight[0];
             isWindowDirty = false;
@@ -183,13 +183,13 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public DisplayDeviceInfo getInfo() {
-        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+//        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
         return displayDeviceInfo;
     }
 
     public void update() {
         processMessages();
-        GLFW.glfwSwapBuffers(GLFW.glfwGetCurrentContext());
+//        GLFW.glfwSwapBuffers(GLFW.glfwGetCurrentContext());
         isWindowDirty = true;
 
     }
@@ -199,10 +199,10 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     protected void updateViewport(int width, int height) {
-        glViewport(0, 0, width, height);
+//        glViewport(0, 0, width, height);
         
         //If the screen is minimized, resolution change is stopped to avoid the width and height of FBO being set to 0.
-        boolean isMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
+        boolean isMinimized = GLFW.glfwGetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
         int i = isMinimized ? 0 : 1;       
         propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, i, 1);
     }
@@ -217,9 +217,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     private void updateFullScreenDisplay() {
-        long window = GLFW.glfwGetCurrentContext();
         GLFWVidMode vidMode = getFullScreenDisplayMode();
-        GLFW.glfwSetWindowMonitor(window,
+        GLFW.glfwSetWindowMonitor(LwjglGraphics.primaryWindow,
                 GLFW.glfwGetPrimaryMonitor(),
                 0,
                 0,
