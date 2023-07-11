@@ -163,7 +163,7 @@ public final class Terasology implements Callable<Integer> {
         }
         splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
-        try {
+//        try {
             TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
             populateSubsystems(builder);
             TerasologyEngine engine = builder.build();
@@ -187,12 +187,12 @@ public final class Terasology implements Callable<Integer> {
             }
 
             engine.run(nextState);
-        } catch (Throwable e) {
-            // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
-            splashScreen.close();
-            reportException(e);
-            return 1;
-        }
+//        } catch (Throwable e) {
+//            // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
+//            splashScreen.close();
+//            reportException(e);
+//            return 1;
+//        }
 
         return 0;
     }
