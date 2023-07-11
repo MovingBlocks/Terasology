@@ -30,7 +30,6 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
-import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
@@ -200,8 +199,7 @@ public class Engines {
                 .add(audio)
                 .add(new LwjglGraphics())
                 .add(new LwjglTimer())
-                .add(new LwjglInput())
-                .add(new OpenVRInput());
+                .add(new LwjglInput());
         createExtraSubsystems().forEach(terasologyEngineBuilder::add);
 
         return createEngine(terasologyEngineBuilder);
