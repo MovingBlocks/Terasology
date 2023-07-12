@@ -38,7 +38,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private GameEngine engine;
     private LwjglDisplayDevice lwjglDisplay;
-    private EngineKernel kernel;
+//    private EngineKernel kernel;
 
     private LwjglGraphicsManager graphics = new LwjglGraphicsManager();
 
@@ -66,7 +66,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postInitialise(Context rootContext) {
         graphics.registerRenderingSubsystem(context);
-        this.kernel = context.get(EngineKernel.class);
+//        this.kernel = context.get(EngineKernel.class);
 
         if (!GLFW.glfwInit()) {
             throw new RuntimeException("Failed to initialize GLFW");
@@ -89,7 +89,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         switch(GLFW.glfwGetPlatform()) {
             case GLFW.GLFW_PLATFORM_X11:
-                kernel.initializeWinX11Surface(GLFWNativeX11.glfwGetX11Display(),
+                EngineKernel.instance().initializeWinX11Surface(GLFWNativeX11.glfwGetX11Display(),
                         GLFWNativeX11.glfwGetX11Window(window));
                 break;
             default:
@@ -102,7 +102,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
         primaryWindow = window;
 
-        kernel.resizeSurface(lwjglDisplay.getWidth(), lwjglDisplay.getHeight());
+        EngineKernel.instance().resizeSurface(lwjglDisplay.getWidth(), lwjglDisplay.getHeight());
         if (OS.get() != OS.MACOSX) {
             try {
                 String root = "org/terasology/engine/icons/";
@@ -131,7 +131,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             @Override
             public void invoke(long window, int width, int height) {
                 lwjglDisplay.updateViewport(width, height);
-                kernel.resizeSurface(width, height);
+                EngineKernel.instance().resizeSurface(width, height);
             }
         });
 

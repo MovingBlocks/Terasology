@@ -122,7 +122,6 @@ public class TerasologyEngine implements GameEngine {
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
     private EngineStatus status = StandardGameStatus.UNSTARTED;
-    private EngineKernel kernel;
     private final List<EngineStatusSubscriber> statusSubscriberList = new CopyOnWriteArrayList<>();
 
     private volatile boolean shutdownRequested;
@@ -164,8 +163,7 @@ public class TerasologyEngine implements GameEngine {
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
 
-        kernel = new EngineKernel();
-        rootContext.put(EngineKernel.class, kernel);
+        EngineKernel.initialize();
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -561,7 +559,7 @@ public class TerasologyEngine implements GameEngine {
                 logger.error("Error shutting down {} subsystem", subsystem.getName(), e);
             }
         }
-        kernel.dispose();
+        EngineKernel.disposeKernel();
     }
 
     /**
