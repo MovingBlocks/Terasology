@@ -85,7 +85,7 @@ public class NewGameScreen extends CoreScreenLayer {
             });
         }
         final UIText gameName = find("gameName", UIText.class);
-        setGameName(gameName);
+        initialiseGameName(gameName);
 
         final UIDropdownScrollable<Module> gameplay = find("gameplay", UIDropdownScrollable.class);
         gameplay.setOptions(getGameplayModules());
@@ -133,16 +133,13 @@ public class NewGameScreen extends CoreScreenLayer {
 
         AdvancedGameSetupScreen advancedSetupGameScreen = getManager().createScreen(AdvancedGameSetupScreen.ASSET_URI, AdvancedGameSetupScreen.class);
         WidgetUtil.trySubscribe(this, "advancedSetup", button -> {
-            universeWrapper.setGameName(gameName.getText());
+            setNameOnUniverse(gameName.getText());
             advancedSetupGameScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(advancedSetupGameScreen);
         });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            if (gameName.getText().isEmpty()) {
-                universeWrapper.setGameName(GameProvider.getNextGameName());
-            }
-            universeWrapper.setGameName(GameProvider.getNextGameName(gameName.getText()));
+            setNameOnUniverse(gameName.getText());
             if (gameplay.getOptions().isEmpty()) {
                 logger.error("No gameplay modules present");
                 MessagePopup errorPopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
@@ -172,10 +169,11 @@ public class NewGameScreen extends CoreScreenLayer {
     }
 
     /**
-     * Sets the game names based on the game number of the last saved game
+     * Initialise the game name based on the game number of the last saved game.
+     * 
      * @param gameName The {@link UIText} in which the name will be displayed.
      */
-    private void setGameName(UIText gameName) {
+    private void initialiseGameName(UIText gameName) {
         if (gameName != null) {
             gameName.setText(GameProvider.getNextGameName());
         }
@@ -231,13 +229,17 @@ public class NewGameScreen extends CoreScreenLayer {
         config.save();
     }
 
+    private void setNameOnUniverse(String input) {
+        if (input.isBlank()) {
+            universeWrapper.setGameName(GameProvider.getNextGameName());
+        } else {
+            universeWrapper.setGameName(GameProvider.getNextGameName(input));
+        }
+    }
 
     @Override
     public void onOpened() {
         super.onOpened();
-
-        final UIText gameName = find("gameName", UIText.class);
-        setGameName(gameName);
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
 

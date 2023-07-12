@@ -1,0 +1,265 @@
+<mxfile host="65bd71144e">
+    <diagram id="OJkdpkguBYpw241fi1gp" name="Page-1">
+        <mxGraphModel dx="2600" dy="866" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="5" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="sets &amp;lt;&amp;lt;UniverseWrapper&amp;gt;&amp;gt;" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="SelectGameScreen" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="410" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="NewGameScreen" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="410" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="UniverseWrapper" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-180" y="160" width="1890" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="SelectGameScreen" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-180" y="410" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="whether loading&lt;br&gt;as server" style="html=1;entryX=0.7;entryY=-0.083;entryDx=0;entryDy=0;dashed=1;entryPerimeter=0;" parent="1" edge="1" target="2">
+                    <mxGeometry x="0.5711" y="-1" relative="1" as="geometry">
+                        <mxPoint x="234" y="230" as="sourcePoint"/>
+                        <mxPoint x="241" y="470" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" value="sets &amp;lt;&amp;lt;UniverseWrapper&amp;gt;&amp;gt;" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="21" target="2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="280" y="465" as="sourcePoint"/>
+                        <mxPoint x="450" y="465" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="26" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="html=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-151" y="410" as="sourcePoint"/>
+                        <mxPoint x="-150" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="27" value="define whether&lt;br&gt;loading as server" style="html=1;dashed=1;" parent="1" edge="1">
+                    <mxGeometry x="0.4737" y="1" relative="1" as="geometry">
+                        <mxPoint x="-88" y="410" as="sourcePoint"/>
+                        <mxPoint x="-90" y="220" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="28" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="21" target="2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="280" y="435" as="sourcePoint"/>
+                        <mxPoint x="450" y="435" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="30" value="Config" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="425" y="40" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Module&lt;br&gt;Manager" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="90" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="WorldGenerator&lt;br&gt;Manager" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="40" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="GameEngine" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="425" y="90" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="AdvancedGameSetup&lt;br&gt;Screen" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="720" y="410" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="set&amp;nbsp;&lt;br&gt;game name" style="html=1;dashed=1;" parent="1" edge="1">
+                    <mxGeometry x="0.4737" relative="1" as="geometry">
+                        <mxPoint x="530" y="410" as="sourcePoint"/>
+                        <mxPoint x="530" y="220" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="37" value="sets &amp;lt;&amp;lt;UniverseWrapper&amp;gt;&amp;gt;" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="3" target="35" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="280" y="465" as="sourcePoint"/>
+                        <mxPoint x="450" y="465" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="play" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;strokeWidth=3;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="38">
+                    <mxGeometry x="1" y="20" relative="1" as="geometry">
+                        <mxPoint x="500" y="740" as="targetPoint"/>
+                        <mxPoint x="-20" y="19" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="GameManifest" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="570" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="35">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="280" y="435" as="sourcePoint"/>
+                        <mxPoint x="450" y="435" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="38">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="570" y="435" as="sourcePoint"/>
+                        <mxPoint x="730" y="435" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="41" value="whether loading&lt;br&gt;as server" style="html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" target="3">
+                    <mxGeometry x="0.5711" y="-1" relative="1" as="geometry">
+                        <mxPoint x="470" y="230" as="sourcePoint"/>
+                        <mxPoint x="244" y="415.02" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="43" value="Both NewGameScreen and GameManifestProvider double-check the game name, but use sligthly different logic.&lt;br&gt;&lt;br&gt;I'm wondering who should have the main responsibility here? Can we trust the UniverseWrapper?&lt;br&gt;&lt;br&gt;In any case, there should only be one place where we fall back to a default." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="160" y="510" width="200" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="set&amp;nbsp;&lt;br&gt;seed" style="html=1;dashed=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="35">
+                    <mxGeometry x="0.4737" relative="1" as="geometry">
+                        <mxPoint x="540" y="420" as="sourcePoint"/>
+                        <mxPoint x="810" y="230" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="45" value="Observation: immediately creating a new world and clicking through the advanced setup without changing anything will create a different world.&lt;br&gt;&lt;br&gt;There's a seed on the UniverseWrapper,&amp;nbsp;&lt;br&gt;There's another seed o nthe WorldGenerator itself." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="620" y="520" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="What was the intentation with the universe seed vs world gen seeds?&lt;br&gt;&lt;br&gt;When removing multi-world support, we should make sure that&lt;br&gt;&lt;br&gt;universeSeed == worldSeed" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="620" y="680" width="200" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="can we just remove the UniverseConfig and/or UniverseWrapper?" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="620" y="810" width="200" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="66" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeWidth=3;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;fillColor=#e1d5e7;strokeColor=#9673a6;entryX=0.09;entryY=-0.029;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="51" target="56">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="UniverseSetup&lt;br&gt;Screen" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1030" y="410" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="sets &amp;lt;&amp;lt;UniverseWrapper&amp;gt;&amp;gt;" style="html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="35" target="51">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="570" y="465" as="sourcePoint"/>
+                        <mxPoint x="730" y="465" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="53" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="35" target="51">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="860" y="420" as="sourcePoint"/>
+                        <mxPoint x="1020" y="420" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54" value="setEnvironment(...) or setContext(...) is a way better name and API than individual setters for passing in required data." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="-450" y="320" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="Should we pass it manually like this, or should the screens communicate via Config?" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="-450" y="420" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.326;exitY=-0.014;exitDx=0;exitDy=0;dashed=1;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;curved=1;exitPerimeter=0;" edge="1" parent="1" source="56">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1230" y="490" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="83" value="get&lt;br&gt;&amp;lt;&amp;lt; UniverseWrapper &amp;gt;&amp;gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.866;exitY=0;exitDx=0;exitDy=0;entryX=0.169;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;dashed=1;exitPerimeter=0;" edge="1" parent="1" source="56" target="82">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="Context" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1030" y="570" width="670" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.045;entryY=-0.014;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="51" target="56">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1060" y="490" as="sourcePoint"/>
+                        <mxPoint x="1070" y="550" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="59" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.061;entryY=1;entryDx=0;entryDy=0;endArrow=open;startSize=14;endSize=14;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;entryPerimeter=0;" edge="1" parent="1" source="58" target="56">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="I guess we need to get real here and create a Context because we want to preview the world and thus need to start (parts of) the game already." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="970" y="770" width="200" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="Contains (among others):&lt;br&gt;&amp;nbsp;- UniverseSetupScreen&lt;br&gt;&amp;nbsp;- UniverseWrapper" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;" vertex="1" parent="1">
+                    <mxGeometry x="970" y="870" width="200" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="put the wrapper&lt;br&gt;into the Context" style="html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;" edge="1" parent="1" target="51">
+                    <mxGeometry x="0.5711" y="-1" relative="1" as="geometry">
+                        <mxPoint x="1090" y="230" as="sourcePoint"/>
+                        <mxPoint x="1080" y="437" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="65" value="" style="html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;" edge="1" parent="1" target="3">
+                    <mxGeometry x="1" y="108" relative="1" as="geometry">
+                        <mxPoint x="500" y="230" as="sourcePoint"/>
+                        <mxPoint x="1100" y="420" as="targetPoint"/>
+                        <mxPoint x="-68" y="99" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="67" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeWidth=3;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#e1d5e7;strokeColor=#9673a6;" edge="1" parent="1" source="3" target="38">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="550" y="480.5000000000002" as="sourcePoint"/>
+                        <mxPoint x="550" y="564.4999999999998" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="73" value="&amp;lt;&amp;lt; reads &amp;gt;&amp;gt;" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="69" target="51">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="WorldPreGeneration&lt;br&gt;Screen" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1300" y="410" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="71" value="sets &amp;lt;&amp;lt;Context&amp;gt;&amp;gt;" style="html=1;exitX=1.015;exitY=0.913;exitDx=0;exitDy=0;entryX=-0.015;entryY=0.899;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="51" target="69">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="850" y="465" as="sourcePoint"/>
+                        <mxPoint x="1040" y="465" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="74" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="51" target="69">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="850" y="435" as="sourcePoint"/>
+                        <mxPoint x="1040" y="435" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="76" value="&amp;lt;&amp;lt; creates &amp;gt;&amp;gt;" style="edgeStyle=none;html=1;exitX=-0.007;exitY=0.636;exitDx=0;exitDy=0;entryX=1.015;entryY=0.649;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" edge="1" parent="1" source="69" target="51">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1220" y="340" as="sourcePoint"/>
+                        <mxPoint x="1370" y="340" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="78" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="77" target="69">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" value="creates the world seed based on the universe seed" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="1370" y="180" width="200" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="79" value="read&lt;br&gt;seed" style="html=1;dashed=1;" edge="1" parent="1">
+                    <mxGeometry x="0.5711" y="-1" relative="1" as="geometry">
+                        <mxPoint x="1320" y="230" as="sourcePoint"/>
+                        <mxPoint x="1320" y="400" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="81" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=90;exitDy=0;exitPerimeter=0;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="80">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1260" y="440" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="80" value="on all screens before we just triggered a &quot;back animation&quot;, but here we are re-creating the previous screen - why?" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;" vertex="1" parent="1">
+                    <mxGeometry x="1060" y="90" width="200" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" value="StartPlaying&lt;br&gt;Screen" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1590" y="410" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="84" value="sets &amp;lt;&amp;lt;Context&amp;gt;&amp;gt;" style="html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="69" target="82">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1161.8000000000002" y="493.03999999999974" as="sourcePoint"/>
+                        <mxPoint x="1308.2000000000003" y="491.9200000000001" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="85" value="get&lt;br&gt;&amp;lt;&amp;lt; UniverseWrapper &amp;gt;&amp;gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.491;exitY=-0.044;exitDx=0;exitDy=0;strokeWidth=1;endArrow=classic;endFill=1;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;dashed=1;exitPerimeter=0;" edge="1" parent="1" source="56" target="69">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1620.2199999999993" y="580" as="sourcePoint"/>
+                        <mxPoint x="1620.2799999999997" y="500" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
