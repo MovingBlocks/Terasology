@@ -291,6 +291,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * in the drop-down.
      * @return A list of world names encoded as a String
      */
+    @Deprecated
     public List<String> worldNames() {
         final List<String> worldNamesList = Lists.newArrayList();
         if (selectedWorld != null) {
