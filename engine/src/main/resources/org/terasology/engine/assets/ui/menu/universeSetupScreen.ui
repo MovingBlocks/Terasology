@@ -35,7 +35,7 @@
       },
       {
         "type": "UIBox",
-        "id":"mainBox",
+        "id": "mainBox",
         "content": {
           "type": "ColumnLayout",
           "columns": 1,
@@ -59,30 +59,8 @@
                   "type": "UIDropdownScrollable",
                   "id": "worldGenerators",
                   "layoutInfo": {
-                    "relativeWidth": 0.50
+                    "relativeWidth": 1.00
                   }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
-                },
-                {
-                  "type": "UIButton",
-                  "id": "addGenerator",
-                  "text": "${engine:menu#add}",
-                  "layoutInfo": {
-                    "relativeWidth": 0.30
-                  }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
                 }
               ]
             },
@@ -91,46 +69,6 @@
               "size": [
                 1,
                 8
-              ]
-            },
-            {
-              "type": "UILabel",
-              "text": "${engine:menu#game-worlds}:",
-              "family": "left-label"
-            },
-            {
-              "type": "RowLayout",
-              "horizontalSpacing": 4,
-              "contents": [
-                {
-                  "type": "UIDropdownScrollable",
-                  "id": "worlds",
-                  "layoutInfo": {
-                    "relativeWidth": 0.50
-                  }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
-                },
-                {
-                  "type": "UIButton",
-                  "id": "worldConfig",
-                  "text": "${engine:menu#config}",
-                  "layoutInfo": {
-                    "relativeWidth": 0.30
-                  }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
-                }
               ]
             }
           ]
