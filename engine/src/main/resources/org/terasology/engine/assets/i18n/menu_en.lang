@@ -298,7 +298,7 @@
     "player-settings-identities-import": "Import...",
     "player-settings-title": "Player Settings",
     "please-wait": "Please wait...",
-    "pregeneration-description": "Select a world in the drop-down to see it previewed. Click Re-Roll to randomly pick a new seed or Configure to manually tweak the world further",
+    "pregeneration-description": "Click Re-Roll to randomly pick a new seed or Configure to manually tweak the world further",
     "preview-world-title": "Preview World...",
     "preview-zoom-factor": "Zoom",
     "previous-toolbar-item": "Previous Toolbar Item",
