@@ -88,9 +88,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerators", UIDropdownScrollable.class);
-        if (worldGenerator != null) {
-            worldGenerator.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
+        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerators = find("worldGenerators", UIDropdownScrollable.class);
+        if (worldGenerators != null) {
+            worldGenerators.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
@@ -98,7 +98,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     final Set<Name> enabledModuleNames = new HashSet<>(getAllEnabledModuleNames());
                     final List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
-                        if (enabledModuleNames.contains(option.getUri().getModuleName())) {
+                        //TODO: There should not be a reference from the engine to some module.
+                        //      The engine must be agnostic to what modules may do.
+                        if (enabledModuleNames.contains(option.getUri().getModuleName()) && !option.getUri().toString().equals("CoreWorlds:heightMap")) {
                             result.add(option);
                         }
                     }
@@ -106,8 +108,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     return result;
                 }
             });
-            worldGenerator.setVisibleOptions(3);
-            worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
+            worldGenerators.setVisibleOptions(3);
+            worldGenerators.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
                     // get the default generator from the config. This is likely to have a user triggered selection.
@@ -134,7 +136,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     }
                 }
             });
-            worldGenerator.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
+            worldGenerators.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
                 @Override
                 public String getString(WorldGeneratorInfo value) {
                     if (value != null) {
@@ -152,7 +154,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen =
                     getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-            addNewWorld(worldGenerator.getSelection());
+            addNewWorld(worldGenerators.getSelection());
             if (selectedWorld != null) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
