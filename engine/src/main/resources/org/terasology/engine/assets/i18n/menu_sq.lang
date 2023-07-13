@@ -391,7 +391,7 @@
     "this-language-English": "Albanian",
     "this-language-native": "Shqip",
     "universe-setup": "Rrëgullimi i universit ",
-    "universe-setup-description": "Zgjidh një gjenerator të botës dhe shtoje atë. Pastaj zgjidhni dhe konfiguroni botët nga rishtarja e mbushur Botët dropdown.",
+    "universe-setup-description": "Zgjidhni një gjenerator botëror.",
     "update-module": "Update",
     "time-progression-during-pre-generation": "Progresi i kohës gjatë pre-lindja",
     "validation-username-max-length": "Emri nuk mun të jetë më i gjatë se 100 shenja",

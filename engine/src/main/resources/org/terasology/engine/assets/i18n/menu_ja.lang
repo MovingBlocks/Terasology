@@ -395,7 +395,7 @@
     "this-language-English": "Japanese",
     "this-language-native": "日本語",
     "universe-setup": "全体の設定",
-    "universe-setup-description": 新しいワールドをドロップダウンから選んで設定したとき、ワールドジェネレータを選択し追加してください。",
+    "universe-setup-description": "ワールドジェネレーターを選択します。",
     "update-module": "アップデート",
     "time-progression-during-pre-generation": "事前生成中の時間経過",
     "validation-username-max-length": "ユーザーネームは100文字以上長くできません",

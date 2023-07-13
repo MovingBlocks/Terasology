@@ -410,7 +410,7 @@
     "this-language-English": "Ukrainian",
     "this-language-native": "Українська",
     "universe-setup": "Налаштування світу",
-    "universe-setup-description": "Виберіть генератор світу і додайте його - потім виберіть та налаштуйте світи з новоствореного списку.",
+    "universe-setup-description": "Виберіть генератор світу.",
     "update-module": "Оновити",
     "time-progression-during-pre-generation": "Прогрес часу під час попереднього генерування",
     "validation-username-max-length": "Логін має бути коротшим за 100 символів",

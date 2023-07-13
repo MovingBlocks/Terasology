@@ -410,7 +410,7 @@
     "this-language-English": "English",
     "this-language-native": "English",
     "universe-setup": "Universe Setup",
-    "universe-setup-description": "Pick a world generator and add it. Then select and configure worlds from the freshly filled Worlds dropdown.",
+    "universe-setup-description": "Pick a world generator.",
     "update-module": "Update",
     "time-progression-during-pre-generation": "Time progression during pre-generation",
     "validation-username-max-length": "Username can't be longer then 100 chars",

@@ -395,7 +395,7 @@
   "this-language-English": "Czech",
   "this-language-native": "Česky",
   "universe-setup": "Nastavení Vesmíru",
-  "universe-setup-description": "Vyber generátor světa a přidej ho. Poté vyber a nastav světy z čerstvě vyplněného seznamu světů.",
+  "universe-setup-description": "Vyber generátor světa.",
   "update-module": "Aktualizovat",
   "time-progression-during-pre-generation": "Postup času během předgenerace",
   "validation-username-max-length": "Jméno nesmí být delší než 100 znaků",

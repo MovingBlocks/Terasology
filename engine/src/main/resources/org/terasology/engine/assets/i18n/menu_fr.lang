@@ -391,7 +391,7 @@
     "this-language-English": "French",
     "this-language-native": "Français",
     "universe-setup": "Configuration de l'univers",
-    "universe-setup-description": "Choisissez un générateur de monde et ajoutez-le. Ensuite, sélectionnez et configurez des mondes dans la liste déroulante des mondes fraîchement remplie.",
+    "universe-setup-description": "Choisissez un générateur de monde.",
     "update-module": "Mise à jour",
     "time-progression-during-pre-generation": "Progression de temps pendant la pré-génération",
     "validation-username-max-length": "Le nom d'utilisateur ne peut pas être plus long que 100 caractères",
