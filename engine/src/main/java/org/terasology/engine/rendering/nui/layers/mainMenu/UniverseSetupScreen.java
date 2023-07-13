@@ -144,61 +144,15 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 }
             });
         }
-        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        worldsDropdown.bindSelection(new Binding<String>() {
-            @Override
-            public String get() {
-                if (selectedWorld != null) {
-                    return selectedWorld.getWorldName().toString();
-                } else {
-                    return "";
-                }
-            }
-
-            @Override
-            public void set(String value) {
-                selectedWorld.setWorldName(new Name(value));
-            }
-        });
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
 
-        WidgetUtil.trySubscribe(this, "worldConfig", button -> {
-            final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-            try {
-                if (selectedWorld != null || !selectedWorld.getWorldName().isEmpty()) {
-                    worldSetupScreen.setWorld(context, selectedWorld, worldsDropdown);
-                    triggerForwardAnimation(worldSetupScreen);
-                } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage("Worlds List Empty!", "No world found to configure.");
-                }
-            } catch (UnresolvedWorldGeneratorException e) {
-                logger.error("Can't configure the world! due to {}", e.getMessage());
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "addGenerator", button -> {
-            //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
-            //      modules may do
-            if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("HeightMap not supported",
-                                "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-            } else if (selectedWorld != null) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("World Already Created", "You can only add one world.");
-            } else {
-                addNewWorld(worldGenerator.getSelection());
-                worldsDropdown.setOptions(worldNames());
-            }
-        });
-
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen =
                     getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
+            addNewWorld(worldGenerator.getSelection());
             if (selectedWorld != null) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
@@ -233,11 +187,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        selectedWorld = null;
-        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        if (worldsDropdown != null) {
-            worldsDropdown.setOptions(worldNames());
-        }
+        selectedWorld = null;        
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -275,8 +225,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * This method refreshes the worlds drop-down menu when world name is changed and updates variable selectedWorld.
      * @param worldsDropdown the drop-down to work on
      */
+    @Deprecated
     public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
-        worldsDropdown.setOptions(worldNames());
+        // no-op
     }
 
     /**
