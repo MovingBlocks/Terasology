@@ -100,8 +100,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
                         //TODO: There should not be a reference from the engine to some module.
                         //      The engine must be agnostic to what modules may do.
-                        if (enabledModuleNames.contains(option.getUri().getModuleName()) &&
-                                !option.getUri().toString().equals("CoreWorlds:heightMap")) {
+                        if (enabledModuleNames.contains(option.getUri().getModuleName())
+                                && !option.getUri().toString().equals("CoreWorlds:heightMap")) {
                             result.add(option);
                         }
                     }
