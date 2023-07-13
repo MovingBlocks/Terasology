@@ -439,6 +439,7 @@
     "world-config-preview": "world-config-preview",
     "world-configuration": "world-configuration",
     "world-generator": "world-generator",
+    "world-name": "world-name",
     "world-pre-generation": "world-pre-generation",
     "world-seed": "world-seed",
     "world-setup": "world-setup",

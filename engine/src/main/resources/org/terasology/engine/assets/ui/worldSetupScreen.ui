@@ -73,7 +73,7 @@
                 "contents": [
                   {
                     "type": "UILabel",
-                    "text": "World Name"
+                    "text": "${engine:menu#world-name}"
                   },
                   {
                     "type": "UIText",
