@@ -7,7 +7,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.game.GameManifest;
@@ -19,14 +18,11 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.engine.world.time.WorldTime;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
-
-import java.util.List;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
