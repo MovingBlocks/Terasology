@@ -19,21 +19,6 @@
         }
       },
       {
-        "type": "UILabel",
-        "id": "warning",
-        "text": "${engine:menu#multi-world-warning}",
-        "family": "warning",
-        "layoutInfo": {
-          "height": 12,
-          "position-horizontal-center": {},
-          "position-bottom": {
-            "target": "TOP",
-            "widget": "mainBox",
-            "offset": 36
-          }
-        }
-      },
-      {
         "type": "UIBox",
         "id": "mainBox",
         "content": {
