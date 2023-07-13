@@ -222,15 +222,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * This method refreshes the worlds drop-down menu when world name is changed and updates variable selectedWorld.
-     * @param worldsDropdown the drop-down to work on
-     */
-    @Deprecated
-    public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
-        // no-op
-    }
-
-    /**
      * This method switches the environment of the game to a temporary one needed for
      * creating a game. It creates a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
