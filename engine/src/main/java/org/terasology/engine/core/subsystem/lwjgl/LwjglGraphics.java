@@ -145,8 +145,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
         if (!gameWindowIsMinimized) {
-//            currentState.render();
-//            TeraRusty.dispatch();
+            EngineKernel kernel = EngineKernel.instance();
+            kernel.cmdPrepare();
+            currentState.render();
+            kernel.cmdDispatch();
         }
 
         lwjglDisplay.update();
