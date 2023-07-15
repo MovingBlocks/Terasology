@@ -12,7 +12,9 @@ properties([
     // that can't simply be turned off
     copyArtifactPermission('*'),
     // Flag for Jenkins to discard attached artifacts after x builds
-    buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep))
+    buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep)),
+    // configure Jenkins to abort a build if a new one is triggered for the same branch
+    disableConcurrentBuilds(abortPrevious: true)
 ])
 
 /**
