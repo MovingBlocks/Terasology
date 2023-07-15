@@ -33,7 +33,7 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
-    /** The interval in which pings are send, in milliseconds. */
+    /** The interval in which pings are sent, in milliseconds. */
     private static final long PING_PERIOD = 200;
 
     @In
