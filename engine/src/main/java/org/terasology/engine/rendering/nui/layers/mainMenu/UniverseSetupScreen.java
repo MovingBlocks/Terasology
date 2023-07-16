@@ -281,20 +281,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * Create a list of the names of the world, so that they can be displayed as simple String
-     * in the drop-down.
-     * @return A list of world names encoded as a String
-     */
-    @Deprecated
-    public List<String> worldNames() {
-        final List<String> worldNamesList = Lists.newArrayList();
-        if (selectedWorld != null) {
-            worldNamesList.add(selectedWorld.getWorldName().toString());
-        }
-        return worldNamesList;
-    }
-
-    /**
      * @return the selected world in the drop-down.
      */
     public WorldSetupWrapper getSelectedWorld() {
