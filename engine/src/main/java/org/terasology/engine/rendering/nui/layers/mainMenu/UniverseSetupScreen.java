@@ -108,7 +108,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private Context context;
     private UniverseWrapper universeWrapper;
     private WorldSetupWrapper selectedWorld;
-    private String seed;
     private UISlider zoomSlider;
     private Texture texture;
     private PreviewGenerator previewGen;
@@ -183,12 +182,12 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         seedField.bindText(new Binding<String>() {
             @Override
             public String get() {
-                return seed;
+                return universeWrapper.getSeed();
             }
 
             @Override
             public void set(String value) {
-                seed = value;
+                universeWrapper.setSeed(value);
             }
         });
 
@@ -217,8 +216,8 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             if (selectedWorld != null) {
-                seed = createRandomSeed();
-                selectedWorld.getWorldGenerator().setWorldSeed(seed);
+                universeWrapper.setSeed(createRandomSeed());
+                selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
                 updatePreview();
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -260,7 +259,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             ensureWorldGeneratorIsSet();
 
             universeWrapper.setTargetWorld(selectedWorld);
-            universeWrapper.setSeed(seed);
             final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
@@ -297,7 +295,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                     selectedWorld.setWorldGenerator(worldGenerator);
                 }
                 if (selectedWorld.getWorldGenerator().getWorldSeed().isEmpty()) {
-                    selectedWorld.getWorldGenerator().setWorldSeed(seed);
+                    selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
                 }
                 previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
                 updatePreview();
@@ -337,7 +335,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
         ensureWorldGeneratorIsSet();
-        selectedWorld.getWorldGenerator().setWorldSeed(seed);
+        selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
 
         genTexture();
         List<Zone> previewZones = Lists.newArrayList(selectedWorld.getWorldGenerator().getZones())
@@ -359,7 +357,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         universeWrapper = wrapper;
-        seed = universeWrapper.getSeed();
         context = new ContextImpl();
         CoreRegistry.setContext(context);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
