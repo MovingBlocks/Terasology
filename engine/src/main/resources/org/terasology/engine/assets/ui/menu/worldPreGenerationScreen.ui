@@ -27,11 +27,59 @@
           "position-top": {
             "target": "TOP",
             "offset": -16,
-            "widget": "coreLayout"
+            "widget": "generator"
           },
           "position-bottom": {
             "target": "BOTTOM",
             "offset": -16,
+            "widget": "coreLayout"
+          }
+        }
+      },
+      {
+        "type": "ColumnLayout",
+        "id": "generator",
+        "columns": 1,
+        "verticalSpacing": 4,
+        "horizontalSpacing": 4,
+        "contents": [
+          {
+            "type": "UILabel",
+            "text": "${engine:menu#universe-setup-description}"
+          },
+          {
+            "type": "UILabel",
+            "text": "${engine:menu#game-world-generators}:",
+            "family": "left-label"
+          },
+          {
+            "type": "RowLayout",
+            "horizontalSpacing": 4,
+            "contents": [
+              {
+                "type": "UIDropdownScrollable",
+                "id": "worldGenerators",
+                "layoutInfo": {
+                  "relativeWidth": 1.00
+                }
+              }
+            ]
+          },
+          {
+            "type": "UISpace",
+            "size": [
+              1,
+              8
+            ]
+          }
+        ],
+        "layoutInfo": {
+          "width": 500,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "TOP",
+            "offset": 16,
             "widget": "coreLayout"
           }
         }
