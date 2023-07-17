@@ -9,18 +9,28 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
+import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
+import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
@@ -35,6 +45,8 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.zones.Zone;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -46,6 +58,7 @@ import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
+import org.terasology.math.TeraMath;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.databinding.Binding;
@@ -53,19 +66,26 @@ import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Sets up the Universe for a user. Displays a list of {@link WorldGenerator}
  * for a particular game template.
  */
-public class UniverseSetupScreen extends CoreScreenLayer {
+public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(UniverseSetupScreen.class);
@@ -79,10 +99,19 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private GameEngine gameEngine;
+
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
     private WorldSetupWrapper selectedWorld;
+    private UISlider zoomSlider;
+    private int seedNumber;
+    private Texture texture;
+    private PreviewGenerator previewGen;
+    private UniverseWrapper universeWrapper;
+    private UIImage previewImage;
 
     @Override
     public void initialise() {
@@ -148,37 +177,90 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             });
         }
 
+        zoomSlider = find("zoomSlider", UISlider.class);
+        if (zoomSlider != null) {
+            zoomSlider.setValue(2f);
+            zoomSlider.setUiSliderOnChangeTriggeredListener(this);
+        }
+
+        final UIText worldName = find("worldName", UIText.class);
+        worldName.bindText(new Binding<String>() {
+            @Override
+            public String get() {
+                if (selectedWorld == null) {
+                    return "";
+                }
+                return selectedWorld.getWorldName().toString();
+            }
+
+            @Override
+            public void set(String value) {
+                // no-op
+                // field should be read-only
+            }
+        });
+
+        WidgetUtil.trySubscribe(this, "reRoll", button -> {
+            if (selectedWorld != null) {
+                selectedWorld.getWorldGenerator().setWorldSeed(createSeed(selectedWorld.getWorldName().toString()));
+                updatePreview();
+            } else {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("No world generator selected!", "Please select a world generator first!");
+            }
+        });
+
+        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
+        WidgetUtil.trySubscribe(this, "config", button -> {
+            if (selectedWorld != null) {
+                try {
+                    if (!selectedWorld.getWorldName().isEmpty()) {
+                        worldSetupScreen.setWorld(context, selectedWorld);
+                        triggerForwardAnimation(worldSetupScreen);
+                    } else {
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                .setMessage("Worlds List Empty!", "No world found to configure.");
+                    }
+                } catch (UnresolvedWorldGeneratorException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("No world generator selected!", "Please select a world generator first!");
+            }
+        });
+
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
 
-        WidgetUtil.trySubscribe(this, "continue", button -> {
-            final WorldPreGenerationScreen worldPreGenerationScreen =
-                    getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-            addNewWorld(worldGenerators.getSelection());
-            if (selectedWorld != null) {
-                final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-                loadPopup.setMessage("Loading", "please wait ...");
-                loadPopup.onSuccess(result -> {
-                    if (result != null && result) {
-                        triggerForwardAnimation(worldPreGenerationScreen);
-                    } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                                .setMessage("Error", "Can't load world pre generation screen! Please, try again!");
-                    }
-                });
-                loadPopup.startOperation(() -> {
-                    try {
-                        worldPreGenerationScreen.setEnvironment(context);
-                    } catch (UnresolvedWorldGeneratorException e) {
-                        return false;
-                    }
-                    return true;
-                }, true);
-            } else {
+        WidgetUtil.trySubscribe(this, "play", button -> {
+            if (selectedWorld == null) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
+                        .setMessage("No world generator selected!", "Please select a world generator first!");
+                return;
             }
+
+            ensureWorldGeneratorIsSet();
+
+            universeWrapper.setTargetWorld(selectedWorld);
+            final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+            if (gameManifest != null) {
+                gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
+                        ? NetworkMode.DEDICATED_SERVER
+                        : NetworkMode.NONE));
+            } else {
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+            }
+
+            SimpleUri uri;
+            WorldInfo worldInfo;
+            //TODO: if we don't do that here, where do we do it? or does the world not show up in the game manifest?
+            //gameManifest.addWorld(worldInfo);
+
+            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
+                    ? NetworkMode.DEDICATED_SERVER
+                    : NetworkMode.NONE));
         });
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
@@ -190,7 +272,22 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        selectedWorld = null;        
+        if (selectedWorld != null) {
+            try {
+                if (selectedWorld.getWorldGenerator() == null) {
+                    WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(selectedWorld
+                            .getWorldGeneratorInfo().getUri(), context, environment);
+                    selectedWorld.setWorldGenerator(worldGenerator);
+                }
+                if (selectedWorld.getWorldGenerator().getWorldSeed().isEmpty()) {
+                    selectedWorld.getWorldGenerator().setWorldSeed(createSeed(selectedWorld.getWorldName().toString()));
+                }
+                previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+                updatePreview();
+            } catch (UnresolvedWorldGeneratorException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -231,6 +328,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * @param wrapper takes the {@link AdvancedGameSetupScreen} and pushes it into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
+        universeWrapper = wrapper;
         context = new ContextImpl();
         CoreRegistry.setContext(context);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
@@ -243,7 +341,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
-        context.put(UniverseWrapper.class, wrapper);
+        context.put(UniverseWrapper.class, universeWrapper);
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -257,6 +355,20 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
             environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
+        }
+
+        //selectedWorld.getWorldGenerator().setWorldSeed(createSeed(selectedWorld.getWorldName().toString()));
+
+        if (selectedWorld != null) {
+            genTexture();
+
+            List<Zone> previewZones = Lists.newArrayList(selectedWorld.getWorldGenerator().getZones())
+                    .stream()
+                    .filter(z -> !z.getPreviewLayers().isEmpty())
+                    .collect(Collectors.toList());
+            if (previewZones.isEmpty()) {
+                previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+            }
         }
     }
 
@@ -287,9 +399,81 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return selectedWorld;
     }
 
+    /**
+     * Generates a texture and sets it to the image view, thus previewing the world.
+     */
+    private void genTexture() {
+        int imgWidth = 384;
+        int imgHeight = 384;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
+        ByteBuffer[] data = new ByteBuffer[]{buffer};
+        ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
+        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        texture = Assets.generateAsset(uri, texData, Texture.class);
+
+        previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
+    }
+
+    /**
+     * Updates the preview according to any changes made to the configurator.
+     * Also pops up a message and keeps track of percentage world preview prepared.
+     */
+    private void updatePreview() {
+
+        final NUIManager manager = context.get(NUIManager.class);
+        final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Updating Preview", "Please wait ...");
+
+        ProgressListener progressListener = progress ->
+                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+
+        Callable<TextureData> operation = () -> {
+            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
+            TextureData data = texture.getData();
+
+            previewGen.render(data, zoom, progressListener);
+
+            return data;
+        };
+
+        popup.onSuccess(texture::reload);
+        popup.startOperation(operation, true);
+    }
+
+    /**
+     * Creates a unique world seed by appending the world name with an incrementing number, on top of the universe seed.
+     *
+     * @param world {@link WorldSetupWrapper} object whose seed is to be set.
+     * @return The seed as a string.
+     */
+    private String createSeed(String world) {
+        String seed = context.get(UniverseWrapper.class).getSeed();
+        return seed + world + seedNumber++;
+    }
+
+    private void ensureWorldGeneratorIsSet() {
+        if (selectedWorld.getWorldGenerator() == null) {
+            try {
+                selectedWorld.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(
+                        selectedWorld.getWorldGeneratorInfo().getUri(), context, environment));
+            } catch (UnresolvedWorldGeneratorException e) {
+                //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public void onSliderValueChanged(float val) {
+        if (selectedWorld != null) {
+            updatePreview();
+        }
     }
 }
 
