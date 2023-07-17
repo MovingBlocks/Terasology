@@ -139,7 +139,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                     return result;
                 }
             });
-            worldGenerators.setVisibleOptions(3);
+            worldGenerators.setVisibleOptions(worldGenerators.getOptions().size());
             worldGenerators.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
@@ -164,6 +164,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                 public void set(WorldGeneratorInfo value) {
                     if (value != null) {
                         config.getWorldGeneration().setDefaultGenerator(value.getUri());
+                        addNewWorld(value);
                     }
                 }
             });
@@ -335,6 +336,19 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
         selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
+        ensureWorldGeneratorIsSet();
+        selectedWorld.getWorldGenerator().setWorldSeed(seed);
+
+        genTexture();
+        List<Zone> previewZones = Lists.newArrayList(selectedWorld.getWorldGenerator().getZones())
+                .stream()
+                .filter(z -> !z.getPreviewLayers().isEmpty())
+                .collect(Collectors.toList());
+        if (previewZones.isEmpty()) {
+            previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+        }
+
+        updatePreview();
     }
 
     /**
