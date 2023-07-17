@@ -66,6 +66,15 @@
             ]
           },
           {
+            "type": "UILabel",
+            "text": "${engine:menu#world-seed}:",
+            "family": "left-label"
+          },
+          {
+            "type": "UIText",
+            "id": "seed"
+          },
+          {
             "type": "UISpace",
             "size": [
               1,
