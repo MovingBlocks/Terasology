@@ -107,7 +107,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
     private UniverseWrapper universeWrapper;
-    private WorldSetupWrapper selectedWorld;
     private UISlider zoomSlider;
     private Texture texture;
     private PreviewGenerator previewGen;
@@ -201,10 +200,10 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         worldName.bindText(new Binding<String>() {
             @Override
             public String get() {
-                if (selectedWorld == null) {
+                if (universeWrapper.getTargetWorld() == null) {
                     return "";
                 }
-                return selectedWorld.getWorldName().toString();
+                return universeWrapper.getTargetWorld().getWorldName().toString();
             }
 
             @Override
@@ -215,9 +214,9 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         });
 
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
-            if (selectedWorld != null) {
+            if (universeWrapper.getTargetWorld() != null) {
                 universeWrapper.setSeed(createRandomSeed());
-                selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+                universeWrapper.getTargetWorld().getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
                 updatePreview();
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -227,10 +226,10 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
         WidgetUtil.trySubscribe(this, "config", button -> {
-            if (selectedWorld != null) {
+            if (universeWrapper.getTargetWorld() != null) {
                 try {
-                    if (!selectedWorld.getWorldName().isEmpty()) {
-                        worldSetupScreen.setWorld(context, selectedWorld);
+                    if (!universeWrapper.getTargetWorld().getWorldName().isEmpty()) {
+                        worldSetupScreen.setWorld(context, universeWrapper.getTargetWorld());
                         triggerForwardAnimation(worldSetupScreen);
                     } else {
                         getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -250,7 +249,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         );
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            if (selectedWorld == null) {
+            if (universeWrapper.getTargetWorld() == null) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("No world generator selected!", "Please select a world generator first!");
                 return;
@@ -258,7 +257,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
             ensureWorldGeneratorIsSet();
 
-            universeWrapper.setTargetWorld(selectedWorld);
             final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
@@ -287,17 +285,17 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     public void onOpened() {
         super.onOpened();
 
-        if (selectedWorld != null) {
+        if (universeWrapper.getTargetWorld() != null) {
             try {
-                if (selectedWorld.getWorldGenerator() == null) {
-                    WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(selectedWorld
+                if (universeWrapper.getTargetWorld().getWorldGenerator() == null) {
+                    WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(universeWrapper.getTargetWorld()
                             .getWorldGeneratorInfo().getUri(), context, environment);
-                    selectedWorld.setWorldGenerator(worldGenerator);
+                    universeWrapper.getTargetWorld().setWorldGenerator(worldGenerator);
                 }
-                if (selectedWorld.getWorldGenerator().getWorldSeed().isEmpty()) {
-                    selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+                if (universeWrapper.getTargetWorld().getWorldGenerator().getWorldSeed().isEmpty()) {
+                    universeWrapper.getTargetWorld().getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
                 }
-                previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+                previewGen = new FacetLayerPreview(environment, universeWrapper.getTargetWorld().getWorldGenerator());
                 updatePreview();
             } catch (UnresolvedWorldGeneratorException e) {
                 e.printStackTrace();
@@ -333,17 +331,17 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
-        selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
+        universeWrapper.setTargetWorld(new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo));
         ensureWorldGeneratorIsSet();
-        selectedWorld.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+        universeWrapper.getTargetWorld().getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
 
         genTexture();
-        List<Zone> previewZones = Lists.newArrayList(selectedWorld.getWorldGenerator().getZones())
+        List<Zone> previewZones = Lists.newArrayList(universeWrapper.getTargetWorld().getWorldGenerator().getZones())
                 .stream()
                 .filter(z -> !z.getPreviewLayers().isEmpty())
                 .collect(Collectors.toList());
         if (previewZones.isEmpty()) {
-            previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+            previewGen = new FacetLayerPreview(environment, universeWrapper.getTargetWorld().getWorldGenerator());
         }
 
         updatePreview();
@@ -385,15 +383,15 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
         }
 
-        if (selectedWorld != null) {
+        if (universeWrapper.getTargetWorld() != null) {
             genTexture();
 
-            List<Zone> previewZones = Lists.newArrayList(selectedWorld.getWorldGenerator().getZones())
+            List<Zone> previewZones = Lists.newArrayList(universeWrapper.getTargetWorld().getWorldGenerator().getZones())
                     .stream()
                     .filter(z -> !z.getPreviewLayers().isEmpty())
                     .collect(Collectors.toList());
             if (previewZones.isEmpty()) {
-                previewGen = new FacetLayerPreview(environment, selectedWorld.getWorldGenerator());
+                previewGen = new FacetLayerPreview(environment, universeWrapper.getTargetWorld().getWorldGenerator());
             }
         }
     }
@@ -422,7 +420,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
      * @return the selected world in the drop-down.
      */
     public WorldSetupWrapper getSelectedWorld() {
-        return selectedWorld;
+        return universeWrapper.getTargetWorld();
     }
 
     /**
@@ -473,10 +471,10 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     }
 
     private void ensureWorldGeneratorIsSet() {
-        if (selectedWorld.getWorldGenerator() == null) {
+        if (universeWrapper.getTargetWorld().getWorldGenerator() == null) {
             try {
-                selectedWorld.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(
-                        selectedWorld.getWorldGeneratorInfo().getUri(), context, environment));
+                universeWrapper.getTargetWorld().setWorldGenerator(WorldGeneratorManager.createWorldGenerator(
+                        universeWrapper.getTargetWorld().getWorldGeneratorInfo().getUri(), context, environment));
             } catch (UnresolvedWorldGeneratorException e) {
                 //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
                 e.printStackTrace();
@@ -491,7 +489,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
     @Override
     public void onSliderValueChanged(float val) {
-        if (selectedWorld != null) {
+        if (universeWrapper.getTargetWorld() != null) {
             updatePreview();
         }
     }
