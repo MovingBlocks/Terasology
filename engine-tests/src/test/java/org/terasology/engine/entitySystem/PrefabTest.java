@@ -142,6 +142,14 @@ public class PrefabTest {
         assertEquals("returnHome", mappedContainer.elements.get(1).id);
     }
 
+
+    @Test
+    public void testPrefabWithEmptyListOfMappedContainers() {
+        Prefab prefab = prefabManager.getPrefab("unittest:withEmptyListContainer");
+        ListOfObjectComponent mappedContainer = prefab.getComponent(ListOfObjectComponent.class);
+        assertEquals(0, mappedContainer.elements.size());
+    }
+
     @Test
     public void testPrefabWithListOfEnums() {
         Prefab prefab = prefabManager.getPrefab("unittest:withListEnumContainer");

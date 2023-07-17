@@ -28,7 +28,6 @@ import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.Property;
 import org.terasology.nui.properties.PropertyOrdering;
 import org.terasology.nui.properties.PropertyProvider;
-import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -60,17 +59,12 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private Context context;
     private WorldConfigurator oldWorldConfig;
     private Name newWorldName;
-    private UIDropdownScrollable worldsDropdown;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            final UniverseSetupScreen universeSetupScreen =
-                    getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            final WorldPreGenerationScreen worldPreGenerationScreen =
-                    getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
+        WidgetUtil.trySubscribe(this, "close", button -> {            
             UIText customWorldName = find("customisedWorldName", UIText.class);
 
             boolean goBack = false;
@@ -83,10 +77,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
             } else if (customWorldName.getText().equalsIgnoreCase(world.getWorldName().toString())) {
                 //same name as before: go back to universe setup
                 goBack = true;
-            } else if (universeSetupScreen.worldNameMatchesAnother(customWorldName.getText())) {
-                //if same name is already used, inform user with a  popup
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("Name Already Used!", "Please use a different name for this world");
             } else {
                 //no match found: go back to universe setup
                 goBack = true;
@@ -95,8 +85,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
             if (goBack) {
                 newWorldName = new Name(customWorldName.getText());
                 world.setWorldName(newWorldName);
-                universeSetupScreen.refreshWorldDropdown(worldsDropdown);
-                worldPreGenerationScreen.setName(newWorldName);
                 triggerBackAnimation();
             }
         });
@@ -129,11 +117,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * @param worldSelected the world whose configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
-    public void setWorld(Context subContext, WorldSetupWrapper worldSelected, UIDropdownScrollable dropDown)
+    public void setWorld(Context subContext, WorldSetupWrapper worldSelected)
             throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
-        worldsDropdown = dropDown;
         SimpleUri worldGenUri = worldSelected.getWorldGeneratorInfo().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));

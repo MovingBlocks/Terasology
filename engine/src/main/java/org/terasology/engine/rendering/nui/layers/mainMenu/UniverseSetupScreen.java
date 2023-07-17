@@ -79,22 +79,18 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private List<WorldSetupWrapper> worlds = Lists.newArrayList();
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
-    private int worldNumber;
-    private String selectedWorld = "";
-    private int indexOfSelectedWorld;
-    private WorldSetupWrapper copyOfSelectedWorld;
+    private WorldSetupWrapper selectedWorld;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerators", UIDropdownScrollable.class);
-        if (worldGenerator != null) {
-            worldGenerator.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
+        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerators = find("worldGenerators", UIDropdownScrollable.class);
+        if (worldGenerators != null) {
+            worldGenerators.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
@@ -102,7 +98,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     final Set<Name> enabledModuleNames = new HashSet<>(getAllEnabledModuleNames());
                     final List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
-                        if (enabledModuleNames.contains(option.getUri().getModuleName())) {
+                        //TODO: There should not be a reference from the engine to some module.
+                        //      The engine must be agnostic to what modules may do.
+                        if (enabledModuleNames.contains(option.getUri().getModuleName())
+                                && !option.getUri().toString().equals("CoreWorlds:heightMap")) {
                             result.add(option);
                         }
                     }
@@ -110,8 +109,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     return result;
                 }
             });
-            worldGenerator.setVisibleOptions(3);
-            worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
+            worldGenerators.setVisibleOptions(3);
+            worldGenerators.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
                     // get the default generator from the config. This is likely to have a user triggered selection.
@@ -138,7 +137,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     }
                 }
             });
-            worldGenerator.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
+            worldGenerators.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
                 @Override
                 public String getString(WorldGeneratorInfo value) {
                     if (value != null) {
@@ -148,56 +147,16 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 }
             });
         }
-        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        worldsDropdown.bindSelection(new Binding<String>() {
-            @Override
-            public String get() {
-                return selectedWorld;
-            }
-
-            @Override
-            public void set(String value) {
-                selectedWorld = value;
-                indexOfSelectedWorld = findIndex(worlds, selectedWorld);
-            }
-        });
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
 
-        WidgetUtil.trySubscribe(this, "worldConfig", button -> {
-            final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-            try {
-                if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
-                    triggerForwardAnimation(worldSetupScreen);
-                } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage("Worlds List Empty!", "No world found to configure.");
-                }
-            } catch (UnresolvedWorldGeneratorException e) {
-                logger.error("Can't configure the world! due to {}", e.getMessage());
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "addGenerator", button -> {
-            //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
-            //      modules may do
-            if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("HeightMap not supported",
-                                "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-            } else {
-                addNewWorld(worldGenerator.getSelection());
-                worldsDropdown.setOptions(worldNames());
-            }
-        });
-
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen =
                     getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-            if (!worlds.isEmpty()) {
+            addNewWorld(worldGenerators.getSelection());
+            if (selectedWorld != null) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
                 loadPopup.setMessage("Loading", "please wait ...");
                 loadPopup.onSuccess(result -> {
@@ -231,14 +190,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        worlds.clear();
-        worldNumber = 0;
-        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        if (worldsDropdown != null) {
-            worldsDropdown.setOptions(worldNames());
-        }
-        selectedWorld = "";
-        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
+        selectedWorld = null;        
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -263,47 +215,13 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * returns true if 'name' matches (case-insensitive) with another world already present
-     * @param name The world name to be checked
-     */
-    public boolean worldNameMatchesAnother(String name) {
-        boolean taken = false;
-
-        for (WorldSetupWrapper worldTaken: worlds) {
-            if (worldTaken.getWorldName().toString().equalsIgnoreCase(name)) {
-                taken = true;
-                break;
-            }
-        }
-
-        return taken;
-    }
-
-    /**
      * Called whenever the user decides to add a new world.
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
-        while (worldNameMatchesAnother(selectedWorldName + "-" + worldNumber)) {
-            ++worldNumber;
-        }
-
-        selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
-        worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
-        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
-        ++worldNumber;
-    }
-
-    /**
-     * This method refreshes the worlds drop-down menu when world name is changed and updates variable selectedWorld.
-     * @param worldsDropdown the drop-down to work on
-     */
-    public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
-        worldsDropdown.setOptions(worldNames());
-        copyOfSelectedWorld = worlds.get(indexOfSelectedWorld);
-        selectedWorld = copyOfSelectedWorld.getWorldName().toString();
+        selectedWorld = new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo);
     }
 
     /**
@@ -342,23 +260,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
     }
 
-    /**
-     * Looks for the index of a selected world from the given list.
-     * @param worldsList the list to search
-     * @param worldName the name of the world to find
-     * @return the found index value or -1 if not found
-     */
-    private int findIndex(List<WorldSetupWrapper> worldsList, String worldName) {
-        for (int i = 0; i < worldsList.size(); i++) {
-            WorldSetupWrapper currentWorldFromList = worldsList.get(i);
-            Name customName = currentWorldFromList.getWorldName();
-            if (customName.toString().equals(worldName)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private void initAssets() {
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
@@ -380,40 +281,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * Create a list of the names of the world, so that they can be displayed as simple String
-     * in the drop-down.
-     * @return A list of world names encoded as a String
+     * @return the selected world in the drop-down.
      */
-    public List<String> worldNames() {
-        final List<String> worldNamesList = Lists.newArrayList();
-        for (WorldSetupWrapper world : worlds) {
-            worldNamesList.add(world.getWorldName().toString());
-        }
-        return worldNamesList;
-    }
-
-    /**
-     * This method takes the name of the selected world as String and return the corresponding
-     * WorldSetupWrapper object.
-     * @return {@link WorldSetupWrapper} object.
-     */
-    public WorldSetupWrapper findWorldByName() {
-        for (WorldSetupWrapper world : worlds) {
-            if (world.getWorldName().toString().equals(selectedWorld)) {
-                return world;
-            }
-        }
-        return null;
-    }
-
-    public List<WorldSetupWrapper> getWorldsList() {
-        return worlds;
-    }
-
-    /**
-     * @return the selcted world in the drop-down.
-     */
-    public String getSelectedWorld() {
+    public WorldSetupWrapper getSelectedWorld() {
         return selectedWorld;
     }
 

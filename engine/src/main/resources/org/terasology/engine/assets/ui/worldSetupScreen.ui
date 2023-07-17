@@ -62,7 +62,7 @@
             "contents": [
               {
                 "type": "RowLayout",
-                "id": "shape",
+                "id": "customNameWorld",
                 "layoutInfo": {
                   "use-content-height": true,
                   "position-horizontal-center": {},
@@ -73,32 +73,7 @@
                 "contents": [
                   {
                     "type": "UILabel",
-                    "text": "World Shape:",
-                    "enabled": false
-                  },
-                  {
-                    "type": "UIDropdownScrollable",
-                    "id": "worlds",
-                    "enabled": false
-                  }
-                ]
-              },
-              {
-                "type": "RowLayout",
-                "id": "customNameWorld",
-                "layoutInfo": {
-                  "use-content-height": true,
-                  "position-horizontal-center": {},
-                  "position-top": {
-                    "target": "BOTTOM",
-                    "offset": 8,
-                    "widget": "shape"
-                  }
-                },
-                "contents": [
-                  {
-                    "type": "UILabel",
-                    "text": "World Name"
+                    "text": "${engine:menu#world-name}"
                   },
                   {
                     "type": "UIText",

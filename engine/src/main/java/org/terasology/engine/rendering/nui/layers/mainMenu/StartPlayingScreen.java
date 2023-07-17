@@ -7,7 +7,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.game.GameManifest;
@@ -19,14 +18,11 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.engine.world.time.WorldTime;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
-
-import java.util.List;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
@@ -45,7 +41,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private Texture texture;
-    private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
     private WorldSetupWrapper targetWorld;
 
@@ -70,19 +65,8 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             SimpleUri uri;
             WorldInfo worldInfo;
+            //TODO: if we don't do that here, where do we do it? or does the world not show up in the game manifest?
             //gameManifest.addWorld(worldInfo);
-            int i = 0;
-            for (WorldSetupWrapper world : worldSetupWrappers) {
-                if (world != targetWorld) {
-                    i++;
-                    uri = world.getWorldGeneratorInfo().getUri();
-                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldName().toString(),
-                            world.getWorldGenerator().getWorldSeed(), (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
-                    gameManifest.addWorld(worldInfo);
-                    config.getUniverseConfig().addWorldManager(worldInfo);
-                }
-
-            }
 
             gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
                     ? NetworkMode.DEDICATED_SERVER
@@ -99,20 +83,18 @@ public class StartPlayingScreen extends CoreScreenLayer {
         UIImage previewImage = find("preview", UIImage.class);
         previewImage.setImage(texture);
 
-        UILabel subitle = find("subtitle", UILabel.class);
-        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + targetWorld.getWorldName().toString());
+        UILabel subtitle = find("subtitle", UILabel.class);
+        subtitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + targetWorld.getWorldName().toString());
     }
 
     /**
      * This method is called before the screen comes to the forefront to set the world in which the player is about to spawn.
      *
-     * @param worldSetupWrapperList The world in which the player is going to spawn.
      * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this screen.
      */
-    public void setTargetWorld(List<WorldSetupWrapper> worldSetupWrapperList, WorldSetupWrapper spawnWorld,
+    public void setTargetWorld(WorldSetupWrapper spawnWorld,
                                Texture targetWorldTexture, Context context) {
         texture = targetWorldTexture;
-        worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
         targetWorld = spawnWorld;
     }
