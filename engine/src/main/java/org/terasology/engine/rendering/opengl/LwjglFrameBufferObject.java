@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL30;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
-import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
 
@@ -27,7 +26,6 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;
     private Vector2ic size;
     private IntBuffer vp;
-    private LwjglCanvasRenderer canvasRenderer;
 
     private final Matrix4fStack transforms;
     private final Matrix4f projectionMatrix;
