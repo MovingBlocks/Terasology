@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.game.GameManifest;
@@ -29,7 +28,6 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
-import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.zones.Zone;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -56,8 +54,6 @@ import java.util.stream.Collectors;
 public class WorldPreGenerationScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
-
-    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
 
     @In
     private ModuleManager moduleManager;
@@ -167,15 +163,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             } else {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
-
-            SimpleUri uri;
-            WorldInfo worldInfo;
-            //TODO: if we don't do that here, where do we do it? or does the world not show up in the game manifest?
-            //gameManifest.addWorld(worldInfo);
-
-            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
-                    ? NetworkMode.DEDICATED_SERVER
-                    : NetworkMode.NONE));
         });
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
