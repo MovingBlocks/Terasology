@@ -29,6 +29,7 @@ import org.terasology.engine.rendering.opengl.GLSLShader;
 import org.terasology.engine.rendering.opengl.OpenGLMesh;
 import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.engine.rendering.opengl.OpenGLTexture;
+import org.terasology.engine.rendering.opengl.WgpuTexture;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.module.ModuleAssetScanner;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
@@ -61,8 +62,10 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.createAssetType(Font.class,
                 FontImpl::new, "fonts");
+        //AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
+        //        (urn, assetType, data) -> (OpenGLTexture.create(urn, assetType, data, this)), "textures", "fonts");
         AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
-                (urn, assetType, data) -> (OpenGLTexture.create(urn, assetType, data, this)), "textures", "fonts");
+                WgpuTexture::create, "textures", "fonts");
 
         assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
                 new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> {
