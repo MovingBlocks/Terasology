@@ -75,14 +75,11 @@ gradlew game --args='--help'
 The main entry point for the PC Facade is `Terasology#main`.
 Starting from there, the game engine is initialized and started according to the user inputs.
 
-<figure style="border:1px #cccccc solid; padding:4px;">
-  <!-- this image is an editable SVG created with Draw.io -->
-  <img 
-    style="display:block; margin-left:auto; margin-right:auto"
-    src="./docs/pc-facade-overview.drawio.svg" 
-    alt="Architectural overview of the PC Facade entry point."/>
-  <figcaption style="text-align:center;">Architectural overview of the PC Facade entry point.</figcaption>
-</figure>
+
+<p align="center">
+<!-- this image is an editable SVG created with Draw.io -->
+<img src="./docs/pc-facade-overview.drawio.svg" alt="Architectural overview of the PC Facade entry point."/>
+</p>
 
 The execution flow is as follows:
 
