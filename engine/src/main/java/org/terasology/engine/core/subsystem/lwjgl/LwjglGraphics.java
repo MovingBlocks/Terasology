@@ -17,7 +17,7 @@ import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
-import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.engine.rendering.nui.internal.WgpuCanvasRenderer;
 import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.utilities.OS;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
@@ -136,7 +136,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         });
 
         context.put(ShaderManager.class, new ShaderManagerLwjgl());
-        context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
+        context.put(CanvasRenderer.class, new WgpuCanvasRenderer(context));
     }
 
     @Override
