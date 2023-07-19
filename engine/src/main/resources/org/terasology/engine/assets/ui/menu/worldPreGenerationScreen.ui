@@ -41,7 +41,10 @@
         "id": "coreLayout",
         "columns": 2,
         "horizontalSpacing": 8,
-        "column-widths": [0.53, 0.47],
+        "column-widths": [
+          0.53,
+          0.47
+        ],
         "layoutInfo": {
           "width": 704,
           "use-content-height": true,
@@ -133,16 +136,11 @@
                 }
               },
               {
-                "type": "UIDropdownScrollable",
-                "id": "worlds",
-                "layoutInfo": {
-                  "position-horizontal-center": {},
-                  "position-top": {
-                    "target": "BOTTOM",
-                    "widget": "worldGenLabel",
-                    "offset": 0
-                  }
-                }
+                "type": "engine:UIText",
+                "id": "worldName",
+                "readOnly": true,
+                "enabled": false,
+                "layoutInfo": {}
               },
               {
                 "type": "RowLayout",
