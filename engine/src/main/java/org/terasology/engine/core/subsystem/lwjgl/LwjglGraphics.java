@@ -5,6 +5,7 @@ package org.terasology.engine.core.subsystem.lwjgl;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.glfw.GLFWNativeWin32;
 import org.lwjgl.glfw.GLFWNativeX11;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
@@ -91,6 +92,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             case GLFW.GLFW_PLATFORM_X11:
                 EngineKernel.instance().initializeWinX11Surface(GLFWNativeX11.glfwGetX11Display(),
                         GLFWNativeX11.glfwGetX11Window(window));
+                break;
+            case GLFW.GLFW_PLATFORM_WIN32:
+                EngineKernel.instance().initializeWin32Surface(
+                        GLFWNativeWin32.nglfwGetWin32Adapter(window),
+                        GLFWNativeWin32.glfwGetWin32Window(window));
                 break;
             default:
                 throw new RuntimeException("missing platform: " + GLFW.glfwGetPlatform());
