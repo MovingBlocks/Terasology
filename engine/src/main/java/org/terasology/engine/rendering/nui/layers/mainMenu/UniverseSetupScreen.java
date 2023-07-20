@@ -276,23 +276,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     @Override
     public void onOpened() {
         super.onOpened();
-
-        if (universeWrapper.getTargetWorld() != null) {
-            try {
-                if (universeWrapper.getTargetWorld().getWorldGenerator() == null) {
-                    WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(universeWrapper.getTargetWorld()
-                            .getWorldGeneratorInfo().getUri(), context, environment);
-                    universeWrapper.getTargetWorld().setWorldGenerator(worldGenerator);
-                }
-                if (universeWrapper.getTargetWorld().getWorldGenerator().getWorldSeed().isEmpty()) {
-                    universeWrapper.getTargetWorld().getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
-                }
-                previewGen = new FacetLayerPreview(environment, universeWrapper.getTargetWorld().getWorldGenerator());
-                updatePreview();
-            } catch (UnresolvedWorldGeneratorException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private Set<Name> getAllEnabledModuleNames() {
