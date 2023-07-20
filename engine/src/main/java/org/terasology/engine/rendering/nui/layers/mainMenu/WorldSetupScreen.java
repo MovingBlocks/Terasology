@@ -10,7 +10,6 @@ import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
@@ -54,7 +53,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private WorldGenerator worldGenerator;
-    private WorldSetupWrapper world;
+    private UniverseWrapper universe;
     private ModuleEnvironment environment;
     private Context context;
     private WorldConfigurator oldWorldConfig;
@@ -74,7 +73,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 //name empty: display a popup, stay on the same screen
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("Name Cannot Be Empty!", "Please add a name for the world");
-            } else if (customWorldName.getText().equalsIgnoreCase(world.getWorldName().toString())) {
+            } else if (customWorldName.getText().equalsIgnoreCase(universe.getWorldName().toString())) {
                 //same name as before: go back to universe setup
                 goBack = true;
             } else {
@@ -84,7 +83,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
             if (goBack) {
                 newWorldName = new Name(customWorldName.getText());
-                world.setWorldName(newWorldName);
+                universe.setWorldName(newWorldName);
                 triggerBackAnimation();
             }
         });
@@ -96,7 +95,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * @param customWorldName
      */
     private void setCustomWorldName(UIText customWorldName) {
-        customWorldName.setText(world.getWorldName().toString());
+        customWorldName.setText(universe.getWorldName().toString());
     }
 
     @Override
@@ -104,7 +103,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
         super.onOpened();
 
         UILabel subitle = find("subtitle", UILabel.class);
-        subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
+        subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + universe.getWorldName().toString());
         UIText customWorldName = find("customisedWorldName", UIText.class);
         setCustomWorldName(customWorldName);
     }
@@ -114,21 +113,21 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * to the forefront.
      *
      * @param subContext    the new environment created in {@link UniverseSetupScreen}
-     * @param worldSelected the world whose configurations are to be changed.
+     * @param universe      the universe whose world's configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
-    public void setWorld(Context subContext, WorldSetupWrapper worldSelected)
+    public void setWorld(Context subContext, UniverseWrapper universe)
             throws UnresolvedWorldGeneratorException {
-        world = worldSelected;
+        this.universe = universe;
         context = subContext;
-        SimpleUri worldGenUri = worldSelected.getWorldGenerator().getUri();
+        SimpleUri worldGenUri = universe.getWorldGenerator().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-        if (world.getWorldGenerator() == null) {
+        if (universe.getWorldGenerator() == null) {
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
-            world.setWorldGenerator(worldGenerator);
+            universe.setWorldGenerator(worldGenerator);
         } else {
-            worldGenerator = world.getWorldGenerator();
+            worldGenerator = universe.getWorldGenerator();
         }
         configureProperties();
     }
@@ -143,11 +142,11 @@ public class WorldSetupScreen extends CoreScreenLayer {
         propLayout.setOrdering(PropertyOrdering.byLabel());
         propLayout.clear();
         WorldConfigurator worldConfig;
-        if (world.getWorldConfigurator() != null) {
-            worldConfig = world.getWorldConfigurator();
+        if (universe.getWorldConfigurator() != null) {
+            worldConfig = universe.getWorldConfigurator();
         } else {
             worldConfig = worldGenerator.getConfigurator();
-            world.setWorldConfigurator(worldConfig);
+            universe.setWorldConfigurator(worldConfig);
         }
         oldWorldConfig = worldConfig;
 

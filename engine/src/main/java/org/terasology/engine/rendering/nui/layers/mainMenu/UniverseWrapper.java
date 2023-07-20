@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
-import org.terasology.engine.rendering.world.WorldSetupWrapper;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.naming.Name;
 
 /**
  * A class which stores the universe level properties for a game like whether
@@ -13,7 +15,9 @@ public class UniverseWrapper {
     private  String seed;
     private  boolean loadingAsServer;
     private  String gameName;
-    private WorldSetupWrapper targetWorld;
+    private Name worldName;
+    private WorldConfigurator worldConfigurator;
+    private WorldGenerator worldGenerator;
 
     public void setSeed(String seed) {
         this.seed = seed;
@@ -39,11 +43,27 @@ public class UniverseWrapper {
         return gameName;
     }
 
-    public void setTargetWorld(WorldSetupWrapper targetWorld) {
-        this.targetWorld = targetWorld;
+    public Name getWorldName() {
+        return this.worldName;
     }
 
-    public WorldSetupWrapper getTargetWorld() {
-        return targetWorld;
+    public void setWorldName(Name newName) {
+        this.worldName = newName;
+    }
+
+    public void setWorldConfigurator(WorldConfigurator worldConfigurator) {
+        this.worldConfigurator = worldConfigurator;
+    }
+
+    public WorldConfigurator getWorldConfigurator() {
+        return worldConfigurator;
+    }
+
+    public void setWorldGenerator(WorldGenerator worldGenerator) {
+        this.worldGenerator = worldGenerator;
+    }
+
+    public WorldGenerator getWorldGenerator() {
+        return worldGenerator;
     }
 }
