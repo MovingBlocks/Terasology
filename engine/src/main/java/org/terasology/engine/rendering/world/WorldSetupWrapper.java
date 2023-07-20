@@ -14,23 +14,17 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 public class WorldSetupWrapper {
 
     private Name worldName;
-    private WorldGeneratorInfo worldGeneratorInfo;
     private WorldConfigurator worldConfigurator;
     private WorldGenerator worldGenerator;
 
     /**
      * A constructor to initialise a world object.
      * @param worldName The World Name which is displayed in the drop-downs.
-     * @param worldGeneratorInfo Contains the {@link WorldGeneratorInfo} object for that world.
+     * @param worldGenerator Contains the {@link WorldGenerator} object for that world.
      */
-    public WorldSetupWrapper(Name worldName, WorldGeneratorInfo worldGeneratorInfo, WorldGenerator worldGenerator) {
+    public WorldSetupWrapper(Name worldName, WorldGenerator worldGenerator) {
         this.worldName = worldName;
-        this.worldGeneratorInfo = worldGeneratorInfo;
         this.worldGenerator = worldGenerator;
-    }
-
-    public WorldGeneratorInfo getWorldGeneratorInfo() {
-        return this.worldGeneratorInfo;
     }
 
     public Name getWorldName() {

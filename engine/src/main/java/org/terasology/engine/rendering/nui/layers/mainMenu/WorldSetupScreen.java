@@ -121,7 +121,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
             throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
-        SimpleUri worldGenUri = worldSelected.getWorldGeneratorInfo().getUri();
+        SimpleUri worldGenUri = worldSelected.getWorldGenerator().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
         if (world.getWorldGenerator() == null) {

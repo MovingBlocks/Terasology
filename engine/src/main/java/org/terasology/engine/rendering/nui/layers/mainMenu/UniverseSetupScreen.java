@@ -162,7 +162,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                 @Override
                 public void set(WorldGeneratorInfo value) {
                     if (value != null) {
-                        if (universeWrapper.getTargetWorld() == null || value != universeWrapper.getTargetWorld().getWorldGeneratorInfo()) {
+                        if (universeWrapper.getTargetWorld() == null || !value.getUri().equals(universeWrapper.getTargetWorld().getWorldGenerator().getUri())) {
                             config.getWorldGeneration().setDefaultGenerator(value.getUri());
                             addNewWorld(value);
                         }
@@ -307,7 +307,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         try {
             WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGeneratorInfo.getUri(), context, environment);
             worldGenerator.setWorldSeed(universeWrapper.getSeed());
-            universeWrapper.setTargetWorld(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName()), worldGeneratorInfo, worldGenerator));
+            universeWrapper.setTargetWorld(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName()), worldGenerator));
         } catch (UnresolvedWorldGeneratorException e) {
             //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
             e.printStackTrace();
