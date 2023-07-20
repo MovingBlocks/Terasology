@@ -13,7 +13,6 @@ import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.assets.font.FontCharacter;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 import org.terasology.engine.rendering.opengl.FrameBufferObject;
 import org.terasology.engine.rendering.opengl.WgpuTexture;
 import org.terasology.engine.rust.EngineKernel;
@@ -23,8 +22,6 @@ import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Border;
 import org.terasology.nui.Colorc;
-import org.terasology.nui.FontColor;
-import org.terasology.nui.FontUnderline;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.ScaleMode;
 import org.terasology.nui.TextLineBuilder;
@@ -32,12 +29,15 @@ import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
 import reactor.function.Consumer4;
-import reactor.function.Consumer5;
 
 import java.util.List;
 
 public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
     private DisplayDevice displayDevice;
+    private static final float SHADOW_DEPTH = -2;
+    private static final int SHADOW_HORIZONTAL_OFFSET = 1;
+    private static final int SHADOW_VERTICAL_OFFSET = 1;
+    private static final int UNKNOWN = -1;
 
     public WgpuCanvasRenderer(Context context) {
         this.displayDevice = context.get(DisplayDevice.class);
@@ -111,6 +111,14 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                 float texLeft = character.getX();
                 float texRight = texLeft + character.getTexWidth();
 
+                if (shadowColor.a() != 0) {
+                    kernel.cmdUIDrawTexture(
+                            ((WgpuTexture) character.getPage()).getTeraTexture(),
+                            new Rectanglef(texLeft, texTop, texRight, texBottom),
+                            new Rectanglef(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)
+                                    .translate(SHADOW_HORIZONTAL_OFFSET, SHADOW_VERTICAL_OFFSET),
+                            shadowColor.rgba());
+                }
                 kernel.cmdUIDrawTexture(
                         ((WgpuTexture) character.getPage()).getTeraTexture(),
                         new Rectanglef(texLeft, texTop, texRight, texBottom),
