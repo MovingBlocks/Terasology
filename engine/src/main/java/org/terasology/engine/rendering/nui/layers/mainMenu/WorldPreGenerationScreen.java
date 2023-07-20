@@ -3,30 +3,23 @@
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.assets.ResourceUrn;
+import org.joml.Vector2i;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateLoading;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
-import org.terasology.math.TeraMath;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.naming.Name;
-import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.widgets.UIImage;
-import org.terasology.nui.widgets.UISlider;
-import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
-import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldGenerator;
@@ -34,6 +27,17 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.engine.world.zones.Zone;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.math.TeraMath;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
+import org.terasology.nui.widgets.UIText;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -49,13 +53,14 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 
-    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
-
     @In
     private ModuleManager moduleManager;
 
     @In
     private Config config;
+
+    @In
+    private GameEngine gameEngine;
 
     private ModuleEnvironment environment;
     private WorldGenerator worldGenerator;
@@ -63,6 +68,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     private UIImage previewImage;
     private Context context;
     private PreviewGenerator previewGen;
+    private UniverseWrapper universeWrapper;
     private WorldSetupWrapper selectedWorld;
     private int seedNumber;
     private UISlider zoomSlider;
@@ -80,6 +86,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
+        universeWrapper = context.get(UniverseWrapper.class);
 
         ensureWorldGeneratorIsSet();
         selectedWorld.getWorldGenerator().setWorldSeed(createSeed(selectedWorld.getWorldName().toString()));
@@ -125,12 +132,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             updatePreview();
         });
 
-        StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
-        WidgetUtil.trySubscribe(this, "continue", button -> {
-            startPlayingScreen.setTargetWorld(selectedWorld, texture, context);
-            triggerForwardAnimation(startPlayingScreen);
-        });
-
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
         WidgetUtil.trySubscribe(this, "config", button -> {
             try {
@@ -148,6 +149,18 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             triggerBackAnimation();
+        });
+
+        WidgetUtil.trySubscribe(this, "play", button -> {
+            universeWrapper.setTargetWorld(selectedWorld);
+            final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+            if (gameManifest != null) {
+                gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
+                        ? NetworkMode.DEDICATED_SERVER
+                        : NetworkMode.NONE));
+            } else {
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+            }
         });
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
@@ -259,5 +272,10 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i vector2i) {
+        return vector2i;
     }
 }
