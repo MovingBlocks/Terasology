@@ -31,6 +31,7 @@ import org.terasology.nui.asset.font.Font;
 import reactor.function.Consumer4;
 
 import java.util.List;
+import java.util.Optional;
 
 public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
     private DisplayDevice displayDevice;
@@ -61,7 +62,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
     @Override
     public void crop(Rectanglei cropRegion) {
         EngineKernel kernel = EngineKernel.instance();
-
+        kernel.cmdUISetCrop(Optional.of(new Rectanglef(cropRegion.minX(), cropRegion.minY(), cropRegion.maxX(), cropRegion.maxY())));
     }
 
     @Override
