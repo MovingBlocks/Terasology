@@ -15,7 +15,6 @@ public class UniverseWrapper {
     private  String seed;
     private  boolean loadingAsServer;
     private  String gameName;
-    private Name worldName;
     private WorldConfigurator worldConfigurator;
     private WorldGenerator worldGenerator;
 
@@ -41,14 +40,6 @@ public class UniverseWrapper {
 
     public String getGameName() {
         return gameName;
-    }
-
-    public Name getWorldName() {
-        return this.worldName;
-    }
-
-    public void setWorldName(Name newName) {
-        this.worldName = newName;
     }
 
     public void setWorldConfigurator(WorldConfigurator worldConfigurator) {

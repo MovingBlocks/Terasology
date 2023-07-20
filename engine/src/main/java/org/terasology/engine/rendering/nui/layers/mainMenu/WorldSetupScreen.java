@@ -82,19 +82,13 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * @param universe      the universe whose world's configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
-    public void setWorld(Context subContext, UniverseWrapper universe)
-            throws UnresolvedWorldGeneratorException {
+    public void setWorld(Context subContext, UniverseWrapper universe) {
         this.universe = universe;
         context = subContext;
         SimpleUri worldGenUri = universe.getWorldGenerator().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-        if (universe.getWorldGenerator() == null) {
-            worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
-            universe.setWorldGenerator(worldGenerator);
-        } else {
-            worldGenerator = universe.getWorldGenerator();
-        }
+        worldGenerator = universe.getWorldGenerator();
         configureProperties();
     }
 

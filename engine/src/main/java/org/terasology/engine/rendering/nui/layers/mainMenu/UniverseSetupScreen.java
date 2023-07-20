@@ -209,18 +209,9 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
         WidgetUtil.trySubscribe(this, "config", button -> {
-            if (universeWrapper.getWorldName() != null) {
-                try {
-                    if (!universeWrapper.getWorldName().isEmpty()) {
-                        worldSetupScreen.setWorld(context, universeWrapper);
-                        triggerForwardAnimation(worldSetupScreen);
-                    } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                                .setMessage("Worlds List Empty!", "No world found to configure.");
-                    }
-                } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
-                }
+            if (universeWrapper.getWorldGenerator() != null) {
+                worldSetupScreen.setWorld(context, universeWrapper);
+                triggerForwardAnimation(worldSetupScreen);
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("No world generator selected!", "Please select a world generator first!");
@@ -287,7 +278,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         try {
             WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGeneratorInfo.getUri(), context, environment);
             worldGenerator.setWorldSeed(universeWrapper.getSeed());
-            universeWrapper.setWorldName(new Name(worldGeneratorInfo.getDisplayName()));
             universeWrapper.setWorldGenerator(worldGenerator);
         } catch (UnresolvedWorldGeneratorException e) {
             //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
