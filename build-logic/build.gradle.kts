@@ -4,7 +4,11 @@
 import java.net.URI
 
 plugins {
-    `kotlin-dsl`
+    id("org.gradle.kotlin.kotlin-dsl") version "4.1.0"
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 repositories {
