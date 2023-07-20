@@ -74,7 +74,6 @@ public final class GameManifestProvider {
         }
         gameManifest.setSeed(seed);
 
-        String targetWorldName = universeWrapper.getWorldName().toString();
         WorldConfigurator worldConfigurator = universeWrapper.getWorldConfigurator();
         if (worldConfigurator != null) {
             // horrible hack to get configs into manifest.
@@ -83,7 +82,7 @@ public final class GameManifestProvider {
             gameManifest.setModuleConfigs(uri, worldConfigurator.getProperties());
         }
         // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, targetWorldName, seed,
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, seed,
                 (long) (WorldTime.DAY_LENGTH * WorldTime.SUNRISE_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
