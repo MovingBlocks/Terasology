@@ -57,55 +57,21 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
     private Context context;
     private WorldConfigurator oldWorldConfig;
-    private Name newWorldName;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        WidgetUtil.trySubscribe(this, "close", button -> {            
-            UIText customWorldName = find("customisedWorldName", UIText.class);
-
-            boolean goBack = false;
-
-            //sanity checks on world name
-            if (customWorldName.getText().isEmpty()) {
-                //name empty: display a popup, stay on the same screen
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("Name Cannot Be Empty!", "Please add a name for the world");
-            } else if (customWorldName.getText().equalsIgnoreCase(universe.getWorldName().toString())) {
-                //same name as before: go back to universe setup
-                goBack = true;
-            } else {
-                //no match found: go back to universe setup
-                goBack = true;
-            }
-
-            if (goBack) {
-                newWorldName = new Name(customWorldName.getText());
-                universe.setWorldName(newWorldName);
-                triggerBackAnimation();
-            }
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            triggerBackAnimation();
         });
     }
-
-    /**
-     * This method sets the world name in title as well as in UITextBox
-     *
-     * @param customWorldName
-     */
-    private void setCustomWorldName(UIText customWorldName) {
-        customWorldName.setText(universe.getWorldName().toString());
-    }
-
     @Override
     public void onOpened() {
         super.onOpened();
 
-        UILabel subitle = find("subtitle", UILabel.class);
-        subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + universe.getWorldName().toString());
-        UIText customWorldName = find("customisedWorldName", UIText.class);
-        setCustomWorldName(customWorldName);
+        UILabel subtitle = find("subtitle", UILabel.class);
+        subtitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + universe.getGameName().toString());
     }
 
     /**

@@ -196,23 +196,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             zoomSlider.setUiSliderOnChangeTriggeredListener(this);
         }
 
-        final UIText worldName = find("worldName", UIText.class);
-        worldName.bindText(new Binding<String>() {
-            @Override
-            public String get() {
-                if (universeWrapper.getWorldName() == null) {
-                    return "";
-                }
-                return universeWrapper.getWorldName().toString();
-            }
-
-            @Override
-            public void set(String value) {
-                // no-op
-                // field should be read-only
-            }
-        });
-
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             if (universeWrapper.getWorldGenerator() != null) {
                 universeWrapper.setSeed(createRandomSeed());

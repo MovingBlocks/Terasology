@@ -179,27 +179,6 @@
                 }
               },
               {
-                "type": "UILabel",
-                "text": "${engine:menu#game-worlds}:",
-                "id": "worldLabel",
-                "family": "left-label",
-                "layoutInfo": {
-                  "position-horizontal-center": {},
-                  "position-top": {
-                    "target": "BOTTOM",
-                    "widget": "zoomSlider",
-                    "offset": 0
-                  }
-                }
-              },
-              {
-                "type": "engine:UIText",
-                "id": "worldName",
-                "readOnly": true,
-                "enabled": false,
-                "layoutInfo": {}
-              },
-              {
                 "type": "RowLayout",
                 "id": "worldGenActions",
                 "horizontalSpacing": 4,
