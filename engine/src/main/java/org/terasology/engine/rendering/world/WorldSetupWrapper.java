@@ -23,9 +23,10 @@ public class WorldSetupWrapper {
      * @param worldName The World Name which is displayed in the drop-downs.
      * @param worldGeneratorInfo Contains the {@link WorldGeneratorInfo} object for that world.
      */
-    public WorldSetupWrapper(Name worldName, WorldGeneratorInfo worldGeneratorInfo) {
+    public WorldSetupWrapper(Name worldName, WorldGeneratorInfo worldGeneratorInfo, WorldGenerator worldGenerator) {
         this.worldName = worldName;
         this.worldGeneratorInfo = worldGeneratorInfo;
+        this.worldGenerator = worldGenerator;
     }
 
     public WorldGeneratorInfo getWorldGeneratorInfo() {

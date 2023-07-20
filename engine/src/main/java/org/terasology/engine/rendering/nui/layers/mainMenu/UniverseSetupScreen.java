@@ -258,8 +258,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                 return;
             }
 
-            ensureWorldGeneratorIsSet();
-
             final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
@@ -268,15 +266,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             } else {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
-
-            SimpleUri uri;
-            WorldInfo worldInfo;
-            //TODO: if we don't do that here, where do we do it? or does the world not show up in the game manifest?
-            //gameManifest.addWorld(worldInfo);
-
-            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer())
-                    ? NetworkMode.DEDICATED_SERVER
-                    : NetworkMode.NONE));
         });
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
@@ -332,11 +321,14 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
-        String selectedWorldName = worldGeneratorInfo.getDisplayName();
-
-        universeWrapper.setTargetWorld(new WorldSetupWrapper(new Name(selectedWorldName), worldGeneratorInfo));
-        ensureWorldGeneratorIsSet();
-        universeWrapper.getTargetWorld().getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+        try {
+            WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGeneratorInfo.getUri(), context, environment);
+            worldGenerator.setWorldSeed(universeWrapper.getSeed());
+            universeWrapper.setTargetWorld(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName()), worldGeneratorInfo, worldGenerator));
+        } catch (UnresolvedWorldGeneratorException e) {
+            //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
+            e.printStackTrace();
+        }
 
         genTexture();
         List<Zone> previewZones = Lists.newArrayList(universeWrapper.getTargetWorld().getWorldGenerator().getZones())
@@ -459,18 +451,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private String createRandomSeed() {
         String seed = new FastRandom().nextString(32);
         return seed;
-    }
-
-    private void ensureWorldGeneratorIsSet() {
-        if (universeWrapper.getTargetWorld().getWorldGenerator() == null) {
-            try {
-                universeWrapper.getTargetWorld().setWorldGenerator(WorldGeneratorManager.createWorldGenerator(
-                        universeWrapper.getTargetWorld().getWorldGeneratorInfo().getUri(), context, environment));
-            } catch (UnresolvedWorldGeneratorException e) {
-                //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
