@@ -144,6 +144,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                     // get the default generator from the config. This is likely to have a user triggered selection.
                     WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
                     if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
+                        set(info);
                         return info;
                     }
 
@@ -383,18 +384,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
             environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
-        }
-
-        if (universeWrapper.getTargetWorld() != null) {
-            genTexture();
-
-            List<Zone> previewZones = Lists.newArrayList(universeWrapper.getTargetWorld().getWorldGenerator().getZones())
-                    .stream()
-                    .filter(z -> !z.getPreviewLayers().isEmpty())
-                    .collect(Collectors.toList());
-            if (previewZones.isEmpty()) {
-                previewGen = new FacetLayerPreview(environment, universeWrapper.getTargetWorld().getWorldGenerator());
-            }
         }
     }
 
