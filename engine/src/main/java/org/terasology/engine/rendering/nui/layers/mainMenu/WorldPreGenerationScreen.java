@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
