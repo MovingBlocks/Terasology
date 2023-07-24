@@ -58,56 +58,11 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         this.threadMode = threadMode;
     }
 
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.createAssetType(Font.class,
-                FontImpl::new, "fonts");
-        //AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
-        //        (urn, assetType, data) -> (OpenGLTexture.create(urn, assetType, data, this)), "textures", "fonts");
-        AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
-                WgpuTexture::create, "textures", "fonts");
-
-        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
-                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> {
-                    if (path.getPath().get(0).equals(ModuleAssetScanner.OVERRIDE_FOLDER)) {
-                        return path.getPath().get(2).equals("textures");
-                    } else {
-                        return path.getPath().get(1).equals("textures");
-                    }
-                }));
-        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
-                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
-                    if (path.getPath().get(0).equals(ModuleAssetScanner.OVERRIDE_FOLDER)) {
-                        return path.getPath().get(2).equals("fonts");
-                    } else {
-                        return path.getPath().get(1).equals("fonts");
-                    }
-                }));
-        assetTypeManager.createAssetType(Shader.class, (urn, assetType, data) -> GLSLShader.create(urn, assetType, data, this), "shaders");
-        assetTypeManager.createAssetType(Material.class, (urn, assetType, data) ->
-                        GLSLMaterial.create(urn, this, assetType, data),
-                "materials");
-        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data, this),
-                "mesh");
-        assetTypeManager.createAssetType(SkeletalMesh.class,
-                (urn, assetType, data) ->
-                        OpenGLSkeletalMesh.create(urn, assetType, data, this),
-                "skeletalMesh");
-        assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new,
-                "animations", "skeletalMesh");
-        assetTypeManager.createAssetType(Atlas.class, Atlas::new, "atlas");
-        assetTypeManager.createAssetType(MeshAnimationBundle.class, MeshAnimationBundle::new,
-                "skeletalMesh", "animations");
-        assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);
-    }
-
     public void registerRenderingSubsystem(Context context) {
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
     }
 
     public void processActions() {
-//        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
-
         if (!displayThreadActions.isEmpty()) {
             List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
             displayThreadActions.drainTo(actions);

@@ -648,22 +648,22 @@ public class GLSLMaterial extends BaseMaterial {
 
         @Override
         public void close() {
-            try {
-                GameThread.synch(() -> {
-                    logger.debug("Disposing material {}.", urn);
-                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
-                    graphicsProcessing.asynchToDisplayThread(() -> {
-                        TIntIntIterator it = deletedPrograms.iterator();
-                        while (it.hasNext()) {
-                            it.advance();
-                            GL20.glDeleteProgram(it.value());
-                        }
-                    });
-                    shaderPrograms.clear();
-                });
-            } catch (InterruptedException e) {
-                logger.error("Failed to dispose {}", urn, e);
-            }
+//            try {
+//                GameThread.synch(() -> {
+//                    logger.debug("Disposing material {}.", urn);
+//                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
+//                    graphicsProcessing.asynchToDisplayThread(() -> {
+//                        TIntIntIterator it = deletedPrograms.iterator();
+//                        while (it.hasNext()) {
+//                            it.advance();
+//                            GL20.glDeleteProgram(it.value());
+//                        }
+//                    });
+//                    shaderPrograms.clear();
+//                });
+//            } catch (InterruptedException e) {
+//                logger.error("Failed to dispose {}", urn, e);
+//            }
         }
     }
 }
