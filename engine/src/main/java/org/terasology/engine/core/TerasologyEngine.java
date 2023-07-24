@@ -163,7 +163,6 @@ public class TerasologyEngine implements GameEngine {
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
 
-        EngineKernel.initialize();
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -559,7 +558,6 @@ public class TerasologyEngine implements GameEngine {
                 logger.error("Error shutting down {} subsystem", subsystem.getName(), e);
             }
         }
-        EngineKernel.disposeKernel();
     }
 
     /**

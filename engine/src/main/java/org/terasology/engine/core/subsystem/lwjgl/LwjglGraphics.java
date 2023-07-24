@@ -18,9 +18,31 @@ import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
+import org.terasology.engine.rendering.assets.animation.MeshAnimation;
+import org.terasology.engine.rendering.assets.animation.MeshAnimationBundle;
+import org.terasology.engine.rendering.assets.animation.MeshAnimationImpl;
+import org.terasology.engine.rendering.assets.atlas.Atlas;
+import org.terasology.engine.rendering.assets.font.Font;
+import org.terasology.engine.rendering.assets.font.FontImpl;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.shader.Shader;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.engine.rendering.nui.internal.WgpuCanvasRenderer;
+import org.terasology.engine.rendering.opengl.GLSLMaterial;
+import org.terasology.engine.rendering.opengl.GLSLShader;
+import org.terasology.engine.rendering.opengl.OpenGLMesh;
+import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.engine.rendering.opengl.WgpuTexture;
 import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.utilities.OS;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.module.ModuleAssetScanner;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 
@@ -33,13 +55,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     // we don't use context so we need to
     public static long primaryWindow = 0;
+    private EngineKernel kernel = null;
 
     private Context context;
     private RenderingConfig config;
 
     private GameEngine engine;
     private LwjglDisplayDevice lwjglDisplay;
-//    private EngineKernel kernel;
 
     private LwjglGraphicsManager graphics = new LwjglGraphicsManager();
 
@@ -61,13 +83,56 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        graphics.registerCoreAssetTypes(assetTypeManager);
+
+        AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
+                (ResourceUrn urn, AssetType<Texture, TextureData> assetType, TextureData data) -> {
+                    WgpuTexture.TextureResources resources = new WgpuTexture.TextureResources(
+                            data,
+                            this.kernel.resource.createTexture(WgpuTexture.createDesc(data), data.getBuffers()[0])
+                    );
+
+                    return new WgpuTexture(this.kernel, urn, assetType, resources);
+                }, "textures", "fonts");
+        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> {
+                    if (path.getPath().get(0).equals(ModuleAssetScanner.OVERRIDE_FOLDER)) {
+                        return path.getPath().get(2).equals("textures");
+                    } else {
+                        return path.getPath().get(1).equals("textures");
+                    }
+                }));
+        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
+                    if (path.getPath().get(0).equals(ModuleAssetScanner.OVERRIDE_FOLDER)) {
+                        return path.getPath().get(2).equals("fonts");
+                    } else {
+                        return path.getPath().get(1).equals("fonts");
+                    }
+                }));
+        assetTypeManager.createAssetType(Font.class,
+                FontImpl::new, "fonts");
+
+        assetTypeManager.createAssetType(Shader.class, (urn, assetType, data) -> GLSLShader.create(urn, assetType, data, graphics), "shaders");
+        assetTypeManager.createAssetType(Material.class, (urn, assetType, data) ->
+                        GLSLMaterial.create(urn, graphics, assetType, data),
+                "materials");
+        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data, graphics),
+                "mesh");
+        assetTypeManager.createAssetType(SkeletalMesh.class,
+                (urn, assetType, data) ->
+                        OpenGLSkeletalMesh.create(urn, assetType, data, graphics),
+                "skeletalMesh");
+        assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new,
+                "animations", "skeletalMesh");
+        assetTypeManager.createAssetType(Atlas.class, Atlas::new, "atlas");
+        assetTypeManager.createAssetType(MeshAnimationBundle.class, MeshAnimationBundle::new,
+                "skeletalMesh", "animations");
+        assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);
     }
 
     @Override
     public void postInitialise(Context rootContext) {
         graphics.registerRenderingSubsystem(context);
-//        this.kernel = context.get(EngineKernel.class);
 
         if (!GLFW.glfwInit()) {
             throw new RuntimeException("Failed to initialize GLFW");
@@ -87,28 +152,27 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
+        primaryWindow = window;
 
-        switch(GLFW.glfwGetPlatform()) {
+        EngineKernel.EngineKernelBuild builder = new EngineKernel.EngineKernelBuild();
+        switch (GLFW.glfwGetPlatform()) {
             case GLFW.GLFW_PLATFORM_X11:
-                EngineKernel.instance().initializeWinX11Surface(GLFWNativeX11.glfwGetX11Display(),
-                        GLFWNativeX11.glfwGetX11Window(window));
+                builder.configureX11Window(GLFWNativeX11.glfwGetX11Window(window), GLFWNativeX11.glfwGetX11Display());
                 break;
             case GLFW.GLFW_PLATFORM_WIN32:
-                EngineKernel.instance().initializeWin32Surface(
-                        GLFWNativeWin32.nglfwGetWin32Adapter(window),
-                        GLFWNativeWin32.glfwGetWin32Window(window));
+                builder.configureWin32Window(GLFWNativeWin32.glfwGetWin32Window(window), GLFWNativeWin32.nglfwGetWin32Adapter(window));
                 break;
             default:
                 throw new RuntimeException("missing platform: " + GLFW.glfwGetPlatform());
         }
-
+        this.kernel = new EngineKernel(builder);
+        context.put(EngineKernel.class, this.kernel);
+        this.kernel.resizeSurface(lwjglDisplay.getWidth(), lwjglDisplay.getHeight());
 
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
-        primaryWindow = window;
 
-        EngineKernel.instance().resizeSurface(lwjglDisplay.getWidth(), lwjglDisplay.getHeight());
         if (OS.get() != OS.MACOSX) {
             try {
                 String root = "org/terasology/engine/icons/";
@@ -137,7 +201,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             @Override
             public void invoke(long window, int width, int height) {
                 lwjglDisplay.updateViewport(width, height);
-                EngineKernel.instance().resizeSurface(width, height);
+                kernel.resizeSurface(width, height);
             }
         });
 
@@ -151,10 +215,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         boolean gameWindowIsMinimized = GLFW.glfwGetWindowAttrib(LwjglGraphics.primaryWindow, GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
         if (!gameWindowIsMinimized) {
-            EngineKernel kernel = EngineKernel.instance();
-            kernel.cmdPrepare();
+            this.kernel.cmdPrepare();
             currentState.render();
-            kernel.cmdDispatch();
+            this.kernel.cmdDispatch();
         }
 
         lwjglDisplay.update();
@@ -169,7 +232,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void preShutdown() {
-//        long window = GLFW.glfwGetCurrentContext();
         if (primaryWindow != MemoryUtil.NULL) {
             boolean isVisible = GLFW.glfwGetWindowAttrib(primaryWindow, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
             boolean isFullScreen = lwjglDisplay.isFullscreen();
@@ -195,9 +257,4 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void shutdown() {
         GLFW.glfwTerminate();
     }
-
-    private void initWindow() {
-
-    }
-
 }

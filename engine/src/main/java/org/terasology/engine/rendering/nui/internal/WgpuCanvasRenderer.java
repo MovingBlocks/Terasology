@@ -34,13 +34,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
-    private DisplayDevice displayDevice;
     private static final float SHADOW_DEPTH = -2;
     private static final int SHADOW_HORIZONTAL_OFFSET = 1;
     private static final int SHADOW_VERTICAL_OFFSET = 1;
     private static final int UNKNOWN = -1;
+    private DisplayDevice displayDevice;
+    private final EngineKernel kernel;
 
     public WgpuCanvasRenderer(Context context) {
+        this.kernel = context.get(EngineKernel.class);
         this.displayDevice = context.get(DisplayDevice.class);
     }
 
@@ -61,8 +63,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
     @Override
     public void crop(Rectanglei cropRegion) {
-        EngineKernel kernel = EngineKernel.instance();
-        kernel.cmdUISetCrop(Optional.of(new Rectanglef(cropRegion.minX(), cropRegion.minY(), cropRegion.maxX(), cropRegion.maxY())));
+        kernel.ui.cmdUISetCrop(Optional.of(new Rectanglef(cropRegion.minX(), cropRegion.minY(), cropRegion.maxX(), cropRegion.maxY())));
     }
 
     @Override
@@ -72,11 +73,10 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
     @Override
     public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegion, float ux, float uy, float uw, float uh, float alpha) {
-        EngineKernel kernel = EngineKernel.instance();
         if (texture instanceof WgpuTexture) {
             Vector2fc size = ((WgpuTexture) texture).getTeraTexture().getSize();
 
-            kernel.cmdUIDrawTexture(
+            kernel.ui.cmdUIDrawTexture(
                     ((WgpuTexture) texture).getTeraTexture(),
                     new Rectanglef(ux, uy , ux + uw, uy + uh),
                     new Rectanglef(absoluteRegion.minX(), absoluteRegion.minY(), absoluteRegion.maxX(), absoluteRegion.maxY()));
@@ -86,8 +86,6 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
     @Override
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion, Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
-
-        EngineKernel kernel = EngineKernel.instance();
 
         List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.getSizeX());
         Vector2i offset = new Vector2i(absoluteRegion.minX, absoluteRegion.minY);
@@ -113,14 +111,14 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                 float texRight = texLeft + character.getTexWidth();
 
                 if (shadowColor.a() != 0) {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) character.getPage()).getTeraTexture(),
                             new Rectanglef(texLeft, texTop, texRight, texBottom),
                             new Rectanglef(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)
                                     .translate(SHADOW_HORIZONTAL_OFFSET, SHADOW_VERTICAL_OFFSET),
                             shadowColor.rgba());
                 }
-                kernel.cmdUIDrawTexture(
+                kernel.ui.cmdUIDrawTexture(
                         ((WgpuTexture) character.getPage()).getTeraTexture(),
                         new Rectanglef(texLeft, texTop, texRight, texBottom),
                         new Rectanglef(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y));
@@ -133,7 +131,6 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
     @Override
     public void drawTextureBordered(UITextureRegion texture, Rectanglei absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
-        EngineKernel kernel = EngineKernel.instance();
         Vector2i textureSize = new Vector2i(TeraMath.ceilToInt(texture.getWidth() * uw),
                 TeraMath.ceilToInt(texture.getHeight() * uh));
         Rectanglei region = new Rectanglei(absoluteRegion);
@@ -170,7 +167,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                                 drawRegion.getSizeX()) - left) / tileW;
                         float texCoordBottom = subTextureRegion.minY + subTextureRegion.getSizeY() * (Math.min(top + tileH,
                                 drawRegion.getSizeY()) - top) / tileH;
-                        kernel.cmdUIDrawTexture(
+                        kernel.ui.cmdUIDrawTexture(
                                 ((WgpuTexture) texture).getTeraTexture(),
                                 new Rectanglef(texCoordLeft, texCoordTop, texCoordRight, texCoordBottom),
                                 new Rectanglef(vertLeft, vertTop, vertRight, vertBottom));
@@ -193,7 +190,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
             if (border.getTop() != 0) {
                 if (border.getLeft() != 0) {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(0, 0, leftTex, topTex),
                             new Rectanglef(0, 0, left, top)
@@ -206,7 +203,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                             new Vector2i(textureSize.x - border.getTotalWidth(), border.getTop()),
                             new Rectanglef(leftTex, 0, rightTex, topTex));
                 } else {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(leftTex, 0, rightTex, topTex),
                             new Rectanglef(left, 0, right, top)
@@ -214,7 +211,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                                     .translate(region.minX, region.minY));
                 }
                 if (border.getRight() != 0) {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(rightTex, 0, 1, topTex),
                             new Rectanglef(right, 0, 1, top)
@@ -230,7 +227,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                             new Vector2i(border.getLeft(), textureSize.y - border.getTotalHeight()),
                             new Rectanglef(0, topTex, leftTex, bottomTex));
                 } else {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(0, topTex, leftTex, bottomTex),
                             new Rectanglef( 0, top, left, bottom)
@@ -245,7 +242,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                         new Vector2i(textureSize.x - border.getTotalWidth(), textureSize.y - border.getTotalHeight()),
                         new Rectanglef(leftTex, topTex, rightTex, bottomTex));
             } else {
-                kernel.cmdUIDrawTexture(
+                kernel.ui.cmdUIDrawTexture(
                         ((WgpuTexture) texture).getTeraTexture(),
                         new Rectanglef(leftTex, topTex, rightTex, bottomTex),
                         new Rectanglef(left, top, right, bottom)
@@ -261,7 +258,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                             new Vector2i(border.getRight(), textureSize.y - border.getTotalHeight()),
                             new Rectanglef(rightTex, topTex, 1, bottomTex));
                 } else {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(rightTex, topTex, 1, bottomTex),
                             new Rectanglef(right, top, 1, bottom)
@@ -272,7 +269,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
 
             if (border.getBottom() != 0) {
                 if (border.getLeft() != 0) {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(0, bottomTex, leftTex, 1),
                             new Rectanglef(0, bottom, left, 1)
@@ -286,7 +283,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                             new Vector2i(textureSize.x - border.getTotalWidth(), border.getBottom()),
                             new Rectanglef(leftTex, bottomTex, rightTex, 1));
                 } else {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(leftTex, bottomTex, rightTex, 1),
                             new Rectanglef(left, bottom, right, 1)
@@ -294,7 +291,7 @@ public class WgpuCanvasRenderer implements TerasologyCanvasRenderer {
                                     .translate(region.minX, region.minY));
                 }
                 if (border.getRight() != 0) {
-                    kernel.cmdUIDrawTexture(
+                    kernel.ui.cmdUIDrawTexture(
                             ((WgpuTexture) texture).getTeraTexture(),
                             new Rectanglef(rightTex, bottomTex, 1, 1),
                             new Rectanglef(right, bottom, 1, 1)
