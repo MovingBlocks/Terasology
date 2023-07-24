@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import org.joml.Vector2i;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.rust.TeraTexture;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
@@ -18,31 +19,27 @@ import java.util.List;
 
 
 public class WgpuTexture extends Texture  {
-
     private TextureResources resource;
-
-    private static TeraTexture.TextureDesc createDesc(TextureData data) {
+    private final EngineKernel kernel;
+    public static TeraTexture.TextureDesc createDesc(TextureData data) {
         TeraTexture.TextureDesc desc = new TeraTexture.TextureDesc();
-        desc.format = TeraTexture.ImageFormat.R8G8B8A8_UNORM;
-        desc.dim = TeraTexture.TextureDimension.DIM_2D;
-        desc.width = data.getWidth();
-        desc.height = data.getHeight();
-        desc.layers = 1;
+        desc.setFormat(TeraTexture.ImageFormat.R8G8B8A8_UNORM)
+                .setDim(TeraTexture.TextureDimension.DIM_2D)
+                .setWidth(data.getWidth())
+                .setHeight(data.getHeight())
+                .setLayers(1);
         return desc;
     }
 
-    public WgpuTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureResources textureResources) {
+    public WgpuTexture(EngineKernel kernel, ResourceUrn urn, AssetType<Texture, TextureData> assetType, TextureResources textureResources) {
         super(urn, assetType);
+        this.kernel = kernel;
         this.resource = textureResources;
-    }
-
-    public static WgpuTexture create(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
-        return new WgpuTexture(urn, assetType, new TextureResources(data, TeraTexture.createFromBuffer(createDesc(data), data.getBuffers()[0])));
     }
 
     @Override
     protected void doReload(TextureData data) {
-        this.resource = new TextureResources(data, TeraTexture.createFromBuffer(createDesc(data), data.getBuffers()[0]));
+        this.resource = new TextureResources(data, this.kernel.resource.createTexture(createDesc(data), data.getBuffers()[0]));
     }
 
     @Override
@@ -119,12 +116,12 @@ public class WgpuTexture extends Texture  {
         return this.resource.texture;
     }
 
-    private static class TextureResources implements DisposableResource {
+    public static class TextureResources implements DisposableResource {
         private final TeraTexture texture;
         private final List<DisposableResource> disposalSubscribers = Lists.newArrayList();
         private final TextureData data;
 
-        TextureResources(TextureData data, TeraTexture texture) {
+        public TextureResources(TextureData data, TeraTexture texture) {
             this.data = data;
             this.texture = texture;
         }
