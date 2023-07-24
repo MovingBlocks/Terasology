@@ -116,25 +116,9 @@ public class GLSLShader extends Shader {
         return availableFeatures;
     }
 
-    // made package-private after CheckStyle suggestion
-    int linkShaderProgram(int featureHash) {
-//        int shaderProgram = GL20.glCreateProgram();
-//
-//        GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
-//        GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
-//        if (shaderProgramBase.getGeometryProgram() != null) {
-//            GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
-//        }
-//        GL20.glLinkProgram(shaderProgram);
-//        GL20.glValidateProgram(shaderProgram);
-        return 0;
-    }
 
     @Override
     public void recompile() {
-        graphicsProcessing.asynchToDisplayThread(() -> {
-//            registerAllShaderPermutations();
-        });
     }
 
 

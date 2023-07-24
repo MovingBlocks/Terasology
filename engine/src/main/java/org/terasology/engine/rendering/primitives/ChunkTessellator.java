@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.primitives;
 import com.google.common.base.Stopwatch;
 import org.joml.Vector3f;
 import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.chunks.Chunks;
@@ -18,9 +19,10 @@ import java.util.concurrent.TimeUnit;
 public final class ChunkTessellator {
 
     private static int statVertexArrayUpdateCount;
+    private final EngineKernel kernel;
 
-    public ChunkTessellator() {
-
+    public ChunkTessellator(EngineKernel kernel) {
+        this.kernel = kernel;
     }
 
     public ChunkMesh generateMesh(ChunkView chunkView) {

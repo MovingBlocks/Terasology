@@ -26,7 +26,7 @@ public abstract class ModuleRendering {
     protected Context context;
     protected ModuleManager moduleManager;
     protected Name providingModule;
-    protected RenderGraph renderGraph;
+//    protected RenderGraph renderGraph;
     protected WorldRenderer worldRenderer;
     protected Boolean isEnabled = true;
 
@@ -61,7 +61,7 @@ public abstract class ModuleRendering {
     }
 
     public void initialise() {
-        renderGraph = context.get(RenderGraph.class);
+//        renderGraph = context.get(RenderGraph.class);
         worldRenderer = context.get(WorldRenderer.class);
     }
 
