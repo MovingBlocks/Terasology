@@ -31,6 +31,7 @@ import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
 import org.terasology.engine.rendering.backdrop.Skysphere;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.world.DeferredRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.world.BlockEntityRegistry;
@@ -159,8 +160,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         BackdropProvider backdropProvider = skysphere;
         context.put(BackdropProvider.class, backdropProvider);
 
-        RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
+        WorldRenderer worldRenderer = new DeferredRenderer(context);
         context.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer

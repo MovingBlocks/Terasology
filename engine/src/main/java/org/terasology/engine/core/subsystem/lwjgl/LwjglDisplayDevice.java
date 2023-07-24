@@ -178,7 +178,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public void prepareToRender() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     @Override

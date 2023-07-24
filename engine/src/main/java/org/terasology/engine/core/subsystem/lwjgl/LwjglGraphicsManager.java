@@ -4,48 +4,18 @@ package org.terasology.engine.core.subsystem.lwjgl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
-import org.terasology.engine.rendering.assets.animation.MeshAnimation;
-import org.terasology.engine.rendering.assets.animation.MeshAnimationBundle;
-import org.terasology.engine.rendering.assets.animation.MeshAnimationImpl;
-import org.terasology.engine.rendering.assets.atlas.Atlas;
-import org.terasology.engine.rendering.assets.font.Font;
-import org.terasology.engine.rendering.assets.font.FontImpl;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.shader.Shader;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
-import org.terasology.engine.rendering.assets.texture.TextureData;
-import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
-import org.terasology.engine.rendering.opengl.GLSLMaterial;
-import org.terasology.engine.rendering.opengl.GLSLShader;
-import org.terasology.engine.rendering.opengl.OpenGLMesh;
-import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
-import org.terasology.engine.rendering.opengl.OpenGLTexture;
-import org.terasology.engine.rendering.opengl.WgpuTexture;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.module.ModuleAssetScanner;
-import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.function.Consumer;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexParameterf;
 
 public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
 
