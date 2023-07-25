@@ -176,8 +176,7 @@
           {
             "type": "UIButton",
             "text": "${engine:menu#start-playing}",
-            "id": "play",
-            "enabled": false
+            "id": "play"
           }
         ],
         "layoutInfo": {
@@ -204,24 +203,6 @@
           },
           "position-right": {
             "target": "LEFT",
-            "widget": "container",
-            "offset": 16
-          }
-        }
-      },
-      {
-        "type": "UIButton",
-        "text": "${engine:menu#continue-spawn-preview}",
-        "id": "continue",
-        "layoutInfo": {
-          "width": 120,
-          "height": 80,
-          "position-vertical-center": {
-            "target": "CENTER",
-            "widget": "container"
-          },
-          "position-left": {
-            "target": "RIGHT",
             "widget": "container",
             "offset": 16
           }
