@@ -34,7 +34,7 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
 
 
     @Override
-    public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
+    public void generateChunkMesh(ChunkView view, ChunkMeshBufferGroup chunkMesh, int x, int y, int z) {
         final BlockAppearance blockAppearance = block.getPrimaryAppearance();
         if (!blockAppearance.hasAppearance()) {
             // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
@@ -92,7 +92,7 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
                             .setGreen(colorSource.gf() * colorOffset.gf())
                             .setBlue(colorSource.bf() * colorOffset.bf())
                             .setAlpha(colorSource.af() * colorOffset.af());
-                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, colorCache, sideVertexFlag);
+                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, block, colorCache, sideVertexFlag);
                 }
             }
         }
@@ -104,7 +104,7 @@ public class BlockMeshGeneratorSingleShape extends BlockMeshShapeGenerator {
                     .setGreen(colorSource.gf() * colorOffset.gf())
                     .setBlue(colorSource.bf() * colorOffset.bf())
                     .setAlpha(colorSource.af() * colorOffset.af());
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, colorCache, vertexFlag);
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, block, colorCache, vertexFlag);
         }
     }
 

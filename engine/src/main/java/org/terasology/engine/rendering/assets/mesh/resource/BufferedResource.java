@@ -39,7 +39,7 @@ public abstract class BufferedResource {
         return this.version;
     }
 
-    ByteBuffer buffer() {
+    public ByteBuffer buffer() {
         return this.buffer;
     }
 

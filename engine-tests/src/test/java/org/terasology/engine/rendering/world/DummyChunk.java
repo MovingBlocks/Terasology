@@ -7,6 +7,7 @@ import com.google.common.base.MoreObjects;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rust.resource.ChunkGeometry;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
@@ -19,7 +20,7 @@ import java.text.NumberFormat;
 public class DummyChunk implements Chunk {
     private final Vector3ic chunkPos;
     private boolean dirty;
-    private ChunkMesh mesh;
+    private ChunkGeometry mesh;
     private boolean ready;
 
     public DummyChunk(Vector3ic position) {
@@ -147,7 +148,7 @@ public class DummyChunk implements Chunk {
     }
 
     @Override
-    public void setMesh(ChunkMesh newMesh) {
+    public void setMesh(ChunkGeometry newMesh) {
         this.mesh = newMesh;
     }
 
@@ -167,7 +168,7 @@ public class DummyChunk implements Chunk {
     }
 
     @Override
-    public ChunkMesh getMesh() {
+    public ChunkGeometry getMesh() {
         return mesh;
     }
 

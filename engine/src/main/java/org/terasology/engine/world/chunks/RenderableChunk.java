@@ -3,6 +3,7 @@
 package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3f;
+import org.terasology.engine.rust.resource.ChunkGeometry;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
@@ -17,7 +18,7 @@ public interface RenderableChunk {
 
     AABBfc getAABB();
 
-    void setMesh(ChunkMesh newMesh);
+    void setMesh(ChunkGeometry newMesh);
 
     void setAnimated(boolean animated);
 
@@ -25,7 +26,7 @@ public interface RenderableChunk {
 
     boolean hasMesh();
 
-    ChunkMesh getMesh();
+    ChunkGeometry getMesh();
 
     void disposeMesh();
 

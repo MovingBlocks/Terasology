@@ -7,6 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.world.ChunkView;
@@ -80,32 +81,38 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
-                         ChunkMesh.RenderType renderType, Colorc colorOffset, ChunkVertexFlag flags) {
-        ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
-        for (Vector2f texCoord : texCoords) {
-            elements.uv0.put(texCoord);
-        }
+    public void appendTo(BlockMeshGenerator.ChunkMeshBufferGroup chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
+                         Block block, Colorc colorOffset, ChunkVertexFlag flags) {
 
-        int nextIndex = elements.vertexCount;
-        elements.buffer.reserveElements(nextIndex + vertices.length);
+        BlockMeshGenerator.ChunkMeshBuffer opaque = chunk.opaque;
+//        if(!block.isTranslucent()) {
+//            chunk.opaque;
+//        }
+
+//        BlockMeshGenerator.ChunkMeshBufferGroup.Geometry geometry = chunk.geometries[renderType.ordinal()];
+//        for (Vector2f texCoord : texCoords) {
+//            elements.uv0.put(texCoord);
+//        }
+
+        int nextIndex = opaque.cursor;
+        opaque.positionBuffer.reserveElements(nextIndex + vertices.length);
         Vector3f pos = new Vector3f();
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            elements.color.put(colorOffset);
-            elements.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
-            elements.normals.put(normals[vIdx]);
-            elements.flags.put((byte) (flags.getValue()));
-            elements.frames.put((byte) (texFrames - 1));
-            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ,
-                    new Vector3f()), normals[vIdx]);
-            elements.sunlight.put(lightingData[0]);
-            elements.blockLight.put(lightingData[1]);
-            elements.ambientOcclusion.put(lightingData[2]);
+//            elements.color.put(colorOffset);
+            opaque.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
+//            elements.normals.put(normals[vIdx]);
+//            elements.flags.put((byte) (flags.getValue()));
+//            elements.frames.put((byte) (texFrames - 1));
+//            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ,
+//                    new Vector3f()), normals[vIdx]);
+//            elements.sunlight.put(lightingData[0]);
+//            elements.blockLight.put(lightingData[1]);
+//            elements.ambientOcclusion.put(lightingData[2]);
         }
-        elements.vertexCount += vertices.length;
+        opaque.cursor += vertices.length;
 
         for (int index : indices) {
-            elements.indices.put(index + nextIndex);
+            opaque.indices.put(index + nextIndex);
         }
     }
 
