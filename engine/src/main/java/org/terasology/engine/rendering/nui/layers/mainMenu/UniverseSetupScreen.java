@@ -186,7 +186,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
             @Override
             public void set(String value) {
-                universeWrapper.setSeed(value);
+                setSeed(value);
             }
         });
 
@@ -198,8 +198,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             if (universeWrapper.getWorldGenerator() != null) {
-                universeWrapper.setSeed(createRandomSeed());
-                universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+                setSeed(createRandomSeed());
                 updatePreview();
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -242,6 +241,11 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
             getManager().pushScreen("engine:mainMenuScreen");
         });
+    }
+
+    private void setSeed(String value) {
+        universeWrapper.setSeed(value);
+        universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
     }
 
     @Override
