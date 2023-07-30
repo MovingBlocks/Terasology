@@ -83,15 +83,15 @@ Starting from there, the game engine is initialized and started according to the
 
 The execution flow is as follows:
 
-1. A `TerasologyEngineBuilder` is instantiated to preparet the game engine.
+1. A `TerasologyEngineBuilder` is instantiated to prepare the game engine.
 
 1. Additional subsystems are collected via the builder. This creates and adds subsystems that are specific for running Terasology on a PC. The facade also chooses respective subsystem implementations depending on whether the game is run in _headless mode_.
 
-1. The builder is used to create an instance of a `TerasologyEngine` which is subsequently initalized (`TerasologyEngine#initialize`, not to be confused with `GameEngine#initializeRun`). This trigger initialization of the engine for subsystems and asset managemet. This does not start the game loop yet.
+1. The builder is used to create an instance of `TerasologyEngine` which is subsequently initialized (`TerasologyEngine#initialize`, not to be confused with `GameEngine#initializeRun`). This triggers initialization of the engine for subsystems and asset management. This does not start the game loop yet.
 
 1. Depending on the arguments provided by the user, the facade creates an appropriate `GameState`
     - `HeadlessSetup` if the game is started in _headless mode_
-    - `Loading` if a game should diretly be loaded (either by loading a save game or by creating a new one)
+    - `Loading` if a game should directly be loaded (either by loading a save game or by creating a new one)
     - `MainMenu` otherwise
 
 1. This state is passed to `TerasologyEngine#run` to start the game loop with the given state.
