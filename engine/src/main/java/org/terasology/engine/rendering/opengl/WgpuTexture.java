@@ -8,7 +8,7 @@ import org.joml.Vector2i;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rust.EngineKernel;
-import org.terasology.engine.rust.TeraTexture;
+import org.terasology.engine.rust.resource.TeraTexture;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
