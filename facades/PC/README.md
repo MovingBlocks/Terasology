@@ -14,6 +14,7 @@ Developers will most often use the PC Facade via [Gradle](#gradle) or via a run 
 
 The PC Facade provides a command-line interface (CLI) for configuring Terasology.
 See the usage help (`./Terasology --help`) for a full overview.
+For implementing the CLI, we make use of the [PicoCLI](https://picocli.info/) framework for Java command-line applications.
 
 ```sh
 ./Terasology --help
@@ -85,7 +86,7 @@ The execution flow is as follows:
 
 1. A `TerasologyEngineBuilder` is instantiated to prepare the game engine.
 
-1. Additional subsystems are collected via the builder. This creates and adds subsystems that are specific for running Terasology on a PC. The facade also chooses respective subsystem implementations depending on whether the game is run in _headless mode_.
+1. Additional subsystems are collected via the builder. This creates and adds subsystems that are specific for running Terasology on a PC. The facade also chooses respective subsystem implementations depending on whether the game is run in _headless mode_. For instance, for a headless server it would choose `HeadlessGraphics` instead of `LwjglGraphics`.
 
 1. The builder is used to create an instance of `TerasologyEngine` which is subsequently initialized (`TerasologyEngine#initialize`, not to be confused with `GameEngine#initializeRun`). This triggers initialization of the engine for subsystems and asset management. This does not start the game loop yet.
 
