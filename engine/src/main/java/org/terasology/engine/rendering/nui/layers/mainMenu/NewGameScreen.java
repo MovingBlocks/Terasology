@@ -134,7 +134,7 @@ public class NewGameScreen extends CoreScreenLayer {
         AdvancedGameSetupScreen advancedSetupGameScreen = getManager().createScreen(AdvancedGameSetupScreen.ASSET_URI, AdvancedGameSetupScreen.class);
         WidgetUtil.trySubscribe(this, "advancedSetup", button -> {
             universeWrapper.setGameName(gameName.getText());
-            advancedSetupGameScreen.setUniverseWrapper(universeWrapper);
+            advancedSetupGameScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(advancedSetupGameScreen);
         });
 

@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.SelectModulesConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
@@ -25,6 +27,7 @@ import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
@@ -103,7 +106,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
     private SelectModulesConfig selectModulesConfig;
-    private UniverseWrapper universeWrapper;
+    private Context context;
 
     @Override
     public void onOpened() {
@@ -496,11 +499,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
+            context.get(UniverseWrapper.class).setSeed(seed.getText());
             final UniverseSetupScreen universeSetupScreen = getManager()
                     .createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            universeWrapper.setSeed(seed.getText());
             saveConfiguration();
-            universeSetupScreen.setEnvironment(universeWrapper);
+            universeSetupScreen.setEnvironment();
             triggerForwardAnimation(universeSetupScreen);
         });
 
@@ -509,12 +512,12 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).
                         setMessage("Error", "Game seed cannot be empty!");
             } else {
-                universeWrapper.setSeed(seed.getText());
+                context.get(UniverseWrapper.class).setSeed(seed.getText());
                 saveConfiguration();
-                final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+                final GameManifest gameManifest = GameManifestProvider.createGameManifest(context.get(UniverseWrapper.class), moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest,
-                            (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                            (context.get(UniverseWrapper.class).getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
                     getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                             .setMessage("Error", "Can't create new game!");
@@ -779,7 +782,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
-    public void setUniverseWrapper(UniverseWrapper wrapper) {
-        universeWrapper = wrapper;
+    public void setEnvironment(UniverseWrapper wrapper) {
+        context = new ContextImpl();
+        context.put(UniverseWrapper.class, wrapper);
+        CoreRegistry.setContext(context);
     }
 }
