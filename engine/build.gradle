@@ -195,7 +195,7 @@ sourceSets {
 }
 
 task jmh(type: JavaExec, dependsOn: jmhClasses) {
-    main = 'org.openjdk.jmh.Main'
+    mainClass = 'org.openjdk.jmh.Main'
     classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
 }
 
