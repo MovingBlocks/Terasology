@@ -43,7 +43,7 @@ plugins {
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 
-    id("com.google.protobuf") version "0.8.16" apply false
+    id("com.google.protobuf") version "0.9.4" apply false
     id("terasology-repositories")
 }
 
