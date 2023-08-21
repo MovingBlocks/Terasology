@@ -168,7 +168,7 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
 
     inputs.property("dateTime", startDateTimeString)
     from(templatesDir)
-    into("$buildDir/versionfile")
+    into(layout.buildDirectory.dir("versionfile").get().asFile)
     include(versionFileName)
     expand(mapOf(
         "buildNumber" to env["BUILD_NUMBER"],
@@ -205,7 +205,7 @@ val distForLauncher = tasks.register<Zip>("distForLauncher") {
             if (this.sourcePath == "Terasology" || this.sourcePath == "Terasology.bat") {
                 // I don't know how the "lib/" makes its way in to the classpath used by CreateStartScripts,
                 // so we're adjusting it after-the-fact.
-                filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory))
+                filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory) as Transformer<String?, String>)
             }
         }
     })
@@ -248,7 +248,7 @@ tasks.register<Task>("testDist") {
     dependsOn("testDistForLauncher", "testDistZip")
 }
 
-class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String, String> {
+class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String?, String> {
     private val isBatchFile = file.name.endsWith(".bat")
 
     override fun transform(line: String): String = if (isBatchFile) {
