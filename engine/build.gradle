@@ -251,7 +251,7 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
         property("dateTime", startDateTimeString)
     }
 
-    outputFile = "$buildDir/createVersionInfoFile/versionInfo.properties"
+    destinationFile = layout.buildDirectory.dir("createrVersionInfoFile").get().file("versionInfo.properties")
 }
 
 tasks.named("processResources", Copy) {
