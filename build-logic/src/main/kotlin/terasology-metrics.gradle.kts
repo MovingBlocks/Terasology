@@ -93,9 +93,6 @@ configure<PmdExtension> {
 }
 
 configure<SpotBugsExtension> {
-    // The version of the spotbugs tool https://github.com/spotbugs/spotbugs
-    // not necessarily the same as the version of spotbugs-gradle-plugin
-    toolVersion.set("4.7.0")
     ignoreFailures.set(true)
     excludeFilter.set(file(rootDir.resolve("config/metrics/findbugs/findbugs-exclude.xml")))
 }
