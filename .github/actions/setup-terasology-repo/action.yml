@@ -4,6 +4,8 @@ description: Setup JDK and Gradle for Terasology
 runs:
   using: "composite"
   steps:
+    - name: Checkout Sources
+      uses: actions/checkout@v3
     - name: Set up JDK
         uses: actions/setup-java@v3
         with:
