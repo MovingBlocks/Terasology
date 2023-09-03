@@ -56,4 +56,4 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2      
       - name: Static Code Analysis
-        run: ./gradlew check -x test
+        run: ./gradlew check -x test --scan
