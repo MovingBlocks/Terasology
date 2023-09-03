@@ -16,5 +16,16 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Execute Gradle Build
-        run: ./gradlew build
+      - name: Build Distribution for Launcher
+        run: ./gradlew distForLauncher
+      - name: Unit Tests
+        run: ./gradlew unitTest
+      - name: Integration Tests
+        run: ./gradlew integrationTest
+      - name: Static Code Analysis
+        run: ./gradlew check -x test
+      - name: API Documentation
+        run: ./gradlew javadoc
+      - name: Publish
+        run: echo "TODO"
+        
