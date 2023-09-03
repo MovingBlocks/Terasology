@@ -6,21 +6,19 @@ jobs:
   validate-gradle-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'adopt'
+      - uses: actions/checkout@v3      
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
   build:
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
       - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: adopt
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Build Distribution for Launcher
@@ -39,8 +37,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: 11
+          distribution: adopt
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2      
       - name: Integration Tests
@@ -53,8 +51,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: 11
+          distribution: adopt
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2      
       - name: Static Code Analysis
