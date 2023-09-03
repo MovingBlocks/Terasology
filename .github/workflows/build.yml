@@ -54,4 +54,19 @@ jobs:
         uses: gradle/gradle-build-action@v2      
       - name: Static Code Analysis
         run: ./gradlew check -x test
+  build-with-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Build With Gradlew
+        run: ./gradlew build --scan
         
