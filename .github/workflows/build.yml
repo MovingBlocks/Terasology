@@ -6,13 +6,14 @@ jobs:
   validate-gradle-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3      
+      - uses: actions/checkout@v3
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
   build:
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-terasology-repo
       - name: Build Distribution for Launcher
         run: ./gradlew extractConfig extractNatives distForLauncher testDist
@@ -34,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-terasology-repo
       - name: Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
