@@ -45,8 +45,8 @@ println "Version for $project.name loaded as $version for group $group"
 
 sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main.java.outputDir = new File("$buildDir/classes")
-    test.java.outputDir = new File("$buildDir/testClasses")
+    main.java.destinationDirectory = new File("$buildDir/classes")
+    test.java.destinationDirectory = new File("$buildDir/testClasses")
 }
 
 // Primary dependencies definition
@@ -88,14 +88,21 @@ dependencies {
     // See terasology-metrics for other test-only internal dependencies
 }
 
+//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type:Copy) {
-    from sourceSets.main.output.resourcesDir
+    from tasks.named("processResources")
     into sourceSets.main.output.classesDirs.first()
 }
 
+tasks.named("compileJava"){
+    dependsOn(copyResourcesToClasses)
+}
+
+jar { // Workaround about previous copy to classes. idk why engine-tests:jar called before :engine ...
+    duplicatesStrategy = "EXCLUDE"
+}
+
 test {
-    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-    dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
     description("Runs all tests (slow)")
@@ -104,8 +111,6 @@ test {
 }
 
 task unitTest(type: Test) {
-    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-    dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
     group "Verification"
@@ -118,8 +123,6 @@ task unitTest(type: Test) {
 }
 
 task integrationTest(type: Test) {
-    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-    dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
     group "Verification"

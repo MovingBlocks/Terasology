@@ -45,8 +45,9 @@ sourceSets {
         }
         java {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-            outputDir = new File("$buildDir/classes")
+            destinationDirectory = new File("$buildDir/classes")
         }
+        test.java.destinationDirectory = new File("$buildDir/testClasses")
     }
 }
 
@@ -189,6 +190,7 @@ sourceSets {
         java.srcDirs = ['src/jmh/java']
         resources.srcDirs = ['src/jmh/resources']
         compileClasspath += sourceSets.main.runtimeClasspath
+        java.destinationDirectory = new File("$buildDir/jmhClasses")
     }
 }
 
@@ -263,14 +265,12 @@ tasks.named("processResources", Copy) {
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
-    from sourceSets.main.output.resourcesDir
+    from processResources
     into sourceSets.main.output.classesDirs.first()
 
-    dependsOn processResources
-    mustRunAfter compileJava
 }
 
-tasks.named("classes") {
+tasks.named("compileJava") {
     dependsOn(tasks.named("copyResourcesToClasses"))
 }
 

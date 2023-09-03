@@ -50,7 +50,7 @@ tasks.withType<Test> {
     // If false, the outputs are still collected and visible in the test report, but they don't spam the console.
     testLogging.showStandardStreams = false
     reports {
-        junitXml.isEnabled = true
+        junitXml.required.set(true)
     }
     jvmArgs("-Xms512m", "-Xmx1024m")
 
@@ -58,6 +58,18 @@ tasks.withType<Test> {
     if (project.name != project(":").name) {
         dependsOn(tasks.getByPath(":extractNatives"))
     }
+}
+
+tasks.withType<Checkstyle> {
+    dependsOn(tasks.getByPath(":extractConfig"))
+}
+
+tasks.withType<Pmd> {
+    dependsOn(tasks.getByPath(":extractConfig"))
+}
+
+tasks.withType<SpotBugsTask> {
+    dependsOn(tasks.getByPath(":extractConfig"))
 }
 
 // The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds
@@ -81,9 +93,6 @@ configure<PmdExtension> {
 }
 
 configure<SpotBugsExtension> {
-    // The version of the spotbugs tool https://github.com/spotbugs/spotbugs
-    // not necessarily the same as the version of spotbugs-gradle-plugin
-    toolVersion.set("4.7.0")
     ignoreFailures.set(true)
     excludeFilter.set(file(rootDir.resolve("config/metrics/findbugs/findbugs-exclude.xml")))
 }
