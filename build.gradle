@@ -282,3 +282,15 @@ idea {
 cleanIdea.doLast {
     new File('Terasology.iws').delete()
 }
+
+if (hasProperty('buildScan')
+        // allow to programmically accept the Gradle Build Scan terms of service when running in CI
+        && project.hasProperty('acceptGradleBuildScanTermsOfService') 
+        && project.acceptGradleBuildScanTermsOfService == 'yes') {
+    gradleEnterprise {
+        buildScan {
+            termsOfServiceUrl = "https://gradle.com/terms-of-service"
+            termsOfServiceAgree = "yes"
+        }
+    }
+}
