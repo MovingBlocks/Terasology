@@ -6,14 +6,23 @@ jobs:
   validate-gradle-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3      
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
   build:
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
-      - uses: ./.github/actions/setup-terasology-repo
+      - uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Build Distribution for Launcher
         run: ./gradlew extractConfig extractNatives distForLauncher testDist
       - name: Unit Tests
@@ -26,18 +35,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
-      - uses: ./.github/actions/setup-terasology-repo      
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2      
       - name: Integration Tests
         run: ./gradlew -PacceptGradleBuildScanTermsOfService=yes integrationTest --scan
   code-analysis:
-    name: Static Code Analysis
     runs-on: ubuntu-latest
     needs: validate-gradle-wrapper
     steps:
-      - uses: ./.github/actions/setup-terasology-repo
-      - name: Checkstyle
-        run: ./gradlew checkstyleMain checkstyleTest
-      - name: Spotbugs
-        run: ./gradlew spotbugsMain spotbugsTest
-      - name: PMD
-        run: ./gradlew pmdMain pmdTest
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2      
+      - name: Static Code Analysis
+        run: ./gradlew check -x test
