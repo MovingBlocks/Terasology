@@ -332,4 +332,3 @@ task assembleBuildHarness(type: Zip) {
     // set the archive name
     archiveFileName.set('build-harness.zip')
 }
-    
