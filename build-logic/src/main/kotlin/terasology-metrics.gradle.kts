@@ -60,16 +60,28 @@ tasks.withType<Test> {
     }
 }
 
-tasks.withType<Checkstyle> {
-    dependsOn(tasks.getByPath(":extractConfig"))
-}
+ tasks.withType<Checkstyle> {
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
+ }
 
 tasks.withType<Pmd> {
-    dependsOn(tasks.getByPath(":extractConfig"))
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
 }
 
 tasks.withType<SpotBugsTask> {
-    dependsOn(tasks.getByPath(":extractConfig"))
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
 }
 
 // The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds

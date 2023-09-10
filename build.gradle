@@ -282,3 +282,53 @@ idea {
 cleanIdea.doLast {
     new File('Terasology.iws').delete()
 }
+
+// A task to assemble various files into a single zip for distribution as 'build-harness.zip' for module builds
+task assembleBuildHarness(type: Zip) {
+    description 'Assembles a zip of files useful for module development'
+
+    dependsOn extractNatives
+    from('natives'){
+        include '**/*'
+        // TODO: use output of extractNatives?
+        // TODO: which module needs natives to build?
+        into 'natives'
+    }
+
+    dependsOn extractConfig
+    from('config'){
+        //include 'gradle/**/*', 'metrics/**/*'
+        include '**/*'
+        // TODO: depend on output of extractConfig?
+        into 'config'
+    }
+
+    from('gradle'){
+        include '**/*' // include all files in 'gradle'
+        // TODO: exclude groovy jar?
+        into 'gradle'
+    }
+
+    from('build-logic'){
+        include 'src/**', '*.kts'
+        into 'build-logic'
+    }
+
+    from('templates') {
+        include 'build.gradle'        
+    }
+
+    from('.') {
+        include 'gradlew'
+    }
+
+    // include file 'templates/module.logback-test.xml' as 'src/test/resources/logback-test.xml'
+    from('templates'){
+        include 'module.logback-test.xml'
+        rename 'module.logback-test.xml', 'logback-test.xml'
+        into 'src/test/resources'
+    }
+
+    // set the archive name
+    archiveFileName.set('build-harness.zip')
+}
