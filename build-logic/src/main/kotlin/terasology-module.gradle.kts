@@ -29,10 +29,10 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
     main {
-        java.outputDir = buildDir.resolve("classes")
+        java.destinationDirectory.set(buildDir.resolve("classes"))
     }
     test {
-        java.outputDir = buildDir.resolve("testClasses")
+        java.destinationDirectory.set(buildDir.resolve("testClasses"))
     }
 }
 
@@ -142,6 +142,10 @@ tasks.register<Copy>("syncModuleInfo") {
 tasks.named("processResources") {
     // Make sure the assets directory is included
     dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
+}
+
+tasks.named("compileJava") {
+    dependsOn("processResources")
 }
 
 tasks.named<Test>("test") {
