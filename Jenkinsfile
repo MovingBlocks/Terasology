@@ -121,7 +121,7 @@ pipeline {
 
         stage('Analytics') {
             steps {
-                sh './gradlew --console=plain check -x test'
+                sh './gradlew --console=plain check -x test -x pmdMain -x pmdTest' // TODO: Probably more cleanly remove PMD overall if no use?
             }
             post {
                 always {
@@ -140,8 +140,7 @@ pipeline {
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tools: [
-                            spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true),
-                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                            spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true)
                         ])
 
                     recordIssues(skipBlames: true, enabledForFailure: true,

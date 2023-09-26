@@ -12,7 +12,7 @@ repositories {
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         name "Terasology Artifactory"
-        url "http://artifactory.terasology.org/artifactory/repo"
+        url "https://artifactory.terasology.io/artifactory/repo"
     }
 }
 
