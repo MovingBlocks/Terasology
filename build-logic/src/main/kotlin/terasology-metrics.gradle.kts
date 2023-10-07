@@ -14,8 +14,8 @@ plugins {
 }
 
 dependencies {
-    "pmd"("net.sourceforge.pmd:pmd-core:6.15.0")
-    "pmd"("net.sourceforge.pmd:pmd-java:6.15.0")
+    pmd("net.sourceforge.pmd:pmd-core:6.55.0")
+    pmd("net.sourceforge.pmd:pmd-java:6.55.0")
 
     testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
         because("runtime: to configure logging during tests with logback.xml")
@@ -27,7 +27,7 @@ dependencies {
         because("redirects java.util.logging (from e.g. junit) through slf4j")
     }
 
-    add("testImplementation", platform("org.junit:junit-bom:5.8.1"))
+    add("testImplementation", platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
