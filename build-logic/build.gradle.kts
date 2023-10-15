@@ -7,6 +7,10 @@ plugins {
     `kotlin-dsl`
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 repositories {
     mavenCentral()
     google()  // gestalt uses an annotation package by Google
@@ -14,18 +18,14 @@ repositories {
 
     maven {
         name = "Terasology Artifactory"
-        url = URI("http://artifactory.terasology.org/artifactory/virtual-repo-live")
-        @Suppress("UnstableApiUsage")
-        isAllowInsecureProtocol = true  // 😱
+        url = URI("https://artifactory.terasology.io/artifactory/virtual-repo-live")
     }
 
-    // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
+    // TODO MYSTERY: As of November 7th 2021 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
     // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
     maven {
         name = "Terasology snapshot locals"
-        url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
-        @Suppress("UnstableApiUsage")
-        isAllowInsecureProtocol = true  // 😱
+        url = URI("https://artifactory.terasology.io/artifactory/terasology-snapshot-local")
     }
 }
 
@@ -46,7 +46,7 @@ dependencies {
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
 
     // plugins we configure
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:4.8.0")  // TODO: upgrade with gradle 7.x
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.1.3")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
     api(kotlin("test"))

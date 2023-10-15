@@ -12,6 +12,12 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 group = "org.terasology.subsystems"
 version = project(":engine").version
 
+configure<SourceSetContainer> {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main { java.destinationDirectory.set(File("$buildDir/classes")) }
+    test { java.destinationDirectory.set(File("$buildDir/testClasses")) }
+}
+
 dependencies {
     implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("net.sf.trove4j:trove4j:3.0.3")
