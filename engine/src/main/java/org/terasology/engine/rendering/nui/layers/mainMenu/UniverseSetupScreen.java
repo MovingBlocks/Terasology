@@ -163,7 +163,8 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                 @Override
                 public void set(WorldGeneratorInfo value) {
                     if (value != null) {
-                        if (context.get(UniverseWrapper.class).getWorldGenerator() == null || !value.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
+                        if (context.get(UniverseWrapper.class).getWorldGenerator() == null
+                                || !value.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
                             config.getWorldGeneration().setDefaultGenerator(value.getUri());
                             addNewWorld(value);
                         }
