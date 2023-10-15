@@ -97,6 +97,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
     @In
     private GameEngine gameEngine;
+    @In
+    private Context context;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -106,7 +108,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
     private SelectModulesConfig selectModulesConfig;
-    private Context context;
 
     @Override
     public void onOpened() {
@@ -783,8 +784,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     public void setEnvironment(UniverseWrapper wrapper) {
-        context = new ContextImpl();
-        context.put(UniverseWrapper.class, wrapper);
-        CoreRegistry.setContext(context);
+        CoreRegistry.put(UniverseWrapper.class, wrapper);
     }
 }
