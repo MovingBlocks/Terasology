@@ -23,7 +23,7 @@ public class UniverseWrapper {
     }
 
     public String getSeed() {
-        return seed;
+        return seed == null ? "" : seed;
     }
 
     public void setLoadingAsServer(boolean loadingAsServer) {
