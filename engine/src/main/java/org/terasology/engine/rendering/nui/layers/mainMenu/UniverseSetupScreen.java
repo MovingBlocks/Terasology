@@ -17,6 +17,7 @@ import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
@@ -218,6 +219,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
+            CoreRegistry.put(UniverseWrapper.class, context.get(UniverseWrapper.class));
             triggerBackAnimation();
         });
 

@@ -122,6 +122,19 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void onScreenOpened() {
+        super.onScreenOpened();
+
+        final UIText seed = find("seed", UIText.class);
+        if (seed != null) {
+            UniverseWrapper universeWrapper = CoreRegistry.get(UniverseWrapper.class);
+            if (universeWrapper != null && !universeWrapper.getSeed().isEmpty()) {
+                seed.setText(universeWrapper.getSeed());
+            }
+        }
+    }
+
+    @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor(
