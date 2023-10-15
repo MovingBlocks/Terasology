@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
@@ -101,12 +102,16 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     @In
     private Context context;
 
+    @In
+    private Time time;
+
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private UISlider zoomSlider;
     private Texture texture;
     private PreviewGenerator previewGen;
     private UIImage previewImage;
+    private long seedLastModified = Long.MAX_VALUE;
 
     @Override
     public void initialise() {
@@ -187,6 +192,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             public void set(String value) {
                 //setSeed(value);
                 context.get(UniverseWrapper.class).setSeed(value);
+                seedLastModified = time.getRealTimeInMs();
                 //context.get(UniverseWrapper.class).getWorldGenerator().setWorldSeed(context.get(UniverseWrapper.class).getSeed());
             }
         });
@@ -243,6 +249,18 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
             getManager().pushScreen("engine:mainMenuScreen");
         });
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        if (seedLastModified < time.getRealTimeInMs() - 1000) {
+            UniverseWrapper universeWrapper = context.get(UniverseWrapper.class);
+            universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
+            updatePreview();
+            seedLastModified = Long.MAX_VALUE;
+        }
     }
 
     private void setSeed(String value) {
