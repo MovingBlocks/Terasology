@@ -252,6 +252,15 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     }
 
     @Override
+    public void onScreenOpened() {
+        super.onScreenOpened();
+
+        if (texture != null) {
+            updatePreview();
+        }
+    }
+
+    @Override
     public void update(float delta) {
         super.update(delta);
 
