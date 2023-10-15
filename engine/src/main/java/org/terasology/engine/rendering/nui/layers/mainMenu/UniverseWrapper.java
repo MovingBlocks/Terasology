@@ -4,7 +4,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.gestalt.naming.Name;
 
 /**
  * A class which stores the universe level properties for a game like whether

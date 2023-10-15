@@ -19,7 +19,6 @@ import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.layouts.PropertyLayout;
@@ -28,7 +27,6 @@ import org.terasology.nui.properties.Property;
 import org.terasology.nui.properties.PropertyOrdering;
 import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 

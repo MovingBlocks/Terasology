@@ -15,7 +15,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.SelectModulesConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
