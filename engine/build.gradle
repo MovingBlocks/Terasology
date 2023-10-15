@@ -45,8 +45,9 @@ sourceSets {
         }
         java {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-            outputDir = new File("$buildDir/classes")
+            destinationDirectory = new File("$buildDir/classes")
         }
+        test.java.destinationDirectory = new File("$buildDir/testClasses")
     }
 }
 
@@ -154,7 +155,7 @@ dependencies {
     api fileTree(dir: 'libs', include: '*.jar')
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
-    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.2.0'
+    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '5.0.0'
 
     api(project(":subsystems:TypeHandlerLibrary"))
 }
@@ -189,6 +190,7 @@ sourceSets {
         java.srcDirs = ['src/jmh/java']
         resources.srcDirs = ['src/jmh/resources']
         compileClasspath += sourceSets.main.runtimeClasspath
+        java.destinationDirectory = new File("$buildDir/jmhClasses")
     }
 }
 
@@ -263,14 +265,12 @@ tasks.named("processResources", Copy) {
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
-    from sourceSets.main.output.resourcesDir
+    from processResources
     into sourceSets.main.output.classesDirs.first()
 
-    dependsOn processResources
-    mustRunAfter compileJava
 }
 
-tasks.named("classes") {
+tasks.named("compileJava") {
     dependsOn(tasks.named("copyResourcesToClasses"))
 }
 

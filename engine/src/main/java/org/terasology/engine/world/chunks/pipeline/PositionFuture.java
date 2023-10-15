@@ -5,53 +5,23 @@ package org.terasology.engine.world.chunks.pipeline;
 
 import org.joml.Vector3ic;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
-public class PositionFuture<T> implements RunnableFuture<T> {
-
-    private final RunnableFuture<T> delegate;
+public class PositionFuture<T> extends FutureTask<T> {
     private final Vector3ic position;
 
-    public PositionFuture(RunnableFuture<T> delegate, Vector3ic position) {
-        this.delegate = delegate;
+    public PositionFuture(Callable callable, Vector3ic position) {
+        super(callable);
+        this.position = position;
+    }
+
+    public PositionFuture(Runnable runnable, T result, Vector3ic position) {
+        super(runnable, result);
         this.position = position;
     }
 
     public Vector3ic getPosition() {
         return position;
-    }
-
-    @Override
-    public void run() {
-        delegate.run();
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return delegate.cancel(mayInterruptIfRunning);
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return delegate.isCancelled();
-    }
-
-    @Override
-    public boolean isDone() {
-        return delegate.isDone();
-    }
-
-    @Override
-    public T get() throws InterruptedException, ExecutionException {
-        return delegate.get();
-    }
-
-    @Override
-    public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException,
-            TimeoutException {
-        return delegate.get(timeout, unit);
     }
 }
