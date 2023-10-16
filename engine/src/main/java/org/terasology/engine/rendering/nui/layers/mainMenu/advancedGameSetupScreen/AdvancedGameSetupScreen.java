@@ -144,7 +144,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
         final UIText seed = find("seed", UIText.class);
         if (seed != null) {
-            seed.setText(new FastRandom().nextString(32));
+            seed.setText(createRandomSeed());
         }
 
         // skip loading module configs, limit shown modules to locally present ones
@@ -793,6 +793,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
         setSelectedVersions(dependencyResolver.resolve(selectedModules));
         updateValidToSelect();
+    }
+
+    private String createRandomSeed() {
+        String seed = new FastRandom().nextString(32);
+        return seed;
     }
 
     public void setEnvironment(UniverseWrapper wrapper) {

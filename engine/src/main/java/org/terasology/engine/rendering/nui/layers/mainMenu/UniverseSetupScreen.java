@@ -29,7 +29,6 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPre
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.utilities.random.FastRandom;
-import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
@@ -111,7 +110,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private Texture texture;
     private PreviewGenerator previewGen;
     private UIImage previewImage;
-    private long seedLastModified = Long.MAX_VALUE;
+    private long previewUpdateRequiredSince = Long.MAX_VALUE;
 
     @Override
     public void initialise() {
@@ -161,12 +160,12 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                 }
 
                 @Override
-                public void set(WorldGeneratorInfo value) {
-                    if (value != null) {
+                public void set(WorldGeneratorInfo worldGeneratorInfo) {
+                    if (worldGeneratorInfo != null) {
                         if (context.get(UniverseWrapper.class).getWorldGenerator() == null
-                                || !value.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
-                            config.getWorldGeneration().setDefaultGenerator(value.getUri());
-                            addNewWorld(value);
+                                || !worldGeneratorInfo.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
+                            config.getWorldGeneration().setDefaultGenerator(worldGeneratorInfo.getUri());
+                            addNewWorld(worldGeneratorInfo);
                         }
                     }
                 }
@@ -191,10 +190,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
             @Override
             public void set(String value) {
-                //setSeed(value);
-                context.get(UniverseWrapper.class).setSeed(value);
-                seedLastModified = time.getRealTimeInMs();
-                //context.get(UniverseWrapper.class).getWorldGenerator().setWorldSeed(context.get(UniverseWrapper.class).getSeed());
+                setSeed(value);
             }
         });
 
@@ -207,7 +203,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             if (context.get(UniverseWrapper.class).getWorldGenerator() != null) {
                 setSeed(createRandomSeed());
-                updatePreview();
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("No world generator selected!", "Please select a world generator first!");
@@ -265,23 +260,17 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     public void update(float delta) {
         super.update(delta);
 
-        if (seedLastModified < time.getRealTimeInMs() - 1000) {
+        if (previewUpdateRequiredSince < time.getRealTimeInMs() - 1000) {
             UniverseWrapper universeWrapper = context.get(UniverseWrapper.class);
             universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
             updatePreview();
-            seedLastModified = Long.MAX_VALUE;
+            previewUpdateRequiredSince = Long.MAX_VALUE;
         }
     }
 
     private void setSeed(String value) {
-        UniverseWrapper universeWrapper = context.get(UniverseWrapper.class);
-        universeWrapper.setSeed(value);
-        universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
-    }
-
-    @Override
-    public void onOpened() {
-        super.onOpened();
+        context.get(UniverseWrapper.class).setSeed(value);
+        previewUpdateRequiredSince = time.getRealTimeInMs();
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -294,7 +283,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         return enabledModules;
     }
 
-
     private void recursivelyAddModuleDependencies(Set<Name> modules, Name moduleName) {
         Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
         if (module != null) {
@@ -306,7 +294,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     }
 
     /**
-     * Called whenever the user decides to add a new world.
+     * Called whenever the user chooses a world generator.
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
@@ -320,7 +308,9 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             e.printStackTrace();
         }
 
-        genTexture();
+        texture = generateTexture();
+        previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
         List<Zone> previewZones = Lists.newArrayList(universeWrapper.getWorldGenerator().getZones())
                 .stream()
                 .filter(z -> !z.getPreviewLayers().isEmpty())
@@ -338,6 +328,25 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
      * needed for successful game creation.
      */
     public void setEnvironment() {
+        prepareContext();
+
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+        if (result.isSuccess()) {
+            environment = moduleManager.loadEnvironment(result.getModules(), false);
+            //BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
+            initializeAssets();
+
+            context.put(ModuleEnvironment.class, environment);
+            context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
+            EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
+            context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
+
+            environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
+        }
+    }
+
+    private void prepareContext() {
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         context.put(ReflectFactory.class, reflectFactory);
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
@@ -348,27 +357,9 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-        if (result.isSuccess()) {
-            environment = moduleManager.loadEnvironment(result.getModules(), false);
-            context.put(ModuleEnvironment.class, environment);
-            context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-            initAssets();
-
-            EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
-            context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
-
-            environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
-        }
     }
 
-    private void initAssets() {
-
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
-
+    private void initializeAssets() {
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         assetTypeManager.createAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
@@ -387,17 +378,14 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     /**
      * Generates a texture and sets it to the image view, thus previewing the world.
      */
-    private void genTexture() {
+    private Texture generateTexture() {
         int imgWidth = 384;
         int imgHeight = 384;
         ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
         ByteBuffer[] data = new ByteBuffer[]{buffer};
         ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
         TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-        texture = Assets.generateAsset(uri, texData, Texture.class);
-
-        previewImage = find("preview", UIImage.class);
-        previewImage.setImage(texture);
+        return Assets.generateAsset(uri, texData, Texture.class);
     }
 
     /**
@@ -439,7 +427,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     @Override
     public void onSliderValueChanged(float val) {
         if (context.get(UniverseWrapper.class).getWorldGenerator() != null) {
-            updatePreview();
+            previewUpdateRequiredSince = time.getRealTimeInMs();
         }
     }
 }

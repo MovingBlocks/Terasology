@@ -61,6 +61,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button -> {
+
             triggerBackAnimation();
         });
     }
