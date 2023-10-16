@@ -247,7 +247,7 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
         // It is a value we can always get (on Jenkins or otherwise) but we don't want local builds
         // to invalidate their cache whenever the time changes.
         // TODO: after upgrading to Gradle 6.8, see if we can have it ignore this property specifically:
-        //     https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:property_file_normalization
+        //     https://docs.gradle.org/current/userguide/incremental_build.html#sec:property_file_normalization
         property("dateTime", startDateTimeString)
     }
 
