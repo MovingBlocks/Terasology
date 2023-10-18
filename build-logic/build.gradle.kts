@@ -4,7 +4,7 @@
 import java.net.URI
 
 plugins {
-    id("org.gradle.kotlin.kotlin-dsl") version "4.1.0"
+    `kotlin-dsl`
 }
 
 kotlin {
@@ -46,7 +46,7 @@ dependencies {
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
 
     // plugins we configure
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.1.3")
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.0")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
     api(kotlin("test"))
