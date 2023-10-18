@@ -14,8 +14,8 @@ plugins {
 }
 
 dependencies {
-    "pmd"("net.sourceforge.pmd:pmd-core:6.15.0")
-    "pmd"("net.sourceforge.pmd:pmd-java:6.15.0")
+    pmd("net.sourceforge.pmd:pmd-core:6.55.0")
+    pmd("net.sourceforge.pmd:pmd-java:6.55.0")
 
     testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
         because("runtime: to configure logging during tests with logback.xml")
@@ -27,7 +27,7 @@ dependencies {
         because("redirects java.util.logging (from e.g. junit) through slf4j")
     }
 
-    add("testImplementation", platform("org.junit:junit-bom:5.8.1"))
+    add("testImplementation", platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -60,16 +60,28 @@ tasks.withType<Test> {
     }
 }
 
-tasks.withType<Checkstyle> {
-    dependsOn(tasks.getByPath(":extractConfig"))
-}
+ tasks.withType<Checkstyle> {
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
+ }
 
 tasks.withType<Pmd> {
-    dependsOn(tasks.getByPath(":extractConfig"))
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
 }
 
 tasks.withType<SpotBugsTask> {
-    dependsOn(tasks.getByPath(":extractConfig"))
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
 }
 
 // The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds

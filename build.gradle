@@ -11,16 +11,14 @@ buildscript {
         maven {
             // required to provide runtime dependencies to build-logic.
             name = "Terasology Artifactory"
-            url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
-            allowInsecureProtocol = true  // 😱
+            url = "https://artifactory.terasology.io/artifactory/virtual-repo-live"
         }
 
         // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
         // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
         maven {
             name = "Terasology snapshot locals"
-            url = "http://artifactory.terasology.org/artifactory/terasology-snapshot-local"
-            allowInsecureProtocol = true  // 😱
+            url = "https://artifactory.terasology.io/artifactory/terasology-snapshot-local"
         }
     }
 
@@ -64,7 +62,7 @@ safe to use, any newer than 11 may cause issues.
 If you encounter oddities try Java 11.
 See https://github.com/MovingBlocks/Terasology/issues/3976.
 Current detected Java version is ${JavaVersion.current()}
- from vendor ${System.getProperty("java.vendor")} 
+ from vendor ${System.getProperty("java.vendor")}
 located at ${System.getProperty("java.home")}
 """)
 }
@@ -106,7 +104,7 @@ dependencies {
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.6.3', ext: 'zip'
+    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '2.1.0', ext: 'zip'
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
@@ -293,4 +291,54 @@ if (hasProperty('buildScan')
             termsOfServiceAgree = "yes"
         }
     }
+}
+    
+// A task to assemble various files into a single zip for distribution as 'build-harness.zip' for module builds
+task assembleBuildHarness(type: Zip) {
+    description 'Assembles a zip of files useful for module development'
+
+    dependsOn extractNatives
+    from('natives'){
+        include '**/*'
+        // TODO: use output of extractNatives?
+        // TODO: which module needs natives to build?
+        into 'natives'
+    }
+
+    dependsOn extractConfig
+    from('config'){
+        //include 'gradle/**/*', 'metrics/**/*'
+        include '**/*'
+        // TODO: depend on output of extractConfig?
+        into 'config'
+    }
+
+    from('gradle'){
+        include '**/*' // include all files in 'gradle'
+        // TODO: exclude groovy jar?
+        into 'gradle'
+    }
+
+    from('build-logic'){
+        include 'src/**', '*.kts'
+        into 'build-logic'
+    }
+
+    from('templates') {
+        include 'build.gradle'
+    }
+
+    from('.') {
+        include 'gradlew'
+    }
+
+    // include file 'templates/module.logback-test.xml' as 'src/test/resources/logback-test.xml'
+    from('templates'){
+        include 'module.logback-test.xml'
+        rename 'module.logback-test.xml', 'logback-test.xml'
+        into 'src/test/resources'
+    }
+
+    // set the archive name
+    archiveFileName.set('build-harness.zip')
 }
