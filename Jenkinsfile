@@ -36,7 +36,7 @@ properties([
 
 pipeline {
     agent {
-        label 'ts-engine && heavy && java11'
+        label 'ts-engine && heavy && java17'
     }
     stages {
         // declarative pipeline does `checkout scm` automatically when hitting first stage
