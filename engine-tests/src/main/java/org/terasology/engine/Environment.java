@@ -37,12 +37,10 @@ class Environment {
     Environment(Name... moduleNames) {
         try {
             reset(Sets.newHashSet(moduleNames));
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException(e);
         }
     }
 
