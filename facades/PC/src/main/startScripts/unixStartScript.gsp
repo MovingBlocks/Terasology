@@ -169,13 +169,6 @@ save () {
 }
 APP_ARGS=`save "\$@"`
 
-# Terasology-specific changes - Re-enable SecurityManager on Java 18+
-# According to https://openjdk.org/jeps/223, this string is intentionally parsable.
-JAVA_VERSION=`java -fullversion 2>&1 | sed 's/.* //;s/"//;s/\\([0-9]*\\)\\..*/\\1/'`
-if [ \$JAVA_VERSION -gt 17 ]; then
-    DEFAULT_JVM_OPTS="\$DEFAULT_JVM_OPTS -Djava.security.manager=allow"
-fi
-
 # Collect all arguments for the java command, following the shell quoting and substitution rules
 eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$${optsEnvironmentVar} <% if ( appNameSystemProperty ) { %>"\"-D${appNameSystemProperty}=\$APP_BASE_NAME\"" <% } %> <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "\"\$MODULE_PATH\"" <% } %>-jar lib/Terasology.jar "\$APP_ARGS"
 
