@@ -241,7 +241,11 @@ public class Engines {
 
     protected void mockPathManager() {
         PathManager originalPathManager = PathManager.getInstance();
-        pathManager = Mockito.spy(originalPathManager);
+        if (!Mockito.mockingDetails(originalPathManager).isMock()) {
+            pathManager = Mockito.spy(originalPathManager);
+        } else {
+            pathManager = originalPathManager;
+        }
         Mockito.when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
         pathManagerCleaner = new PathManagerProvider.Cleaner(originalPathManager, pathManager);
         PathManagerProvider.setPathManager(pathManager);

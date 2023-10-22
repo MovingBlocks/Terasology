@@ -72,7 +72,7 @@ dependencies {
 
 
     // Test lib dependencies
-    implementation(platform("org.junit:junit-bom:5.8.1")) {
+    implementation(platform("org.junit:junit-bom:5.10.0")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
     api("org.junit.jupiter:junit-jupiter-api") {
@@ -81,8 +81,13 @@ dependencies {
     api("com.google.truth:truth:1.1.3") {
         because("we provide some helper classes")
     }
-    implementation("org.mockito:mockito-inline:3.12.4") {
+    implementation('org.mockito:mockito-core:5.6.0') {
         because("classes like HeadlessEnvironment use mocks")
+    }
+    constraints {
+        implementation("net.bytebuddy:bytebuddy:1.14.8") {
+            because("we need a newer bytebuddy version for Java 17")
+        }
     }
 
     // See terasology-metrics for other test-only internal dependencies
