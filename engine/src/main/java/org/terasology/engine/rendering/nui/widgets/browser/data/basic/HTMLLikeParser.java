@@ -153,10 +153,15 @@ public final class HTMLLikeParser {
             if (sb.length() > 0) {
                 result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
             }
+
+            reader.close();
+
             return result;
         } catch (IOException exp) {
             // Ignore - can't happen
         }
+
+        reader.close();
 
         return null;
     }

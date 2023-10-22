@@ -92,6 +92,7 @@ public class LwjglControllerDevice implements ControllerDevice {
             if (!GLFW.glfwUpdateGamepadMappings(gamecontrolleDB)) {
                 logger.error("Cannot update GLFW's gamepad mapping, gamepads may not work correctly");
             }
+            inputStream.close();
         } catch (IOException e) {
             logger.error("Cannot read resource '/gamecontrollerdb.txt', gamepads may not work correctly", e);
         }

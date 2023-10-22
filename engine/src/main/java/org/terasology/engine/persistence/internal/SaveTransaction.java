@@ -396,6 +396,7 @@ public class SaveTransaction implements Runnable {
                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     bos.write(compressedChunk);
                 }
+                zip.close();
             }
             // Copy existing, unmodified content into the zips and close them
             for (Map.Entry<Vector3i, FileSystem> chunkZipEntry : newChunkZips.entrySet()) {

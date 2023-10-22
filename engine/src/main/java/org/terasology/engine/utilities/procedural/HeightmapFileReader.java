@@ -88,8 +88,9 @@ public final class HeightmapFileReader {
             }
         }
 
-//        System.out.println("min " + min);
-//        System.out.println("max " + max);
+        myInput.close();
+        s.close();
+
         return (theMap);
     }
 }
