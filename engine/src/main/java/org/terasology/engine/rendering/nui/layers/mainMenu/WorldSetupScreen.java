@@ -84,7 +84,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
     public void setWorld(Context subContext, UniverseWrapper universe) {
         this.universe = universe;
         context = subContext;
-        SimpleUri worldGenUri = universe.getWorldGenerator().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
         worldGenerator = universe.getWorldGenerator();
