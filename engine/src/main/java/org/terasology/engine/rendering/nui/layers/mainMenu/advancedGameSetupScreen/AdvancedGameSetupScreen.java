@@ -759,7 +759,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     private void select(ModuleSelectionInfo target) {
         if (target.isValidToSelect() && !target.isExplicitSelection()) {
-            boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
             refreshSelection();
         }
