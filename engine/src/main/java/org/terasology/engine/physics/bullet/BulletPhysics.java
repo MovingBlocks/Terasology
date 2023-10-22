@@ -825,7 +825,6 @@ public class BulletPhysics implements PhysicsEngine {
 
                             Vector3f a2 = new Vector3f();
                             manifoldPoint.getPositionWorldOnB(a2);
-                            int l = manifoldPoint.getLifeTime();
 
                             Vector3f a3 = new Vector3f();
                             manifoldPoint.getNormalWorldOnB(a3);
