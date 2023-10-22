@@ -796,8 +796,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     private String createRandomSeed() {
-        String seed = new FastRandom().nextString(32);
-        return seed;
+        return new FastRandom().nextString(32);
     }
 
     public void setEnvironment(UniverseWrapper wrapper) {
