@@ -80,11 +80,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         }
     }
 
-    @Override
-    public void setId(String id) {
-        super.setId(id);
-    }
-
     protected InteractionListener getScreenListener() {
         return DEFAULT_SCREEN_LISTENER;
     }
