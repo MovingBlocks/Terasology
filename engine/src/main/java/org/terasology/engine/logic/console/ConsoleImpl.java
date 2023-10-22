@@ -327,9 +327,7 @@ public class ConsoleImpl implements Console {
         String parameterPart = cleanedCommand.substring(commandEndIndex).trim();
 
         //get the parameters
-        List<String> params = splitParameters(parameterPart);
-
-        return params;
+        return splitParameters(parameterPart);
     }
 
     private static List<String> splitParameters(String paramStr) {

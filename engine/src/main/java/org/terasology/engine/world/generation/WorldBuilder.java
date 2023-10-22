@@ -413,7 +413,6 @@ public class WorldBuilder extends ProviderStore {
                 configurables.add((ConfigurableFacetProvider) facetProvider);
             }
         }
-        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator(configurables);
-        return worldConfigurator;
+        return new FacetedWorldConfigurator(configurables);
     }
 }

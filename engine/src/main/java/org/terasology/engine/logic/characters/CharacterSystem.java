@@ -120,23 +120,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (instigator.hasComponent(CharacterComponent.class)) {
             EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
             EntityRef instigatorClientInfo = instigatorClient.getComponent(ClientComponent.class).clientInfo;
-            DisplayNameComponent displayNameComponent = instigatorClientInfo.getComponent(DisplayNameComponent.class);
-            return displayNameComponent.name;
+            return instigatorClientInfo.getComponent(DisplayNameComponent.class).name;
         } else if (instigator.getParentPrefab() != null) {
             //A DisplayName can be specified in the entity prefab
             //Otherwise, the game will attempt to generate one from the name of that prefab
             Prefab parentPrefab = instigator.getParentPrefab();
             if (parentPrefab.hasComponent(DisplayNameComponent.class)) {
-                DisplayNameComponent displayNameComponent = parentPrefab.getComponent(DisplayNameComponent.class);
-                return displayNameComponent.name;
+                return parentPrefab.getComponent(DisplayNameComponent.class).name;
             } else {
                 String instigatorName = parentPrefab.getName();
                 //getParentPrefab.getName() returns a ResourceUrn String such as "engine:player"
                 //The following calls change the damage type to be more readable
                 //For instance, "engine:player" becomes "Player"
                 instigatorName = instigatorName.replaceAll(".*:(.*)", "$1");
-                instigatorName = Character.toUpperCase(instigatorName.charAt(0)) + instigatorName.substring(1);
-                return instigatorName;
+                return Character.toUpperCase(instigatorName.charAt(0)) + instigatorName.substring(1);
             }
         } else {
             return null;
@@ -155,8 +152,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //A DisplayName can be specified in the damage type prefab
         //Otherwise, the game will attempt to generate one from the name of that prefab
         if (damageType.hasComponent(DisplayNameComponent.class)) {
-            DisplayNameComponent displayNameComponent = damageType.getComponent(DisplayNameComponent.class);
-            return displayNameComponent.name;
+            return damageType.getComponent(DisplayNameComponent.class).name;
         } else {
             logger.info(String.format("%s is missing a readable DisplayName", damageType.getName()));
             String damageTypeName = damageType.getName();
