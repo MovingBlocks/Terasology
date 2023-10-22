@@ -97,35 +97,6 @@ public class StateMainMenu extends AbstractState {
         // pushLaunchPopup();
     }
 
-    private void pushLaunchPopup() {
-        Config config = context.get(Config.class);
-        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
-        TranslationSystem translationSystem = context.get(TranslationSystem.class);
-        TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
-        if (!telemetryConfig.isLaunchPopupDisabled()) {
-            String telemetryTitle = translationSystem.translate("${engine:menu#telemetry-launch-popup-title}");
-            String telemetryMessage = translationSystem.translate("${engine:menu#telemetry-launch-popup-text}");
-            LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
-            telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
-            telemetryConfirmPopup.setYesHandler(() -> {
-                telemetryConfig.setTelemetryAndErrorReportingEnable(true);
-
-                // Enable error reporting
-                appender.start();
-            });
-            telemetryConfirmPopup.setNoHandler(() -> {
-                telemetryConfig.setTelemetryAndErrorReportingEnable(false);
-
-                // Disable error reporting
-                appender.stop();
-            });
-            telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
-            telemetryConfirmPopup.setOptionHandler(() -> {
-                nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
-            });
-        }
-    }
-
     @Override
     public void dispose(boolean shuttingDown) {
         stopBackgroundMusic();

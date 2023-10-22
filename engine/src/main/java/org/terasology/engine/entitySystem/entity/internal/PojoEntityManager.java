@@ -708,16 +708,6 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     /**
-     * This method gets called when the entity gets reactivated. e.g. after storage an entity needs to be reactivated.
-     */
-    private void notifyReactivation(EntityRef entity, Collection<Component> components) {
-        for (EntityChangeSubscriber subscriber : subscribers) {
-            subscriber.onReactivation(entity, components);
-        }
-    }
-
-
-    /**
      * This method gets called before an entity gets deactivated (e.g. for storage).
      */
     private void notifyBeforeDeactivation(EntityRef entity, Collection<Component> components) {

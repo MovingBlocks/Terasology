@@ -36,13 +36,4 @@ public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
         }
         return Optional.ofNullable(EntityRef.NULL);
     }
-
-    private void addEntitiesFromLongArray(List<EntityRef> result, PersistedDataArray array) {
-        TLongIterator iterator = array.getAsLongArray().iterator();
-        while (iterator.hasNext()) {
-            long item = iterator.next();
-            result.add(entityManager.getEntity(item));
-        }
-    }
-
 }

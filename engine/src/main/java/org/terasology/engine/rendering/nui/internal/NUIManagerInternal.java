@@ -265,11 +265,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    private void closeScreenWithoutEvent(ResourceUrn screenUri) {
-        boolean sendEvents = false;
-        closeScreen(screenUri, sendEvents);
-    }
-
     @Override
     public ResourceUrn getUri(UIScreenLayer screen) {
         BiMap<ResourceUrn, UIScreenLayer> lookup = HashBiMap.create(screenLookup);
