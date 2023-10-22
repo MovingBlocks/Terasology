@@ -386,7 +386,7 @@ public class OggReader extends FilterInputStream {
      */
     private int decodePacket() {
         // check the endianes of the computer.
-        final boolean bigEndian = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
+        final boolean bigEndian = ByteOrder.nativeOrder().equals(ByteOrder.BIG_ENDIAN);
 
         if (block.synthesis(packet) == 0) {
             dspState.synthesis_blockin(block);

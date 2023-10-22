@@ -242,7 +242,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
@@ -281,7 +281,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers =
