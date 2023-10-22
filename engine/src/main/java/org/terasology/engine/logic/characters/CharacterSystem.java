@@ -194,10 +194,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = LocationComponent.class)
     public void onAttackRequest(AttackRequest event, EntityRef character, CharacterComponent characterComponent) {
         // if an item is used,  make sure this entity is allowed to attack with it
-        if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getOwner())) {
-                return;
-            }
+        if (event.getItem().exists() && !character.equals(event.getItem().getOwner())) {
+            return;
         }
 
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();

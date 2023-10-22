@@ -93,10 +93,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (depth == SortOrderSystem.DEFAULT_DEPTH) {
             setDepthAuto();
         }
-        if (SortOrderSystem.isInitialized()) {
-            if (!SortOrderSystem.getUsed().contains(depth)) {
-                SortOrderSystem.getUsed().add(depth);
-            }
+        if (SortOrderSystem.isInitialized() && !SortOrderSystem.getUsed().contains(depth)) {
+            SortOrderSystem.getUsed().add(depth);
         }
         modifyingList = false;
         activateBindEvent = false;

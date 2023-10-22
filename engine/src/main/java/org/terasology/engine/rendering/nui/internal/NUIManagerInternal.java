@@ -715,20 +715,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void charEvent(CharEvent ev, EntityRef entity) {
         NUICharEvent nuiEvent = new NUICharEvent(mouse, keyboard, ev.getCharacter());
-        if (focus != null) {
-            if (focus.onCharEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onCharEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onCharEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onCharEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;
@@ -742,20 +739,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
         NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getState());
-        if (focus != null) {
-            if (focus.onKeyEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onKeyEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onKeyEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onKeyEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;

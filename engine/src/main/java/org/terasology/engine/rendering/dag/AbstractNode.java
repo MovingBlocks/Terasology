@@ -101,10 +101,8 @@ public abstract class AbstractNode implements Node {
 
     public void tryBufferPairPass() {
         BufferPairConnection bufferPairConnection = getInputBufferPairConnection(1);
-        if (bufferPairConnection != null) {
-            if (bufferPairConnection.getData() != null) {
-                addOutputBufferPairConnection(1, bufferPairConnection);
-            }
+        if (bufferPairConnection != null && bufferPairConnection.getData() != null) {
+            addOutputBufferPairConnection(1, bufferPairConnection);
         }
     }
 

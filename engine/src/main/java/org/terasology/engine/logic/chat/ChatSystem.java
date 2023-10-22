@@ -72,12 +72,10 @@ public class ChatSystem extends BaseComponentSystem {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
             Message message = event.getFormattedMessage();
-            if (message.getType() == CoreMessageType.CHAT || message.getType() == CoreMessageType.NOTIFICATION) {
-
+            if (message.getType() == CoreMessageType.CHAT || message.getType() == CoreMessageType.NOTIFICATION
+                    && !nuiManager.isOpen(CHAT_UI) && !nuiManager.isOpen(CONSOLE_UI)) {
                 // show overlay only if chat and console are hidden
-                if (!nuiManager.isOpen(CHAT_UI) && !nuiManager.isOpen(CONSOLE_UI)) {
-                    overlay.setVisible(true);
-                }
+                overlay.setVisible(true);
             }
         }
     }
