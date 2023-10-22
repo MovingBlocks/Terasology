@@ -261,7 +261,7 @@ public class OggReader extends FilterInputStream {
     /**
      * Initalizes the vorbis stream. Reads the stream until info and comment are read.
      */
-    private void initVorbis() throws Exception {
+    private void initVorbis() throws IOException {
         // Now we can read pages
         syncState.init();
 
@@ -283,7 +283,7 @@ public class OggReader extends FilterInputStream {
                 return; //break;
             }
             // error case.  Must not be Vorbis data
-            throw new Exception("Input does not appear to be an Ogg bitstream.");
+            throw new IOException("Input does not appear to be an Ogg bitstream.");
         }
 
         // Get the serial number and set up the rest of decode.
@@ -302,15 +302,15 @@ public class OggReader extends FilterInputStream {
         comment.init();
         if (streamState.pagein(page) < 0) {
             // error; stream version mismatch perhaps
-            throw new Exception("Error reading first page of Ogg bitstream data.");
+            throw new IOException("Error reading first page of Ogg bitstream data.");
         }
         if (streamState.packetout(packet) != 1) {
             // no page? must not be vorbis
-            throw new Exception("Error reading initial header packet.");
+            throw new IOException("Error reading initial header packet.");
         }
         if (info.synthesis_headerin(comment, packet) < 0) {
             // error case; not a vorbis header
-            throw new Exception("This Ogg bitstream does not contain Vorbis audio data.");
+            throw new IOException("This Ogg bitstream does not contain Vorbis audio data.");
         }
 
         // At this point, we're sure we're Vorbis.  We've set up the logical
@@ -346,7 +346,7 @@ public class OggReader extends FilterInputStream {
                         if (result == -1) {
                             // Uh oh; data at some point was corrupted or missing!
                             // We can't tolerate that in a header.  Die.
-                            throw new Exception("Corrupt secondary header. Exiting.");
+                            throw new IOException("Corrupt secondary header. Exiting.");
                         }
                         info.synthesis_headerin(comment, packet);
                         i++;
@@ -364,7 +364,7 @@ public class OggReader extends FilterInputStream {
                 bytes = 0;
             }
             if (bytes == 0 && i < 2) {
-                throw new Exception("End of file before finding all Vorbis headers!");
+                throw new IOException("End of file before finding all Vorbis headers!");
             }
             syncState.wrote(bytes);
         }

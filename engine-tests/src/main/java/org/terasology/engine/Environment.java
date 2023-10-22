@@ -44,7 +44,7 @@ class Environment {
         }
     }
 
-    protected void reset(Set<Name> moduleNames) throws Exception {
+    protected void reset(Set<Name> moduleNames) throws IOException {
         this.context = new ContextImpl();
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         context.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
@@ -97,7 +97,7 @@ class Environment {
         PathManager.getInstance();
     }
 
-    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
+    protected void setupModuleManager(Set<Name> moduleNames) throws RuntimeException {
         // empty
     }
 
@@ -160,7 +160,7 @@ class Environment {
      *
      * @throws Exception if something goes wrong
      */
-    public void close() throws Exception {
+    public void close() throws RuntimeException {
         CoreRegistry.setContext(null);
         context = null;
     }
