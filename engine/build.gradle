@@ -195,7 +195,7 @@ sourceSets {
 }
 
 task jmh(type: JavaExec, dependsOn: jmhClasses) {
-    main = 'org.openjdk.jmh.Main'
+    mainClass = 'org.openjdk.jmh.Main'
     classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
 }
 
@@ -251,7 +251,7 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
         property("dateTime", startDateTimeString)
     }
 
-    outputFile = "$buildDir/createVersionInfoFile/versionInfo.properties"
+    destinationFile = layout.buildDirectory.dir("createrVersionInfoFile").get().file("versionInfo.properties")
 }
 
 tasks.named("processResources", Copy) {
