@@ -80,6 +80,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         }
     }
 
+    @Override
+    @SuppressWarnings("PMD.UselessOverridingMethod") // override elevates access modifier
+    public void setId(String id) {
+        super.setId(id);
+    }
+
     protected InteractionListener getScreenListener() {
         return DEFAULT_SCREEN_LISTENER;
     }
