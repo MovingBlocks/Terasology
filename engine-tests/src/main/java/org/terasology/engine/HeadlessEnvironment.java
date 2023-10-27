@@ -320,7 +320,7 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws RuntimeException {
         // it would be nice, if elements in the context implemented (Auto)Closeable
 
         // The StorageManager creates a thread pool (through TaskMaster)
