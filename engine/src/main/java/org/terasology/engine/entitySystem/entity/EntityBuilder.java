@@ -70,10 +70,9 @@ public class EntityBuilder implements MutableComponentContainer {
         }
     }
     /**
-     * Adds all of the components from a prefab to this builder
+     * Adds all components from a prefab to this builder
      *
      * @param prefab the prefab to add
-     * @return whether the prefab was successfully added
      */
     public void addPrefab(Prefab prefab) {
         if (prefab != null) {

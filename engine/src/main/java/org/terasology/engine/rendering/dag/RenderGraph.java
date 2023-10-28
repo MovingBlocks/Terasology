@@ -406,11 +406,7 @@ public class RenderGraph {
 
     /**
      * Remove previous input connection and connect a new input connection to previous output.
-     * @param fromNode
-     * @param outputId
-     * @param toNode
-     * @param inputId
-
+     */
     /*public void reconnectInputBufferPairToOutput(Node fromNode, int outputId, Node toNode, int inputId) {
         // for each output connection connected to input get it's connected inputs, find us and remove ourselves from its list
         DependencyConnection connectionToReconnect = toNode.getInputBufferPairConnection(inputId);
