@@ -11,7 +11,7 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
- * Decorator for recording Events to Record&Replay subsystem.
+ * Decorator for recording Events to Record&amp;Replay subsystem.
  */
 public class RecordingEventSystemDecorator extends AbstractEventSystemDecorator {
     private final EventCatcher eventCatcher;

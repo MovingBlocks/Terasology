@@ -386,7 +386,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      *
      * @param other {@link BlockRegion}
      * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
+     * @return dest (after modification)
      */
     default BlockRegion union(BlockRegionc other, BlockRegion dest) {
         return this.union(other.minX(), other.minY(), other.minZ(), dest)

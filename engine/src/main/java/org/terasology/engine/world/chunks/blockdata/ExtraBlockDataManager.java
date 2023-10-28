@@ -32,7 +32,7 @@ import java.util.Set;
  * public static method annotated with @RegisterExtraData which determines, for each block,
  * whether the field is applicable for that block. For example:
  *
- * {@code
+ * <pre>
  * @ExtraDataSystem
  * public class ExampleExtraDataSystem {
  *     @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
@@ -40,7 +40,7 @@ import java.util.Set;
  *         return block.isGrass();
  *     }
  *  }
- *  }
+ * </pre>
  */
 @API
 public class ExtraBlockDataManager {

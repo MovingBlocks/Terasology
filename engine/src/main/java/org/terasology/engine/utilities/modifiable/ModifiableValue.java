@@ -49,9 +49,7 @@ public class ModifiableValue {
      * Calculates the result value from the base value and given modifiers and multiplier.
      * <p>
      * The value is calculated based on the following formula:
-     * <pre> {@code
-     *      result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
-     * } </pre>
+     * {@code result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>}
      *
      * <emph>non-negativity of the value is not ensured and must be checked by the system if needed</emph>
      */

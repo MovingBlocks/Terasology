@@ -335,7 +335,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
      *
      * @param other {@link BlockArea}
      * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
+     * @return dest (after modification)
      */
     default BlockArea union(BlockAreac other, BlockArea dest) {
         return this.union(other.minX(), other.minY(), dest)
