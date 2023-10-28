@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 
 /**
  * All telemetry fields should have this annotation.
- * {@link org.terasology.engine.telemetry.metrics.Metric} finds all the telemetry fields & values via this annotation.
+ * {@link org.terasology.engine.telemetry.metrics.Metric} finds all telemetry fields and values via this annotation.
  */
 @API
 @Target(ElementType.FIELD)

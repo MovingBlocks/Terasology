@@ -33,9 +33,9 @@ public class NumberedGameName {
      * </pre>
      * These examples will be parsed as follows:
      * <pre>
-     *      "Gooey's 1st Game"  -> ("Gooey's 1st Game", None)
-     *      "Gooey 42"          -> ("Gooey", Optional(42))
-     *      "42"                -> ("42", None)
+     *      "Gooey's 1st Game"  → ("Gooey's 1st Game", None)
+     *      "Gooey 42"          → ("Gooey", Optional(42))
+     *      "42"                → ("42", None)
      * </pre>
      * <p>
      * The input string will be trimmed before matching.
@@ -70,9 +70,9 @@ public class NumberedGameName {
      * the name prefix will be returned.
      *
      * <pre>
-     *      ("Gooey's 1st Game", None)  -> "Gooey's 1st Game"
-     *      ("Gooey", Optional(42))     -> "Gooey 42"
-     *      ("42", None)                -> "42"
+     *      ("Gooey's 1st Game", None)  → "Gooey's 1st Game"
+     *      ("Gooey", Optional(42))     → "Gooey 42"
+     *      ("42", None)                → "42"
      * </pre>
      *
      * @return a textual representation of the numbered game version
