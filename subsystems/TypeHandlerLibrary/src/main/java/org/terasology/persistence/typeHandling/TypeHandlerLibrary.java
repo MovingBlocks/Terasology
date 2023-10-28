@@ -310,6 +310,9 @@ public class TypeHandlerLibrary {
         return new RuntimeDelegatingTypeHandler<>(delegateHandler, typeInfo, context);
     }
 
+    // log after else is false positive, suppress.
+    // see bug: https://github.com/pmd/pmd/issues/4731
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {

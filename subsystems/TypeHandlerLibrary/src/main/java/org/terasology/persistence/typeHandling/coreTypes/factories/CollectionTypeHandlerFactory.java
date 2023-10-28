@@ -24,7 +24,7 @@ import java.util.Optional;
 public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTypeHandlerFactory.class);
 
-    private ConstructorLibrary constructorLibrary;
+    @SuppressWarnings("PMD.UnusedLocalVariable") private ConstructorLibrary constructorLibrary;
 
     public CollectionTypeHandlerFactory(ConstructorLibrary constructorLibrary) {
         this.constructorLibrary = constructorLibrary;

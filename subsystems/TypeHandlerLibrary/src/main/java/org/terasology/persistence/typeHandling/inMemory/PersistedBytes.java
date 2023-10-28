@@ -5,6 +5,7 @@ package org.terasology.persistence.typeHandling.inMemory;
 
 import java.nio.ByteBuffer;
 
+@SuppressWarnings({"PMD.ArrayIsStoredDirectly", "PMD.MethodReturnsInternalArray"})
 public class PersistedBytes extends AbstractPersistedData {
 
     private final byte[] bytes;

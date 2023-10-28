@@ -25,6 +25,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+// both, pmd and spotbugs complain about not used private fields, suppress in
+// the static test class, but fields are checked. suppress.
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class ObjectFieldMapTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
@@ -111,5 +115,10 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     private static class MultiTypeClass<T, U> {
         private T t;
         private U u;
+    }
+
+    private static class SomeClass<T> {
+        private T t;
+        private List<T> list;
     }
 }

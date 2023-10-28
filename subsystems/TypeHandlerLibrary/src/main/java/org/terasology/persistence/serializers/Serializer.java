@@ -22,6 +22,9 @@ import java.util.Optional;
  * methods that use {@link #serializeToPersisted(Object, TypeInfo)} and {@link #deserializeFromPersisted(PersistedData,
  * TypeInfo)}.
  */
+// log statements after an if are marked as false positive, suppress.
+// see pmd bug: https://github.com/pmd/pmd/issues/4731
+@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
 public final class Serializer<D extends PersistedData> {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);

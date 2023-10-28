@@ -3,8 +3,6 @@
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
@@ -23,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectFieldMapTypeHandlerFactory.class);
 
     private ConstructorLibrary constructorLibrary;
 

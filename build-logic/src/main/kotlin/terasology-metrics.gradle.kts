@@ -13,7 +13,14 @@ plugins {
     id("org.sonarqube")
 }
 
+// give test dependencies access to compileOnly dependencies to emulate providedCompile
+// only because of spotbugs-annotations in below dependencies.
+configurations.testImplementation.get().extendsFrom(configurations.compileOnly.get())
+
 dependencies {
+    // spotbugs annotations to suppress warnings are not included via spotbugs plugin
+    // see bug: https://github.com/spotbugs/spotbugs-gradle-plugin/issues/1018
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.0")
     pmd("net.sourceforge.pmd:pmd-core:6.55.0")
     pmd("net.sourceforge.pmd:pmd-java:6.55.0")
 

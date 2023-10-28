@@ -80,6 +80,9 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
         return serializedName.value();
     }
 
+    // log after else is false positive, suppress.
+    // see bug: https://github.com/pmd/pmd/issues/4731
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     @Override
     public Optional<T> deserialize(PersistedData data) {
         if (!data.isValueMap()) {
