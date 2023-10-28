@@ -70,10 +70,10 @@ import java.util.function.Consumer;
  * {@link OnChunkLoaded} when chunk was loaded from {@link StorageManager}
  * <p>
  * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?)
- * {@see https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>}
  * <p>
  * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?)
- * {@see https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>}
  * <p>
  * {@link BeforeChunkUnload} when chunk ready to remove from provider.
  * <p>

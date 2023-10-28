@@ -33,9 +33,9 @@ import java.util.Set;
  * whether the field is applicable for that block. For example:
  *
  * <pre>
- * @ExtraDataSystem
+ * {@code @ExtraDataSystem}
  * public class ExampleExtraDataSystem {
- *     @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
+ *     {@code @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)}
  *     public static boolean shouldHaveNutrients(Block block) {
  *         return block.isGrass();
  *     }

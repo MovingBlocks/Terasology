@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * The valid values for bitSize are 4, 8 and 16.
  * The correct format is
  * <pre>
- * @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
+ * {@code @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)}
  * public static boolean shouldHaveNutrients(Block block) {
  *     return block.isGrass();
  * }
