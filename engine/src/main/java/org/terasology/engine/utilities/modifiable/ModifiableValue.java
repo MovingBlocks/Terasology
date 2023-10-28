@@ -51,7 +51,7 @@ public class ModifiableValue {
      * The value is calculated based on the following formula:
      * {@code result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>}
      *
-     * <emph>non-negativity of the value is not ensured and must be checked by the system if needed</emph>
+     * <em>non-negativity of the value is not ensured and must be checked by the system if needed</em>
      */
     public float getValue() {
         return (baseValue + preModifier) * multiplier + postModifier;
