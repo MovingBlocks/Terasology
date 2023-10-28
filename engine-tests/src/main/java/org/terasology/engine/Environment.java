@@ -158,7 +158,7 @@ class Environment {
     /**
      * Cleans up all resources (similar to AutoCloseable)
      *
-     * @throws Exception if something goes wrong
+     * @throws RuntimeException if something goes wrong
      */
     public void close() throws RuntimeException {
         CoreRegistry.setContext(null);
