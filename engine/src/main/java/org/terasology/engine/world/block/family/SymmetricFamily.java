@@ -19,7 +19,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     private Block block;
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -33,7 +33,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
+        super(definition);
         block = blockBuilder.constructSimpleBlock(definition, new BlockUri(definition.getUrn()), this);
     }
 

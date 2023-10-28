@@ -16,12 +16,7 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     private BlockUri uri;
     private Set<String> categories = Sets.newHashSet();
 
-    protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        setBlockUri(new BlockUri(definition.getUrn()));
-        setCategory(definition.getCategories());
-    }
-
-    protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    protected AbstractBlockFamily(BlockFamilyDefinition definition) {
         setBlockUri(new BlockUri(definition.getUrn()));
         setCategory(definition.getCategories());
     }

@@ -40,24 +40,12 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
 
     /**
-     * Constructor for a block with a specified shape
-     *
-     * @param definition Family definition
-     * @param shape The shape of the block
-     * @param blockBuilder The builder to make the blocks for the family
-     */
-    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
-    }
-
-    /**
      * Constructor for a regular block
      *
      * @param definition Family definition
-     * @param blockBuilder The builder to make the blocks for the family
      */
-    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
+    public MultiConnectFamily(BlockFamilyDefinition definition) {
+        super(definition);
     }
 
     /**

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * When you create a TaskMaster, it is important to shut it down after you're finished with it, generally in the
  * shutdown method of a ComponentSystem. A basic usage example follows:
- * <p>
+ * <br>
  * <pre>
  * {@literal
  * TaskMaster<MyBaseTask> taskMaster = TaskMaster.createFIFOTaskMaster("MyTaskMaster", 1);

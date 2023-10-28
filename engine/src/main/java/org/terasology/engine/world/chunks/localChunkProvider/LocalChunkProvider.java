@@ -62,7 +62,7 @@ import java.util.function.Consumer;
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
  * <p>
  * Loading/Unload chunks dependent on {@link RelevanceSystem}
- * <p/>
+ * <p>
  * Produces events:
  * <p>
  * {@link OnChunkGenerated} when chunk was generated {@link WorldGenerator}

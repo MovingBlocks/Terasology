@@ -42,7 +42,7 @@ public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
     }
 
     public CeilingSupportingHorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
+        super(definition);
 
         BlockUri uri = new BlockUri(definition.getUrn());
         populateBlockMaps(blockBuilder, null, definition, uri);
