@@ -11,18 +11,18 @@ import org.terasology.engine.world.generator.WorldGenerator;
  */
 public class UniverseWrapper {
 
-    private  String seed;
+    private  String seed = "";
     private  boolean loadingAsServer;
     private  String gameName;
     private WorldConfigurator worldConfigurator;
     private WorldGenerator worldGenerator;
 
     public void setSeed(String seed) {
-        this.seed = seed;
+        this.seed = seed == null ? "" : seed;
     }
 
     public String getSeed() {
-        return seed == null ? "" : seed;
+        return seed;
     }
 
     public void setLoadingAsServer(boolean loadingAsServer) {
