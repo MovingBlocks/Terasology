@@ -418,6 +418,7 @@ public class SaveTransaction implements Runnable {
                         }
                     }
                 }
+                zip.close();
             }
         } else {
             for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : allChunks.entrySet()) {
