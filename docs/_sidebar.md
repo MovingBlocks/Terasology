@@ -1,32 +1,32 @@
 - **[Home](Home.md)**
-- [[Contributor Quick Start]]
-- [[Troubleshooting]]
+- [Contributor Quickstart Guide](Contributor-Quick-Start.md)
+- [Troubleshooting](Troubleshooting.md)
 
 ### 🕹️ Player Guides
-  - [[What is Terasology]]
-  - [[Why Terasology]]
-  - [[Project Overview]]
-  - [[Setup a headless server]]
-  - [[Troubleshooting for Players|Troubleshooting-Player]]
-  - [[Advanced Options]]
+  - [What is Terasology](./What-is-Terasology.md)
+  - [Why Terasology](./Why-Terasology.md)
+  - [Project Overview](./Project-Overview.md)
+  - [Setup a headless server](./Setup-a-headless-server.md)
+  - [Troubleshooting for Players](./Troubleshooting-Player.md)
+  - [Advanced Options](./Advanced-Options.md)
 
 ### 🤓 Development & Modding
-  - [[Architecture | Codebase Structure]]
-    - [[Using Locally Developed Libraries]]
-  - [[Entity Component System (ECS) | Entity-System-Architecture]]
-    - [[Events and Systems]]
-    - [[Event Types]]
-    - [[Component Types]]
-    - [[Entities, Components and Events on the Network]]
-  - [[Module System]]
-    - [[Modding API]]
-    - [[Develop Modules|Developing-Modules]]
-    - [[Testing Modules]]
-    - [[Depend on Modules|Module-Dependencies]]
-    - [[IO API for Modules]]
-    - [[Module Security]]
-  - [[Renderer]]
-  - [[Serialization | Serialization Overview]]
+  - [Architecture](./Codebase-Structure.md)
+    - [Using Locally Developed Libraries](./Using-Locally-Developed-Libraries.md)
+  - [Entity Component System (ECS)](./Entity-System-Architecture.md)
+    - [Events and Systems](./Events-and-Systems.md)
+    - [Event Types](./Event-Types.md)
+    - [Component Types](./Component-Types.md)
+    - [Entities, Components and Events on the Network](./Entities,-Components-and-Events-on-the-Network.md)
+  - Module System
+    - [Modding API](./Modding-API.md)
+    - [Develop Modules](./Developing-Modules.md)
+    - [Testing Modules](./Testing-Modules.md)
+    - [Depend on Modules](./Module-Dependencies.md)
+    - [IO API for Modules](./IO-API-for-Modules.md)
+    - [Module Security](./Module-Security.md)
+  - [Renderer](./Renderer.md)
+  - [Serialization](./Serialization-Overview.md)
 
 ### 👩‍🏫 Tutorial Modules
   - [🔗 Overview](https://github.com/Terasology?q=Tutorial&type=source&language=)
@@ -39,30 +39,30 @@
   - [🔗 World Generation](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 
 ### ℹ️ Contributor Information
-  - [[Terasology's Multi-Repo Workspace]]
-  - [[How to Work on a PR Efficiently | How-to-Work-on-a-PR-Efficiently]]
-  - [[Code Conventions]]
-  - [[Developing with GitHub UI / Desktop|Setting-up-a-Light-Environment]]
-  - [[Deal with Forks|Dealing-with-Forks]]
-  - [[Troubleshooting for Developers|Troubleshooting-Developer]]
+  - [Terasology's Multi-Repo Workspace](./Terasology's-Multi-Repo-Workspace.md)
+  - [How to Work on a PR Efficiently](./How-to-Work-on-a-PR-Efficiently.mediawiki)
+  - [Code Conventions](./Code-Conventions.md)
+  - [Developing with GitHub UI / Desktop](./Setting-up-a-Light-Environment.md)
+  - [Deal with Forks](./Dealing-with-Forks.md)
+  - [Troubleshooting for Developers](./Troubleshooting-Developer.md)
 
 ### 📚  Guides
-  - [[Texture Guide | Textures]]
-  - [[Translation Guide]]
-  - [[Block Shape Guide | Block Shapes]]
-  - [[Block Definition Guide | Block Definitions]]
-  - [[Interactive Blocks Guide | Interactive Blocks]]
-  - [[Command Guide | Developing-Commands]]
+  - [Texture Guide](./Textures.md)
+  - [Translation Guide](./Translation-Guide.md)
+  - [Block Shape Guide](./Block-Shapes.md)
+  - [Block Definition Guide](./Block-Definitions.md)
+  - [Interactive Blocks Guide](./Interactive-Blocks.md)
+  - [Command Guide](./Developing-Commands.md)
   - Record & Replay
-    - [[How to Use Record and Replay]]
-    - [[Replay Tests]]
-    - [[Record and Replay Code Details]]
-  - [[Outreach]]
+    - [How to Use Record and Replay](./How-to-Use-Record-and-Replay.md)
+    - [Replay Tests](./Replay-Tests.md)
+    - [Record and Replay Code Details](./Record-and-Replay-Code-Details.md)
+  - [Outreach](./Outreach.md)
 
 ### 🤖 Maintainer Guides
-  - [[Release: Omega]]
-  - [[Release: Modules]]
-  - [[Build Setup]]
-  - [[Maintenance]]
-  - [[Play Test Setup]]
-  - [[Discord Integrations]]
+  - [Release: Omega](./Release-Omega.md)
+  - [Release: Modules](./Release-Modules.md)
+  - [Build Setup](./Build-Setup.md)
+  - [Maintenance](./Maintenance.md)
+  - [Play Test Setup](./Play-Test-Setup.md)
+  - [Discord Integrations](./Discord-Integrations.md)
