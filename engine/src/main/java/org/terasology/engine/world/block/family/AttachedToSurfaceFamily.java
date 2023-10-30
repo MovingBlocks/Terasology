@@ -10,6 +10,7 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.gestalt.naming.Name;
 
 import java.util.Locale;
@@ -27,13 +28,13 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
 
-    public AttachedToSurfaceFamily(BlockFamilyDefinition definition) {
-        super(definition);
+    public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
         throw new UnsupportedOperationException("Freeform blocks not supported");
     }
 
     public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition);
+        super(definition, blockBuilder);
 
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (definition.getData().hasSection("top")) {

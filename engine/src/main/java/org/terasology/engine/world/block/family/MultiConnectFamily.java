@@ -17,6 +17,7 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.gestalt.naming.Name;
 
 import java.util.Locale;
@@ -39,12 +40,23 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
 
     /**
+     * Constructor for a block with a specified shape
+     *
+     * @param definition Family definition
+     * @param shape The shape of the block
+     * @param blockBuilder The builder to make the blocks for the family
+     */
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
+    }
+
+    /**
      * Constructor for a regular block
      *
      * @param definition Family definition
      */
-    public MultiConnectFamily(BlockFamilyDefinition definition) {
-        super(definition);
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
     }
 
     /**
