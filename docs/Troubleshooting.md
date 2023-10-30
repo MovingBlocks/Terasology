@@ -2,12 +2,12 @@ Not everything succeeds on the first try. When that happens check this page to s
 
 <table align="center">
   <thead><tr>
-    <th width="50%">[[Players | Troubleshooting-Player]]</th>
-    <th width="50%">[[Developers | Troubleshooting-Developer]]</th>
+    <th width="50%"><a href="#/Troubleshooting-Player">Players</a></th>
+    <th width="50%"><a href="#/Troubleshooting-Developer">Developers</a></th>
   </tr></thead>
   <tr>
-    <td width="50%" align="center"><a href="Troubleshooting-Player">[[icons/baseline-videogame_asset-24px.svg | width=96px]]</a></td>
-    <td width="50%" align="center"><a href="Troubleshooting-Developer">[[icons/baseline-bug_report-24px.svg | width=96px]]</a></td>
+    <td width="50%" align="center"><a href="Troubleshooting-Player"><img src="icons/baseline-videogame_asset-24px.svg" width=96px /></a></td>
+    <td width="50%" align="center"><a href="Troubleshooting-Developer"><img src="icons/baseline-bug_report-24px.svg" width=96px /></a></td>
   </tr>
   <tr>
     <td width="50%">A crashing game is not enough entertainment? :boom: Search no more, we can help! ... at least we try :wink:</td>

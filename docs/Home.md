@@ -6,7 +6,7 @@ It doesn't cover game content or how to play the game much, but check out the do
 
 Use the sidebar to arrive at the most central topics this wiki covers.
 
-See [[What is Terasology]] for some more background information.
+See [What is Terasology](./What-is-Terasology.md) for some more background information.
 
 ## Joining the Community & Asking for Help
 
@@ -20,9 +20,9 @@ However, it has a lot of more or less actionable ideas for improvement and a bun
 
 ## Contributing
 
-Interested in getting involved with working on the game? Make sure to check out the [[Contributor Quick Start]] for setting up your first workspace and starting the game from source. It also has useful links on how to start with your first contribution.
+Interested in getting involved with working on the game? Make sure to check out the [Contributor Quick Start](./Contributor-Quick-Start.md) for setting up your first workspace and starting the game from source. It also has useful links on how to start with your first contribution.
 
-We also apply for [[GSOC]] - [Google Summer of Code](https://developers.google.com/open-source/gsoc) and [[GCI]] - [Google Code-In](https://codein.withgoogle.com/) every year. So if you're a student and it is that time of the year maybe check it out!
+We also apply for GSOC - [Google Summer of Code](https://developers.google.com/open-source/gsoc) and [GCI](./GCI.md) - [Google Code-In](https://codein.withgoogle.com/) every year. So if you're a student and it is that time of the year maybe check it out!
 
 ## Architecture
 
@@ -39,11 +39,11 @@ All Terasology modules reside in the [Terasology](https://github.com/Terasology)
 
 These pages offer more advanced insight into how specific features of the game are architected and why.
 
-- [[Project Sturcture | Codebase Structure]] - a high-level overview of the code base
-- [[Entity System Architecture]] - describes the structure and usage of the entity system.
-- [[Events and Systems]] - describes how new game logic can be hooked in
+- [Project Sturcture](./Codebase-Structure.md) - a high-level overview of the code base
+- [Entity System Architecture](./Entity-System-Architecture.md) - describes the structure and usage of the entity system.
+- [Events and Systems](./Events-and-Systems.md) - describes how new game logic can be hooked in
 - [Block Architecture](https://github.com/Terasology/TutorialAssetSystem/wiki/Block-Attributes) - development overview of our Block system. (pending changes needed to make the game work in an applet again)
-- [[Block Shapes]] - defining 3D meshes via definitions in JSON!
+- [Block Shapes](./Block-Shapes.md) - defining 3D meshes via definitions in JSON!
 
 ## Announcement Channels
 

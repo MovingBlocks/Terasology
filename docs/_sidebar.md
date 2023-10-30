@@ -39,7 +39,7 @@
   - [🔗 World Generation](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 
 ### ℹ️ Contributor Information
-  - [Terasology's Multi-Repo Workspace](./Terasology's-Multi-Repo-Workspace.md)
+  - [Multi-Repo Workspace](./Multi-Repo-Workspace.md)
   - [How to Work on a PR Efficiently](./How-to-Work-on-a-PR-Efficiently.mediawiki)
   - [Code Conventions](./Code-Conventions.md)
   - [Developing with GitHub UI / Desktop](./Setting-up-a-Light-Environment.md)

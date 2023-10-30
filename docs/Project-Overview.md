@@ -6,8 +6,6 @@ Sites
 Our online presence covers:
 
 * [Portal / forum](http://forum.terasology.org) - main site for announcements and discussion
-* [Freenode IRC](https://webchat.freenode.net) - live chat and support, when somebody is available (please be patient!)
- * If you're new to IRC please read [[Using IRC]] and understand it isn't quite like instant messaging, many lurk and only occasionally respond :-)
 * [Meta Server](http://meta.terasology.org) - shows a list of game servers, modules, and so on. Can be used via API and is used as such by the game and launcher.
 * [Splash Site](http://terasology.org) - a small GitHub Page (hosted [here](https://github.com/MovingBlocks/movingblocks.github.com) to intro the game, play via applet, or even run the soundtrack (top left - Flash)
  * Note: Both applets and flash are aging as technologies and may not work in some browsers due to support and security. Goal is to eventually replace with Java Webstart and HTML5.
@@ -18,13 +16,13 @@ Primary Repositories
 
 The central components of Terasology live under two GitHub Organizations. The ones needed to run the base game are listed below.
 
-See [[Codebase Structure]] for more details on each piece
+See [Codebase Structure](./Codebase-Structure.md) for more details on each piece
 
 * [MovingBlocks](https://github.com/MovingBlocks) - this organization primarily contains the engine itself plus facades. It also holds some library projects - more below
   * [Engine](https://github.com/MovingBlocks/Terasology): The beating heart of the game. Also contains the PC Facade (the standard application) and the Core Module, as they're required for the base game to run normally
 * [Terasology](https://github.com/Terasology) - this organization is entirely meant for hosting content modules. These come in two flavors
-  * Root repos: Modules that follow the full [[Contributor Guidelines]] and may be maintained to some degree by the official community
-  * Fork repos: Modules hosted by modders elsewhere on GitHub that follow the [[Modder Guidelines]] and are eligible for inclusion in official distributions and the launcher
+  * Root repos: Modules that follow the full Contributor Guidelines and may be maintained to some degree by the official community
+  * Fork repos: Modules hosted by modders elsewhere on GitHub that follow the Modder Guidelines and are eligible for inclusion in official distributions and the launcher
 
 Libraries
 ---------

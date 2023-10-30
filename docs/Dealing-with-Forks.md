@@ -1,4 +1,4 @@
-Alright, you have gone through [[Contributor Quick Start]] and maybe looked at [[Developing Modules]] - now how about actually submitting some changes back to GitHub?
+Alright, you have gone through [Contributor Quick Start](./Contributor-Quick-Start.md) and maybe looked at [Developing Modules](./Developing-Modules.md) - now how about actually submitting some changes back to GitHub?
 
 There are two ways to submit changes back to GitHub, either gaining write ("push") access to any of our root repos or forking personal copies of any of them yourself.
 
@@ -24,7 +24,7 @@ While you can fork module repos we hand out write access to modules pretty easil
 
 Multiple people can work directly on a single module repo if they coordinate well, but this is where it becomes useful to work via Pull Requests (PRs - see below)
 
-To get access ask in our [forum](http://forum.terasology.org/forum) or on IRC (`#terasology` on Freenode) - see [[Using IRC]] and be patient please :-)
+To get access ask in our [forum](http://forum.terasology.org/forum) - be patient please :-)
 
 Trusted long-term contributors can eventually get these rights to the main repos under the `MovingBlocks` organization on GitHub. 
 

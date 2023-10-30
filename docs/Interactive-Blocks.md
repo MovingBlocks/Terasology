@@ -32,7 +32,7 @@ With the tiles object it is possible to specify cube like blocks with up to 6 di
 The properties of the `tiles` object should reference textures by their asset URI: `<module name>:<tile image name without extension>` (learn more in the [Asset System Tutorial](https://github.com/Terasology/TutorialAssetSystem/wiki)).
 Any image under `assets/blockTiles` in module can be referenced that way.
 
-For more details about the block properties have a look at [[Block Definitions]].
+For more details about the block properties have a look at [Block Definitions](./Block-Definitions.md).
 
 ## Block Entity
 

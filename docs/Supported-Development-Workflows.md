@@ -6,7 +6,7 @@ This document is aimed at those who are testing the development environment itse
 
 A 🧩 symbol in this document indicates an incomplete section. This is a wiki, please help here you can!
 
-If you have questions about what's needed or you want to someone to look over what you've written before you commit it, ask us in the `#logistics` channel of [[Discord|Home#communication]].
+If you have questions about what's needed or you want to someone to look over what you've written before you commit it, ask us in the `#logistics` channel of [Discord](./Home.md#joining-the-community--asking-for-help).
 
 # Engine, Subsystems, Facade
 
@@ -93,4 +93,4 @@ The version number of a module is defined by the `version` field in its `module.
 
 Running Terasology while developing one of its dependencies outside of the `MovingBlocks/Terasology` project, such as TeraNUI.
 
-See [[Using Locally Developed Libraries]].
+See [Using Locally Developed Libraries](./Using-Locally-Developed-Libraries.md).

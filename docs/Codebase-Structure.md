@@ -1,4 +1,4 @@
-This is an overview of the different parts of our primary codebase and will be primarily of interest to developers/modders. See also [[Project Overview]] for a higher level view across more different projects.
+This is an overview of the different parts of our primary codebase and will be primarily of interest to developers/modders. See also [Project Overview](./Project-Overview.md) for a higher level view across more different projects.
 
 Gradle
 ---------
@@ -36,11 +36,11 @@ IntelliJ (versions 2020.1 and newer) will load the configuration from gradle aft
 The configuration includes:
 
 * Several run configurations including "TerasologyPC" will be created and immediately be available for execution. These run configurations includes memory settings and the "--homedir" parameter that makes game data files save in the install directory rather than the data directory (easier for development)
-* [[Checkstyle]] integration with IntelliJ will be enabled. This allows you to catch style violations that clash with the project conventions. Please check these before committing :D
-* You'll be able to automatically insert the [[Project Header]] (copyright etc) in new files (TODO: More details)
-* [[Annotations]], which are used extensively in the project, will get some special consideration when IntelliJ looks at whether code is used or not
+* Checkstyle integration with IntelliJ will be enabled. This allows you to catch style violations that clash with the project conventions. Please check these before committing :D
+* You'll be able to automatically insert the Project Header (copyright etc) in new files (TODO: More details)
+* Annotations, which are used extensively in the project, will get some special consideration when IntelliJ looks at whether code is used or not
 
-The biggest architectural piece of the engine is our [[Entity System|Entity System Architecture]] which powers just about everything, much more than just creatures (typically considered "movable entities" or "mobs")
+The biggest architectural piece of the engine is our [Entity System](./Entity-System-Architecture.md) which powers just about everything, much more than just creatures (typically considered "movable entities" or "mobs")
 
 
 Facades
@@ -83,7 +83,7 @@ On the next execution of Gradle the new module will be detected and scanned. If 
 
 * Does the dependency exist as another local source module? If so then use that.
 * If not then look for a local binary version present in the modules directory. If you later fetch a source module the binary version will be ignored.
-* If a dependency is still not found go to our [[Artifactory]] instance and look there. If found the binary is copied to the local modules directory to be available at runtime. This will resolve as a local binary next time.
+* If a dependency is still not found go to our Artifactory instance and look there. If found the binary is copied to the local modules directory to be available at runtime. This will resolve as a local binary next time.
 
 You can update all your modules to the latest source via the command:
 
@@ -99,30 +99,30 @@ After the next Gradle execution (like "gradlew idea" to regenerate IntelliJ file
 
 For more on modules see:
 
-* [[Module.txt]] the manifest for a module. Includes description stuff, author info, dependencies, etc.
-* [[Module Versioning|Release:-Modules#versioning]]
+* [Module.txt](./Module.txt.md) the manifest for a module. Includes description stuff, author info, dependencies, etc.
+* [Module Versioning](./Release-Modules.md#versioning)
 * [Semantic Versioning](http://semver.org) (SemVer).
-* [[Modding Guide]]
-* [[Gestalt Modules|https://github.com/MovingBlocks/gestalt/wiki/Modules]] - In-depth discussion of Modules (non-Terasology-specific)
+* Modding Guide
+* [Gestalt Modules](https://github.com/MovingBlocks/gestalt/wiki/Modules) - In-depth discussion of Modules (non-Terasology-specific)
 
 Libraries
 ---------
 
-`libs/` is a directory you can use for including [[developing libraries|Using Locally Developed Libraries]].
+`libs/` is a directory you can use for including [Locally Developed Libraries](./Using-Locally-Developed-Libraries.md).
 
 Other File Types
 ---------
 
 Beyond code, we have a few major groups of files
 
-* **Game assets** - actual content used by the game. Might be textures, block shapes, models, etc. See [[Asset Types]] for more information.
+* **Game assets** - actual content used by the game. Might be textures, block shapes, models, etc. See Asset Types for more information.
 * **[Protobuf](http://code.google.com/p/protobuf)** - this is a framework for structured data provided by Google. It is used to store data in a binary format for efficient transfer over network connection.
 * **Module manifests** - as mentioned above. Each module has a manifest that describes it and any dependencies it has. This includes versioning information.
 
 We heavily use [JSON](http://www.json.org/) throughout our projects to store text data / assets, configuration, meta-data, and so on. Rather than using json as the file extension, each asset uses an extension relevant to what it is, such as:
 
-* `.block` = Block definition files. See [[Block Architecture]] for more details. Might be outdated at the moment though :-(
-* `.shape` = Defines a 3d shape that a block may have. These can be exported from Blender using a [[bundled addon|Block Shapes In Blender]]
+* `.block` = Block definition files. See Block Architecture for more details. Might be outdated at the moment though :-(
+* `.shape` = Defines a 3d shape that a block may have. These can be exported from Blender using a bundled addon.
 * `.prefab` = "Prefabricated" object, a recipe for creating entities in our entity system. They can also be used to define static information without generating an entity.
 * `.texinfo` = Added configuration for how textures should behave.
 
@@ -137,10 +137,8 @@ Common Issues and Other Notes
 Related Pages
 ---------
 
-* [[Dev Setup]]
-* [[Contributor Guide]]
-* [[Code Conventions]]
-* [[Modding Guide]]
-* [[Modding API]]
-* [[Entity System Architecture]]
-* [[Shape Architecture]]
+* [Contributor Quick Start Guide](./Contributor-Quick-Start.md)
+* [Code Conventions](./Code-Conventions.md)
+* [Modding API](./Modding-API.md)
+* [Entity System Architecture](./Entity-System-Architecture.md)
+* [Shape Architecture](./Block-Shapes.md)

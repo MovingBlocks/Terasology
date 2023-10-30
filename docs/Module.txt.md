@@ -3,10 +3,10 @@
 ## Contents
 
 * _id_ - Machine-readable name of the module.  Used by the terasology engine and other modules to refer to the module.
-* _version_ - Version of the module. See [[Module Versioning|Release:-Modules#versioning]]
+* _version_ - Version of the module. See [Module Versioning](./Release-Modules.md#versioning)
 * _displayName_ - The name of the module isplayed to end-users
 * _description_ - Human-readable description of the module.
-* _dependencies_ - List of ids and minVersions of modules needed for this module to work. See [[Module-Dependencies]]
+* _dependencies_ - List of ids and minVersions of modules needed for this module to work. See [Module-Dependencies](./Module-Dependencies.md)
 * _defaultWorldGenerator_ - The default world generator to use for this module.
 
 ### Ways to categorize your module:
@@ -34,4 +34,5 @@
     }
 
 ## More information
-[[Gestalt Modules|https://github.com/MovingBlocks/gestalt/wiki/Modules]] - In-depth discussion of Modules (non-Terasology-specific)
+
+[Gestalt Modules](https://github.com/MovingBlocks/gestalt/wiki/Modules) - In-depth discussion of Modules (non-Terasology-specific)

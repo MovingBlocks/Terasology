@@ -16,6 +16,6 @@ To do this, download an appropriate 16x11 icon from the [famfamfam.com icon pack
 Rename it to `flag_xx.png`, `xx` being the two-letter code you've used before.
 
 Submit your translation as a pull request.
-See [[Contributor Quick Start]] and [[Dealing with Forks]] for help.
+See [Contributor Quick Start](./Contributor-Quick-Start.md) and [Dealing with Forks](./Dealing-with-Forks.md) for help.
 
 And while you're at it, feel free to add yourself to [Credits.md](https://github.com/MovingBlocks/Terasology/blob/develop/docs/Credits.md) as a new contributor!

@@ -50,7 +50,7 @@ Consider testing locally with `ipconfig -flushdns` or comparable if needed, then
 
 Use a tool like WinSCP or any other SSH / file transfer tool of your choice
 
-* Make sure you have the desired build available locally and extracted (see [[Release: Omega]] for instructions how to create a release)
+* Make sure you have the desired build available locally and extracted (see [Release: Omega](./Release-Omega.md) for instructions how to create a release)
 * Open an `ssh` session for user "root" on the server and go to `/opt/terasology` if not already there
 * `rm -rf server libs modules` to reset current state
 * Copy the `libs` and `modules` from your local build to the server

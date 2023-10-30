@@ -31,7 +31,7 @@ The configuration for the game is in [`/facades/PC/src/main/resources/logback.xm
 
 ## See also
 
-* [[Developing Modules]] - how to edit an existing module, or create a new one
-* [[Modding API]] - the methods a module is allowed to call
-* [[Module Dependencies]] - how to deal with modules that depend on another
-* [[Dealing with Forks]] - work with your own copies of GitHub repos you can write to
+* [Developing Modules](./Developing-Modules.md) - how to edit an existing module, or create a new one
+* [Modding API](./Modding-API.md) - the methods a module is allowed to call
+* [Module Dependencies](./Module-Dependencies.md) - how to deal with modules that depend on another
+* [Dealing with Forks](./Dealing-with-Forks.md) - work with your own copies of GitHub repos you can write to

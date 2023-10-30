@@ -4,7 +4,7 @@ This is a guide for maintainers to explain how the [CI/CD pipeline](http://jenki
 
 The Terasology engine repository at [MovingBlocks/Terasology :octocat:](https://github.com/MovingBlocks/Terasology) follows a **two-branch setup** with `master` and `develop`.
 Commits to these branches are automatically built and published to our [Artifactory], either as a release or as snapshots.
-For more details, see our [[Build-Setup]].
+For more details, see our [Build-Setup](./Build-Setup.md).
 
 ## Branches
 

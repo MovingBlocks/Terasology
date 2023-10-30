@@ -39,7 +39,7 @@
 
 ## Get Help when Facing Issues
 
-* Check out our wiki pages on [[Troubleshooting|Troubleshooting-Developer]]
+* Check out our wiki pages on [Troubleshooting](./Troubleshooting-Developer.md)
 * Join our community on [Discord](https://discord.gg/terasology) and ask questions
 
 
@@ -62,11 +62,11 @@ You can read through the intro topics for more details on exactly how to set up 
 * [Resources for Learning Git & GitHub](https://help.github.com/articles/good-resources-for-learning-git-and-github)
   * [Recommended Git Tutorial](http://learngitbranching.js.org)
   * [Recommended GitHub Tutorial](https://help.github.com/categories/bootcamp)
-* [[Codebase Structure]]
-* [[Module Dependencies]] - explains how you can have module `X` depend on module `Y` even at a specific version level
-* [[Developing Modules]] - shows you how to interact with and organize modules that hold most the content for the game
+* [Codebase Structure](./Codebase-Structure.md)
+* [Module Dependencies](./Module-Dependencies.md) - explains how you can have module `X` depend on module `Y` even at a specific version level
+* [Developing Modules](./Developing-Modules.md) - shows you how to interact with and organize modules that hold most the content for the game
 * Advanced Gradle and Groovy usage: take a look at `gradlew tasks` and `groovyw usage`
-* [[Using Locally Developed Libraries]]
+* [Using Locally Developed Libraries](./Using-Locally-Developed-Libraries.md)
 
 
 ## Notes

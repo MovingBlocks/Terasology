@@ -17,26 +17,26 @@ The block definition files are structures as any other JSON document. For inform
 
 Block definitions can extend from other block definitions, specifying just the features by which they differ. This simplifies creating classes of block (like plants).
 
- Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**basedOn**   | _A block definition uri (e.g. "engine:plant")_ |  | Specifies the block to base this block on.
-**template** | _true, false_ | false | If true, this block cannot be created and exists only to be based on.
+ | Option       |                    Value(s)                    | Default | Description                                                           |
+ | ------------ | :--------------------------------------------: | :-----: | --------------------------------------------------------------------- |
+ | **basedOn**  | _A block definition uri (e.g. "engine:plant")_ |         | Specifies the block to base this block on.                            |
+ | **template** |                 _true, false_                  |  false  | If true, this block cannot be created and exists only to be based on. |
 
 ## Informational
 
- Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**displayName** | <string> | The file name of the block, with the first letter capitalised | The name of the block that is shown to players - particularly when the block is picked up and in their inventory.
+ | Option          | Value(s) |                            Default                            | Description                                                                                                       |
+ | --------------- | :------: | :-----------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------- |
+ | **displayName** | <string> | The file name of the block, with the first letter capitalised | The name of the block that is shown to players - particularly when the block is picked up and in their inventory. |
 
 ## Core behavioural
 
- Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**attachmentAllowed**   | _true, false_ | true  | Determines whether other blocks can be attached to this block.
-**hardness**            | \<int\>       | 3     | Specifies the hardness of the block - effectively its health.
-**liquid**              | _true, false_ | false | Determines if the block is a liquid.
-**replacementAllowed**  | _true, false_ | false | Specifies whether the block can be replaced freely by other blocks - that you can place another block over it. **In order to make a block replaceable, it requires the block not to be targetable!**
-**supportRequired**     | _true, false_ | false | Specify whether the block should be destroyed when no longer attached to any other block. **Only works for vertically adjacent blocks - e.g. grass is removed if the ground under it is destroyed**
+ | Option                 |   Value(s)    | Default | Description                                                                                                                                                                                          |
+ | ---------------------- | :-----------: | :-----: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+ | **attachmentAllowed**  | _true, false_ |  true   | Determines whether other blocks can be attached to this block.                                                                                                                                       |
+ | **hardness**           |    \<int\>    |    3    | Specifies the hardness of the block - effectively its health.                                                                                                                                        |
+ | **liquid**             | _true, false_ |  false  | Determines if the block is a liquid.                                                                                                                                                                 |
+ | **replacementAllowed** | _true, false_ |  false  | Specifies whether the block can be replaced freely by other blocks - that you can place another block over it. **In order to make a block replaceable, it requires the block not to be targetable!** |
+ | **supportRequired**    | _true, false_ |  false  | Specify whether the block should be destroyed when no longer attached to any other block. **Only works for vertically adjacent blocks - e.g. grass is removed if the ground under it is destroyed**  |
 
 ## Tiles
 By default, a block will try to use a tile texture with a matching filename. e.g. A block defined in Grass.block will use the block tile Grass.png from the same module.
@@ -61,26 +61,26 @@ Possible block parts are
  * **front, left, right, back, top, bottom** refer to the specific sides
  * **center** to change the tile on the center part of the block (see the section on shapes_
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**tile** | _a blockTile uri_ | A block tile with the same module and name as block definition | Specifies what blockTile to use to texture this block
-**tiles**           |    |       | Allows the blockTile used by different parts/sides of the block to be overridden.
-**doubleSided**     | _true, false_                     | false | Whether this block should be rendered double sided. This done for billboard plants to render both sides of polygons.
-**invisible**       | _true, false_                     | false | If set to `true` the block is not rendered at all.
-**translucent**     | _true, false_                     | false | Determines whether the block is transparent/translucent or not. Blocks with this option enabled can use textures with transparency (but not translucency, see _ice_). Moreover, translucent blocks do not prevent occluded blocks behind them from beeing rendered (blocks behind a translucent glass block are still displayed).
-**ice**             | _true, false_                     | false | Determines whether the block is translucent, but not completely transparent. Blocks with this option enabled can use textures with translucency. Blocks with this enabled should also have _translucent_ enabled, or they will occlude blocks behind them.
-**shadowCasting**   | _true, false_                     | true  | Should this block cast a slight shadow around it?
-**waving**          | _true, false_                     | false | Whether the blocks waves in the wind. Mainly used for grass and foliage.
-**luminance**       | _\<int\>_                         | 0     | The light level of the block. The default torches have a light value of 15, for reference.
+| Option            |     Value(s)      |                            Default                             | Description                                                                                                                                                                                                                                                                                                                       |
+| ----------------- | :---------------: | :------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **tile**          | _a blockTile uri_ | A block tile with the same module and name as block definition | Specifies what blockTile to use to texture this block                                                                                                                                                                                                                                                                             |
+| **tiles**         |                   |                                                                | Allows the blockTile used by different parts/sides of the block to be overridden.                                                                                                                                                                                                                                                 |
+| **doubleSided**   |   _true, false_   |                             false                              | Whether this block should be rendered double sided. This done for billboard plants to render both sides of polygons.                                                                                                                                                                                                              |
+| **invisible**     |   _true, false_   |                             false                              | If set to `true` the block is not rendered at all.                                                                                                                                                                                                                                                                                |
+| **translucent**   |   _true, false_   |                             false                              | Determines whether the block is transparent/translucent or not. Blocks with this option enabled can use textures with transparency (but not translucency, see _ice_). Moreover, translucent blocks do not prevent occluded blocks behind them from beeing rendered (blocks behind a translucent glass block are still displayed). |
+| **ice**           |   _true, false_   |                             false                              | Determines whether the block is translucent, but not completely transparent. Blocks with this option enabled can use textures with translucency. Blocks with this enabled should also have _translucent_ enabled, or they will occlude blocks behind them.                                                                        |
+| **shadowCasting** |   _true, false_   |                              true                              | Should this block cast a slight shadow around it?                                                                                                                                                                                                                                                                                 |
+| **waving**        |   _true, false_   |                             false                              | Whether the blocks waves in the wind. Mainly used for grass and foliage.                                                                                                                                                                                                                                                          |
+| **luminance**     |     _\<int\>_     |                               0                                | The light level of the block. The default torches have a light value of 15, for reference.                                                                                                                                                                                                                                        |
 
 ### Color Lookup tables (LUTs)
 Color gradients can be used to change the color of specific blocks, e.g. grass or fooliage.
 
- Option | Value(s)  |  Description
---------|:---------:|-------------
-**colorSource**     | _\<source\>_                    | e.g. `"colorSource" : "color_lut"`.
-**colorSources**    |    | Enumerate the different color sources, `default` can be used to exclude LUTs for specific block parts.
-**colorOffset**     | [R, G, B, A ]                     | Specify a color offset, e.g. given for red leaves: `"colorOffset" : '[2.0, 0.0, 0.5, 1.0']`.
+ | Option           |   Value(s)    | Description                                                                                            |
+ | ---------------- | :-----------: | ------------------------------------------------------------------------------------------------------ |
+ | **colorSource**  | _\<source\>_  | e.g. `"colorSource" : "color_lut"`.                                                                    |
+ | **colorSources** |               | Enumerate the different color sources, `default` can be used to exclude LUTs for specific block parts. |
+ | **colorOffset**  | [R, G, B, A ] | Specify a color offset, e.g. given for red leaves: `"colorOffset" : '[2.0, 0.0, 0.5, 1.0']`.           |
 
 ## Shapes and Rotation
 
@@ -110,27 +110,27 @@ When using the alignToSurface rotation mode, you can specify a "sides", "top" an
 
 would be shaped like a cube when placed on the ground, and shaped like stairs when placed against a side. It cannot be placed against a ceiling (as no shape is defined for that case). Many properties can be overridden in this manner.
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-shape | _a shape uri_ | "engine:cube" | The shape of the block
-shapes | _a lists of shape uris_ | | A set of valid shapes for this block
-rotation | _none, horizontal, alignToSurface_ | none | Defines the rotation mode for the block
-top/bottom/sides | | | In alignToSurface rotation mode, allows settings to be specified for specific surface placements
+| Option           |              Value(s)              |    Default    | Description                                                                                      |
+| ---------------- | :--------------------------------: | :-----------: | ------------------------------------------------------------------------------------------------ |
+| shape            |           _a shape uri_            | "engine:cube" | The shape of the block                                                                           |
+| shapes           |      _a lists of shape uris_       |               | A set of valid shapes for this block                                                             |
+| rotation         | _none, horizontal, alignToSurface_ |     none      | Defines the rotation mode for the block                                                          |
+| top/bottom/sides |                                    |               | In alignToSurface rotation mode, allows settings to be specified for specific surface placements |
 
-For more on shapes see [[Shape Architecture]]
+For more on shapes see [Block Shapes](Block-Shapes.md)
 
 ## Collision related
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**penetrable**  | _true, false_ | false | A block is penetrable if it does not block solid objects.
-**targetable**  | _true, false_ | true  | Define whether the block can be targeted for interactions. **Must be set to `false` to allow direct replacement.**
+| Option         |   Value(s)    | Default | Description                                                                                                        |
+| -------------- | :-----------: | :-----: | ------------------------------------------------------------------------------------------------------------------ |
+| **penetrable** | _true, false_ |  false  | A block is penetrable if it does not block solid objects.                                                          |
+| **targetable** | _true, false_ |  true   | Define whether the block can be targeted for interactions. **Must be set to `false` to allow direct replacement.** |
 
 ## Physics related
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**debrisOnDestroy** | _true, false_ | true  | If enabled destroyed blocks will drop a miniature instance of the block that can be picked up by the player.
-**mass**            | _\<int\>_     | 10    | The mass value for the physics simulation.
+| Option              |   Value(s)    | Default | Description                                                                                                  |
+| ------------------- | :-----------: | :-----: | ------------------------------------------------------------------------------------------------------------ |
+| **debrisOnDestroy** | _true, false_ |  true   | If enabled destroyed blocks will drop a miniature instance of the block that can be picked up by the player. |
+| **mass**            |   _\<int\>_   |   10    | The mass value for the physics simulation.                                                                   |
 
 > The mass does not seem to have any influence on the objects in the game.
 
@@ -142,10 +142,10 @@ The options for enity integration are wrapped in the `entity` option, e.g. for a
         "mode"   : "persistent"
     }
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**prefab**  | _\<prefab\>_      |               | The corresponding entity prefab for this block.
-**mode**    | _\<EntityMode\>_  | onInteraction | Specify the mode for the entity. For information on the enity  modes see [[Entity Modes]].
+| Option     |     Value(s)     |    Default    | Description                                     |
+| ---------- | :--------------: | :-----------: | ----------------------------------------------- |
+| **prefab** |   _\<prefab\>_   |               | The corresponding entity prefab for this block. |
+| **mode**   | _\<EntityMode\>_ | onInteraction | Specify the mode for the entity.                |
 
 ## Inventory settings
 The inventory settings have to be in an `inventory` section as well, e.g. again for the chest definition:
@@ -155,29 +155,29 @@ The inventory settings have to be in an `inventory` section as well, e.g. again 
         "directPickup" : true
     }
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**directPickup**    | _true, false_ | false | Whether this block should go directly into a character's inventory when harvested.
-**isStackable**     | _true, false_ | true  | Determines whether the block type is stackable in the inventory.
+| Option           |   Value(s)    | Default | Description                                                                        |
+| ---------------- | :-----------: | :-----: | ---------------------------------------------------------------------------------- |
+| **directPickup** | _true, false_ |  false  | Whether this block should go directly into a character's inventory when harvested. |
+| **isStackable**  | _true, false_ |  true   | Determines whether the block type is stackable in the inventory.                   |
 
 ## Mesh related
 
-Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**shape**   | _\<shape\>_         | "engine:cube" | Define the shape of the block. You can use either existing shapes or use self created ones. For more information, see [[Block Shapes in Blender]] or [[Shapes]] in general.
-**shapes**  | _[\<shape\>,...]_    |               | You can restrict the usage of a block type to some shapes. If not explicitly defined, a block type can be instantiated as any available shape.
+| Option     |     Value(s)      |    Default    | Description                                                                                                                                              |
+| ---------- | :---------------: | :-----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **shape**  |    _\<shape\>_    | "engine:cube" | Define the shape of the block. You can use either existing shapes or use self created ones. For more information, see [Block Shapes](./Block-Shapes.md). |
+| **shapes** | _[\<shape\>,...]_ |               | You can restrict the usage of a block type to some shapes. If not explicitly defined, a block type can be instantiated as any available shape.           |
 
 ## Block Families/Categories
 
- Option | Value(s) | Description
---------|:--------:|-------------
-**categories**  | _\<listOfCategories\>_    | Give a list of categories the block belongs to, e.g. new soil types might go into `"categories" : '["soil"']`.
+ | Option         |        Value(s)        | Description                                                                                                    |
+ | -------------- | :--------------------: | -------------------------------------------------------------------------------------------------------------- |
+ | **categories** | _\<listOfCategories\>_ | Give a list of categories the block belongs to, e.g. new soil types might go into `"categories" : '["soil"']`. |
 
 # Temporary/deprecated
 
- Option | Value(s)  | Default | Description
---------|:---------:|:-------:|-------------
-**craftPlace**          | _true, false_ | true  | Determines whether the player can open up the [[crafting system]] on this block.
+ | Option         |   Value(s)    | Default | Description                                                                  |
+ | -------------- | :-----------: | :-----: | ---------------------------------------------------------------------------- |
+ | **craftPlace** | _true, false_ |  true   | Determines whether the player can open up the crafting system on this block. |
 
 # Suggestions
 * Add soundfile specification for walking sounds on specific block types?

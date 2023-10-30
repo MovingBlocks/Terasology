@@ -1,6 +1,6 @@
 *Note: This page is still under construction!*
 
-In Terasology, [[block shapes|Shape Architecture]] are defined in **.shape** files. These are JSON files (technically, [[GSON|https://github.com/google/gson]]) which provide rendering mesh data, physics collision data, and mouse collision data for Terasology's voxel blocks.
+In Terasology, [block shapes](./Block-Shapes.md) are defined in **.shape** files. These are JSON files (technically, [GSON](https://github.com/google/gson) which provide rendering mesh data, physics collision data, and mouse collision data for Terasology's voxel blocks.
 
 This page lists the Shape File format's specification standards, and their history.
 
