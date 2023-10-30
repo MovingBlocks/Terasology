@@ -396,8 +396,6 @@ public class SaveTransaction implements Runnable {
                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     bos.write(compressedChunk);
                 }
-                // FIXME: this only closes happy path but not if exceptions are thrown
-                zip.close();
             }
             // Copy existing, unmodified content into the zips and close them
             for (Map.Entry<Vector3i, FileSystem> chunkZipEntry : newChunkZips.entrySet()) {
@@ -420,7 +418,6 @@ public class SaveTransaction implements Runnable {
                         }
                     }
                 }
-                zip.close();
             }
         } else {
             for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : allChunks.entrySet()) {
