@@ -17,7 +17,7 @@
     - [Events and Systems](Events-and-Systems.md)
     - [Event Types](Event-Types.md)
     - [Component Types](Component-Types.md)
-    - [Entities, Components and Events on the Network](Entities,-Components-and-Events-on-the-Network.md)
+    - [Entities, Components and Events on the Network](Entities-Components-and-Events-on-the-Network.md)
   - Module System
     - [Modding API](Modding-API.md)
     - [Develop Modules](Developing-Modules.md)

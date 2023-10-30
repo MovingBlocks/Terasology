@@ -75,4 +75,4 @@ Some ideas that take less effort:
 * Class loader tricks to allow for "headless server + remote client" in one JVM
 
 Synchronization part:
- * See [Entities,-Components-and-Events-on-the-Network](https://github.com/MovingBlocks/Terasology/wiki/Entities,-Components-and-Events-on-the-Network)
+ * See [Entities, Components and Events on the Network](Entities-Components-and-Events-on-the-Network.md)
