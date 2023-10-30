@@ -97,7 +97,7 @@ class Environment {
         PathManager.getInstance();
     }
 
-    protected void setupModuleManager(Set<Name> moduleNames) throws RuntimeException {
+    protected void setupModuleManager(Set<Name> moduleNames) {
         // empty
     }
 
@@ -160,7 +160,7 @@ class Environment {
      *
      * @throws RuntimeException if something goes wrong
      */
-    public void close() throws RuntimeException {
+    public void close() {
         CoreRegistry.setContext(null);
         context = null;
     }
