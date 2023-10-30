@@ -69,10 +69,9 @@ public final class HTMLLikeParser {
         if (text == null) {
             return null;
         }
-        StringReader reader = new StringReader(text);
 
         int character;
-        try {
+        try (StringReader reader = new StringReader(text)) {
             StringBuilder sb = new StringBuilder();
             Font font = null;
             Color color = null;
@@ -154,14 +153,10 @@ public final class HTMLLikeParser {
                 result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
             }
 
-            reader.close();
-
             return result;
         } catch (IOException exp) {
             // Ignore - can't happen
         }
-
-        reader.close();
 
         return null;
     }

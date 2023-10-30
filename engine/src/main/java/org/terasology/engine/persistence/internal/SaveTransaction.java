@@ -396,6 +396,7 @@ public class SaveTransaction implements Runnable {
                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     bos.write(compressedChunk);
                 }
+                // FIXME: this only closes happy path but not if exceptions are thrown
                 zip.close();
             }
             // Copy existing, unmodified content into the zips and close them
