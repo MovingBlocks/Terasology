@@ -16,7 +16,7 @@ Primary Repositories
 
 The central components of Terasology live under two GitHub Organizations. The ones needed to run the base game are listed below.
 
-See [Codebase Structure](./Codebase-Structure.md) for more details on each piece
+See [Codebase Structure](Codebase-Structure.md) for more details on each piece
 
 * [MovingBlocks](https://github.com/MovingBlocks) - this organization primarily contains the engine itself plus facades. It also holds some library projects - more below
   * [Engine](https://github.com/MovingBlocks/Terasology): The beating heart of the game. Also contains the PC Facade (the standard application) and the Core Module, as they're required for the base game to run normally

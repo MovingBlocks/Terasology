@@ -24,7 +24,7 @@ More often then not, you will need more information then just the description of
 Terasology uses [OpenGL 2.1](https://www.opengl.org/sdk/docs/man2/) for all it's rendering. Shaders are written in the corresponding [GLSL version 1.2](https://www.opengl.org/registry/doc/GLSLangSpec.Full.1.20.8.pdf).
 
 ## Related Links
-* [Renderer](./Renderer.md)
+* [Renderer](Renderer.md)
 * [OpenGL 2.1 specification](https://www.opengl.org/sdk/docs/man2/)
 * [GLSL 1.2 specification](https://www.opengl.org/registry/doc/GLSLangSpec.Full.1.20.8.pdf)
 * [LWJGL OpenGL package documentation](http://javadoc.lwjgl.org/index.html?org/lwjgl/opengl/package-summary.html)

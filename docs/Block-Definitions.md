@@ -164,7 +164,7 @@ The inventory settings have to be in an `inventory` section as well, e.g. again 
 
 | Option     |     Value(s)      |    Default    | Description                                                                                                                                              |
 | ---------- | :---------------: | :-----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **shape**  |    _\<shape\>_    | "engine:cube" | Define the shape of the block. You can use either existing shapes or use self created ones. For more information, see [Block Shapes](./Block-Shapes.md). |
+| **shape**  |    _\<shape\>_    | "engine:cube" | Define the shape of the block. You can use either existing shapes or use self created ones. For more information, see [Block Shapes](Block-Shapes.md). |
 | **shapes** | _[\<shape\>,...]_ |               | You can restrict the usage of a block type to some shapes. If not explicitly defined, a block type can be instantiated as any available shape.           |
 
 ## Block Families/Categories

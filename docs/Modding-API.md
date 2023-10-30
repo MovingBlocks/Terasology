@@ -21,8 +21,8 @@ As we improve our documentation system expect to eventually see a JavaDoc-like s
 
 ## See also
 
-* [Developing Modules](./Developing-Modules.md) - how to edit an existing module or create a new one
-* [Testing Modules](./Testing-Modules.md) - test your module with unit tests and integration tests
-* [Module Dependencies](./Module-Dependencies.md) - how to deal with modules that depend on another
-* [I/O API for Modules](./IO-API-for-Modules.md) - reading and writing files from modules
-* [Module Security](./Module-Security.md) - which threats does the module sandbox protect against, and how?
+* [Developing Modules](Developing-Modules.md) - how to edit an existing module or create a new one
+* [Testing Modules](Testing-Modules.md) - test your module with unit tests and integration tests
+* [Module Dependencies](Module-Dependencies.md) - how to deal with modules that depend on another
+* [I/O API for Modules](IO-API-for-Modules.md) - reading and writing files from modules
+* [Module Security](Module-Security.md) - which threats does the module sandbox protect against, and how?

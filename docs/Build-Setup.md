@@ -1,7 +1,7 @@
 In Terasology, the engine as well as all libraries and modules are automatically built on [Jenkins](https://jenkins.terasology.io) and the resulting build artifacts published to our [Artifactory](http://artifactory.terasology.org).
 While libraries and the engine define how they are built via a `Jenkinsfile` and `build.gradle` in their repositories, the modules in the [Terasology GitHub Org](https://github.com/Terasology) do not (yet).
 
-![Terasology - Build Setup](./images/Build-Setup.png)
+![Terasology - Build Setup](images/Build-Setup.png)
 
 ## Local Module Builds
 

@@ -16,7 +16,7 @@ A partial side does not.
 Below is an example stair block shape, with each side moved away from the center.
 In the stair block, the Back and Bottom sides are full sides, while the Top, Front, Left and Right sides are not.
 
-![An 'exploded' block shape](./block-shapes-exploded.png)
+![An 'exploded' block shape](block-shapes-exploded.png)
 
 ## Shape part
 
@@ -131,7 +131,7 @@ The second pane, Terasology Mesh Properties, contains settings that apply to the
 
 Example properties screen (may be outdated):
 
-![Properties window](./block-shapes-TerasologyProperties.png)
+![Properties window](block-shapes-TerasologyProperties.png)
 
 ### Tips & Tricks
 

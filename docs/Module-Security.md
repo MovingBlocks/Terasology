@@ -70,8 +70,8 @@ The restrictions of ModuleSecurityPolicy apply to classes which were loaded usin
 
 
 # Related:
-* [Modding API](./Modding-API.md)
-* [IO API for Modules](./IO-API-for-Modules.md) for local persistent storage
+* [Modding API](Modding-API.md)
+* [IO API for Modules](IO-API-for-Modules.md) for local persistent storage
 
 
 # Threats not addressed

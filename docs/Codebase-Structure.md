@@ -1,4 +1,4 @@
-This is an overview of the different parts of our primary codebase and will be primarily of interest to developers/modders. See also [Project Overview](./Project-Overview.md) for a higher level view across more different projects.
+This is an overview of the different parts of our primary codebase and will be primarily of interest to developers/modders. See also [Project Overview](Project-Overview.md) for a higher level view across more different projects.
 
 Gradle
 ---------
@@ -40,7 +40,7 @@ The configuration includes:
 * You'll be able to automatically insert the Project Header (copyright etc) in new files (TODO: More details)
 * Annotations, which are used extensively in the project, will get some special consideration when IntelliJ looks at whether code is used or not
 
-The biggest architectural piece of the engine is our [Entity System](./Entity-System-Architecture.md) which powers just about everything, much more than just creatures (typically considered "movable entities" or "mobs")
+The biggest architectural piece of the engine is our [Entity System](Entity-System-Architecture.md) which powers just about everything, much more than just creatures (typically considered "movable entities" or "mobs")
 
 
 Facades
@@ -99,8 +99,8 @@ After the next Gradle execution (like "gradlew idea" to regenerate IntelliJ file
 
 For more on modules see:
 
-* [Module.txt](./Module.txt.md) the manifest for a module. Includes description stuff, author info, dependencies, etc.
-* [Module Versioning](./Release-Modules.md#versioning)
+* [Module.txt](Module.txt.md) the manifest for a module. Includes description stuff, author info, dependencies, etc.
+* [Module Versioning](Release-Modules.md#versioning)
 * [Semantic Versioning](http://semver.org) (SemVer).
 * Modding Guide
 * [Gestalt Modules](https://github.com/MovingBlocks/gestalt/wiki/Modules) - In-depth discussion of Modules (non-Terasology-specific)
@@ -108,7 +108,7 @@ For more on modules see:
 Libraries
 ---------
 
-`libs/` is a directory you can use for including [Locally Developed Libraries](./Using-Locally-Developed-Libraries.md).
+`libs/` is a directory you can use for including [Locally Developed Libraries](Using-Locally-Developed-Libraries.md).
 
 Other File Types
 ---------
@@ -137,8 +137,8 @@ Common Issues and Other Notes
 Related Pages
 ---------
 
-* [Contributor Quick Start Guide](./Contributor-Quick-Start.md)
-* [Code Conventions](./Code-Conventions.md)
-* [Modding API](./Modding-API.md)
-* [Entity System Architecture](./Entity-System-Architecture.md)
-* [Shape Architecture](./Block-Shapes.md)
+* [Contributor Quick Start Guide](Contributor-Quick-Start.md)
+* [Code Conventions](Code-Conventions.md)
+* [Modding API](Modding-API.md)
+* [Entity System Architecture](Entity-System-Architecture.md)
+* [Shape Architecture](Block-Shapes.md)

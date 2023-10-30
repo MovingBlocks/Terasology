@@ -1,4 +1,4 @@
-Alright, you have gone through [Contributor Quick Start](./Contributor-Quick-Start.md) and maybe looked at [Developing Modules](./Developing-Modules.md) - now how about actually submitting some changes back to GitHub?
+Alright, you have gone through [Contributor Quick Start](Contributor-Quick-Start.md) and maybe looked at [Developing Modules](Developing-Modules.md) - now how about actually submitting some changes back to GitHub?
 
 There are two ways to submit changes back to GitHub, either gaining write ("push") access to any of our root repos or forking personal copies of any of them yourself.
 
