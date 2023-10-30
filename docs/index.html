@@ -24,7 +24,8 @@
       loadSidebar: true,
       autoHeader: true,
       search: 'auto',
-      homepage: 'https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/README.md',
+      //homepage: 'https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/README.md',
+      homepage: 'Home.md',
       pagination: {
         crossChapter: true,
         crossChapterText: true,
@@ -33,14 +34,14 @@
         EditOnGithubPlugin.create(
           "https://github.com/MovingBlocks/Terasology/tree/develop/docs/"
         ),
-        function (hook) {
-          // this "fixes" the relative links in the README which is loaded from remote (see 'homepage' above)
-          hook.beforeEach(function (content) {
-            return content
-                    .replace(new RegExp("https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/docs/"), "")
-                    .replace(new RegExp("./docs/"), "");
-          })
-        }
+        // function (hook) {
+        //   // this "fixes" the relative links in the README which is loaded from remote (see 'homepage' above)
+        //   hook.beforeEach(function (content) {
+        //     return content
+        //             .replace(new RegExp("https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/docs/"), "")
+        //             .replace(new RegExp("./docs/"), "");
+        //   })
+        // }
       ],
     }
   </script>
