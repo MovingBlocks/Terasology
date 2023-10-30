@@ -4,7 +4,6 @@
 package org.terasology.engine.core.subsystem.config;
 
 import org.terasology.engine.config.BindsConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;

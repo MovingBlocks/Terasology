@@ -4,8 +4,6 @@ package org.terasology.engine.core.modes;
 
 import com.google.common.base.MoreObjects;
 import org.terasology.engine.audio.AudioManager;
-import org.terasology.engine.config.Config;
-import org.terasology.engine.config.TelemetryConfig;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.modes.loadProcesses.RegisterInputSystem;
@@ -17,11 +15,7 @@ import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.engine.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.engine.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.engine.telemetry.TelemetryScreen;
-import org.terasology.engine.telemetry.TelemetryUtils;
-import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.engine.utilities.Assets;
 
 /**

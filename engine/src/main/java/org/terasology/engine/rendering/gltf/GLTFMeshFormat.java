@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.gltf;
 
-import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TIntArrayList;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
@@ -15,7 +11,6 @@ import org.terasology.engine.rendering.gltf.model.GLTF;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
 import org.terasology.engine.rendering.gltf.model.GLTFMesh;
-import org.terasology.engine.rendering.gltf.model.GLTFNode;
 import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AssetDataFile;
