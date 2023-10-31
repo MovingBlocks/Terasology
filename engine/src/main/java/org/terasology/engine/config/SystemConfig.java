@@ -11,6 +11,8 @@ import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.max;
 import static org.terasology.engine.config.flexible.SettingArgument.constraint;
@@ -81,7 +83,7 @@ public class SystemConfig extends AutoConfig {
 
     public final Setting<Locale> locale = setting(
             type(Locale.class),
-            defaultValue(Locale.getDefault(Category.DISPLAY)),
+            defaultValue(getAdjustedLocale()),
             name("${engine:menu#settings-language}"),
             constraint(new LocaleConstraint(Locale.getAvailableLocales())) // TODO provide translate project's locales (Pirate lang don't works)
     );
@@ -89,5 +91,21 @@ public class SystemConfig extends AutoConfig {
     @Override
     public String getName() {
         return "${engine:menu#system-settings-title}";
+    }
+
+    private static Locale getAdjustedLocale() {
+        Locale systemLocale = Locale.getDefault(Category.DISPLAY);
+
+        // Matches strings like xx_XX. e.g. en_US
+        final Pattern langRegionPattern = Pattern.compile("[a-z]{2}_[A-Z]{2}");
+
+        String input = systemLocale.toString();
+        Matcher matcher = langRegionPattern.matcher(input);
+
+        // If the locale is like that, convert it to just the language, e.g. en_US -> en
+        if (matcher.find()) {
+            systemLocale = Locale.forLanguageTag(systemLocale.getLanguage());
+        }
+        return systemLocale;
     }
 }
