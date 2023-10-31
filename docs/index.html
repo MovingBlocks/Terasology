@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Terasology - Knowledge Base</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="google-site-verification" content="AEyBzDSx59v83eaRwdY3ghuYBa4g072fzgMdtQiCCn8" />
+  <meta name="description"
+    content="An open source voxel game - imagine the possibilities!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="//cdn.jsdelivr.net/npm/docsify-edit-on-github"></script>
+  <script>
+    window.$docsify = {
+      name: 'Terasology',
+      repo: 'MovingBlocks/Terasology',
+      logo: '/_media/icon.svg',
+      themeColor: '#08A045',
+      loadSidebar: true,
+      autoHeader: true,
+      search: 'auto',
+      //homepage: 'https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/README.md',
+      homepage: 'Home.md',
+      pagination: {
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      plugins: [
+        EditOnGithubPlugin.create(
+          "https://github.com/MovingBlocks/Terasology/tree/develop/docs/"
+        ),
+        // function (hook) {
+        //   // this "fixes" the relative links in the README which is loaded from remote (see 'homepage' above)
+        //   hook.beforeEach(function (content) {
+        //     return content
+        //             .replace(new RegExp("https://raw.githubusercontent.com/MovingBlocks/Terasology/develop/docs/"), "")
+        //             .replace(new RegExp("./docs/"), "");
+        //   })
+        // }
+      ],
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json5.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
+</body>
+
+</html>
