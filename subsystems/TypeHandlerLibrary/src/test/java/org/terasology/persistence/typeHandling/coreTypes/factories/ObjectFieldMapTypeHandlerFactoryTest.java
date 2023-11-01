@@ -25,10 +25,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-// both, pmd and spotbugs complain about not used private fields, suppress in
-// the static test class, but fields are checked. suppress.
-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class ObjectFieldMapTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
@@ -117,6 +113,11 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         private U u;
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+            value = "UUF_UNUSED_FIELD",
+            justification = "Direct member access is not expected. TypeHandler factory dynamically loads type handlers on type handler" +
+                    " creation based on member types of input class TypeInfo. ")
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private static class SomeClass<T> {
         private T t;
         private List<T> list;

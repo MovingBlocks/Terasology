@@ -22,9 +22,6 @@ import java.util.Optional;
  * methods that use {@link #serializeToPersisted(Object, TypeInfo)} and {@link #deserializeFromPersisted(PersistedData,
  * TypeInfo)}.
  */
-// log statements after an if are marked as false positive, suppress.
-// see pmd bug: https://github.com/pmd/pmd/issues/4731
-@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
 public final class Serializer<D extends PersistedData> {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
@@ -87,7 +84,7 @@ public final class Serializer<D extends PersistedData> {
             D persistedData = reader.read(inputStream);
             return deserializeFromPersisted(persistedData, type);
         } catch (IOException e) {
-            logger.error("Cannot deserialize type [" + type + "]", e);
+            logger.error("Cannot deserialize type [{}]", type, e);
         }
         return Optional.empty();
     }
@@ -105,7 +102,7 @@ public final class Serializer<D extends PersistedData> {
             D persistedData = reader.read(bytes);
             return deserializeFromPersisted(persistedData, type);
         } catch (IOException e) {
-            logger.error("Cannot deserialize type [" + type + "]", e);
+            logger.error("Cannot deserialize type [{}]", type, e);
         }
         return Optional.empty();
     }
@@ -143,7 +140,7 @@ public final class Serializer<D extends PersistedData> {
             try {
                 writer.writeTo(persistedData.get(), outputStream);
             } catch (IOException e) {
-                logger.error("Cannot serialize [" + type + "]", e);
+                logger.error("Cannot serialize [{}]", type, e);
             }
         } else {
             logger.error("Cannot serialize [{}]", type);

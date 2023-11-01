@@ -14,7 +14,6 @@ import java.util.Map;
  * A serializer provides low-level serialization support for a type, using a mapping of type handlers for each field of that type.
  *
  */
-@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
 public class Serializer {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);

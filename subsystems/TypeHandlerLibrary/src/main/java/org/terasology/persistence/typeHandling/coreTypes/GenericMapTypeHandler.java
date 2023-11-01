@@ -60,7 +60,6 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
         return serializer.serialize(result);
     }
 
-    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     @Override
     public Optional<Map<K, V>> deserialize(PersistedData data) {
 

@@ -37,10 +37,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-
-// spotbugs does thinks Assertions.assertThrows does not throw the exception, even if
-// test is successful. see bug: https://github.com/spotbugs/spotbugs/issues/2667.
-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 class InMemorySerializerTest {
     private final InMemoryPersistedDataSerializer serializer = new InMemoryPersistedDataSerializer();
 

@@ -31,9 +31,6 @@ public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
         return serializer.serialize(value.toString());
     }
 
-    // log after else is false positive, suppress.
-    // see bug: https://github.com/pmd/pmd/issues/4731
-    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     @Override
     public Optional<T> deserialize(PersistedData data) {
         if (data.isString()) {

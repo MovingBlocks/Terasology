@@ -21,8 +21,9 @@ dependencies {
     // spotbugs annotations to suppress warnings are not included via spotbugs plugin
     // see bug: https://github.com/spotbugs/spotbugs-gradle-plugin/issues/1018
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.1")
-    pmd("net.sourceforge.pmd:pmd-core:6.55.0")
-    pmd("net.sourceforge.pmd:pmd-java:6.55.0")
+    pmd("net.sourceforge.pmd:pmd-ant:7.0.0-rc4")
+    pmd("net.sourceforge.pmd:pmd-core:7.0.0-rc4")
+    pmd("net.sourceforge.pmd:pmd-java:7.0.0-rc4")
 
     testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
         because("runtime: to configure logging during tests with logback.xml")

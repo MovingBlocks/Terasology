@@ -65,7 +65,10 @@ public class FutureTypeHandlerTest {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+            value = "SIC_INNER_SHOULD_BE_STATIC",
+            justification = "Test code is not performance-relevant, flagged inner ResultCaptor class is a mock with dynamic behavior" +
+                    " and cannot be static.")
     private class ResultCaptor<T> implements Answer {
         private T result = null;
         public T getResult() {
