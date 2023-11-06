@@ -1,0 +1,66 @@
+== Introduction ==
+The first thing to understand when you submit a Pull Request (PR) is that you are asking for somebody's else Time. 
+
+Somebody has to spend time to review the PR, test it and then merge it, the review part usually being the most time-consuming. 
+
+This page intends to offer some clear guidelines on how to structure your PR process to minimize Reviewer's time and maximize the efficiency of the process.
+
+== Executive Summary ==
+* Talk to People
+* Produce good code and structured commits
+* Keep it Small
+* Write a solid Description
+* Use GitHub well
+
+== How To Work on a PR Efficiently ==
+===Step 0 for an efficient PR: before you even start writing code===
+* '''Talk to the people who would be in the position to review and approve the changes you have in mind.'''
+** Ideally these are people who are actively working in that area or have worked on it in the past.
+* '''Make sure they agree with the general direction of the changes you intend to propose.'''
+** Work out with them, in written form (diagrams, bullet points), the broad strokes of what you intend to do.
+** You will waste your time if you don't.
+** Changes envisioned by contributors that are known to be good at handling feedback are more readily embraced.'''
+* Some areas have been left "orphan" by the ebb and flow of contributors over time.
+** On one hand there's the opportunity for you to become the new curator of an area.
+** On the other hand you will need approval from people that do not know much about that area, requiring an extra communication effort to clear with them what you are doing.
+
+===Step 1 for an efficient PR: before you even submit a PR===
+* '''Write well readable, well maintainable code that does the job''' - that's a given or your code won't go anywhere.
+* '''Self-documenting code is good, but usually not enough.''' Javadocs and inline comments remain necessary.
+** Javadocs for public methods ''may'' be <u>postponed</u> to the latter phase of a PR process, but Javadocs for public classes are usually necessary right away, especially when new classes are introduced or existing classes are changed significantly.
+** Inline comments should document <u>why</u> the code is the way it is, not what it does.
+* '''Take advantage of your commits and their descriptions to document your steps.'''
+** A reviewer may look at the changes brought by individual commits, to review one step at the time.
+* '''The best results can be achieved by working on an exploratory branch first.'''
+** Once you are happy with the results, start a new branch from scratch and replicate the changes, this time with a reviewer in mind and with the intent of creating a neat and tidy set of changes.
+** Make sure to group closely-related commits by squashing them into one commit. 
+** Also group trivial changes in isolated commits (i.e. refactoring the order of methods or renaming a class) and clearly mark them as such, so that a reviewer can quickly skim through them.
+
+===Step 2 for an efficient PR: keep it small===
+* Ideally you want to change ''significantly'' at most 10-20 files in one PR. 
+* It is possible and sometimes necessary to change many more files, but the large majority of the changes should then be trivial consequences of significant changes in 10-20 files at most. 
+* Significant changes to large number of files can usually be handled via multiple consecutive PRs.
+* '''PRs significantly changing large number of files tend to require exponentially longer time to review.''' 
+** In extreme cases, PRs that are too big may be left unreviewed and, eventually, may be closed as obsolete.
+
+===Step 3 for an efficient PR: write a solid description for it===
+* Whenever you submit a PR a default template appears as the initial description: take advantage of it and fill it in. 
+** Feel free to partially or completely deviate from the default template, if it makes sense.
+* '''The description of medium to large changes, as well as potentially controversial changes, should show some effort.''' 
+** You might want to draw attention to the changes in specific files as the most significant, declaring other changes trivial consequences of the significant changes.
+** You might also want to draw attention to specific commits, where the most significant changes are, declaring other commits as trivial. 
+** See PR [https://github.com/MovingBlocks/Terasology/pull/3199 #3199] and [https://github.com/MovingBlocks/Terasology/pull/3227 #3227] for some descriptions that clearly took a good effort to write.
+** See also [https://github.com/MovingBlocks/Terasology/pull/1459 #1459] for a more compact description that still shows some effort. 
+* Large PRs like [https://github.com/MovingBlocks/Terasology/pull/3535 #3535] may also link to the files/classes with the most important changes in a "Review guide" to make it easier for reviewers.
+
+===Step 4 for an efficient PR: use GitHub well===
+* Once you have submitted a PR, feel free to add your own GitHub comments to pieces of code you wish to draw attention to.
+** I.e. to have a second opinion on a specific section you are not fully convinced about.
+* '''When the feedback arrives do <u>not rush to push new commits</u>:'''
+** When you push new commits you may hide conversations that haven't reached a conclusion.
+** Ideally, every conversation should end with a thumb up from you or from the reviewer, before new commits are pushed.
+** And your own thumb up should mean: "I made the requested changes locally" - it's a good way to keep track of what you did and didn't yet, before you push the new commits.
+* One thing to not use GitHub for: Editing files on the website using the GitHub code editor in your browser. This bypasses a lot of checks that local code editors / IDEs do well, like matching existing whitespace and actually validating that code still compiles. 
+
+== Conclusion ==
+By taking onboard these guidelines the process leading to your code being merged in should be faster and smoother, for both you and the people reviewing your PRs.

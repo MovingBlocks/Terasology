@@ -96,7 +96,7 @@ fun moduleDependencyOrdering(modulesConfig: Configuration): List<String> {
 
     val result = resolvable.resolutionResult
     val allDependencies = result.allDependencies
-    val resolvedDependencies = allDependencies.mapNotNull {
+    allDependencies.mapNotNull {
         if (it is ResolvedDependencyResult) {
             return@mapNotNull it
         }
