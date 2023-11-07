@@ -13,7 +13,6 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
