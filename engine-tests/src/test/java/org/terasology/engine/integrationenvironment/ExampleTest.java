@@ -19,6 +19,7 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
+import org.terasology.unittest.stubs.DummyEvent;
 
 import java.io.IOException;
 
@@ -75,7 +76,7 @@ public class ExampleTest {
         Context clientContext = helper.createClient();
 
         // send an event to a client's local player just for fun
-        clientContext.get(LocalPlayer.class).getClientEntity().send(new ResetCameraEvent());
+        clientContext.get(LocalPlayer.class).getClientEntity().send(new DummyEvent());
     }
 
     @Test
