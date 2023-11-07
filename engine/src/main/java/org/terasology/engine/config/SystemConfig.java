@@ -8,11 +8,14 @@ import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.LocaleConstraint;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Math.max;
 import static org.terasology.engine.config.flexible.SettingArgument.constraint;
@@ -85,7 +88,10 @@ public class SystemConfig extends AutoConfig {
             type(Locale.class),
             defaultValue(getAdjustedLocale()),
             name("${engine:menu#settings-language}"),
-            constraint(new LocaleConstraint(Locale.getAvailableLocales())) // TODO provide translate project's locales (Pirate lang don't works)
+            constraint(new LocaleConstraint(
+                // Locale.getAvailableLocales() + non-standard "pr" (pirate) tag
+                Stream.concat(Arrays.stream(Locale.getAvailableLocales()), Stream.of(Locale.forLanguageTag("pr")))
+                .collect(Collectors.toSet())))
     );
 
     @Override
@@ -96,15 +102,17 @@ public class SystemConfig extends AutoConfig {
     private static Locale getAdjustedLocale() {
         Locale systemLocale = Locale.getDefault(Category.DISPLAY);
 
-        // Matches strings like xx_XX. e.g. en_US
-        final Pattern langRegionPattern = Pattern.compile("[a-z]{2}_[A-Z]{2}");
+        // Matches unusual locales on Mac OS created from the user's language and location, e.g. en_UA
+        if (!Arrays.asList(Locale.getAvailableLocales()).contains(systemLocale)) {
+            final Pattern langRegionPattern = Pattern.compile("[a-z]{2}_[A-Z]{2}");
 
-        String input = systemLocale.toString();
-        Matcher matcher = langRegionPattern.matcher(input);
+            String input = systemLocale.toString();
+            Matcher matcher = langRegionPattern.matcher(input);
 
-        // If the locale is like that, convert it to just the language, e.g. en_US -> en
-        if (matcher.find()) {
-            systemLocale = Locale.forLanguageTag(systemLocale.getLanguage());
+            // If the locale is like that, convert it to just the language, e.g. en_UA -> en
+            if (matcher.find()) {
+                systemLocale = Locale.forLanguageTag(systemLocale.getLanguage());
+            }
         }
         return systemLocale;
     }
