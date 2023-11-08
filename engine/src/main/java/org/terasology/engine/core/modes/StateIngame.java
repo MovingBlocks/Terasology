@@ -219,8 +219,7 @@ public class StateIngame implements GameState {
         display.prepareToRender();
 
         if (worldRenderer != null) {
-            worldRenderer.render(RenderingStage.LEFT_EYE);
-            worldRenderer.render(RenderingStage.RIGHT_EYE);
+            worldRenderer.render(RenderingStage.MONO);
         }
 
         /* UI */
