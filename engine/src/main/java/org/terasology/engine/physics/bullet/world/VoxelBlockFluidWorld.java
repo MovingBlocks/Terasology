@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
+import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.bullet.BulletPhysics;
 import org.terasology.engine.physics.bullet.shapes.BulletCollisionShape;
@@ -50,7 +51,7 @@ public class VoxelBlockFluidWorld implements VoxelWorld {
         // interacts with liquid only
         short mask = (short) StandardCollisionGroup.LIQUID.getFlag();
         // adds rigid body to world
-        discreteDynamicsWorld.addRigidBody(rigidBody, physics.combineGroups(StandardCollisionGroup.LIQUID), mask);
+        discreteDynamicsWorld.addRigidBody(rigidBody, CollisionGroup.combineGroups(StandardCollisionGroup.LIQUID), mask);
     }
 
 

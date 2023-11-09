@@ -15,6 +15,7 @@ import java.util.List;
 
 @ForceBlockActive
 public class RigidBodyComponent implements Component<RigidBodyComponent> {
+
     @Replicate
     public float mass = 10.0f;
     @Replicate
@@ -33,8 +34,8 @@ public class RigidBodyComponent implements Component<RigidBodyComponent> {
     public float friction = 0.5f;
 
     /**
-     * The ratio of the relative velocity after impact to the relative velocity before the impact of two colliding
-     * bodies, equal to 1 for an elastic collision and 0 for an inelastic collision.
+     * The ratio of the relative velocity after impact to the relative velocity before the impact of two colliding bodies, equal to 1 for an
+     * elastic collision and 0 for an inelastic collision.
      */
     @Replicate
     public float restitution = 0f;

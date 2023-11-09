@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -19,7 +18,6 @@ import org.terasology.engine.math.Side;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.telemetry.GamePlayStatsComponent;
 import org.terasology.engine.utilities.Assets;
@@ -46,16 +44,16 @@ public class BlockItemSystem extends BaseComponentSystem {
     private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.04f;
 
     @In
-    private WorldProvider worldProvider;
+    protected WorldProvider worldProvider;
 
     @In
-    private BlockEntityRegistry blockEntityRegistry;
+    protected BlockEntityRegistry blockEntityRegistry;
 
     @In
-    private AudioManager audioManager;
+    protected NetworkSystem networkSystem;
 
     @In
-    private NetworkSystem networkSystem;
+    protected Physics physics;
 
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
@@ -176,7 +174,6 @@ public class BlockItemSystem extends BaseComponentSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            Physics physics = CoreRegistry.get(Physics.class);
             AABBf blockBounds = block.getBounds(blockPos);
 
             /**

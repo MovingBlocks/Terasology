@@ -25,7 +25,6 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.StorageManager;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.engine.rendering.world.WorldRenderer;
@@ -148,8 +147,6 @@ public class StateIngame implements GameState {
             worldRenderer = null;
         }
         componentSystemManager.shutdown();
-
-        context.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
 

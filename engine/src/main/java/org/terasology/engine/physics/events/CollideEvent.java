@@ -4,6 +4,7 @@
 package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 
@@ -12,17 +13,17 @@ import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
  * TODO Have a CollideRequest before the CollideEvent?
  */
 public class CollideEvent extends AbstractConsumableEvent {
-    private EntityRef otherEntity;
-    private Vector3f entityContactPoint;
-    private Vector3f otherEntityContactPoint;
-    private float penetration;
-    private Vector3f normal;
+    private EntityRef otherEntity = EntityRef.NULL;
+    private Vector3f entityContactPoint = new Vector3f();
+    private Vector3f otherEntityContactPoint = new Vector3f();
+    private float penetration = 0.0f;
+    private Vector3f normal = new Vector3f();
 
-    public CollideEvent(EntityRef other, Vector3f entityContactPoint, Vector3f otherEntityContactPoint, float penetration, Vector3f normal) {
+    public CollideEvent(EntityRef other, Vector3fc entityContactPoint, Vector3fc otherEntityContactPoint, float penetration, Vector3fc normal) {
         this.otherEntity = other;
-        this.normal = normal;
-        this.entityContactPoint = entityContactPoint;
-        this.otherEntityContactPoint = otherEntityContactPoint;
+        this.normal.set(normal);
+        this.entityContactPoint.set(entityContactPoint);
+        this.otherEntityContactPoint.set(otherEntityContactPoint);
         this.penetration = penetration;
     }
 

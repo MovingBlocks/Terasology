@@ -3,6 +3,7 @@
 package org.terasology.engine.physics.engine;
 
 import org.terasology.engine.context.Context;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.bullet.BulletPhysics;
 import org.terasology.engine.physics.bullet.shapes.BulletCollisionShapeFactory;
 import org.terasology.engine.physics.shapes.CollisionShape;
@@ -22,12 +23,12 @@ public final class PhysicsEngineManager {
     private PhysicsEngineManager() { }
 
     /**
-     * Create a new {@link PhysicsEngine} instance.
+     * Create a new {@link Physics} instance.
      *
      * @param context The {@link Context} with which to create the engine
-     * @return The created {@link PhysicsEngine} instance.
+     * @return The created {@link Physics} instance.
      */
-    public static PhysicsEngine getNewPhysicsEngine(Context context) {
+    public static Physics getNewPhysicsEngine(Context context) {
         return new BulletPhysics();
     }
 }

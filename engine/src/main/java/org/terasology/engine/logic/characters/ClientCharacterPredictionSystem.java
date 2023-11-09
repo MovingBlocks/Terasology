@@ -20,7 +20,7 @@ import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.collection.CircularBuffer;
 import org.terasology.engine.world.WorldProvider;
@@ -39,7 +39,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
     private Time time;
 
     @In
-    private PhysicsEngine physics;
+    private Physics physics;
 
     @In
     private WorldProvider worldProvider;

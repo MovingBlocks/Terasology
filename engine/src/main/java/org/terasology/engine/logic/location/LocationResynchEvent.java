@@ -9,15 +9,15 @@ import org.terasology.gestalt.entitysystem.event.Event;
 
 @BroadcastEvent
 public class LocationResynchEvent implements Event {
-    public Vector3f position;
-    public Quaternionf rotation;
+    public Vector3f position = new Vector3f();
+    public Quaternionf rotation = new Quaternionf();
 
     public LocationResynchEvent() {
     }
 
     public LocationResynchEvent(Vector3f position, Quaternionf rotation) {
-        this.position = position;
-        this.rotation = rotation;
+        this.position.set(position);
+        this.rotation.set(rotation);
     }
 
     public Vector3f getPosition() {

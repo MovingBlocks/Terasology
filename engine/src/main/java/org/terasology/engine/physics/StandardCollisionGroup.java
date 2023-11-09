@@ -19,7 +19,7 @@ public enum StandardCollisionGroup implements CollisionGroup {
 
     private short flag;
 
-     StandardCollisionGroup(short flag) {
+    StandardCollisionGroup(short flag) {
         this.flag = flag;
     }
 
@@ -32,4 +32,5 @@ public enum StandardCollisionGroup implements CollisionGroup {
     public String getName() {
         return "engine:" + toString().toLowerCase(Locale.ENGLISH);
     }
+
 }

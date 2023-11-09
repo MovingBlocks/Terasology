@@ -16,7 +16,7 @@ import org.terasology.engine.logic.characters.events.SwimStrokeEvent;
 import org.terasology.engine.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.physics.engine.CharacterCollider;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.physics.events.MovedEvent;
 import org.terasology.engine.world.WorldProvider;
@@ -69,11 +69,11 @@ public class KinematicCharacterMover implements CharacterMover {
     // Processing state variables
     private float steppedUpDist;
     private WorldProvider worldProvider;
-    private PhysicsEngine physics;
+    private Physics physics;
 
-    public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
+    public KinematicCharacterMover(WorldProvider wp, Physics physics) {
         this.worldProvider = wp;
-        physics = physicsEngine;
+        this.physics = physics;
     }
 
     @Override

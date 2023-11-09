@@ -4,9 +4,6 @@ package org.terasology.engine.logic.debug;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -27,7 +24,6 @@ import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.utilities.Assets;
@@ -39,16 +35,8 @@ import java.util.Optional;
 @Share(MovementDebugCommands.class)
 public class MovementDebugCommands extends BaseComponentSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
-
-    @In
-    private PhysicsEngine physics;
-
     @In
     private EntityManager entityManager;
-
-    @In
-    private Config config;
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)

@@ -43,7 +43,6 @@ import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
@@ -62,9 +61,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Physics physics;
-
-    @In
-    private PhysicsEngine physicsEngine;
 
     @In
     private NetworkSystem networkSystem;
@@ -473,8 +469,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         entity.saveComponent(character);
 
         // refresh the entity collider - by retrieving the character collider after removing it we force recreation
-        physicsEngine.removeCharacterCollider(entity);
-        physicsEngine.getCharacterCollider(entity);
+        physics.removeCharacterCollider(entity);
+        physics.getCharacterCollider(entity);
 
         // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
         // safely above ground.

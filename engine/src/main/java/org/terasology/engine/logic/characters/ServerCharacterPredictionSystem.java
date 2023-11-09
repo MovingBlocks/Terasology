@@ -23,7 +23,7 @@ import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.engine.CharacterCollider;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.recording.CharacterStateEventPositionMap;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
@@ -54,7 +54,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     private Time time;
 
     @In
-    private PhysicsEngine physics;
+    private Physics physics;
 
     @In
     private WorldProvider worldProvider;
