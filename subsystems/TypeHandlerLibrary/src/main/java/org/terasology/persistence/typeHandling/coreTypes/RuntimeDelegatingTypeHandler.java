@@ -64,7 +64,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         Type runtimeType = getRuntimeTypeIfMoreSpecific(value);
 
         if (!typeInfo.getType().equals(runtimeType)) {
-            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler(runtimeType);
+            var runtimeTypeHandler = typeHandlerLibrary.getTypeHandler(runtimeType);
 
             chosenHandler =
                 (TypeHandler<T>)

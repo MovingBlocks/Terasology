@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
@@ -14,14 +14,14 @@ import java.util.Map;
  * A serializer provides low-level serialization support for a type, using a mapping of type handlers for each field of that type.
  *
  */
-public class Serializer {
+public class Serializer<C> {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
 
-    private ClassMetadata<?, ?> classMetadata;
-    private Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers;
+    private final ClassMetadata<C, ?> classMetadata;
+    private final Map<FieldMetadata<C, ?>, TypeHandler<?>> fieldHandlers;
 
-    public Serializer(ClassMetadata<?, ?> classMetadata, Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers) {
+    public Serializer(ClassMetadata<C, ? extends FieldMetadata<C, ?>> classMetadata, Map<FieldMetadata<C, ?>, TypeHandler<?>> fieldHandlers) {
         this.fieldHandlers = fieldHandlers;
         this.classMetadata = classMetadata;
     }
@@ -30,8 +30,8 @@ public class Serializer {
      * @param field The metadata for a field of the type handled by this serializer.
      * @return The TypeHandler for the given field
      */
-    public TypeHandler<?> getHandlerFor(FieldMetadata<?, ?> field) {
-        return fieldHandlers.get(field);
+    public <F> TypeHandler<F> getHandlerFor(FieldMetadata<C, F> field) {
+        return (TypeHandler<F>) fieldHandlers.get(field);
     }
 
     /**
@@ -42,11 +42,10 @@ public class Serializer {
      * @param context   The current serialization context
      * @return The serialized value of the field
      */
-    @SuppressWarnings("unchecked")
-    public PersistedData serialize(FieldMetadata<?, ?> field, Object container, PersistedDataSerializer context) {
-        Object rawValue = field.getValue(container);
+    public <F> PersistedData serialize(FieldMetadata<C, F> field, C container, PersistedDataSerializer context) {
+        F rawValue = field.getValue(container);
         if (rawValue != null) {
-            TypeHandler handler = getHandlerFor(field);
+            TypeHandler<F> handler = getHandlerFor(field);
             if (handler != null) {
                 return handler.serialize(rawValue, context);
             }
@@ -62,9 +61,9 @@ public class Serializer {
      * @param rawValue The value to serialize
      * @return The serialized value
      */
-    @SuppressWarnings("unchecked")
-    public PersistedData serializeValue(FieldMetadata<?, ?> fieldMetadata, Object rawValue, PersistedDataSerializer context) {
-        return fieldHandlers.get(fieldMetadata).serialize(rawValue, context);
+    public <F> PersistedData serializeValue(FieldMetadata<C, F> fieldMetadata, F rawValue, PersistedDataSerializer context) {
+        @SuppressWarnings("unchecked") TypeHandler<F> handler = (TypeHandler<F>) fieldHandlers.get(fieldMetadata);
+        return handler.serialize(rawValue, context);
     }
 
     /**
@@ -74,13 +73,13 @@ public class Serializer {
      * @param fieldMetadata The metadata of the field
      * @param data          The serialized value of the field
      */
-    public void deserializeOnto(Object target, FieldMetadata<?, ?> fieldMetadata, PersistedData data) {
-        TypeHandler<?> handler = getHandlerFor(fieldMetadata);
+    public <F> void deserializeOnto(C target, FieldMetadata<C, F> fieldMetadata, PersistedData data) {
+        TypeHandler<F> handler = getHandlerFor(fieldMetadata);
         if (handler == null) {
             logger.error("No type handler for type {} used by {}::{}", fieldMetadata.getType(), target.getClass(), fieldMetadata);
         } else {
             try {
-                Object deserializedValue = handler.deserializeOrNull(data);
+                F deserializedValue = handler.deserializeOrNull(data);
                 fieldMetadata.setValue(target, deserializedValue);
             } catch (DeserializationException e) {
                 logger.error("Unable to deserialize field '{}' from '{}'", fieldMetadata.getName(), data.toString(), e);
@@ -94,7 +93,7 @@ public class Serializer {
      * @param target  The object to deserialize onto
      * @param values  The collection of values to apply to the object
      */
-    public void deserializeOnto(Object target, PersistedDataMap values) {
+    public void deserializeOnto(C target, PersistedDataMap values) {
         deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance());
     }
 
@@ -105,15 +104,16 @@ public class Serializer {
      * @param values The collection of values to apply to the object
      * @param check  A check to filter which fields to deserialize
      */
-    public void deserializeOnto(Object target, PersistedDataMap values, DeserializeFieldCheck check) {
-        for (Map.Entry<String, PersistedData> field : values.entrySet()) {
-            FieldMetadata<?, ?> fieldInfo = classMetadata.getField(field.getKey());
+    public void deserializeOnto(C target, PersistedDataMap values, DeserializeFieldCheck check) {
+        values.entrySet().forEach(field -> goomp(target, check, field.getKey(), field.getValue()));
+    }
 
-            if (fieldInfo != null && check.shouldDeserialize(classMetadata, fieldInfo)) {
-                deserializeOnto(target, fieldInfo, field.getValue());
-            } else if (fieldInfo == null) {
-                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getKey(), classMetadata.getId());
-            }
+    private void goomp(C target, DeserializeFieldCheck check, String fieldName, PersistedData data) {
+        var fieldInfo = classMetadata.getField(fieldName);
+        if (fieldInfo != null && check.shouldDeserialize(classMetadata, fieldInfo)) {
+            deserializeOnto(target, fieldInfo, data);
+        } else if (fieldInfo == null) {
+            logger.warn("Cannot deserialize unknown field '{}' onto '{}'", fieldName, classMetadata.getId());
         }
     }
 
@@ -123,7 +123,7 @@ public class Serializer {
      * @param target The object to deserialize onto
      * @param values The collection of values to apply to the object
      */
-    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values) {
+    public void deserializeOnto(C target, Map<FieldMetadata<C, ?>, PersistedData> values) {
         deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance());
     }
 
@@ -134,12 +134,12 @@ public class Serializer {
      * @param values The collection of values to apply to the object
      * @param check  A check to filter which fields to deserialize
      */
-    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializeFieldCheck check) {
-        for (Map.Entry<FieldMetadata<?, ?>, PersistedData> field : values.entrySet()) {
-            if (check.shouldDeserialize(classMetadata, field.getKey())) {
-                deserializeOnto(target, field.getKey(), field.getValue());
+    public void deserializeOnto(C target, Map<FieldMetadata<C, ?>, PersistedData> values, DeserializeFieldCheck check) {
+        values.forEach((field, data) -> {
+            if (check.shouldDeserialize(classMetadata, field)) {
+                deserializeOnto(target, field, data);
             }
-        }
+        });
     }
 
 

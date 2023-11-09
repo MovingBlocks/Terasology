@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
@@ -42,7 +42,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
 
             getResolvedFields(typeInfo).forEach(
                     (field, fieldType) -> {
-                        Optional<TypeHandler<?>> declaredFieldTypeHandler =
+                        var declaredFieldTypeHandler =
                                 context.getTypeHandlerLibrary().getTypeHandler(fieldType);
 
                         TypeInfo<?> fieldTypeInfo = TypeInfo.of(fieldType);

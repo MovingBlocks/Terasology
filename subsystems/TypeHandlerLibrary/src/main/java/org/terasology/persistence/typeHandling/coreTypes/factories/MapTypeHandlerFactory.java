@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
@@ -20,7 +20,6 @@ import java.util.Optional;
 public class MapTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringMapTypeHandler.class);
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
         if (!Map.class.isAssignableFrom(typeInfo.getRawType())) {
@@ -36,31 +35,25 @@ public class MapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<?>> declaredValueTypeHandler =
-                context.getTypeHandlerLibrary().getTypeHandler(valueType);
-
-        TypeInfo<?> valueTypeInfo = TypeInfo.of(valueType);
-
-        @SuppressWarnings("unchecked")
-        TypeHandler<?> valueTypeHandler = new RuntimeDelegatingTypeHandler(
-                declaredValueTypeHandler.orElse(null),
-                valueTypeInfo,
+        TypeHandler<?> valueTypeHandler = new RuntimeDelegatingTypeHandler<>(
+                context.getTypeHandlerLibrary().<T>getTypeHandler(valueType).orElse(null),
+                TypeInfo.of(valueType),
                 context
         );
 
+        TypeHandler<T> result;
         if (String.class.equals(keyType)) {
-            return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
+            //noinspection unchecked
+            result = (TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler);
         } else {
-            Optional<TypeHandler<?>> declaredKeyTypeHandler =
-                    context.getTypeHandlerLibrary().getTypeHandler(keyType);
-            TypeInfo<?> keyTypeInfo = TypeInfo.of(keyType);
-            @SuppressWarnings("unchecked")
-            TypeHandler<?> keyTypeHandler = new RuntimeDelegatingTypeHandler(
-                    declaredKeyTypeHandler.orElse(null),
-                    keyTypeInfo,
+            TypeHandler<?> keyTypeHandler = new RuntimeDelegatingTypeHandler<>(
+                    context.getTypeHandlerLibrary().getTypeHandler(keyType).orElse(null),
+                    TypeInfo.of(keyType),
                     context
             );
-            return Optional.of((TypeHandler<T>) new GenericMapTypeHandler<>(keyTypeHandler, valueTypeHandler));
+            //noinspection unchecked
+            result = (TypeHandler<T>) new GenericMapTypeHandler<>(keyTypeHandler, valueTypeHandler);
         }
+        return Optional.of(result);
     }
 }

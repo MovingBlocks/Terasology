@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -52,9 +53,9 @@ public class RuntimeDelegatingTypeHandlerTest {
 
         this.typeHandlerLibrary = typeHandlerLibrary;
         // We must mock `getTypeHandler(Type)`, not only `getTypeHandler(Class<>)`
-        when(typeHandlerLibrary.getTypeHandler((Type) baseType))
+        Mockito.<Optional<TypeHandler<Base>>>when(typeHandlerLibrary.getTypeHandler((Type) baseType))
                 .thenReturn(Optional.of(baseTypeHandler));
-        when(typeHandlerLibrary.getTypeHandler((Type) subType))
+        Mockito.<Optional<TypeHandler<Sub>>>when(typeHandlerLibrary.getTypeHandler((Type) subType))
                 .thenReturn(Optional.of(subTypeHandler));
 
         when(sandbox.findSubTypeOf(subType.getName(), baseType))

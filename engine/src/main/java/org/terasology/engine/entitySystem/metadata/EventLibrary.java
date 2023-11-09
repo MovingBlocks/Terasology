@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.metadata;
 
@@ -49,7 +49,6 @@ public class EventLibrary extends ModuleClassLibrary<Event> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public EventMetadata<? extends Event> getMetadata(ResourceUrn uri) {
         return (EventMetadata<? extends Event>) super.getMetadata(uri);
     }

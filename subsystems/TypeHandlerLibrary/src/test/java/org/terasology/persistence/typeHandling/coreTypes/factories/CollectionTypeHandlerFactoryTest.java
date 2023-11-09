@@ -1,8 +1,7 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
-import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
@@ -10,7 +9,6 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ConstructorLibrary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,7 @@ import static org.mockito.Mockito.verify;
 
 public class CollectionTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-    private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap()));
+    private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory();
 
     private final TypeHandlerContext context =
             new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));

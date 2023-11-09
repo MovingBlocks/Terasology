@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.persistence.serializers;
@@ -61,19 +61,17 @@ public class EventSerializer {
     }
 
     /**
-     * @param eventData
      * @return The event described by the eventData
-     * @throws org.terasology.engine.persistence.typeHandling.DeserializationException if an error occurs when deserializing
+     * @throws org.terasology.persistence.typeHandling.DeserializationException if an error occurs when deserializing
      */
     public Event deserialize(EntityData.Event eventData) {
-        Class<? extends Event> eventClass = getEventClass(eventData);
+        var eventClass = getEventClass(eventData);
         if (eventClass != null) {
-            EventMetadata<?> eventMetadata = eventLibrary.getMetadata(eventClass);
+            var eventMetadata = eventLibrary.getMetadata(eventClass);
             if (!eventMetadata.isConstructable()) {
                 throw new DeserializationException("Cannot deserialize " + eventMetadata + " - lacks default constructor");
             } else {
-                Event event = eventMetadata.newInstance();
-                return deserializeOnto(event, eventData, eventMetadata);
+                return deserializeOnto(eventMetadata.newInstance(), eventData, eventMetadata);
             }
         } else {
             throw new DeserializationException("Unable to deserialize unknown event type: " + eventData.getType());
@@ -81,11 +79,11 @@ public class EventSerializer {
     }
 
 
-    private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, EventMetadata<? extends Event> eventMetadata) {
-        Serializer serializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
+    private <C extends Event> Event deserializeOnto(C targetEvent, EntityData.Event eventData, EventMetadata<C> eventMetadata) {
+        Serializer<C> serializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
         for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
             byte fieldId = eventData.getFieldIds().byteAt(i);
-            ReplicatedFieldMetadata<?, ?> fieldInfo = eventMetadata.getField(fieldId);
+            var fieldInfo = eventMetadata.getField(fieldId);
             if (fieldInfo == null) {
                 logger.error("Unable to serialize field {}, out of bounds", fieldId);
                 continue;
@@ -100,12 +98,11 @@ public class EventSerializer {
     /**
      * Serializes an event.
      *
-     * @param event
      * @return The serialized event
-     * @throws org.terasology.engine.persistence.typeHandling.SerializationException if an error occurs during serialization
+     * @throws org.terasology.persistence.typeHandling.SerializationException if an error occurs during serialization
      */
-    public EntityData.Event serialize(Event event) {
-        EventMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
+    public <E extends Event> EntityData.Event serialize(E event) {
+        @SuppressWarnings("unchecked") var eventMetadata = eventLibrary.getMetadata((Class<E>) event.getClass());
         if (eventMetadata == null) {
             throw new SerializationException("Unregistered event type: " + event.getClass());
         } else if (!eventMetadata.isConstructable()) {
@@ -115,19 +112,19 @@ public class EventSerializer {
         EntityData.Event.Builder eventData = EntityData.Event.newBuilder();
         serializeEventType(event, eventData);
 
-        Serializer eventSerializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
+        Serializer<E> eventSerializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
         ByteString.Output fieldIds = ByteString.newOutput();
-        for (ReplicatedFieldMetadata field : eventMetadata.getFields()) {
-            if (field.isReplicated()) {
-                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer
-                        .serialize(field, event, persistedDataSerializer))
-                        .getValue();
-                if (serializedValue != null) {
-                    eventData.addFieldValue(serializedValue);
-                    fieldIds.write(field.getId());
-                }
+        eventMetadata.getFields().stream()
+                .filter(ReplicatedFieldMetadata::isReplicated)
+                .forEach(field -> {
+            EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer
+                    .serialize(field, event, persistedDataSerializer))
+                    .getValue();
+            if (serializedValue != null) {
+                eventData.addFieldValue(serializedValue);
+                fieldIds.write(field.getId());
             }
-        }
+        });
         eventData.setFieldIds(fieldIds.toByteString());
 
         return eventData.build();
@@ -141,16 +138,16 @@ public class EventSerializer {
     /**
      * Determines the event class that the serialized event is for.
      *
-     * @param eventData
      * @return The event class the given eventData describes, or null if it is unknown.
      */
-    public Class<? extends Event> getEventClass(EntityData.Event eventData) {
+    public <E extends Event> Class<E> getEventClass(EntityData.Event eventData) {
         if (eventData.hasType()) {
-            EventMetadata<? extends Event> metadata = null;
+            EventMetadata<E> metadata = null;
             if (!idTable.isEmpty()) {
-                Class<? extends Event> eventClass = idTable.inverse().get(eventData.getType());
+                var eventClass = idTable.inverse().get(eventData.getType());
                 if (eventClass != null) {
-                    metadata = eventLibrary.getMetadata(eventClass);
+                    //noinspection unchecked
+                    metadata = (EventMetadata<E>) eventLibrary.getMetadata(eventClass);
                 }
             }
             if (metadata == null) {
