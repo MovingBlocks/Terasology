@@ -70,9 +70,10 @@ public final class GameThread {
      */
     public static void processWaitingProcesses() {
         if (Thread.currentThread() == gameThread) {
-            List<Runnable> processes = Lists.newArrayList();
-            pendingRunnables.drainTo(processes);
-            processes.forEach(Runnable::run);
+            Runnable inst;
+            while((inst = pendingRunnables.poll()) != null) {
+                inst.run();
+            }
         }
     }
 
