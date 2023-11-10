@@ -114,8 +114,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     // Shared
     private ContextImpl context;
-    private Optional<HibernationManager> hibernationSettings;
-    private NetworkConfig config;
+    private final Optional<HibernationManager> hibernationSettings;
+    private final NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
@@ -124,22 +124,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
-    private TIntLongMap netIdToEntityId = new TIntLongHashMap();
-    private EngineTime time;
+    private final TIntLongMap netIdToEntityId = new TIntLongHashMap();
+    private final EngineTime time;
     private long nextNetworkTick;
     private boolean kicked;
     // Server only
-    private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels", GlobalEventExecutor.INSTANCE);
+    private final ChannelGroup allChannels = new DefaultChannelGroup("tera-channels", GlobalEventExecutor.INSTANCE);
     private ChannelFuture serverChannelFuture;
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
 
-    private BlockingQueue<NetClient> newClients = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetClient> disconnectedClients = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<NetClient> newClients = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<NetClient> disconnectedClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
-    private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
-    private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
-    private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
+    private final Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
+    private final Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
+    private final SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
     private StorageManager storageManager;
 
     // Client only
@@ -157,9 +157,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void host(int port, boolean dedicatedServer) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
-                if (hibernationSettings.isPresent()) {
-                    hibernationSettings.get().setHibernationAllowed(false);
-                }
+                hibernationSettings.ifPresent(hibernationManager -> hibernationManager.setHibernationAllowed(false));
                 mode = dedicatedServer ? NetworkMode.DEDICATED_SERVER : NetworkMode.LISTEN_SERVER;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
@@ -209,9 +207,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
-            if (hibernationSettings.isPresent()) {
-                hibernationSettings.get().setHibernationAllowed(false);
-            }
+            hibernationSettings.ifPresent(hibernationManager -> hibernationManager.setHibernationAllowed(false));
             ChannelFuture connectCheck = null;
 
             clientGroup = new NioEventLoopGroup();
@@ -402,7 +398,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     public int getBandwidthPerClient() {
-        if (netClientList.size() > 0) {
+        if (!netClientList.isEmpty()) {
             return config.getUpstreamBandwidth() / netClientList.size();
         }
         return config.getUpstreamBandwidth();
@@ -448,7 +444,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             netComponent.setNetworkId(nextNetId++);
             entity.saveComponent(netComponent);
             netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
-            switch (netComponent.replicateMode) {
+            switch (java.util.Objects.requireNonNull(netComponent.replicateMode)) {
                 case OWNER:
                     NetClient clientPlayer = getNetOwner(entity);
                     if (clientPlayer != null) {
@@ -932,7 +928,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
-                    .setName(metadata.getId().toString());
+                    .setName(metadata.getId());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -949,7 +945,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
-                    .setName(metadata.getId().toString());
+                    .setName(metadata.getId());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());

@@ -34,7 +34,7 @@ import static org.terasology.engine.registry.InjectionHelper.createWithConstruct
 public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
-    private static final long timeoutThreshold = 120000;
+    private static final long TIMEOUT_THRESHOLD = 120000;
 
     private final Config config;
     private final Context context;
@@ -74,7 +74,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
      */
     private void scheduleTimeout(Channel inputChannel) {
         channel = inputChannel;
-        timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+        timeoutPoint = System.currentTimeMillis() + TIMEOUT_THRESHOLD;
         timeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
@@ -84,12 +84,12 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                             && joinStatus.getStatus() != JoinStatus.Status.FAILED) {
                         joinStatus.setErrorMessage("Server stopped responding.");
                         channel.close();
-                        logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
+                        logger.error("Server timeout threshold of {} ms exceeded.", TIMEOUT_THRESHOLD);
                     }
                 }
                 Thread.currentThread().stop();
             }
-        }, timeoutThreshold + 200);
+        }, TIMEOUT_THRESHOLD + 200);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
         }
 
         synchronized (joinStatus) {
-            timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+            timeoutPoint = System.currentTimeMillis() + TIMEOUT_THRESHOLD;
             if (message.hasServerInfo()) {
                 receivedServerInfo(ctx, message.getServerInfo());
             } else if (message.hasModuleDataHeader()) {
