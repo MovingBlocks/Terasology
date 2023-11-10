@@ -20,7 +20,7 @@ configurations.testImplementation.get().extendsFrom(configurations.compileOnly.g
 dependencies {
     // spotbugs annotations to suppress warnings are not included via spotbugs plugin
     // see bug: https://github.com/spotbugs/spotbugs-gradle-plugin/issues/1018
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.0")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.1")
     pmd("net.sourceforge.pmd:pmd-core:6.55.0")
     pmd("net.sourceforge.pmd:pmd-java:6.55.0")
 

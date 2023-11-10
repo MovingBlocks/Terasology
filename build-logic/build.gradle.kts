@@ -46,7 +46,7 @@ dependencies {
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
 
     // plugins we configure
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.1")
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
     api(kotlin("test"))
