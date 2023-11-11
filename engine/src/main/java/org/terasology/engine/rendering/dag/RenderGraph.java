@@ -52,8 +52,8 @@ public class RenderGraph {
         }
         if (akaNodeMap.containsKey(nodeAka)) {
             Node aNode = akaNodeMap.get(nodeAka);
-            logger.info("Node " + nodeUri + " also known as" + nodeAka + " already matches existing node with uri "
-                    + aNode.getUri() + " - attempting replacing...");
+            logger.info("Node {} also known as {} already matches existing node with uri {} - attempting replacing...",
+                    nodeUri, nodeAka, aNode.getUri());
             replaceNode(aNode, node);
         } else {
             nodeMap.put(nodeUri, node);
@@ -149,7 +149,7 @@ public class RenderGraph {
                 if (!graph.hasEdgeConnecting(fromNode, toNode)) {
                     graph.putEdge(fromNode, toNode);
                 } else {
-                    logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
+                    logger.warn("Trying to connect two already connected nodes, {} and {}", fromNode.getUri(), toNode.getUri());
                 }
             }
 
@@ -169,7 +169,7 @@ public class RenderGraph {
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
         if (!graph.hasEdgeConnecting(fromNode, toNode)) {
-            logger.warn("Trying to disconnect two nodes that aren't connected, " + fromNode.getUri() + " and " + toNode.getUri());
+            logger.warn("Trying to disconnect two nodes that aren't connected,  {} and {}", fromNode.getUri(), toNode.getUri());
         }
 
         graph.removeEdge(fromNode, toNode);
@@ -264,7 +264,7 @@ public class RenderGraph {
         // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
         // Is not yet connected?
         if (!fromConnection.getConnectedConnections().isEmpty()) {
-            logger.warn("Warning, " + fromConnection + "connection is already read somewhere else.");
+            logger.warn("Warning, {} connection is already read somewhere else.", fromConnection);
         }
         // If adding new input goes smoothly
         // TODO These checks might be redundant
@@ -275,8 +275,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.info(toNode.getUri() + ".connectFbo(" + inputFboId + ", " + fromConnection.getName() + "):" +
-                    " Connection already existed. Testing for its connections..");
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputFboId, fromConnection.getName());
             DependencyConnection localConnection = toNode.getInputFboConnection(inputFboId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -302,7 +302,7 @@ public class RenderGraph {
 //        if (!areConnected(fromNode, toNode)) {
 //            connect(fromNode, toNode);
 //        }
-        logger.debug("Connected " + fromNode.getOutputFboConnection(outputId) + " to " + toNode + ".");
+        logger.debug("Connected {} to {}.", fromNode.getOutputFboConnection(outputId),  toNode);
     }
 
     public void reconnectFbo(Node fromNode, int outputId, Node toNode, int inputId) {
@@ -328,7 +328,7 @@ public class RenderGraph {
     private void connectBufferPair(Node toNode, int inputConnectionId, DependencyConnection fromConnection) {
         // Is not yet connected?
         if (!fromConnection.getConnectedConnections().isEmpty()) {
-            logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
+            logger.info("Warning, {} connection is already read somewhere else.", fromConnection);
         }
         // If adding new input goes smoothly
         // TODO These checks might be redundant
@@ -339,8 +339,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.info(toNode.getUri() + ".connectFbo(" + inputConnectionId + ", " + fromConnection.getName() + "):" +
-                    " Connection already existed. Testing for its connections..");
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputConnectionId, fromConnection.getName());
             DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -401,7 +401,7 @@ public class RenderGraph {
 //        if (!areConnected(fromNode, toNode)) {
 //            connect(fromNode, toNode);
 //        }
-        logger.debug("Connected " + fromNode.getOutputBufferPairConnection(outputId) + " to " + toNode + ".");
+        logger.debug("Connected {} to {}.", fromNode.getOutputBufferPairConnection(outputId), toNode);
     }
 
     /**
@@ -533,13 +533,13 @@ public class RenderGraph {
      */
     private void reconnectInputToOutput(Node toNode, int inputId, DependencyConnection fromConnection,
                                         ConnectionType connectionType, boolean disconnectPrevious) {
-        logger.debug("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode() + "'s output.");
+        logger.debug("Attempting reconnection of {} to {}'s output.", toNode.getUri(), fromConnection.getParentNode());
         Node fromNode;
 
         fromNode = findNode(fromConnection.getParentNode());
         if (!fromConnection.getConnectedConnections().isEmpty()) {
-            logger.warn("WARNING: destination connection (" + fromConnection + ") is already connected to ("
-                    + fromConnection.getConnectedConnections());
+            logger.warn("WARNING: destination connection ({}) is already connected to ({})",
+                    fromConnection, fromConnection.getConnectedConnections());
             // TODO update the hashmap to string to be pretty
             // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
             // + fromConnection.getConnectedConnections() + "). Remove connection first.");
@@ -591,7 +591,7 @@ public class RenderGraph {
                 // either do this after everything is set up, or in renderGraph.addNode
                 // and when calling these trough api, call resetDesiredStateChanges();
             } else {
-                logger.info(toNode + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
+                logger.info("{}'s connection {} was not connected. Attempting new connection...", toNode, connectionToReconnect);
                 this.connectFbo(toNode, inputId, fromConnection);
             }
         } else { //                               TODO make it connectionToReconnect
@@ -607,7 +607,7 @@ public class RenderGraph {
                     connectionName = "[unsupported connection type]";
             }
 
-            logger.info("No such input connection named " + connectionName + ". Attempting new connection...");
+            logger.info("No such input connection named {}. Attempting new connection...", connectionName);
 
             switch (connectionType) {
                 case FBO:
@@ -638,7 +638,7 @@ public class RenderGraph {
 
     @Deprecated
     public void disconnectOutputFboConnection(Node node, int connectionId) {
-        logger.debug("Attempting disconnection of " + node + "'s output fbo number " + connectionId + "..");
+        logger.debug("Attempting disconnection of {}'s output fbo number {}..", node, connectionId);
 
         if (node != null) {
             DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
@@ -646,7 +646,7 @@ public class RenderGraph {
                 outputConnection.disconnect();
                 logger.debug("..disconnecting complete.");
             } else {
-                logger.warn("Could not find output Fbo connection number " + connectionId + "within " + node + ".");
+                logger.warn("Could not find output Fbo connection number {} within {}.", connectionId, node);
             }
         } else {
             throw new RuntimeException("Could not find node named " + node + " within renderGraph.");
@@ -661,7 +661,7 @@ public class RenderGraph {
     }
 
     public void disconnectInputFbo(String nodeUri, int connectionId) {
-        logger.debug("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
+        logger.debug("Attempting disconnection of {}'s input fbo number {}.", nodeUri, connectionId);
         Node node = findNode(new SimpleUri(nodeUri));
         if (node != null) {
             ((AbstractNode) node).disconnectInputFbo(connectionId);
@@ -730,7 +730,7 @@ public class RenderGraph {
         } else if (newOutputConnection instanceof BufferPairConnection) {
             connectionType = ConnectionType.BUFFER_PAIR;
         } else {
-            logger.error("Unknown connection type: " + newOutputConnection + " .\n");
+            logger.error("Unknown connection type: {} .\n", newOutputConnection);
             throw new RuntimeException("Unknown connection type: " + newOutputConnection + " .\n");
         }
 

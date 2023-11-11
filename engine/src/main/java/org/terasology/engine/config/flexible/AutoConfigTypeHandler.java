@@ -89,7 +89,7 @@ public class AutoConfigTypeHandler<T extends AutoConfig> extends TypeHandler<Aut
             }
             return Optional.of(config);
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            logger.error("Cannot create type [" + typeInfo + "] for deserialization", e);
+            logger.error("Cannot create type [{}] for deserialization", typeInfo, e);
         }
         return Optional.empty();
     }

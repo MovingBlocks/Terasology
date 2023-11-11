@@ -107,9 +107,9 @@ public class ExtraBlockDataManager {
                 if (registerAnnotation != null) {
                     String errorType = validRegistrationMethod(method, registerAnnotation);
                     if (errorType != null) {
-                        logger.error("Unable to register extra block data: " + errorType +
-                            " for {}.{}: should be \"public static boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
-                            type.getName(), method.getName(), method.getName());
+                        logger.error("Unable to register extra block data: {} for {}.{}: should be \"public static"
+                                        + " boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
+                                errorType, type.getName(), method.getName(), method.getName());
                         continue;
                     }
                     method.setAccessible(true);

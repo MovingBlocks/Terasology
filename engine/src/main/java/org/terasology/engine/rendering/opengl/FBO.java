@@ -472,36 +472,31 @@ public final class FBO {
                 fbo.setStatus(Status.COMPLETE);
                 break;
             case GL30.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
+                logger.error("FrameBuffer: {}, has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception", urn);
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
             case GL30.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
+                logger.error("FrameBuffer: {}, has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception", urn);
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
             case GL30.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
+                logger.error("FrameBuffer: {}, has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception", urn);
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
             case GL30.GL_FRAMEBUFFER_UNSUPPORTED:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
+                logger.error("FrameBuffer: {}, has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception", urn);
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
             case GL30.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
+                logger.error("FrameBuffer: {}, has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception", urn);
 
             /*
              * On some graphics cards, FBO.Type.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
              * Code using NO_COLOR FBOs should check for this and -not use- the FBO if its status is DISPOSED
              */
                 if (type == Type.NO_COLOR) {
-                    logger.error("FrameBuffer: " + urn
-                            + ", ...but the FBO.Type was NO_COLOR, ignoring this error and continuing without this FBO.");
+                    logger.error("FrameBuffer: {}, ...but the FBO.Type was NO_COLOR, ignoring this error and continuing without this FBO.",
+                            urn);
                     fbo.dispose();
                 } else {
                     fbo.setStatus(Status.INCOMPLETE);
@@ -509,7 +504,7 @@ public final class FBO {
                 break;
 
             default:
-                logger.error("FBO '" + urn + "' generated an unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
+                logger.error("FBO '{}' generated an unexpected reply from glCheckFramebufferStatusEXT: {}", urn, checkFB);
                 fbo.setStatus(Status.UNEXPECTED);
                 break;
         }

@@ -177,7 +177,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
-            logger.warn("System " + object.getClass().getName() + " registered post-init.");
+            logger.warn("System {} registered post-init.", object.getClass().getName());
             initialiseSystem(object);
         }
     }
