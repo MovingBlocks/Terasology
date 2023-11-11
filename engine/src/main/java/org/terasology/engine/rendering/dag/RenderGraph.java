@@ -52,8 +52,8 @@ public class RenderGraph {
         }
         if (akaNodeMap.containsKey(nodeAka)) {
             Node aNode = akaNodeMap.get(nodeAka);
-            logger.info("Node {} also known as {} already matches existing node with uri {} - attempting replacing..."
-                    , nodeUri, nodeAka, aNode.getUri());
+            logger.info("Node {} also known as {} already matches existing node with uri {} - attempting replacing...",
+                    nodeUri, nodeAka, aNode.getUri());
             replaceNode(aNode, node);
         } else {
             nodeMap.put(nodeUri, node);
@@ -275,8 +275,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections.."
-                    , toNode.getUri(), inputFboId, fromConnection.getName());
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputFboId, fromConnection.getName());
             DependencyConnection localConnection = toNode.getInputFboConnection(inputFboId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -339,8 +339,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections.."
-                    , toNode.getUri(), inputConnectionId, fromConnection.getName());
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputConnectionId, fromConnection.getName());
             DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -538,8 +538,8 @@ public class RenderGraph {
 
         fromNode = findNode(fromConnection.getParentNode());
         if (!fromConnection.getConnectedConnections().isEmpty()) {
-            logger.warn("WARNING: destination connection ({}) is already connected to ({})"
-                    , fromConnection, fromConnection.getConnectedConnections());
+            logger.warn("WARNING: destination connection ({}) is already connected to ({})",
+                    fromConnection, fromConnection.getConnectedConnections());
             // TODO update the hashmap to string to be pretty
             // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
             // + fromConnection.getConnectedConnections() + "). Remove connection first.");
