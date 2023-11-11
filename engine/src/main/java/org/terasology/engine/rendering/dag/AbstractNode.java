@@ -197,7 +197,7 @@ public abstract class AbstractNode implements Node {
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
                 logger.debug("Propagating bufferPair data to all connected connections of {}: ", localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.debug("setting data for: {} ,", v);
+                    logger.debug("setting data for: {} ,", v.toString());
                     v.setData(bufferPair);
                 });
                 logger.debug("data propagated.\n");
@@ -234,7 +234,7 @@ public abstract class AbstractNode implements Node {
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
                 logger.info("Propagating data from {} to all connected connections of {}: ", from.toString(), localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.info("setting data for: {} ,", v);
+                    logger.info("setting data for: {} ,", v.toString());
                     v.setData(from.getData());
                 });
                 logger.info("data propagated.\n");
@@ -312,7 +312,7 @@ public abstract class AbstractNode implements Node {
             if (!fboConnection.getConnectedConnections().isEmpty()) {
                 logger.info("Propagating fbo data to all connected connections of {}: ", fboConnection);
                 fboConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.info("setting data for: {} ,", v);
+                    logger.info("setting data for: {} ,", v.toString());
                     v.setData(fboData);
                 });
                 logger.info("data propagated.\n");
