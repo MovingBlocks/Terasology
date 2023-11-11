@@ -272,12 +272,8 @@ public class ExtraBlockDataManager {
 
         // Creates a new graph containing the complement of the contraction of the complement.
         public Graph ntract(String s0, String s1) {
-            int v0 = -1;
             int v1 = -1;
             for (int i = 0; i < verts.length; i++) {
-                if (verts[i].equals(s0)) {
-                    v0 = i;
-                }
                 if (verts[i].equals(s1)) {
                     v1 = i;
                 }
