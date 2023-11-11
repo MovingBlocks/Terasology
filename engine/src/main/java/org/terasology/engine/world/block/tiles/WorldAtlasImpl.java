@@ -231,11 +231,7 @@ public class WorldAtlasImpl implements WorldAtlas {
             Vector2f coords = getTexCoords(index);
             SubtextureData subtextureData = new SubtextureData(texture, new Rectanglef(coords, coords).setSize(texSize));
 
-            Map<Name, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getModuleName());
-            if (textureAtlas == null) {
-                textureAtlas = Maps.newHashMap();
-                textureAtlases.put(tileUri.getModuleName(), textureAtlas);
-            }
+            Map<Name, SubtextureData> textureAtlas = textureAtlases.computeIfAbsent(tileUri.getModuleName(), k -> Maps.newHashMap());
             textureAtlas.put(tileUri.getResourceName(), subtextureData);
 
             return true;
@@ -256,7 +252,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i, tileImages, initialColor);
-            if (alphaMaskTiles.size() > 0) {
+            if (!alphaMaskTiles.isEmpty()) {
                 BufferedImage alphaMask = generateAtlas(i, alphaMaskTiles, Color.BLACK);
                 storeGreyscaleMapIntoAlpha(image, alphaMask);
             }
@@ -339,8 +335,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         g.fillRect(0, 0, size, size);
 
         int totalIndex = 0;
-        for (int tileIndex = 0; tileIndex < tileImages.size(); tileIndex++) {
-            BlockTile tile = tileImages.get(tileIndex);
+        for (BlockTile tile : tileImages) {
             if (tile == null) {
                 totalIndex++;
             } else {
