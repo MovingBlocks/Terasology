@@ -353,7 +353,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = !screenUri.isInstance() && assetManager.isLoaded(screenUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find screen '{}'", screenUri);
         } else {
             UIElement element = opt.get();
@@ -477,7 +477,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = assetManager.isLoaded(overlayUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find overlay '{}'", overlayUri);
         } else {
             UIElement element = opt.get();

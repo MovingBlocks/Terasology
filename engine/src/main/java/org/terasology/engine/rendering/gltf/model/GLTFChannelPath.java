@@ -15,16 +15,16 @@ public enum GLTFChannelPath {
     SCALE("scale", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT),
     WEIGHTS("weights", GLTFAttributeType.SCALAR, GLTFComponentType.FLOAT);
 
-    private static final Map<String, GLTFChannelPath> codeToPath;
+    private static final Map<String, GLTFChannelPath> CODE_TO_PATH;
     private final GLTFComponentType supportedComponentType;
     private final GLTFAttributeType accessorType;
 
-    private String code;
+    private final String code;
 
     static {
-        codeToPath = Maps.newLinkedHashMap();
+        CODE_TO_PATH = Maps.newLinkedHashMap();
         for (GLTFChannelPath path : GLTFChannelPath.values()) {
-            codeToPath.put(path.code, path);
+            CODE_TO_PATH.put(path.code, path);
         }
     }
 
@@ -47,6 +47,6 @@ public enum GLTFChannelPath {
     }
 
     public static GLTFChannelPath getPathFromCode(String code) {
-        return codeToPath.get(code);
+        return CODE_TO_PATH.get(code);
     }
 }
