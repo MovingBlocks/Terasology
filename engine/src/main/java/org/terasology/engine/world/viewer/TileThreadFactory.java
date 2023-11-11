@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TileThreadFactory implements ThreadFactory {
 
+    private static final String namePrefix = "TileThreadPool-thread-";
     private final AtomicInteger threadNumber = new AtomicInteger(1);
-    private final String namePrefix = "TileThreadPool-thread-";
 
     @Override
     public Thread newThread(Runnable r) {

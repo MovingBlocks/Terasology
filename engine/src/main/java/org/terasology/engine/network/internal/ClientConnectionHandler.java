@@ -34,6 +34,7 @@ import static org.terasology.engine.registry.InjectionHelper.createWithConstruct
 public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
+    private static final long timeoutThreshold = 120000;
 
     private final Config config;
     private final Context context;
@@ -50,7 +51,6 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     private long lengthReceived;
     private Timer timeoutTimer = new Timer("Netty-Timeout-Timer", true);
     private long timeoutPoint = System.currentTimeMillis();
-    private final long timeoutThreshold = 120000;
     private Channel channel;
 
     /**

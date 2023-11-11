@@ -291,15 +291,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         server = null;
         nextNetId = 1;
         netIdToEntityId.clear();
-        if (mode != NetworkMode.CLIENT) {
-            if (this.entityManager != null) {
-                for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
-                    NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                    netComp.setNetworkId(0);
-                    entity.saveComponent(netComp);
-                }
-                this.entityManager.unsubscribe(this);
+        if (mode != NetworkMode.CLIENT && this.entityManager != null) {
+            for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
+                NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                netComp.setNetworkId(0);
+                entity.saveComponent(netComp);
             }
+            this.entityManager.unsubscribe(this);
         }
         mode = NetworkMode.NONE;
         entityManager = null;
@@ -328,24 +326,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public void update() {
-        if (mode != NetworkMode.NONE) {
-            if (entityManager != null) {
-                processPendingConnections();
-                processPendingDisconnects();
-                long currentTimer = time.getRealTimeInMs();
-                boolean netTick = false;
-                if (currentTimer > nextNetworkTick) {
-                    nextNetworkTick += NET_TICK_RATE;
-                    netTick = true;
-                }
-                PerformanceMonitor.startActivity("Client update");
-                for (Client client : clientList) {
-                    client.update(netTick);
-                }
-                PerformanceMonitor.endActivity();
-                if (server != null) {
-                    server.update(netTick);
-                }
+        if (mode != NetworkMode.NONE && entityManager != null) {
+            processPendingConnections();
+            processPendingDisconnects();
+            long currentTimer = time.getRealTimeInMs();
+            boolean netTick = false;
+            if (currentTimer > nextNetworkTick) {
+                nextNetworkTick += NET_TICK_RATE;
+                netTick = true;
+            }
+            PerformanceMonitor.startActivity("Client update");
+            for (Client client : clientList) {
+                client.update(netTick);
+            }
+            PerformanceMonitor.endActivity();
+            if (server != null) {
+                server.update(netTick);
             }
         }
     }
@@ -597,14 +593,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
-            if (mode.isServer()) {
-                if (metadata.isReplicated()) {
-                    for (NetClient client : netClientList) {
-                        logger.debug("Component {} added to {}", component, entity);
-                        client.setComponentAdded(netComp.getNetworkId(), component);
-                    }
-                }
+        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID && mode.isServer() && metadata.isReplicated()) {
+            for (NetClient client : netClientList) {
+                logger.debug("Component {} added to {}", component, entity);
+                client.setComponentAdded(netComp.getNetworkId(), component);
             }
         }
         updatedOwnedEntities(entity, component, metadata);
@@ -614,14 +606,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
         ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
-            if (mode.isServer()) {
-                if (metadata.isReplicated()) {
-                    for (NetClient client : netClientList) {
-                        logger.debug("Component {} removed from {}", component, entity);
-                        client.setComponentRemoved(netComp.getNetworkId(), component);
-                    }
-                }
+        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID && mode.isServer() && metadata.isReplicated()) {
+            for (NetClient client : netClientList) {
+                logger.debug("Component {} removed from {}", component, entity);
+                client.setComponentRemoved(netComp.getNetworkId(), component);
             }
         }
         if (mode.isAuthority() && metadata.isReferenceOwner()) {

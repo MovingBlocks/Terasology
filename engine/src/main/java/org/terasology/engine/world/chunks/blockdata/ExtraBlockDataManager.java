@@ -32,15 +32,15 @@ import java.util.Set;
  * public static method annotated with @RegisterExtraData which determines, for each block,
  * whether the field is applicable for that block. For example:
  *
- * {@code
- * @ExtraDataSystem
+ * <pre>
+ * {@code @ExtraDataSystem}
  * public class ExampleExtraDataSystem {
- *     @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
+ *     {@code @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)}
  *     public static boolean shouldHaveNutrients(Block block) {
  *         return block.isGrass();
  *     }
  *  }
- *  }
+ * </pre>
  */
 @API
 public class ExtraBlockDataManager {
@@ -107,9 +107,9 @@ public class ExtraBlockDataManager {
                 if (registerAnnotation != null) {
                     String errorType = validRegistrationMethod(method, registerAnnotation);
                     if (errorType != null) {
-                        logger.error("Unable to register extra block data: " + errorType +
-                            " for {}.{}: should be \"public static boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
-                            type.getName(), method.getName(), method.getName());
+                        logger.error("Unable to register extra block data: {} for {}.{}: should be \"public static"
+                                        + " boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
+                                errorType, type.getName(), method.getName(), method.getName());
                         continue;
                     }
                     method.setAccessible(true);

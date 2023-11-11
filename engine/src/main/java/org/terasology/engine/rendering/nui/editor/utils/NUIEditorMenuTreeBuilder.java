@@ -349,7 +349,7 @@ public class NUIEditorMenuTreeBuilder {
                 value = field.get(newInstance(clazz));
             }
 
-            if (value != null && value instanceof Boolean) {
+            if (value instanceof Boolean) {
                 value = !(Boolean) value;
             }
 

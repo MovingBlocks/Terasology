@@ -11,8 +11,8 @@ apply(from = "$rootDir/config/gradle/common.gradle")
 
 configure<SourceSetContainer> {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main { java.destinationDirectory.set(File("$buildDir/classes")) }
-    test { java.destinationDirectory.set(File("$buildDir/testClasses")) }
+    main { java.destinationDirectory.set(layout.buildDirectory.dir("classes")) }
+    test { java.destinationDirectory.set(layout.buildDirectory.dir("testClasses")) }
 }
 
 dependencies {

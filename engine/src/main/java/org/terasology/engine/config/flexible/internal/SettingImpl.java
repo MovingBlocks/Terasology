@@ -138,8 +138,8 @@ class SettingImpl<T> implements Setting<T> {
         Preconditions.checkNotNull(newValue, "The value of a setting cannot be null.");
 
         if (override.get().isPresent()) {
-            LOGGER.warn("An attempt was made to overwrite the value specified in the System property." +
-                    " This will give nothing while the System Property value is supplied");
+            LOGGER.warn("An attempt was made to overwrite the value specified in the System property."
+                    + " This will give nothing while the System Property value is supplied");
             return false;
         }
 

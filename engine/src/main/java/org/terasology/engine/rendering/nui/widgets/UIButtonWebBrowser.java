@@ -147,8 +147,6 @@ public class UIButtonWebBrowser extends UIButton {
      * Sets the {@link UIButtonWebBrowser#url} value and sets
      * {@link UIButtonWebBrowser#confirmed} to true if the given URL or Hostname is
      * already trusted, otherwise confirmed is false.
-     *
-     * @throws MalformedURLException
      */
     public UIButtonWebBrowser setUrl(String url) {
         boolean trustedHostName = false;

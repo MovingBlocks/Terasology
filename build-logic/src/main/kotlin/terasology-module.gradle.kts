@@ -29,10 +29,10 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
     main {
-        java.destinationDirectory.set(buildDir.resolve("classes"))
+        java.destinationDirectory.set(layout.buildDirectory.dir("classes"))
     }
     test {
-        java.destinationDirectory.set(buildDir.resolve("testClasses"))
+        java.destinationDirectory.set(layout.buildDirectory.dir("testClasses"))
     }
 }
 
@@ -178,8 +178,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = buildDir.resolve("classes")
-        testOutputDir = buildDir.resolve("testClasses")
+        outputDir = layout.buildDirectory.dir("classes").get().asFile
+        testOutputDir = layout.buildDirectory.dir("testClasses").get().asFile
         isDownloadSources = true
     }
 }

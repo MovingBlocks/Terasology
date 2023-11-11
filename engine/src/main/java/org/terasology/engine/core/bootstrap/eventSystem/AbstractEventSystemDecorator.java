@@ -21,7 +21,7 @@ public abstract class AbstractEventSystemDecorator implements EventSystem {
     }
 
     public boolean currentThreadIsMain() {
-        return mainThread == Thread.currentThread();
+        return mainThread.equals(Thread.currentThread());
     }
 
     @Override

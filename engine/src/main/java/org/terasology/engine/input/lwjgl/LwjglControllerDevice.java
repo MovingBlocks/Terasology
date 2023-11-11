@@ -84,8 +84,7 @@ public class LwjglControllerDevice implements ControllerDevice {
     }
 
     private void updateGamepadMappings() {
-        InputStream inputStream = LwjglControllerDevice.class.getResourceAsStream("/gamecontrollerdb.txt");
-        try {
+        try (InputStream inputStream = LwjglControllerDevice.class.getResourceAsStream("/gamecontrollerdb.txt")) {
             byte[] bytes = ByteStreams.toByteArray(inputStream);
             String gamecontrollerDBContent = new String(bytes, TerasologyConstants.CHARSET);
             ByteBuffer gamecontrolleDB = MemoryUtil.memASCIISafe(gamecontrollerDBContent);

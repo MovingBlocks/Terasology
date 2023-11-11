@@ -73,8 +73,7 @@ public class Actor {
      * @return The component of the actors minion or null if the minion has no such component.
      */
     public <T extends Component> T getComponent(Class<T> type) {
-        T component = entity.getComponent(type);
-        return component;
+        return entity.getComponent(type);
     }
 
     public Object getComponentField(ComponentFieldUri uri) {

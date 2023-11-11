@@ -64,8 +64,8 @@ public class WorldGeneratorManager {
                                 infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                                 logger.debug("{} added from {}", uri, generatorClass);
                             } else {
-                                logger.error("{} marked to be registered as a World Generator, " +
-                                                "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
+                                logger.error("{} marked to be registered as a World Generator, "
+                                        + "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
                             }
                         }
                     }
@@ -159,12 +159,7 @@ public class WorldGeneratorManager {
 
     private static boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
-            if (WorldGenerator.class.isAssignableFrom(generatorClass)) {
-                if (generatorClass.getConstructor(SimpleUri.class) != null) {
-                    return true;
-                }
-            }
-            return false;
+            return WorldGenerator.class.isAssignableFrom(generatorClass) && generatorClass.getConstructor(SimpleUri.class) != null;
             // Being generous in catching here, because if the module is broken due to code changes or missing classes
             // the world generator is invalid
         } catch (NoSuchMethodException | RuntimeException e) {

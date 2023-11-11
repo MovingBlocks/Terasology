@@ -22,6 +22,7 @@
 
 <h3 align="center"><b>
     <a href="#community">Community</a> | 
+    <a href="#knowledge-base">Knowledge Base</a> |
     <a href="#installation">Installation</a> | 
     <a href="#development">Development</a>  | 
     <a href="#license">License</a> 
@@ -67,6 +68,11 @@ We are present in nearly the complete round-up of social networks. Follow/friend
         <img src="./docs/images/forum.png" width="48px"/>
     </a>
 </p>
+
+
+## Knowledge Base
+
+Find documentation, instructions, and helpful references in our [Terasology Knowledge Base](http://terasology.org/Terasology/#/), formerly known as the Terasology Engine wiki.
 
 
 ## Installation
