@@ -10,11 +10,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Jvm {
-    @SuppressWarnings("CheckStyle")
-    static final Pattern gradleCache = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
+    static final Pattern GRADLE_CACHE = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
 
-    @SuppressWarnings("CheckStyle")
-    static final Pattern mavenCache = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
+    static final Pattern MAVEN_CACHE = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
 
     private Jvm() { }
 
@@ -26,8 +24,8 @@ public final class Jvm {
         int elidedCount = 0;
 
         for (String pathEntry : System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))) {
-            Matcher asGradleCache = gradleCache.matcher(pathEntry);
-            Matcher asMavenCache = mavenCache.matcher(pathEntry);
+            Matcher asGradleCache = GRADLE_CACHE.matcher(pathEntry);
+            Matcher asMavenCache = MAVEN_CACHE.matcher(pathEntry);
             if (asGradleCache.matches()) {
                 if (asGradleCache.group(1).contains(interestingGroup)) {
                     aLogger.debug("{}gradle:{}", indent, asGradleCache.group(2));
