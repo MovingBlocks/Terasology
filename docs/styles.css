@@ -1,8 +1,4 @@
-.img-responsive {
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+.app-name img {
+    max-width: 70%;
+    height: auto;
   }
-  
