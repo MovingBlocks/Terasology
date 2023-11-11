@@ -63,7 +63,7 @@ public class EventSerializer {
     /**
      * @param eventData
      * @return The event described by the eventData
-     * @throws org.terasology.engine.persistence.typeHandling.DeserializationException if an error occurs when deserializing
+     * @throws DeserializationException if an error occurs when deserializing
      */
     public Event deserialize(EntityData.Event eventData) {
         Class<? extends Event> eventClass = getEventClass(eventData);
@@ -102,7 +102,7 @@ public class EventSerializer {
      *
      * @param event
      * @return The serialized event
-     * @throws org.terasology.engine.persistence.typeHandling.SerializationException if an error occurs during serialization
+     * @throws DeserializationException if an error occurs during serialization
      */
     public EntityData.Event serialize(Event event) {
         EventMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());

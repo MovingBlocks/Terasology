@@ -239,11 +239,10 @@ public class WorldBuilder extends ProviderStore {
         }
 
         for (FacetProvider provider : providersList) {
-            if (updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)) {
-                if (updatePriority(provider, facet) > minPriority) {
-                    providedBy.put(facet, provider);
-                    addRequirements(facet, provider, scalable, orderedProviders);
-                }
+            if (updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)
+                    && updatePriority(provider, facet) > minPriority) {
+                providedBy.put(facet, provider);
+                addRequirements(facet, provider, scalable, orderedProviders);
             }
         }
     }
@@ -413,7 +412,6 @@ public class WorldBuilder extends ProviderStore {
                 configurables.add((ConfigurableFacetProvider) facetProvider);
             }
         }
-        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator(configurables);
-        return worldConfigurator;
+        return new FacetedWorldConfigurator(configurables);
     }
 }

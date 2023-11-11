@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  * Provides chunks received from remote source.
  * <p>
  * Loading/Unload chunks dependent on {@link org.terasology.engine.network.Server}
- * <p/>
+ * <p>
  * Produce events:
  * <p>
  * {@link OnChunkLoaded} when chunk received from server and processed.

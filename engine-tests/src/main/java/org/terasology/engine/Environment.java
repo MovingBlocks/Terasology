@@ -37,16 +37,14 @@ class Environment {
     Environment(Name... moduleNames) {
         try {
             reset(Sets.newHashSet(moduleNames));
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException(e);
         }
     }
 
-    protected void reset(Set<Name> moduleNames) throws Exception {
+    protected void reset(Set<Name> moduleNames) throws IOException {
         this.context = new ContextImpl();
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         context.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
@@ -99,7 +97,7 @@ class Environment {
         PathManager.getInstance();
     }
 
-    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
+    protected void setupModuleManager(Set<Name> moduleNames) {
         // empty
     }
 
@@ -160,9 +158,9 @@ class Environment {
     /**
      * Cleans up all resources (similar to AutoCloseable)
      *
-     * @throws Exception if something goes wrong
+     * @throws RuntimeException if something goes wrong
      */
-    public void close() throws Exception {
+    public void close() {
         CoreRegistry.setContext(null);
         context = null;
     }

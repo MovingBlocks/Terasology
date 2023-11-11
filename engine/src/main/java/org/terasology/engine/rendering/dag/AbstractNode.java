@@ -101,10 +101,8 @@ public abstract class AbstractNode implements Node {
 
     public void tryBufferPairPass() {
         BufferPairConnection bufferPairConnection = getInputBufferPairConnection(1);
-        if (bufferPairConnection != null) {
-            if (bufferPairConnection.getData() != null) {
-                addOutputBufferPairConnection(1, bufferPairConnection);
-            }
+        if (bufferPairConnection != null && bufferPairConnection.getData() != null) {
+            addOutputBufferPairConnection(1, bufferPairConnection);
         }
     }
 
@@ -339,9 +337,9 @@ public abstract class AbstractNode implements Node {
 
 
     /**
-     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * Is {@code thisNode} dependent on {@code anotherNode}?
      * @param anotherNode
-     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     * @return If this node has at least one {@code anotherNode}'s connection on input - true. Otherwise false.
      */
     public boolean isDependentOn(Node anotherNode) {
         boolean isDependent = false;

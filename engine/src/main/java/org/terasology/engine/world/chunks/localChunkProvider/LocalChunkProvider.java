@@ -62,22 +62,22 @@ import java.util.function.Consumer;
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
  * <p>
  * Loading/Unload chunks dependent on {@link RelevanceSystem}
- * <p/>
+ * <p>
  * Produces events:
  * <p>
  * {@link OnChunkGenerated} when chunk was generated {@link WorldGenerator}
  * <p>
  * {@link OnChunkLoaded} when chunk was loaded from {@link StorageManager}
  * <p>
- * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
- * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle
  * <p>
- * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
- * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?)
  * <p>
  * {@link BeforeChunkUnload} when chunk ready to remove from provider.
  * <p>
  * {@link BeforeDeactivateBlocks} when chunk ready to remove and have block lifecycle.
+ * <p>
+ * @see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>
  */
 public class LocalChunkProvider implements ChunkProvider {
 
