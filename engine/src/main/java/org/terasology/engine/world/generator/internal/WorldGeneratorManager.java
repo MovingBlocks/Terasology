@@ -64,8 +64,8 @@ public class WorldGeneratorManager {
                                 infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                                 logger.debug("{} added from {}", uri, generatorClass);
                             } else {
-                                logger.error("{} marked to be registered as a World Generator, " +
-                                                "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
+                                logger.error("{} marked to be registered as a World Generator, "
+                                        + "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
                             }
                         }
                     }

@@ -248,10 +248,10 @@ public class GLSLShader extends Shader {
 
             // TODO: Have our own shader language and parse this stuff out properly
             if (shaderProgramBase.getFragmentProgram().contains(feature.toString())) {
-                logger.debug("Fragment shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Fragment shader feature '{}' is available...", feature);
                 availableFeatures.add(feature);
             } else if (shaderProgramBase.getVertexProgram().contains(feature.toString())) {
-                logger.debug("Vertex shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Vertex shader feature '{}' is available...", feature);
                 availableFeatures.add(feature);
             }
         }
