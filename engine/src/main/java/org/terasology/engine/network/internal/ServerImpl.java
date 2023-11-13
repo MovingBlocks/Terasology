@@ -366,10 +366,9 @@ public class ServerImpl implements Server {
             boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
-            if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
-                    logger.error("Failed to associated new block entity");
-                }
+            if (blockComponent != null && !blockEntityBefore
+                    && !blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
+                logger.error("Failed to associated new block entity");
             }
             if (netComp.getNetworkId() != updateEntity.getNetId()) {
                 logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), netComp.getNetworkId());

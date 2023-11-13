@@ -5,8 +5,8 @@ package org.terasology.engine.logic.players.event;
 import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
- *  This event gets sent when the player respawns.<br/>
- *  The player entity is preserved along with its components during respawn.<br/>
+ *  This event gets sent when the player respawns.<br>
+ *  The player entity is preserved along with its components during respawn.<br>
  *  This event should be received and handled by systems that need to reset
  *  some components attached to the player entity.
  */

@@ -12,7 +12,7 @@ import org.joml.Vector3fc;
  */
 public interface CollisionShape {
     /**
-     * Returns the axis-aligned bounding box ({@link AABBfc}) of the transformed shape.
+     * Returns the axis-aligned bounding box ({@link org.terasology.joml.geom.AABBfc}) of the transformed shape.
      *
      * @return The {@link AABBf} bounding the shape.
      */

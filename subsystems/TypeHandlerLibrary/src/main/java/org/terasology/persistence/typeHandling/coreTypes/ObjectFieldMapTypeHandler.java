@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
+ * Serializes objects as a fieldName → fieldValue map. It is used as the last resort while serializing an
  * object through a {@link TypeHandlerLibrary}.
  */
 public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {

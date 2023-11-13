@@ -38,9 +38,8 @@ public class MonitoringSubsystem implements EngineSubsystem {
         if (rootContext.get(SystemConfig.class).monitoringEnabled.get()) {
             advancedMonitor = new AdvancedMonitor();
             advancedMonitor.setVisible(true);
+            initMicrometerMetrics(rootContext.get(Time.class));
         }
-
-        initMicrometerMetrics(rootContext.get(Time.class));
     }
 
     /**
