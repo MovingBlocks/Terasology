@@ -180,10 +180,8 @@ public abstract class AbstractStorageManager implements StorageManager {
                     continue;
                 }
                 Vector3f pos = loc.getWorldPosition(new Vector3f());
-                if (pos.isFinite()) {
-                    if (aabb.containsPoint(loc.getWorldPosition(new Vector3f()))) {
-                        entitiesToStore.add(entity);
-                    }
+                if (pos.isFinite() && aabb.containsPoint(loc.getWorldPosition(new Vector3f()))) {
+                    entitiesToStore.add(entity);
                 }
             }
         }

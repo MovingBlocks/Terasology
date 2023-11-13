@@ -105,7 +105,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     @Override
     public Activity startActivity(String activityName) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             return OFF_THREAD_ACTIVITY;
         }
 
@@ -127,7 +127,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     @Override
     public void endActivity() {
-        if (Thread.currentThread() != mainThread || activityStack.isEmpty()) {
+        if (!Thread.currentThread().equals(mainThread) || activityStack.isEmpty()) {
             return;
         }
 

@@ -54,7 +54,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * Constructor for a regular block
      *
      * @param definition Family definition
-     * @param blockBuilder The builder to make the blocks for the family
      */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);

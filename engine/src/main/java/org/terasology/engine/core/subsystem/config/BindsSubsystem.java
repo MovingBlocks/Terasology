@@ -356,7 +356,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     private BindableAxis registerRealBindAxis(String id, BindAxisEvent event) {
-        BindableRealAxis axis = new BindableRealAxis(id.toString(), event);
+        BindableRealAxis axis = new BindableRealAxis(id, event);
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;

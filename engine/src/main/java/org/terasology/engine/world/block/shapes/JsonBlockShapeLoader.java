@@ -123,10 +123,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
 
             if (collisionInfo.has(SYMMETRIC) && collisionInfo.get(SYMMETRIC).isJsonPrimitive()
-                    && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean()) {
-                if (collisionInfo.get(SYMMETRIC).getAsBoolean()) {
-                    shape.setCollisionSymmetric(true);
-                }
+                    && collisionInfo.get(SYMMETRIC).getAsJsonPrimitive().isBoolean() && collisionInfo.get(SYMMETRIC).getAsBoolean()) {
+                shape.setCollisionSymmetric(true);
             }
 
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()

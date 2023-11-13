@@ -39,7 +39,7 @@ public final class GameManifestProvider {
     /**
      * Generates game manifest with default settings (title, seed) if not specified.
      * Uses default world generator, and modules selection.
-     * @TODO: rewrite/fix it when code will be more stable
+     * TODO: rewrite/fix it when code will be more stable
      *
      * @param universeWrapper  contains the universe level properties
      * @param moduleManager    resolves modules
