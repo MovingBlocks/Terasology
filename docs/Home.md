@@ -1,12 +1,15 @@
 # Welcome to Terasology!
 
-🌟 This wiki does not cover game content or how to play the game in much detail, but you can find more information on these topics here
+🌟 **Embark on an open-source adventure** where you can contribute, play, and explore the world of Terasology.
+
+Discover a diverse range of Terasology resources within this wiki, encompassing various aspects of the game. For detailed game content, comprehensive gameplay guidance, developer resources, and dedicated information on related topics, navigate to specific sections provided here.
 
 ## Quick Links
 
-- **[🎮 Players](https://github.com/MovingBlocks/Terasology/blob/develop/docs-pre-merge/Playing.md)**
-- **[🏗️ Developer's Hub](Contributor-Quick-Start.md)**
-- **[🛠️ Maintainer's Dashboard](Maintenance.md)**
+- **[🎮 Players](https://github.com/MovingBlocks/Terasology/blob/develop/docs-pre-merge/Playing.md)** - For Players
+- **[🏗️ Developer's Hub](Contributor-Quick-Start.md)** - For Developers
+- **[🛠️ Maintainer's Dashboard](Maintenance.md)** - For Maintainers
+
 
 
 ## Understanding Terasology
