@@ -3,10 +3,10 @@
     <a href="https://github.com/MovingBlocks/Terasology/releases/latest">
         <img src="https://img.shields.io/github/release/MovingBlocks/Terasology.svg" alt="Release" />
     </a>
-    <a href="http://www.apache.org/licenses/LICENSE-2.0">
+    <a href="https://www.apache.org/licenses/LICENSE-2.0">
         <img src="https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg" alt="License (Code)" />
     </a>
-    <a href="http://creativecommons.org/licenses/by/4.0/">
+    <a href="https://creativecommons.org/licenses/by/4.0/">
         <img src="https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg" alt="License (Art)" />
     </a>
     <a href="https://codeclimate.com/" target="_blank" alt="Code climate">
@@ -25,7 +25,7 @@
     <a href="#installation">Installation</a> | 
     <a href="#development">Development</a>  | 
     <a href="#license">License</a> |
-    <a href="http://terasology.org/Terasology/#/">Knowledge Base</a>
+    <a href="https://terasology.org/Terasology/#/">Knowledge Base</a>
 </b></h3>
 
 The _Terasology_ project was born from a Minecraft-inspired tech demo and is becoming a stable platform for various types of gameplay settings in a voxel world.
@@ -52,7 +52,7 @@ We are present in nearly the complete round-up of social networks. Follow/friend
         <img src="./docs/images/facebook.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <a title="Reddit" href="http://www.reddit.com/r/Terasology">
+    <a title="Reddit" href="https://www.reddit.com/r/Terasology">
         <img src="./docs/images/reddit.png" width="48px"/>
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;
@@ -137,8 +137,8 @@ Non-Technical Requirements:
 ### Workspace Setup
 
 To be able to run **Terasology** from source, you'll need to setup your workspace.
-Follow the [Contributor Quick Start Guide](http://terasology.org/Terasology/#/Contributor-Quick-Start).
-This guide is designed for [IntelliJ IDEA](http://www.jetbrains.com/idea/) (you can use the free community edition), but alternative setups are possible.
+Follow the [Contributor Quick Start Guide](https://terasology.org/Terasology/#/Contributor-Quick-Start).
+This guide is designed for [IntelliJ IDEA](https://www.jetbrains.com/idea/) (you can use the free community edition), but alternative setups are possible.
 
 > :warning: _Note, that a Terasology workspace is a **multi-repo workspace**._
 
@@ -147,15 +147,15 @@ While your workspace itself is a clone of [MovingBlocks/Terasology](https://gith
 Accordingly, if you want to contribute to modules, you'll need to navigate into the respective subdirectory and work with Git from in there.
 Any Git commands executed in your workspace root will target [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology).
 
-For more information, see our wiki entry on [Understanding Terasology's Git Setup](http://terasology.org/Terasology/#/Developing-Modules?id=understanding-terasology39s-git-setup).
+For more information, see our wiki entry on [Understanding Terasology's Git Setup](https://terasology.org/Terasology/#/Developing-Modules?id=understanding-terasology39s-git-setup).
 
 
 ### Contributing
 
-Detailed information on how to contribute can be found in [CONTRIBUTING.md](.github/CONTRIBUTING.md). Remember, that all submissions must be licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+Detailed information on how to contribute can be found in [CONTRIBUTING.md](.github/CONTRIBUTING.md). Remember, that all submissions must be licensed under [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 Terasology has a rather steep learning curve in the beginning.
-To help you with the learning process, our [Terasology Knowledge Base](http://terasology.org/Terasology/#/), formerly known as the Terasology Engine wiki, helps you find the resources you need according to the field of contribution you're interested in.
+To help you with the learning process, our [Terasology Knowledge Base](https://terasology.org/Terasology/#/), formerly known as the Terasology Engine wiki, helps you find the resources you need according to the field of contribution you're interested in.
 Additional learning resources can be found in our [tutorial modules](https://github.com/Terasology?q=Tutorial&type=all&language=&sort=).
 
 If you find errors or issues in any of our resources, please report them using GitHub issues and help fix them.
@@ -166,4 +166,4 @@ Developers with previous experience in rendering, physics and other less trivial
 
 ## License
 
-Terasology is fully open source and licensed [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) for code and [Creative Commons Attribution License, Version 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see credits for minor exceptions).
+Terasology is fully open source and licensed [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) for code and [Creative Commons Attribution License, Version 4.0](https://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see credits for minor exceptions).
