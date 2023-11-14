@@ -307,7 +307,7 @@ public class EventSystemReplayImpl implements EventSystem {
             return;
         }
 
-        logger.debug("Registering event handler " + handlerClass.getName());
+        logger.debug("Registering event handler {}", handlerClass.getName());
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
@@ -334,7 +334,7 @@ public class EventSystemReplayImpl implements EventSystem {
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
 
-                logger.debug("Found method: " + method.toString());
+                logger.debug("Found method: {}", method);
                 if (!Event.class.isAssignableFrom(types[0]) || !EntityRef.class.isAssignableFrom(types[1])) {
                     logger.error("Invalid event handler method: {}", method.getName());
                     return;

@@ -266,7 +266,7 @@ public class TerasologyEngine implements GameEngine {
      * Logs software, environment and hardware information.
      */
     private void logEnvironmentInfo() {
-        logger.info(TerasologyVersion.getInstance().toString());
+        logger.info("{}", TerasologyVersion.getInstance().toString());
         logger.info("Home path: {}", PathManager.getInstance().getHomePath());
         logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
         logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
