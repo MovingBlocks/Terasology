@@ -17,13 +17,13 @@ dependencies {
     pmd("net.sourceforge.pmd:pmd-core:6.55.0")
     pmd("net.sourceforge.pmd:pmd-java:6.55.0")
 
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.12") {
         because("runtime: to configure logging during tests with logback.xml")
     }
     testRuntimeOnly("org.codehaus.janino:janino:3.1.7") {
         because("allows use of EvaluatorFilter in logback.xml")
     }
-    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.36") {
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:2.0.9") {
         because("redirects java.util.logging (from e.g. junit) through slf4j")
     }
 
