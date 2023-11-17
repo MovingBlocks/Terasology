@@ -52,7 +52,7 @@ public final class RenderTaskListGenerator {
 
                 // printing out individual desired state changes
                 for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
-                    logger.info("{}", desiredStateChange.toString());
+                    logger.info("{}", desiredStateChange);
                 }
 
                 // printing out process() statement
@@ -183,7 +183,7 @@ public final class RenderTaskListGenerator {
 
     private void logList(List<?> list) {
         for (Object object : list) {
-            logger.debug("{}", object.toString());
+            logger.debug("{}", object);
         }
     }
 
