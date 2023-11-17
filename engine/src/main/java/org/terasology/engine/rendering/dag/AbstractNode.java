@@ -232,7 +232,7 @@ public abstract class AbstractNode implements Node {
 
             // set data for all connected connections
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
-                logger.info("Propagating data from {} to all connected connections of {}: ", from.toString(), localBufferPairConnection);
+                logger.info("Propagating data from {} to all connected connections of {}: ", from, localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
                     logger.info("setting data for: {} ,", v);
                     v.setData(from.getData());
