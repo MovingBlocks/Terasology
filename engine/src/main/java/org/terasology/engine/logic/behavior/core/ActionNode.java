@@ -56,7 +56,7 @@ public class ActionNode implements BehaviorNode {
             try {
                 action.construct(actor);
             } catch (Exception e) {
-                logger.debug("Exception while running construct() of action {} from entity {}: {}", action, actor.getEntity(), e.getMessage());
+                logger.debug("Exception while running construct() of action {} from entity {}: ", action, actor.getEntity(), e);
             }
         }
     }
