@@ -303,7 +303,7 @@ public class EventSystemReplayImpl implements EventSystem {
     public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
-            logger.error("Cannot register handler {}, must be public", handler.getClass().getName());
+            logger.error("Cannot register handler {}, must be public", handlerClass.getName());
             return;
         }
 

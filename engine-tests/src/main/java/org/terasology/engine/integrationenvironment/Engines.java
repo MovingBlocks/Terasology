@@ -255,7 +255,7 @@ public class Engines {
         doneLoading = false;
         host.subscribeToStateChange(() -> {
             GameState newState = host.getState();
-            logger.debug("New engine state is {}", host.getState());
+            logger.debug("New engine state is {}", newState);
             if (newState instanceof StateIngame) {
                 hostContext = newState.getContext();
                 if (hostContext == null) {
