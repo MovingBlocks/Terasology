@@ -17,11 +17,6 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BlockRegionTypeHandlerTest extends MathTypeAssert {
-    public static class AABBBlockRegion1Test {
-        public BlockRegion a1;
-        public AABBi a2;
-    }
-
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
     private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
 
@@ -41,5 +36,10 @@ public class BlockRegionTypeHandlerTest extends MathTypeAssert {
         assertBlockRegion(obj.get("a1"), 5, 5, 5, 13, 12, 14);
         assertTrue(obj.has("a2"));
         assertAABBi(obj.get("a2"), 3, 5, 5, 22, 12, 14);
+    }
+
+    public static class AABBBlockRegion1Test {
+        public BlockRegion a1;
+        public AABBi a2;
     }
 }
