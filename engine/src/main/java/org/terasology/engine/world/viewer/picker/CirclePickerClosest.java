@@ -47,11 +47,9 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
         float distSq = dx * dx + dy * dy;
         float rad = radiusFunc.apply(object).floatValue();
 
-        if (distSq < rad * rad) {
-            if (distSq < minDistSq) {
-                minDistSq = distSq;
-                closest = object;
-            }
+        if (distSq < rad * rad && distSq < minDistSq) {
+            minDistSq = distSq;
+            closest = object;
         }
     }
 

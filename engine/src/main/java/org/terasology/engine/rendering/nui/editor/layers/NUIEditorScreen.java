@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 
 /**
  * The main NUI editor screen.
- * Contains file selection, editing & preview widgets.
+ * Contains file selection, editing &amp; preview widgets.
  */
 @SuppressWarnings("unchecked")
 public final class NUIEditorScreen extends AbstractEditorScreen {

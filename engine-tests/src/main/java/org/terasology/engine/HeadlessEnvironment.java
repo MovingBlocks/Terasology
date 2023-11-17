@@ -263,7 +263,7 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
+    protected void setupModuleManager(Set<Name> moduleNames) throws RuntimeException {
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
 
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -320,7 +320,7 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws RuntimeException {
         // it would be nice, if elements in the context implemented (Auto)Closeable
 
         // The StorageManager creates a thread pool (through TaskMaster)

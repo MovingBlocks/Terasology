@@ -135,7 +135,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     // send method of EventSystemImpl
     private void originalSend(EntityRef entity, Event event) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             networkReplicate(entity, event);
@@ -155,7 +155,7 @@ public class EventSystemReplayImpl implements EventSystem {
     // send method of EventSystemImpl
     private void originalSend(EntityRef entity, Event event, Component component) {
 
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> handlers =

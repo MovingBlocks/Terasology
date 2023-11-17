@@ -32,10 +32,8 @@ public class HTMLDocumentHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
-        if (currentDocumentBuilder == null) {
-            if (!qName.equalsIgnoreCase("body")) {
-                throw new HTMLParseException("Expected <body> tag");
-            }
+        if (currentDocumentBuilder == null && !qName.equalsIgnoreCase("body")) {
+            throw new HTMLParseException("Expected <body> tag");
         }
         processStartTag(qName, attributes);
     }

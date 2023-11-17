@@ -48,8 +48,7 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
 
     private EntityRef createGazeEntity() {
         EntityBuilder gazeContainerBuilder = entityManager.newBuilder("engine:gaze");
-        EntityRef gazeEntity = gazeContainerBuilder.build();
-        return gazeEntity;
+        return gazeContainerBuilder.build();
     }
 
     @Priority(EventPriority.PRIORITY_LOW)

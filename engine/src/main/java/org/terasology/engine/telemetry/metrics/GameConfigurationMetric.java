@@ -80,7 +80,6 @@ public final class GameConfigurationMetric extends Metric {
     }
 
     private void fetchConfig() {
-        Config config = context.get(Config.class);
         SystemConfig systemConfig = context.get(SystemConfig.class);
         language = systemConfig.locale.get().toString();
 

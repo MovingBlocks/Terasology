@@ -61,7 +61,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
  * This implementation works closely with a number of support objects, in particular:
  * <p>
  * TODO: update this section to include new, relevant objects - a RenderableWorld instance, providing acceleration
- * structures caching blocks requiring different rendering treatments<br/>
+ * structures caching blocks requiring different rendering treatments<br>
  */
 public final class WorldRendererImpl implements WorldRenderer {
     /*

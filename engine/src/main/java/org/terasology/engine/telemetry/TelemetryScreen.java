@@ -50,6 +50,7 @@ public class TelemetryScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:telemetryScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryScreen.class);
+    private static final int horizontalSpacing = 12;
 
     @In
     private Config config;
@@ -69,7 +70,6 @@ public class TelemetryScreen extends CoreScreenLayer {
     @In
     private Emitter emitter;
 
-    private final int horizontalSpacing = 12;
 
     private Map<TelemetryCategory, Class> telemetryCategories;
 
