@@ -219,16 +219,12 @@ public class GameDetailsScreen extends CoreScreenLayer {
         gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
             @Override
             public void draw(WorldInfo value, Canvas canvas) {
-                if (value.getCustomTitle().isEmpty()) {
-                    canvas.drawText(value.getTitle());
-                } else {
-                    canvas.drawText(value.getCustomTitle());
-                }
+                canvas.drawText(value.getTitle());
             }
 
             @Override
             public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
-                String text = value.getCustomTitle();
+                String text = value.getTitle();
                 return new Vector2i(
                         canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
@@ -237,12 +233,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        String gameTitle;
-        if (worldInfo.getCustomTitle().isEmpty()) {
-            gameTitle = worldInfo.getTitle();
-        } else {
-            gameTitle = worldInfo.getCustomTitle();
-        }
+        String gameTitle = worldInfo.getTitle();
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle
                 + '\n' + '\n'
                 + translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed()
