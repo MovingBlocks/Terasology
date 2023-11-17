@@ -472,7 +472,7 @@ public abstract class AbstractNode implements Node {
     }
 
     public void disconnectInputFbo(int inputId) {
-        logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
+        logger.info("Disconnecting {} input Fbo number {}", this.getUri(), inputId);
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputFboToOutput
