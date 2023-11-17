@@ -403,7 +403,7 @@ public class SaveTransaction implements Runnable {
                 Path oldChunkZipPath = storagePathProvider.getChunkZipPath(chunkZipPos);
                 final FileSystem zip = chunkZipEntry.getValue();
                 if (Files.isRegularFile(oldChunkZipPath)) {
-                    try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
+                    try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, (ClassLoader) null)) {
                         for (Path root : oldZip.getRootDirectories()) {
                             Files.walkFileTree(root, new SimpleFileVisitor<>() {
                                 @Override
