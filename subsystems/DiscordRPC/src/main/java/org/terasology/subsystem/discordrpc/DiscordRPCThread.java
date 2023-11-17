@@ -204,7 +204,7 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
             /* Update the rich presence and keeping the connection alive */
             while (connected) {
                 synchronized (this) {
-                    /* Ping the ipc connection with an rich presnece to keep the connection alive */
+                    /* Ping the ipc connection with a rich presence to keep the connection alive */
                     if (enabled) {
                         /* Allocate a new rich presence when the buffer has changed */
                         if (buffer.hasChanged() && buffer.isEmpty()) {
