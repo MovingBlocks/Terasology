@@ -8,7 +8,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 repositories {
@@ -37,6 +37,7 @@ dependencies {
     constraints {
         implementation("com.google.guava:guava:31.1-jre")
         implementation("org.javassist:javassist:3.29.0-GA")
+        implementation("net.bytebuddy:bytebuddy:1.14.8")
     }
 
     // graph analysis
@@ -46,7 +47,7 @@ dependencies {
     implementation("org.terasology.gestalt:gestalt-module:7.1.0")
 
     // plugins we configure
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.0")
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
     api(kotlin("test"))

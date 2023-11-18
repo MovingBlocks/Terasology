@@ -39,10 +39,10 @@ class BytesTypeHandlerTest {
         byte[] expectedObj = new byte[]{(byte) 0xFF};
 
         PersistedBytes data = serialize(expectedObj, new ByteArrayTypeHandler());
-        Assertions.assertEquals(expectedObj, data.getAsBytes());
+        Assertions.assertArrayEquals(expectedObj, data.getAsBytes());
 
         byte[] obj = deserialize(data, new ByteArrayTypeHandler());
-        Assertions.assertEquals(expectedObj, obj);
+        Assertions.assertArrayEquals(expectedObj, obj);
     }
 
     private <R extends PersistedData, T> R serialize(T obj, TypeHandler<T> typeHandler) {
