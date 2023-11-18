@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CountCallsTest {
     public int nextId2;
-    private List<Integer> constructCalled = Lists.newArrayList();
-    private List<Integer> destructCalled = Lists.newArrayList();
-    private List<Integer> executeCalled = Lists.newArrayList();
+    private final List<Integer> constructCalled = Lists.newArrayList();
+    private final List<Integer> destructCalled = Lists.newArrayList();
+    private final List<Integer> executeCalled = Lists.newArrayList();
     private GsonBuilder gsonBuilder;
 
     @BeforeEach
@@ -70,7 +70,7 @@ public class CountCallsTest {
     }
 
     private class CountDelegate extends DelegateNode {
-        private int id;
+        private final int id;
 
         CountDelegate(BehaviorNode delegate) {
             super(delegate);

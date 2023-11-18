@@ -4,8 +4,6 @@ package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -45,9 +43,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PrefabTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(PrefabTest.class);
-
     private PrefabManager prefabManager;
 
     @BeforeEach
