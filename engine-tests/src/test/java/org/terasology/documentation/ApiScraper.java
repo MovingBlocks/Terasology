@@ -4,6 +4,8 @@ package org.terasology.documentation;
 
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
  * Enumerates all classes and packages that are annotated with {@link API}.
  */
 public final class ApiScraper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiScraper.class);
+
     private ApiScraper() {
         // Private constructor, utility class
     }
@@ -35,7 +39,7 @@ public final class ApiScraper {
         SortedSetMultimap<String, String> sortedApi = Multimaps.newSortedSetMultimap(new HashMap<>(), TreeSet::new);
 
         for (Class<?> apiClass : environment.getTypesAnnotatedWith(API.class)) {
-            //System.out.println("Processing: " + apiClass);
+            LOGGER.debug("Processing: {}", apiClass);
             boolean isPackage = apiClass.isSynthetic();
             URL location;
             String category;
@@ -49,7 +53,7 @@ public final class ApiScraper {
             }
 
             if (location == null) {
-                System.out.println("Failed to get a class/package location, skipping " + apiClass);
+                LOGGER.info("Failed to get a class/package location, skipping {}", apiClass);
                 continue;
             }
 
@@ -58,18 +62,18 @@ public final class ApiScraper {
 
                     // Find out what jar it came from and consider that the category
                     String categoryFragment = location.getPath();
-                    //System.out.println("category fragment as path: " + categoryFragment);
+                    LOGGER.debug("category fragment as path: {}", categoryFragment);
                     int bang = categoryFragment.lastIndexOf("!");
                     int hyphen = categoryFragment.lastIndexOf("-", bang);
                     int slash = categoryFragment.lastIndexOf("/", hyphen);
                     category = categoryFragment.substring(slash + 1, hyphen);
-                    //System.out.println("category fragment pared down: " + category);
+                    LOGGER.debug("category fragment pared down: {}", category);
 
                     if (isPackage) {
-                        //System.out.println("Jar-based Package: " + apiPackage + ", came from " + location);
+                        LOGGER.debug("Jar-based Package: {}, came from {}", apiPackage, location);
                         sortedApi.put(category, apiPackage + " (PACKAGE)");
                     } else {
-                        //System.out.println("Jar-based Class: " + apiClass + ", came from " + location);
+                        LOGGER.debug("Jar-based Class: {}, came from {}", apiClass, location);
                         sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
                     }
 
@@ -81,17 +85,17 @@ public final class ApiScraper {
                     category = "terasology engine";
 
                     if (isPackage) {
-                        //System.out.println("Local Package: " + apiPackage + ", came from " + location);
+                        LOGGER.debug("Local Package: {}, came from {}", apiPackage, location);
                         sortedApi.put(category, apiPackage + " (PACKAGE)");
                     } else {
-                        //System.out.println("Local Class: " + apiClass + ", came from " + location);
+                        LOGGER.debug("Local Class: {}, came from {}", apiClass, location);
                         sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
                     }
 
                     break;
 
                 default :
-                    System.out.println("Unknown protocol for: " + apiClass + ", came from " + location);
+                    LOGGER.info("Unknown protocol for: {}, came from {}", apiClass, location);
             }
         }
         sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()
@@ -99,13 +103,13 @@ public final class ApiScraper {
         sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
                 .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
-        System.out.println("# Modding API:\n");
+        LOGGER.info("# Modding API:\n");
         for (String key : sortedApi.keySet()) {
-            System.out.println("## " + key + "\n");
+            LOGGER.info("## " + key + "\n");
             for (String value : sortedApi.get(key)) {
-                System.out.println("* " + value);
+                LOGGER.info("* {}", value);
             }
-            System.out.println("");
+            LOGGER.info("");
         }
     }
 }
