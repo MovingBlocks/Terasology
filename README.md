@@ -114,7 +114,7 @@ For more information about playing, like hot keys or server hosting, see the [de
 
 ### Alternative Installation Methods
 
-If you already have a Java Development Kit (JDK) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 11 is required.
+If you already have a Java Development Kit (JDK) installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java version 17 is required.
 
 ßDirect download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/job/Terasology/job/Omega/job/develop/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip).
 
@@ -126,7 +126,7 @@ Development is possible on all common platforms (Windows, Linux, MacOS) as long 
 ### Requirements
 
 Technical Requirements:
-- Java SE Development Kit (JDK) 11. The CI will verify against this baseline version.
+- Java SE Development Kit (JDK) 17. The CI will verify against this baseline version.
   <br>Using newer Java versions may cause issues (see [#3976](https://github.com/MovingBlocks/Terasology/issues/3976)).
 - Git to clone the repo and commit changes.
 

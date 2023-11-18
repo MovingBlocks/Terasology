@@ -18,8 +18,8 @@ public class Serializer {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
 
-    private ClassMetadata<?, ?> classMetadata;
-    private Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers;
+    private final ClassMetadata<?, ?> classMetadata;
+    private final Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers;
 
     public Serializer(ClassMetadata<?, ?> classMetadata, Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlers) {
         this.fieldHandlers = fieldHandlers;

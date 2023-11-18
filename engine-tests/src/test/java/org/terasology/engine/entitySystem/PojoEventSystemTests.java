@@ -191,7 +191,7 @@ public class PojoEventSystemTests {
         assertEquals(1, receiver.eventList.size());
     }
 
-    private static class TestEvent extends AbstractConsumableEvent {
+    public static class TestEvent extends AbstractConsumableEvent {
 
     }
 

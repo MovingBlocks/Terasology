@@ -37,9 +37,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-
 class InMemorySerializerTest {
-    private InMemoryPersistedDataSerializer serializer = new InMemoryPersistedDataSerializer();
+    private final InMemoryPersistedDataSerializer serializer = new InMemoryPersistedDataSerializer();
 
     public static Stream<Arguments> types() {
         return Stream.of(
@@ -116,30 +115,6 @@ class InMemorySerializerTest {
         Assertions.assertThrows(DeserializationException.class, data::getAsByteBuffer);
         Assertions.assertThrows(DeserializationException.class, data::getAsBytes);
 
-        Assertions.assertThrows(ClassCastException.class, data::getAsBoolean);
-        Assertions.assertThrows(ClassCastException.class, data::getAsInteger);
-        Assertions.assertThrows(ClassCastException.class, data::getAsLong);
-        Assertions.assertThrows(ClassCastException.class, data::getAsFloat);
-        Assertions.assertThrows(ClassCastException.class, data::getAsDouble);
-    }
-
-    //TODO remove it
-    public void template(PersistedData data) {
-        Assertions.assertFalse(data.isString());
-        Assertions.assertFalse(data.isArray());
-        Assertions.assertFalse(data.isNull());
-        Assertions.assertFalse(data.isNumber());
-        Assertions.assertFalse(data.isBoolean());
-        Assertions.assertFalse(data.isBytes());
-        Assertions.assertFalse(data.isValueMap());
-
-        Assertions.assertThrows(IllegalStateException.class, data::getAsValueMap);
-        Assertions.assertThrows(IllegalStateException.class, data::getAsArray);
-
-        Assertions.assertThrows(DeserializationException.class, data::getAsByteBuffer);
-        Assertions.assertThrows(DeserializationException.class, data::getAsBytes);
-
-        Assertions.assertThrows(ClassCastException.class, data::getAsString);
         Assertions.assertThrows(ClassCastException.class, data::getAsBoolean);
         Assertions.assertThrows(ClassCastException.class, data::getAsInteger);
         Assertions.assertThrows(ClassCastException.class, data::getAsLong);
@@ -306,7 +281,7 @@ class InMemorySerializerTest {
 
         Assertions.assertEquals(PersistedBytes.class, data.getClass());
         Assertions.assertTrue(data.isBytes());
-        Assertions.assertEquals(value, data.getAsBytes());
+        Assertions.assertArrayEquals(value, data.getAsBytes());
         Assertions.assertEquals(ByteBuffer.wrap(value), data.getAsByteBuffer());
 
         Assertions.assertFalse(data.isString());
@@ -335,7 +310,7 @@ class InMemorySerializerTest {
         Assertions.assertEquals(PersistedBytes.class, data.getClass());
         Assertions.assertTrue(data.isBytes());
 
-        Assertions.assertEquals(value, data.getAsBytes());
+        Assertions.assertArrayEquals(value, data.getAsBytes());
         Assertions.assertEquals(ByteBuffer.wrap(value), data.getAsByteBuffer());
 
         Assertions.assertFalse(data.isString());
@@ -469,7 +444,7 @@ class InMemorySerializerTest {
         Assertions.assertEquals(PersistedValueArray.class, data.getClass());
 
         Assertions.assertEquals(entry, data.getAsArray().getArrayItem(0));
-        typeGetters.stream()
+        typeGetters
                 .forEach(typeGetter ->
                         Assertions.assertEquals(typeGetter.getGetter().apply(entry),
                                 typeGetter.getGetter().apply(data))

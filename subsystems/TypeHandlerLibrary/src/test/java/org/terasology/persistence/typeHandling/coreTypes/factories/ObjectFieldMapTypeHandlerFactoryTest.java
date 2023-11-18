@@ -112,4 +112,14 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         private T t;
         private U u;
     }
+
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+            value = "UUF_UNUSED_FIELD",
+            justification = "Direct member access is not expected. TypeHandler factory dynamically loads type handlers on type handler" +
+                    " creation based on member types of input class TypeInfo. ")
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    private static class SomeClass<T> {
+        private T t;
+        private List<T> list;
+    }
 }
