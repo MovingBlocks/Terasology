@@ -62,11 +62,11 @@ dependencies {
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
-    implementation('org.slf4j:slf4j-api:2.0.9') {
+    implementation('org.slf4j:slf4j-api:1.7.36') {
         because('a backend-independent Logger')
     }
 
-    testImplementation("ch.qos.logback:logback-classic:1.4.11") {
+    testImplementation("ch.qos.logback:logback-classic:1.2.11") {
         because("implementation: a test directly uses logback.classic classes")
     }
 

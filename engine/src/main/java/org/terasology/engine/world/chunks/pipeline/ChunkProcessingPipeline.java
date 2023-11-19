@@ -115,7 +115,10 @@ public class ChunkProcessingPipeline {
                     chunkProcessingInfo.getChunkTaskProvider() == null
                             ? "Generation or Loading"
                             : chunkProcessingInfo.getChunkTaskProvider().getName();
-            logger.error("ChunkTask at position {} and stage [{}] catch error: {}", chunkProcessingInfo.getPosition(), stageName, e.getMessage());
+            logger.error(
+                    String.format("ChunkTask at position %s and stage [%s] catch error: ",
+                            chunkProcessingInfo.getPosition(), stageName),
+                    e);
             chunkProcessingInfo.getExternalFuture().setException(e);
         } catch (CancellationException ignored) {
         }

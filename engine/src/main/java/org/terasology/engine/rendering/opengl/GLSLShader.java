@@ -376,7 +376,7 @@ public class GLSLShader extends Shader {
                 try {
                     registerAllShaderPermutations();
                 } catch (RuntimeException e) {
-                    logger.warn("{}", e.getMessage());
+                    logger.warn(e.getMessage());
                 }
             });
         } catch (InterruptedException e) {

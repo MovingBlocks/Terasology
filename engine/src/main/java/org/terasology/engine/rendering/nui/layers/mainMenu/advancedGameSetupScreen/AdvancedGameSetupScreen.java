@@ -406,7 +406,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         filterModules();
                     });
                 } else {
-                    logger.error("Unable to find checkbox named {} in {}", checkboxName, ASSET_URI);
+                    logger.error("Unable to find checkbox named " + checkboxName + " in " + ASSET_URI.toString());
                     selectModulesConfig.unselectStandardModuleExtension(standardModuleExtension);
                 }
             }

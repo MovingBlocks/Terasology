@@ -64,16 +64,15 @@ final class GlobalStoreLoader {
         Map<String, EntityData.Prefab> pendingPrefabs = Maps.newHashMap();
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
-                String prefabDataName = prefabData.getName();
                 if (!prefabData.hasParentName()) {
-                    Module module = environment.get(new SimpleUri(prefabDataName).getModuleName());
+                    Module module = environment.get(new SimpleUri(prefabData.getName()).getModuleName());
                     try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                         createPrefab(prefabData);
                     } catch (Exception e) {
-                        logger.error("Failed to load prefab {}", prefabDataName, e);
+                        logger.error("Failed to load prefab {}", prefabData.getName(), e);
                     }
                 } else {
-                    pendingPrefabs.put(prefabDataName, prefabData);
+                    pendingPrefabs.put(prefabData.getName(), prefabData);
                 }
             }
         }
