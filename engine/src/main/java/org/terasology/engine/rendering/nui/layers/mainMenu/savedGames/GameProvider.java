@@ -88,8 +88,8 @@ public final class GameProvider {
                         result.add(new GameInfo(info, date, world.getValue()));
                     }
                 } catch (NullPointerException npe) {
-                    logger.error("The save file was corrupted for: {}. The manifest can be found and restored at: {}",
-                            world, gameManifest, npe);
+                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be " +
+                            "found and restored at: " + gameManifest.toString(), npe);
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);

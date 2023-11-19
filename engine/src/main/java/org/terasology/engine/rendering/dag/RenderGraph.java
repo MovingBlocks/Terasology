@@ -169,7 +169,7 @@ public class RenderGraph {
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
         if (!graph.hasEdgeConnecting(fromNode, toNode)) {
-            logger.warn("Trying to disconnect two nodes that aren't connected, {} and {}", fromNode.getUri(), toNode.getUri());
+            logger.warn("Trying to disconnect two nodes that aren't connected,  {} and {}", fromNode.getUri(), toNode.getUri());
         }
 
         graph.removeEdge(fromNode, toNode);

@@ -279,7 +279,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 reader.setLenient(true);
                 content = new JsonParser().parse(reader).toString();
             } catch (IOException e) {
-                logger.error("Could not load asset source file for {}", urn, e);
+                logger.error(String.format("Could not load asset source file for %s", urn.toString()), e);
             }
 
             if (content != null) {

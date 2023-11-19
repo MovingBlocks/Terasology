@@ -232,7 +232,7 @@ public abstract class AbstractNode implements Node {
 
             // set data for all connected connections
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
-                logger.info("Propagating data from {} to all connected connections of {}: ", from, localBufferPairConnection);
+                logger.info("Propagating data from {} to all connected connections of {}: ", from.toString(), localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
                     logger.info("setting data for: {} ,", v);
                     v.setData(from.getData());
@@ -472,7 +472,7 @@ public abstract class AbstractNode implements Node {
     }
 
     public void disconnectInputFbo(int inputId) {
-        logger.info("Disconnecting {} input Fbo number {}", this.getUri(), inputId);
+        logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputFboToOutput
@@ -548,7 +548,7 @@ public abstract class AbstractNode implements Node {
     protected void addDesiredStateChange(StateChange stateChange) {
         if (stateChange.isTheDefaultInstance()) {
             logger.error("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
-                    stateChange.getClass().getSimpleName(), this);
+                    stateChange.getClass().getSimpleName(), this.toString());
         }
         desiredStateChanges.add(stateChange);
     }

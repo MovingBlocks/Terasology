@@ -65,7 +65,7 @@ public class ModuleListDownloader implements Callable<ModuleRegistry> {
             }
 
             int count = modules.size();
-            logger.info("Retrieved {} {}", count, (count == 1) ? "entry" : "entries");
+            logger.info(String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries"));
         }
         return modules;
     }
