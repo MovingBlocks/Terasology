@@ -32,8 +32,8 @@ public class ModuleConfigSystem extends BaseComponentSystem implements ModuleCon
             String moduleName = moduleConfig.moduleName;
             Map<String, String> properties;
             if (propertiesPerModule.containsKey(moduleName)) {
-                logger.error("Encountered more than one Module Config for module - " + moduleName +
-                        ", this is not recommended, as the property values visible are not going to be well defined.");
+                logger.error("Encountered more than one Module Config for module - {}, this is not recommended, " +
+                        "as the property values visible are not going to be well defined.", moduleName);
                 properties = propertiesPerModule.get(moduleName);
             } else {
                 properties = new HashMap<>();

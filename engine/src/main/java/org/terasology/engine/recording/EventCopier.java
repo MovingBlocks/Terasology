@@ -114,7 +114,7 @@ class EventCopier {
                 | InvocationTargetException
                 | InstantiationException
                 exception) {
-            logger.error("ERROR!!! Event not Identified: " + originalEvent.toString(), exception);
+            logger.error("ERROR!!! Event not Identified: {}", originalEvent, exception);
         }
         return null;
     }

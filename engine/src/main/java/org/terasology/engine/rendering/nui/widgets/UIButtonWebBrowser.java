@@ -125,7 +125,7 @@ public class UIButtonWebBrowser extends UIButton {
                 confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
             }
         } catch (MalformedURLException e) {
-            logger.error(this.url + " is malformed", e);
+            logger.error("{} is malformed", this.url, e);
         }
     }
 
@@ -157,7 +157,7 @@ public class UIButtonWebBrowser extends UIButton {
                 String hostname = new URL(url).getHost();
                 trustedHostName = webBrowserConfig.isHostNameTrusted(hostname);
             } catch (MalformedURLException e) {
-                logger.error(url + " is malformed", e);
+                logger.error("{} is malformed", url, e);
             }
 
             if (!trustedHostName) {

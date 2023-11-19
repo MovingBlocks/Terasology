@@ -160,8 +160,8 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 joinStatus.setCurrentActivity(
                         "Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
                                 + sizeString + "," + missingModules.size() + " modules remain)");
-                logger.info("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
-                        + sizeString + "," + missingModules.size() + " modules remain)");
+                logger.info("Downloading {}: {} ({}, {} modules remain)", moduleDataHeader.getId(), moduleDataHeader.getVersion(),
+                        sizeString, missingModules.size());
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
@@ -176,8 +176,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         } else {
-            logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(),
-                    moduleDataHeader.getVersion());
+            logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(), moduleDataHeader.getVersion());
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.channel().close();
         }

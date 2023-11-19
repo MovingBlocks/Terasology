@@ -70,7 +70,7 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
         }
 
         if (!data.isArray() || data.isValueMap()) {
-            logger.warn("Incorrect map format detected: object instead of array.\n" + getUsageInfo(data));
+            logger.warn("Incorrect map format detected: object instead of array.\n{}", getUsageInfo(data));
             return Optional.empty();
         }
 
@@ -79,7 +79,7 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
             PersistedData rawKey = kvEntry.get(KEY);
             PersistedData rawValue = kvEntry.get(VALUE);
             if (rawKey == null || rawValue == null) {
-                logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n" + getUsageInfo(data));
+                logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n{}", getUsageInfo(data));
                 return Optional.empty();
             }
 

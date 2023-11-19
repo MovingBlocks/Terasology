@@ -71,7 +71,7 @@ dependencies {
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "5.0.0")
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.12") {
         because("to configure logging with logback.xml")
     }
     runtimeOnly("org.codehaus.janino:janino:3.1.7") {
