@@ -103,7 +103,7 @@ dependencies {
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '2.1.0', ext: 'zip'
+    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '2.2.0', ext: 'zip'
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
