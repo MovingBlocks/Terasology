@@ -827,7 +827,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
-        logger.info("Client disconnected: " + client.getName());
+        logger.info("Client disconnected: {}", client.getName());
         storageManager.deactivatePlayer(client);
         client.getEntity().send(new DisconnectedEvent());
         client.disconnect();
@@ -973,8 +973,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             int fieldId = 0;
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
-                    logger.error("Class {} has too many fields (>255), serialization will be incomplete",
-                            metadata.getId());
+                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getId());
                     break;
                 }
                 field.setId((byte) fieldId);
