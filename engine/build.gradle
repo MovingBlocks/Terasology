@@ -115,7 +115,7 @@ dependencies {
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
     // Logging
-    implementation('org.slf4j:slf4j-api:2.0.9') {
+    implementation('org.slf4j:slf4j-api:1.7.36') {
         because('a backend-independent Logger')
     }
     implementation("ch.qos.logback:logback-classic:1.2.12") {
