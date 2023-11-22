@@ -7,7 +7,7 @@
 
 ## Required Tools
 
-* Java 11 JDK (e.g. [OpenJDK 11 from AdoptOpenJDK](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot))
+* Java 17 JDK (e.g. [OpenJDK 17 from Adoptium (Eclipse Foundation)](https://adoptium.net/en-GB/temurin/releases/?version=17&package=jdk&arch=x64&os=any))
 * Git Client (e.g. [Git for Windows](https://gitforwindows.org/) or [GitKraken](https://www.gitkraken.com/))<sup id="a1">[1](#f1)</sup>
 * IDE (e.g. [IntelliJ](https://www.jetbrains.com/idea/download)<sup id="a1">[2](#f2)</sup>)
 
