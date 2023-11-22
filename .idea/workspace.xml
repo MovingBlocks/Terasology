@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be2ef6b8-5931-472f-a28d-ed7a1010fd18" name="Changes" comment="" />
+    <list default="true" id="be2ef6b8-5931-472f-a28d-ed7a1010fd18" name="Changes" comment="TestCommit BrestNantes ListSkillScrollable" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ChangesViewManager" show_ignored="true" />
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -80,9 +81,22 @@
       <updated>1700642133050</updated>
       <workItem from="1700642134174" duration="1359000" />
     </task>
+    <task id="LOCAL-00001" summary="TestCommit BrestNantes ListSkillScrollable">
+      <option name="closed" value="true" />
+      <created>1700646094306</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1700646094306</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="TestCommit BrestNantes ListSkillScrollable" />
+    <option name="LAST_COMMIT_MESSAGE" value="TestCommit BrestNantes ListSkillScrollable" />
   </component>
 </project>
