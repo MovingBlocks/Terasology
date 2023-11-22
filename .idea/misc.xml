@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="EntryPointsManager">
-    <list size="3">
-      <item index="0" class="java.lang.String" itemvalue="org.terasology.engine.entitySystem.event.ReceiveEvent" />
-      <item index="1" class="java.lang.String" itemvalue="org.terasology.engine.logic.behavior.BehaviorAction" />
-      <item index="2" class="java.lang.String" itemvalue="org.terasology.engine.logic.console.commandSystem.annotations.Command" />
-    </list>
-    <writeAnnotations>
-      <writeAnnotation name="org.terasology.engine.registry.In" />
-      <writeAnnotation name="picocli.CommandLine.Option" />
-    </writeAnnotations>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="temurin-17 (2)" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>

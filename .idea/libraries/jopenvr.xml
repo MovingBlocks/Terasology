@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jopenvr">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/engine/libs/jopenvr.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

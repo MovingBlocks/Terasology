@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="wrapper">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar!/" />
+      <root url="jar://$PROJECT_DIR$/gradle/wrapper/groovy-wrapper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

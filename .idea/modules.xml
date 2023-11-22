@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" filepath="$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/build-logic/build-logic.iml" filepath="$PROJECT_DIR$/build-logic/build-logic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/config/config.iml" filepath="$PROJECT_DIR$/config/config.iml" />
+      <module fileurl="file://$PROJECT_DIR$/engine/src/jmh/jmh.iml" filepath="$PROJECT_DIR$/engine/src/jmh/jmh.iml" />
+      <module fileurl="file://$PROJECT_DIR$/facades/PC/src/main/main.iml" filepath="$PROJECT_DIR$/facades/PC/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/engine-tests/src/main/main1.iml" filepath="$PROJECT_DIR$/engine-tests/src/main/main1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/engine/src/main/main2.iml" filepath="$PROJECT_DIR$/engine/src/main/main2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/subsystems/TypeHandlerLibrary/src/main/main3.iml" filepath="$PROJECT_DIR$/subsystems/TypeHandlerLibrary/src/main/main3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/subsystems/TypeHandlerLibrary/src/test/test.iml" filepath="$PROJECT_DIR$/subsystems/TypeHandlerLibrary/src/test/test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/facades/PC/src/test/test1.iml" filepath="$PROJECT_DIR$/facades/PC/src/test/test1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/engine-tests/src/test/test2.iml" filepath="$PROJECT_DIR$/engine-tests/src/test/test2.iml" />
+    </modules>
+  </component>
+</project>
