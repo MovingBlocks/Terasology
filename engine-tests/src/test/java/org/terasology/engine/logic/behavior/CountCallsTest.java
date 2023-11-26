@@ -12,6 +12,8 @@ import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.engine.logic.behavior.core.DelegateNode;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -49,16 +51,12 @@ public class CountCallsTest {
         assertBT(tree, result, executed, true);
     }
 
-    public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed, boolean step) {
+    public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed, boolean ignoredStep) {
         BehaviorNode node = fromJson(tree);
 
         node.construct(null);
-        List<BehaviorState> actualStates = Lists.newArrayList();
-        for (int i = 0; i < result.size(); i++) {
-            BehaviorState state = node.execute(null);
-            actualStates.add(state);
-
-        }
+        List<BehaviorState> actualStates =
+                IntStream.range(0, result.size()).mapToObj(i -> node.execute(null)).collect(Collectors.toList());
         node.destruct(null);
 
         assertEquals(result, actualStates);
