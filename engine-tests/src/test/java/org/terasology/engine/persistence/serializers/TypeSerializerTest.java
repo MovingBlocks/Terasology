@@ -113,8 +113,8 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final class SomeClass<T> {
         @SerializedName("generic-t")
         private T data;
-        private List<T> list = Lists.newArrayList();
-        private Set<Animal<?>> animals = Sets.newHashSet();
+        private final List<T> list = Lists.newArrayList();
+        private final Set<Animal<?>> animals = Sets.newHashSet();
         private Animal<T> singleAnimal;
 
         private SomeClass(T data) {
