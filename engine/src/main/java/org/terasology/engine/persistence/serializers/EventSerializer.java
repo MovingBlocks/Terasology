@@ -154,7 +154,7 @@ public class EventSerializer {
                 }
             }
             if (metadata == null) {
-                logger.warn("Unable to deserialize unknown event with id: {}", eventData.getType());
+                logger.atWarn().addArgument(() -> eventData.getType()).log("Unable to deserialize unknown event with id: {}");
                 return null;
             }
             return metadata.getType();

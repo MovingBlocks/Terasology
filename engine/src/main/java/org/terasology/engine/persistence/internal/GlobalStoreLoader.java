@@ -93,7 +93,7 @@ final class GlobalStoreLoader {
             try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                 return createPrefab(prefabData);
             } catch (Exception e) {
-                logger.error("Failed to load prefab {}", prefabData.getParentName(), e);
+                logger.atError().addArgument(() -> prefabData.getParentName()).addArgument(e).log("Failed to load prefab {}");
                 return null;
             }
         }
@@ -112,7 +112,7 @@ final class GlobalStoreLoader {
             if (componentMetadata != null) {
                 componentIdTable.put(componentMetadata.getType(), index);
             } else {
-                logger.warn("Unable to resolve component '{}'", globalStore.getComponentClass(index));
+                logger.atWarn().addArgument(globalStore.getComponentClass(index)).log("Unable to resolve component '{}'");
             }
         }
 
