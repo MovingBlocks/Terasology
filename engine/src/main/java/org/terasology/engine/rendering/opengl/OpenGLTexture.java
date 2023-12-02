@@ -82,7 +82,8 @@ public class OpenGLTexture extends Texture {
                                         resources.graphicsManager.disposeTexture(newId);
                                     } else {
                                         resources.id = newId;
-                                        logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
+                                        logger.atDebug().addArgument(() -> getUrn()).addArgument(resources.id).
+                                                log("Bound texture '{}' - {}");
                                     }
                                 }
                             });
@@ -104,7 +105,7 @@ public class OpenGLTexture extends Texture {
                                 resources.graphicsManager.disposeTexture(newId);
                             } else {
                                 resources.id = newId;
-                                logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
+                                logger.atDebug().addArgument(() -> getUrn()).addArgument(resources.id).log("Bound texture '{}' - {}");
                             }
                         }
                     });

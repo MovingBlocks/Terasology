@@ -112,7 +112,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
                 GL30.glBindVertexArray(0);
             });
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.atError().addArgument(() -> getUrn()).addArgument(e).log("Failed to reload {}");
         }
     }
 

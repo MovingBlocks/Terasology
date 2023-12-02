@@ -328,7 +328,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     }
 
     public void saveSettings() {
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+        logger.atInfo().addArgument(() -> config.renderConfigAsJson(config.getRendering())).log("Video Settings: {}");
         // TODO: add a dirty flag that checks if recompiling is needed
         CoreRegistry.get(ShaderManager.class).recompileAllShaders();
         triggerBackAnimation();

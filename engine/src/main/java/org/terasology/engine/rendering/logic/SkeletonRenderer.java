@@ -307,7 +307,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneTransform.mul(bone.getInverseBindMatrix());
                     boneTransforms[bone.getIndex()] = boneTransform.transpose();
                 } else {
-                    logger.warn("Unable to resolve bone \"{}\"", bone.getName());
+                    logger.atWarn().addArgument(() -> bone.getName()).log("Unable to resolve bone \"{}\"");
                     boneTransforms[bone.getIndex()] = new Matrix4f();
                 }
             }
