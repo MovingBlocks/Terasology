@@ -155,7 +155,8 @@ public class PrefabSerializer {
                     }
                 }
             } else if (componentData.hasType()) {
-                logger.warn("Prefab '{}' contains unknown component '{}'", prefabData.getName(), componentData.getType());
+                logger.atWarn().addArgument(() -> prefabData.getName()).addArgument(() -> componentData.getType()).
+                        log("Prefab '{}' contains unknown component '{}'");
             }
         }
     }
