@@ -253,7 +253,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
-        logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+        logger.atInfo().addArgument(() -> String.format("%.2f", seconds)).log("Initialization completed in {}sec.");
     }
 
     private void verifyInitialisation() {
@@ -266,16 +266,20 @@ public class TerasologyEngine implements GameEngine {
      * Logs software, environment and hardware information.
      */
     private void logEnvironmentInfo() {
-        logger.info("{}", TerasologyVersion.getInstance());
-        logger.info("Home path: {}", PathManager.getInstance().getHomePath());
-        logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
-        logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
-        logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm" +
-                ".version"));
-        logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"),
-                System.getProperty("os.version"));
-        logger.info("Max. Memory: {} MiB", Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE);
-        logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
+        logger.atInfo().addArgument(() -> TerasologyVersion.getInstance()).log("{}");
+        logger.atInfo().addArgument(() -> PathManager.getInstance().getHomePath()).log("Home path: {}");
+        logger.atInfo().addArgument(() -> PathManager.getInstance().getInstallPath()).log("Install path: {}");
+        logger.atInfo().addArgument(() -> System.getProperty("java.version")).addArgument(System.getProperty("java.home")).
+                log("Java: {} in {}");
+        logger.atInfo().addArgument(() -> System.getProperty("java.vm.name")).addArgument(() -> System.getProperty("java.vm" + ".version")).
+                log("Java VM: {}, version: {}");
+        logger.atInfo().
+                addArgument(() -> System.getProperty("os.name")).
+                addArgument(() -> System.getProperty("os.arch")).
+                addArgument(() -> System.getProperty("os.version")).
+                log("OS: {}, arch: {}, version: {}");
+        logger.atInfo().addArgument(() -> Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE).log("Max. Memory: {} MiB");
+        logger.atInfo().addArgument(() -> Runtime.getRuntime().availableProcessors()).log("Processors: {}");
         if (NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE) {
             logger.warn("Running on a 32-bit JVM on a 64-bit system. This may limit performance.");
         }
@@ -543,7 +547,7 @@ public class TerasologyEngine implements GameEngine {
             try {
                 subsystem.preShutdown();
             } catch (RuntimeException e) {
-                logger.error("Error preparing to shutdown {} subsystem", subsystem.getName(), e);
+                logger.atError().addArgument(() -> subsystem.getName()).addArgument(e).log("Error preparing to shutdown {} subsystem");
             }
         }
 
@@ -553,7 +557,7 @@ public class TerasologyEngine implements GameEngine {
             try {
                 subsystem.shutdown();
             } catch (RuntimeException e) {
-                logger.error("Error shutting down {} subsystem", subsystem.getName(), e);
+                logger.atError().addArgument(() -> subsystem.getName()).addArgument(e).log("Error shutting down {} subsystem");
             }
         }
     }

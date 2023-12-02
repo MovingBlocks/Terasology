@@ -104,7 +104,8 @@ public class JoinServer extends VariableStepLoadProcess {
                     context.get(GameEngine.class).changeState(mainMenu);
                     return false;
                 } else {
-                    logger.info("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
+                    logger.atInfo().addArgument(() -> moduleInfo.getName()).addArgument(() -> moduleInfo.getVersion()).
+                            log("Activating module: {}:{}");
                     gameManifest.addModule(module.getId(), module.getVersion());
                     moduleSet.add(module);
                 }

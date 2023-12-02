@@ -78,7 +78,7 @@ public final class PathManager {
             URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
             Path codeLocation = Paths.get(urlToSource);
             installationSearchPaths.add(codeLocation);
-            LOGGER.info("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
+            LOGGER.atInfo().addArgument(codeLocation.toAbsolutePath()).log("PathManager: Initial code location is {}");
         } catch (URISyntaxException e) {
             LOGGER.error("PathManager: Failed to convert code location to path.", e);
         }
@@ -90,7 +90,7 @@ public final class PathManager {
         // Use the current directory as a fallback.
         Path currentDirectory = Paths.get("").toAbsolutePath();
         installationSearchPaths.add(currentDirectory);
-        LOGGER.info("PathManager: Working directory is " + currentDirectory);
+        LOGGER.atInfo().addArgument(currentDirectory).log("PathManager: Working directory is {}");
 
         for (Path startPath : installationSearchPaths) {
             Path installationPath = findNativesHome(startPath, 5);

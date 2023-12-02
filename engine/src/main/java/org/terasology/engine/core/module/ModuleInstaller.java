@@ -38,7 +38,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
     @Override
     public List<Module> call() throws Exception {
         Map<URI, Path> filesToDownload = getDownloadUrls(moduleList);
-        logger.info("Started downloading {} modules", filesToDownload.size());
+        logger.atInfo().addArgument(() -> filesToDownload.size()).log("Started downloading {} modules");
         MultiFileDownloader downloader = new MultiFileDownloader(filesToDownload, downloadProgressListener);
         List<Path> downloadedModulesPaths = downloader.call();
         logger.info("Module download completed, loading the new modules...");
@@ -48,7 +48,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
                 Module module = moduleManager.registerArchiveModule(filePath);
                 newInstalledModules.add(module);
             } catch (IOException e) {
-                logger.warn("Could not load module {}", filePath.getFileName(), e);
+                logger.atWarn().addArgument(() -> filePath.getFileName()).addArgument(e).log("Could not load module {}");
             }
         }
         logger.info("Finished loading the downloaded modules");
