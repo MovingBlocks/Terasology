@@ -71,10 +71,10 @@ public final class StorageServiceWorker {
             throw new RuntimeException("StorageServiceWorker is not in the required status");
         }
         status = StorageServiceWorkerStatus.WORKING;
-        logger.info("Performing action {}", action.getClass().getSimpleName());
+        logger.atInfo().addArgument(() -> action.getClass().getSimpleName()).log("Performing action {}");
         new Thread(() -> {
             action.perform(this);
-            logger.info("Completed action {}", action.getClass().getSimpleName());
+            logger.atInfo().addArgument(() -> action.getClass().getSimpleName()).log("Completed action {}");
         }).start();
     }
 
