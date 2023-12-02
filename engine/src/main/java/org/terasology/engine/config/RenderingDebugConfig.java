@@ -108,6 +108,7 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        logger.debug("Set {} property to {}.", evt.getPropertyName().toUpperCase(), evt.getNewValue());
+        logger.atDebug().addArgument(() -> evt.getPropertyName().toUpperCase()).addArgument(evt.getNewValue()).
+                log("Set {} property to {}.");
     }
 }

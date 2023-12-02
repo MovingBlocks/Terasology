@@ -32,11 +32,11 @@ public class LocaleConstraint implements SettingConstraint<Locale> {
 
     @Override
     public void warnUnsatisfiedBy(Locale value) {
-        logger.warn("Locale {} should be one of {}",
-                value,
-                locales.stream()
+        logger.atWarn().
+                addArgument(value).
+                addArgument(() -> locales.stream()
                         .map(Locale::getLanguage)
-                        .collect(Collectors.joining(",", "[", "]"))
-        );
+                        .collect(Collectors.joining(",", "[", "]"))).
+                log("Locale {} should be one of {}");
     }
 }

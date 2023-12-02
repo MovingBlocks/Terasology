@@ -50,10 +50,12 @@ public class StringConstraint implements SettingConstraint<String> {
 
     @Override
     public void warnUnsatisfiedBy(String value) {
-        logger.warn("String [{}] does not match the conditions: {}", value,
-                predicates.stream()
+        logger.atWarn().
+                addArgument(value).
+                addArgument(() -> predicates.stream()
                         .filter(p -> !p.test(value))
                         .map(StringConstraint::getDescription)
-                        .collect(Collectors.joining(",", "[", "]")));
+                        .collect(Collectors.joining(",", "[", "]"))).
+                log("String [{}] does not match the conditions: {}");
     }
 }
