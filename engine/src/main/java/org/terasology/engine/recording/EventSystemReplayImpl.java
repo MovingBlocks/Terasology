@@ -276,7 +276,7 @@ public class EventSystemReplayImpl implements EventSystem {
     @Override
     public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
-        logger.debug("Registering event {}", eventType.getSimpleName());
+        logger.atDebug().addArgument(() -> eventType.getSimpleName()).log("Registering event {}");
         for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
@@ -303,11 +303,11 @@ public class EventSystemReplayImpl implements EventSystem {
     public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
-            logger.error("Cannot register handler {}, must be public", handlerClass.getName());
+            logger.atError().addArgument(() -> handlerClass.getName()).log("Cannot register handler {}, must be public");
             return;
         }
 
-        logger.debug("Registering event handler {}", handlerClass.getName());
+        logger.atDebug().addArgument(() -> handlerClass.getName()).log("Registering event handler {}");
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
@@ -336,7 +336,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
                 logger.debug("Found method: {}", method);
                 if (!Event.class.isAssignableFrom(types[0]) || !EntityRef.class.isAssignableFrom(types[1])) {
-                    logger.error("Invalid event handler method: {}", method.getName());
+                    logger.atError().addArgument(() -> method.getName()).log("Invalid event handler method: {}");
                     return;
                 }
 
@@ -344,7 +344,8 @@ public class EventSystemReplayImpl implements EventSystem {
                 List<Class<? extends Component>> componentParams = Lists.newArrayList();
                 for (int i = 2; i < types.length; ++i) {
                     if (!Component.class.isAssignableFrom(types[i])) {
-                        logger.error("Invalid event handler method: {} - {} is not a component class", method.getName(), types[i]);
+                        logger.atError().addArgument(() -> method.getName()).addArgument(types[i]).
+                                log("Invalid event handler method: {} - {} is not a component class");
                         return;
                     }
                     requiredComponents.add((Class<? extends Component>) types[i]);
