@@ -234,7 +234,7 @@ public class StateLoading implements GameState {
         current = null;
         if (!loadProcesses.isEmpty()) {
             current = loadProcesses.remove();
-            logger.debug("{}", current.getMessage());
+            logger.atDebug().addArgument(() -> current.getMessage()).log("{}");
             current.begin();
         }
     }

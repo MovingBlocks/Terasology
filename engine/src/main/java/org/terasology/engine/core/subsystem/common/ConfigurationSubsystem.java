@@ -66,7 +66,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         checkServerIdentity();
 
         // TODO: Move to display subsystem
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+        logger.atInfo().addArgument(() -> config.renderConfigAsJson(config.getRendering())).log("Video Settings: {}");
 
         rootContext.put(Config.class, config);
         //add facades

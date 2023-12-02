@@ -68,7 +68,7 @@ public class ComponentSystemManager {
         ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
         for (Class<?> type : environment.getTypesAnnotatedWith(RegisterSystem.class)) {
             if (!ComponentSystem.class.isAssignableFrom(type)) {
-                logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName());
+                logger.atError().addArgument(type.getSimpleName()).log("Cannot load {}, must be a subclass of ComponentSystem");
                 continue;
             }
             Name moduleId = environment.getModuleProviding(type);
@@ -177,7 +177,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
-            logger.warn("System {} registered post-init.", object.getClass().getName());
+            logger.atWarn().addArgument(object.getClass().getName()).log("System {} registered post-init.");
             initialiseSystem(object);
         }
     }
