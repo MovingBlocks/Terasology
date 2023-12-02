@@ -193,7 +193,7 @@ public class ServerImpl implements Server {
     }
 
     private void send(NetData.NetMessage data) {
-        logger.trace("Sending with size {}", data.getSerializedSize());
+        logger.atTrace().addArgument(() -> data.getSerializedSize()).log("Sending with size {}");
         channel.writeAndFlush(data);
     }
 
@@ -232,7 +232,10 @@ public class ServerImpl implements Server {
             if (target.exists()) {
                 target.send(event);
             } else {
-                logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
+                logger.atInfo().
+                        addArgument(() -> event.getClass().getSimpleName()).
+                        addArgument(target).
+                        log("Dropping event {} for unavailable entity {}");
             }
         } catch (DeserializationException e) {
             logger.error("Failed to deserialize event", e);
@@ -346,7 +349,7 @@ public class ServerImpl implements Server {
                     }
                     blockManager.receiveFamilyRegistration(family, registrationMap);
                 } catch (BlockUriParseException e) {
-                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0));
+                    logger.atError().addArgument(() -> blockFamily.getBlockUri(0)).log("Received invalid block uri {}");
                 }
             }
         }
@@ -357,7 +360,8 @@ public class ServerImpl implements Server {
         if (currentEntity.exists()) {
             NetworkComponent netComp = currentEntity.getComponent(NetworkComponent.class);
             if (netComp == null) {
-                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, updateEntity.getNetId());
+                logger.atError().addArgument(() -> currentEntity).addArgument(() -> updateEntity.getNetId()).
+                        log("Updating entity with no network component: {}, expected netId {}");
                 return;
             }
             if (netComp.getNetworkId() != updateEntity.getNetId()) {
@@ -371,10 +375,14 @@ public class ServerImpl implements Server {
                 logger.error("Failed to associated new block entity");
             }
             if (netComp.getNetworkId() != updateEntity.getNetId()) {
-                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), netComp.getNetworkId());
+                logger.atError().
+                        addArgument(() -> currentEntity).
+                        addArgument(() -> updateEntity.getNetId()).
+                        addArgument(() -> netComp.getNetworkId()).
+                        log("Network ID lost in update: {}, {} -> {}");
             }
         } else {
-            logger.warn("Received update for non-existent entity {}", updateEntity.getNetId());
+            logger.atWarn().addArgument(() -> updateEntity.getNetId()).log("Received update for non-existent entity {}");
         }
     }
 
