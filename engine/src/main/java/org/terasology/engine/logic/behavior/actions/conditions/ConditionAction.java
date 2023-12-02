@@ -98,7 +98,7 @@ public class ConditionAction extends BaseAction {
                                 secondValue = "";
                                 break;
                             default:
-                                logger.error("Unsupported guard value type: {}", tokens[0]);
+                                logger.atError().addArgument(() -> tokens[0]).log("Unsupported guard value type: {}");
                                 secondValue = "";
 
                         }
@@ -115,7 +115,7 @@ public class ConditionAction extends BaseAction {
                                     passing = (Boolean) fieldValue != Boolean.parseBoolean(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for boolean values: {}", tokens[2]);
+                                    logger.atError().addArgument(() -> tokens[2]).log("Unsupported operation for boolean values: {}");
 
                             }
 
@@ -142,7 +142,7 @@ public class ConditionAction extends BaseAction {
                                     passing = ((Number) fieldValue).doubleValue() < Double.parseDouble(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for numeric values: {}", tokens[2]);
+                                    logger.atError().addArgument(() -> tokens[2]).log("Unsupported operation for numeric values: {}");
 
                             }
 
@@ -157,7 +157,7 @@ public class ConditionAction extends BaseAction {
                                     passing = !fieldValue.equals(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for strings: {}", tokens[2]);
+                                    logger.atError().addArgument(() -> tokens[2]).log("Unsupported operation for strings: {}");
 
                             }
                         } else {
@@ -190,7 +190,8 @@ public class ConditionAction extends BaseAction {
                                         break;
 
                                     default:
-                                        logger.error("Unknown field type or operation: {} {}", fieldValue.getClass(), tokens[2]);
+                                        logger.atError().addArgument(() -> fieldValue.getClass()).addArgument(() -> tokens[2]).
+                                                log("Unknown field type or operation: {} {}");
                                 }
                             }
                         }

@@ -74,20 +74,23 @@ public final class MethodCommand extends AbstractCommand {
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         for (Method method : commandMethods) {
             if (!hasSenderAnnotation(method)) {
-                logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a " +
-                        "NullPointerException", method.getName(), provider.getClass().getSimpleName());
+                logger.atError().addArgument(() -> method.getName()).addArgument(() -> provider.getClass().getSimpleName()).
+                        log("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException");
             }
-            logger.debug("Registering command method {} in class {}", method.getName(),
-                    method.getDeclaringClass().getCanonicalName());
+            logger.atDebug().addArgument(() -> method.getName()).addArgument(() -> method.getDeclaringClass().getCanonicalName()).
+                    log("Registering command method {} in class {}");
             try {
                 SpecificAccessibleObject<Method> specificMethod = new SpecificAccessibleObject<>(method, provider);
                 MethodCommand command = referringTo(specificMethod, context);
                 console.registerCommand(command);
-                logger.debug("Registered command method {} in class {}", method.getName(),
-                        method.getDeclaringClass().getCanonicalName());
+                logger.atDebug().addArgument(() -> method.getName()).addArgument(() -> method.getDeclaringClass().getCanonicalName()).
+                        log("Registered command method {} in class {}");
             } catch (RuntimeException t) {
-                logger.error("Failed to load command method {} in class {}", method.getName(),
-                        method.getDeclaringClass().getCanonicalName(), t);
+                logger.atError().
+                        addArgument(() -> method.getName()).
+                        addArgument(() -> method.getDeclaringClass().getCanonicalName()).
+                        addArgument(() -> t).
+                        log("Failed to load command method {} in class {}");
             }
         }
     }

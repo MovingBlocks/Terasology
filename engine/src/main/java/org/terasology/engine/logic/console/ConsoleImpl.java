@@ -63,13 +63,17 @@ public class ConsoleImpl implements Console {
         Name commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
-            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
-                    commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
-                    command.getSource().getClass().getCanonicalName());
+            logger.atWarn().
+                    addArgument(() -> commandName).
+                    addArgument(() -> commandRegistry.get(commandName).getSource().getClass().getCanonicalName()).
+                    addArgument(() -> command.getSource().getClass().getCanonicalName()).
+                    log("Command with name '{}' already registered by class '{}', skipping '{}'");
         } else {
             commandRegistry.put(commandName, command);
-            logger.debug("Command '{}' successfully registered for class '{}'.", commandName,
-                    command.getSource().getClass().getCanonicalName());
+            logger.atDebug().
+                    addArgument(() -> commandName).
+                    addArgument(() -> command.getSource().getClass().getCanonicalName()).
+                    log("Command '{}' successfully registered for class '{}'.");
         }
     }
 
@@ -135,7 +139,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void addMessage(Message message) {
         String uncoloredText = FontUnderline.strip(FontColor.stripColor(message.getMessage()));
-        logger.info("[{}] {}", message.getType(), uncoloredText);
+        logger.atInfo().addArgument(() -> message.getType()).addArgument(() -> uncoloredText).log("[{}] {}");
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);

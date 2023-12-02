@@ -155,7 +155,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private void restoreCharacter(EntityRef entity, EntityRef character) {
 
         Client clientListener = networkSystem.getOwner(entity);
-        LOGGER.info(clientListener.toString());
+        LOGGER.atInfo().addArgument(() -> clientListener.toString()).log("{}");
         updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
 
         ClientComponent client = entity.getComponent(ClientComponent.class);
