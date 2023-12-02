@@ -47,7 +47,10 @@ public class UIDeltaFormat extends AbstractAssetAlterationFileFormat<UIData> {
             if (skin.isPresent()) {
                 assetData.getRootWidget().setSkin(skin.get());
             } else {
-                logger.warn("Failed to load skin {} for the delta file {}", skinUri, input.getFilename());
+                logger.atWarn().
+                        addArgument(skinUri).
+                        addArgument(() -> input.getFilename()).
+                        log("Failed to load skin {} for the delta file {}");
             }
         }
     }

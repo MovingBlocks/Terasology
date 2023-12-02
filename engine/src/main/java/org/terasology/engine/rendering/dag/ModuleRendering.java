@@ -118,9 +118,11 @@ public abstract class ModuleRendering {
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
         // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
         if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-            logger.error("FBO {} is incomplete. Look earlier in the log for details.", fboConfig.getName());
+            logger.atError().addArgument(() -> fboConfig.getName()).
+                    log("FBO {} is incomplete. Look earlier in the log for details.");
         } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-            logger.error("FBO {} has generated an unexpected status code. Look earlier in the log for details.", fboConfig.getName());
+            logger.atError().addArgument(() -> fboConfig.getName()).
+                    log("FBO {} has generated an unexpected status code. Look earlier in the log for details.");
         }
         return fbo;
     }

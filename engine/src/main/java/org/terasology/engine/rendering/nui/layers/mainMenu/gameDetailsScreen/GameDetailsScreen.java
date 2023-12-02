@@ -354,16 +354,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
                     if (module != null) {
                         return ModuleSelectionInfo.strictVersion(module);
                     } else {
-                        logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
+                        logger.atWarn().addArgument(() -> nameVersion.getName()).addArgument(() -> nameVersion.getVersion()).
+                                log("Can't find module in your classpath - {}:{}");
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
-                            logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
+                            logger.atDebug().addArgument(() -> nameVersion.getName()).
+                                    log("Get the latest available version of module {} in your classpath");
                             errors.add(String.format("Can't find module %s:%s in your classpath; " +
                                             "loaded description for the latest available version.",
                                     nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
-                        logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
+                        logger.atError().addArgument(() -> nameVersion.getName()).
+                                log("Can't find any versions of module {} in your classpath!");
                         errors.add(String.format("Can't find any versions of module %s in your classpath!", nameVersion.getName()));
                         return ModuleSelectionInfo.unavailableVersion(nameVersion.getName().toString(), nameVersion.getVersion().toString());
                     }

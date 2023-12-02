@@ -259,7 +259,7 @@ public class NUIEditorMenuTreeBuilder {
                 }
             }
         } else {
-            logger.warn("Could not get class for node {}", node.getValue());
+            logger.atWarn().addArgument(() -> node.getValue()).log("Could not get class for node {}");
         }
     }
 

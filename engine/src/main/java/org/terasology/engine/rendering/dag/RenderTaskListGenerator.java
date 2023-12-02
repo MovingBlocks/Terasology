@@ -48,15 +48,15 @@ public final class RenderTaskListGenerator {
             if (node.isEnabled()) {
 
                 // printing out node name
-                logger.info("----- {}", node.getClass().getSimpleName());
+                logger.atInfo().addArgument(() -> node.getClass().getSimpleName()).log("----- {}");
 
                 // printing out individual desired state changes
                 for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
-                    logger.info("{}", desiredStateChange);
+                    logger.atInfo().addArgument(desiredStateChange).log("{}");
                 }
 
                 // printing out process() statement
-                logger.info("{}: process()", node);
+                logger.atInfo().addArgument(node).log("{}: process()");
             }
         }
     }
@@ -167,15 +167,20 @@ public final class RenderTaskListGenerator {
         long endTimeInNanoSeconds = System.nanoTime();
 
         // if (logger.isDebugEnabled()) {
-            logger.debug("===== INTERMEDIATE RENDERER LIST =========================");
+            logger.atDebug().log("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
-            logger.debug("===== RENDERER TASK LIST =================================");
+            logger.atDebug().log("===== RENDERER TASK LIST =================================");
             logList(taskList);
-            logger.debug("----------------------------------------------------------");
-            logger.debug("Task list generated in {} ms", String.format("%.3f", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
-            logger.debug("{} nodes, {} enabled - {} tasks (excluding marker tasks) out of {} potential tasks.",
-                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks);
-            logger.debug("----------------------------------------------------------");
+            logger.atDebug().log("----------------------------------------------------------");
+            logger.atDebug().addArgument(() -> String.format("%.3f", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f)).
+                    log("Task list generated in {} ms");
+            logger.atDebug().
+                    addArgument(() -> nodeList.size()).
+                    addArgument(enabledNodes).
+                    addArgument(taskList.size() - enabledNodes).
+                    addArgument(potentialTasks).
+                    log("{} nodes, {} enabled - {} tasks (excluding marker tasks) out of {} potential tasks.");
+            logger.atDebug().log("----------------------------------------------------------");
         // }
 
         return taskList;
@@ -183,7 +188,7 @@ public final class RenderTaskListGenerator {
 
     private void logList(List<?> list) {
         for (Object object : list) {
-            logger.debug("{}", object);
+            logger.atDebug().addArgument(object).log("{}");
         }
     }
 
