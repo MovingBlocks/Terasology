@@ -56,7 +56,8 @@ public class ActionNode implements BehaviorNode {
             try {
                 action.construct(actor);
             } catch (Exception e) {
-                logger.debug("Exception while running construct() of action {} from entity {}: ", action, actor.getEntity(), e);
+                logger.atDebug().addArgument(() -> action).addArgument(() -> actor.getEntity()).addArgument(() -> e).
+                        log("Exception while running construct() of action {} from entity {}: ");
             }
         }
     }
@@ -67,7 +68,8 @@ public class ActionNode implements BehaviorNode {
             try {
                 return action.modify(actor, BehaviorState.UNDEFINED);
             } catch (Exception e) {
-                logger.debug("Exception while running action {} from entity {}: ", action, actor.getEntity(), e);
+                logger.atDebug().addArgument(() -> action).addArgument(() -> actor.getEntity()).addArgument(() -> e).
+                        log("Exception while running action {} from entity {}: ");
                 // TODO maybe returning UNDEFINED would be more fitting?
                 return BehaviorState.FAILURE;
             }

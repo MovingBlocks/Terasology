@@ -68,7 +68,7 @@ public class ServerCommands extends BaseComponentSystem {
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
         DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
 
-        logger.info("Shutdown triggered by {}", name.name);
+        logger.atInfo().addArgument(() -> name.name).log("Shutdown triggered by {}");
 
         gameEngine.shutdown();
 
@@ -165,7 +165,7 @@ public class ServerCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
 
-            logger.info("Kicking user {}", name.name);
+            logger.atInfo().addArgument(() -> name.name).log("Kicking user {}");
 
             networkSystem.forceDisconnect(client);
             return "User kick triggered for '" + name.name + "'";

@@ -84,7 +84,8 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onCharacterStateReceived(CharacterStateEvent state, EntityRef entity) {
         if (entity.equals(localPlayer.getCharacterEntity())) {
-            logger.trace("Received new state, sequence number: {}, buffered input size {}", state.getSequenceNumber(), inputs.size());
+            logger.atTrace().addArgument(() -> state.getSequenceNumber()).addArgument(() -> inputs.size()).
+                    log("Received new state, sequence number: {}, buffered input size {}");
 
             playerStates.remove(entity);
             authoritiveState = state;
@@ -98,7 +99,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
                     newState = stepState(input, newState, entity);
                 }
             }
-            logger.trace("Resultant input size {}", inputs.size());
+            logger.atTrace().addArgument(() -> inputs.size()).log("Resultant input size {}");
             characterMovementSystemUtility.setToState(entity, newState);
             // TODO: soft correct predicted state
             predictedState = newState;
