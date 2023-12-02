@@ -43,7 +43,7 @@ public class AutoConfigTypeHandler<T extends AutoConfig> extends TypeHandler<Aut
                     if (typeHandler.isPresent()) {
                         fields.put(field.getName(), typeHandler.get().serialize(setting.get(), serializer));
                     } else {
-                        logger.error("Cannot serialize type [{}]", setting.getValueType());
+                        logger.atError().addArgument(() -> setting.getValueType()).log("Cannot serialize type [{}]");
                     }
                 }
             } catch (IllegalAccessException e) {
@@ -65,7 +65,7 @@ public class AutoConfigTypeHandler<T extends AutoConfig> extends TypeHandler<Aut
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
                 Field settingField = settingFields.get(entry.getKey());
                 if (settingField == null) {
-                    logger.warn("Cannot to find setting field with name [{}]", entry.getKey());
+                    logger.atWarn().addArgument(() -> entry.getKey()).log("Cannot to find setting field with name [{}]");
                     continue;
                 }
                 try {
@@ -77,11 +77,11 @@ public class AutoConfigTypeHandler<T extends AutoConfig> extends TypeHandler<Aut
                         if (value.isPresent()) {
                             setting.set(value.get());
                         } else {
-                            logger.error("Cannot deserialize value [{}] to type [{}]", entry.getValue(),
-                                    setting.getValueType());
+                            logger.atError().addArgument(() -> entry.getValue()).addArgument(setting.getValueType()).
+                                    log("Cannot deserialize value [{}] to type [{}]");
                         }
                     } else {
-                        logger.error("Cannot deserialize type [{}]", setting.getValueType());
+                        logger.atError().addArgument(() -> setting.getValueType()).log("Cannot deserialize type [{}]");
                     }
                 } catch (IllegalAccessException e) {
                     // ignore, AutoConfig.getSettingsFieldsIn return public fields.

@@ -97,7 +97,12 @@ public class NumberRangeConstraint<T extends Number & Comparable<? super T>> imp
      */
     @Override
     public void warnUnsatisfiedBy(T value) {
-        LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
-                min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
+        LOGGER.atWarn().
+                addArgument(value).
+                addArgument(minInclusive ? "[" : "(").
+                addArgument(min != null ? min : "UNBOUNDED").
+                addArgument(max != null ? max : "UNBOUNDED").
+                addArgument(maxInclusive ? "]" : ")").
+                log("Value {} is not in the range {}{}, {}{}");
     }
 }

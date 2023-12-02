@@ -85,7 +85,7 @@ public class AutoConfigManager {
             T loadedConfig = (T) serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
             mergeConfig(configClass, loadedConfig, config);
         } catch (Exception e) {
-            logger.error("Error while loading config {} from disk", config.getId(), e);
+            logger.atError().addArgument(() -> config.getId()).addArgument(e).log("Error while loading config {} from disk");
         }
     }
 
@@ -116,7 +116,7 @@ public class AutoConfigManager {
                 StandardOpenOption.CREATE)) {
             serializer.serialize(config, TypeInfo.of((Class<AutoConfig>) config.getClass()), output);
         } catch (IOException e) {
-            logger.error("Error while saving config {} to disk", config.getId(), e);
+            logger.atError().addArgument(() -> config.getId()).addArgument(e).log("Error while saving config {} to disk");
         }
     }
 
