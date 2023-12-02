@@ -30,7 +30,8 @@ public class EventLibrary extends ModuleClassLibrary<Event> {
         try {
             return new EventMetadata<>(type, copyStrategies, factory, uri);
         } catch (NoSuchMethodException e) {
-            logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
+            logger.atError().addArgument(() -> type.getSimpleName()).addArgument(() -> e).
+                    log("Unable to register class {}: Default Constructor Required");
             return null;
         }
     }

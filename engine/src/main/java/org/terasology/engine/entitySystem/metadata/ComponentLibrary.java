@@ -46,11 +46,13 @@ public class ComponentLibrary extends ModuleClassLibrary<Component> {
         try {
             info = new ComponentMetadata<>(uri, type, factory, copyStrategies);
         } catch (NoSuchMethodException e) {
-            logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
+            logger.atError().addArgument(() -> type.getSimpleName()).addArgument(() -> e).
+                    log("Unable to register class {}: Default Constructor Required");
             return null;
         } catch (NoClassDefFoundError e) {
             // log what class was not found so that diagnosis is easier
-            logger.error("Class not found, {}", type.getSimpleName(), e);
+            logger.atError().addArgument(() -> type.getSimpleName()).addArgument(() -> e).
+                    log("Class not found, {}");
             throw e;
         }
         return info;
