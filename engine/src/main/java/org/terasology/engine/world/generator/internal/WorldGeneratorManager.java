@@ -70,7 +70,8 @@ public class WorldGeneratorManager {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
+                    logger.atError().addArgument(() -> module.getId()).addArgument(e).
+                            log("Error loading world generator in module {}, skipping");
                 }
             } else {
                 logger.warn("Could not resolve dependencies for module: {}", module);
