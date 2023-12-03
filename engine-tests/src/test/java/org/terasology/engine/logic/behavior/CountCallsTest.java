@@ -51,6 +51,7 @@ public class CountCallsTest {
         assertBT(tree, result, executed, true);
     }
 
+    // TODO check why ignoredStep is there and tested.
     public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed, boolean ignoredStep) {
         BehaviorNode node = fromJson(tree);
 
