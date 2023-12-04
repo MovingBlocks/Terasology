@@ -75,7 +75,7 @@ ext {
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
 
-    LwjglVersion = '3.3.1'
+    LwjglVersion = '3.3.3'
 }
 
 
