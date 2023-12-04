@@ -31,7 +31,7 @@ dependencies {
     testRuntimeOnly("org.codehaus.janino:janino:3.1.7") {
         because("allows use of EvaluatorFilter in logback.xml")
     }
-    testRuntimeOnly("org.slf4j:jul-to-slf4j:2.0.9") {
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.36") {
         because("redirects java.util.logging (from e.g. junit) through slf4j")
     }
 
