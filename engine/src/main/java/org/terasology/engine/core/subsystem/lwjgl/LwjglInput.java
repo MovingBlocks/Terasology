@@ -51,9 +51,9 @@ public class LwjglInput extends BaseLwjglSubsystem {
         LwjglControllerDevice controllerDevice = new LwjglControllerDevice(controllerConfig);
         inputSystem.setControllerDevice(controllerDevice);
 
-        long window = GLFW.glfwGetCurrentContext();
-        ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(window);
-        ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(window);
+//        long window = GLFW.glfwGetCurrentContext();
+        ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(LwjglGraphics.primaryWindow);
+        ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(LwjglGraphics.primaryWindow);
     }
 
     private void updateInputConfig() {

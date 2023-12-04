@@ -1,5 +1,6 @@
-// Copyright 2022 The Terasology Foundation
+// Copyright 2023 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine.rendering.world;
 
 import org.joml.Vector3f;
@@ -14,12 +15,8 @@ import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.MethodCommand;
-import org.terasology.engine.logic.console.commandSystem.annotations.Command;
-import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.logic.players.LocalPlayerSystem;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.material.Material;
@@ -27,16 +24,11 @@ import org.terasology.engine.rendering.backdrop.BackdropProvider;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.dag.ModuleRendering;
-import org.terasology.engine.rendering.dag.Node;
 import org.terasology.engine.rendering.dag.RenderGraph;
-import org.terasology.engine.rendering.dag.RenderPipelineTask;
-import org.terasology.engine.rendering.dag.RenderTaskListGenerator;
-import org.terasology.engine.rendering.dag.stateChanges.SetViewportToSizeOf;
-import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
-import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
@@ -49,41 +41,25 @@ import org.terasology.math.TeraMath;
 
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glViewport;
-
-
-/**
- * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with
- * elsewhere.
- * <p>
- * This implementation works closely with a number of support objects, in particular:
- * <p>
- * TODO: update this section to include new, relevant objects - a RenderableWorld instance, providing acceleration
- * structures caching blocks requiring different rendering treatments<br>
- */
-public final class WorldRendererImpl implements WorldRenderer {
+public class DeferredRenderer implements WorldRenderer {
     /*
      * Presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeferredRenderer.class);
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
-    private RenderGraph renderGraph;
     private RenderingModuleRegistry renderingModuleRegistry;
 
-    private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
+    private final EngineKernel kernel;
     private final Camera playerCamera;
 
     private float timeSmoothedMainLightIntensity;
-    private RenderingStage currentRenderingStage;
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
@@ -94,11 +70,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderingConfig renderingConfig;
     private final Console console;
 
-    private RenderTaskListGenerator renderTaskListGenerator;
-    private boolean requestedTaskListRefresh;
-    private List<RenderPipelineTask> renderPipelineTaskList;
-
-    private DisplayResolutionDependentFbo displayResolutionDependentFbo;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -115,22 +86,20 @@ public final class WorldRendererImpl implements WorldRenderer {
      *
      * @param context a context object, to obtain instances of classes such as the rendering config.
      */
-    public WorldRendererImpl(Context context) {
+    public DeferredRenderer(Context context) {
         this.context = context;
-        renderGraph = new RenderGraph(context);
-
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
+        this.kernel = context.get(EngineKernel.class);
         playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-        currentRenderingStage = RenderingStage.MONO;
+//        currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        context.put(ChunkTessellator.class, new ChunkTessellator(null
-        ));
+        context.put(ChunkTessellator.class, new ChunkTessellator(this.kernel));
 
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         ChunkTessellator chunkTessellator = context.get(ChunkTessellator.class);
@@ -150,8 +119,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         initRenderingSupport();
 
-        initRenderGraph();
-
         initRenderingModules();
 
         console = context.get(Console.class);
@@ -162,9 +129,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         ScreenGrabber screenGrabber = new ScreenGrabber(context);
         context.put(ScreenGrabber.class, screenGrabber);
 
-        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(
-                context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
-        context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
+//        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(
+//                context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
+//        context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
 
         shaderManager.initShaders();
 
@@ -173,12 +140,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(RenderableWorld.class, renderableWorld);
     }
 
-    private void initRenderGraph() {
-        context.put(RenderGraph.class, renderGraph);
-
-        renderTaskListGenerator = new RenderTaskListGenerator();
-        context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
-    }
 
     private void initRenderingModules() {
         renderingModuleRegistry = context.get(RenderingModuleRegistry.class);
@@ -196,13 +157,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             // Switch module's context from gamecreation subcontext to gamerunning context
             renderingModuleRegistry.updateModulesContext(context);
         }
-        /*
-        TODO: work out where to put this.
-
-        renderGraph.connect(opaqueObjectsNode, overlaysNode);
-        renderGraph.connect(opaqueBlocksNode, overlaysNode);
-        renderGraph.connect(alphaRejectBlocksNode, overlaysNode);
-        */
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
@@ -248,12 +202,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         secondsSinceLastFrame += deltaInSeconds;
     }
 
-    private void resetStats() {
-        statChunkMeshEmpty = 0;
-        statChunkNotReady = 0;
-        statRenderedTriangles = 0;
-    }
-
     @Override
     public void increaseTrianglesCount(int increase) {
         statRenderedTriangles += increase;
@@ -264,47 +212,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         statChunkNotReady += increase;
     }
 
-    private void preRenderUpdate(RenderingStage renderingStage) {
-        resetStats();
-
-        currentRenderingStage = renderingStage;
-
-        if (currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE) {
-            isFirstRenderingStageForCurrentFrame = true;
-        } else {
-            isFirstRenderingStageForCurrentFrame = false;
-        }
-
-        // this is done to execute this code block only once per frame
-        // instead of once per eye in a stereo setup.
-        if (isFirstRenderingStageForCurrentFrame) {
-            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity,
-                    getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
-
-            playerCamera.update(secondsSinceLastFrame);
-
-            renderableWorld.update();
-            secondsSinceLastFrame = 0;
-
-            displayResolutionDependentFbo.update();
-
-            millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are
-            // based on.
-        }
-
-        if (currentRenderingStage != RenderingStage.MONO) {
-            playerCamera.updateFrustum();
-        }
-
-        // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
-        renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
-
-        if (requestedTaskListRefresh) {
-            List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-            renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
-            requestedTaskListRefresh = false;
-        }
-    }
 
     /**
      * TODO: update javadocs This method triggers the execution of the rendering pipeline and, eventually, sends the
@@ -322,35 +229,36 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Override
     public void render(RenderingStage renderingStage) {
+        statChunkMeshEmpty = 0;
+        statChunkNotReady = 0;
+        statRenderedTriangles = 0;
 
-        preRenderUpdate(renderingStage);
+        timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity,
+                getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
-        // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
+        playerCamera.update(secondsSinceLastFrame);
 
-        // The following line re-establish OpenGL defaults, so that the nodes/tasks can rely on them.
-        // A place where Terasology overrides the defaults is LwjglGraphics.initOpenGLParams(), but
-        // there could be potentially other places, i.e. in the UI code. In the rendering engine we'd like
-        // to eventually rely on a default OpenGL state.
-        glDisable(GL_CULL_FACE);
-        FBO lastUpdatedGBuffer = displayResolutionDependentFbo.getGBufferPair().getLastUpdatedFbo();
-        glViewport(0, 0, lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height());
+        renderableWorld.update();
+        secondsSinceLastFrame = 0;
+        millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are
 
-        renderPipelineTaskList.forEach(RenderPipelineTask::process);
+        playerCamera.updateFrustum();
 
-        // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
-//        LwjglGraphicsUtil.initOpenGLParams();
+        // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
+        renderableWorld.queueVisibleChunks(true);
+
+        //TODO: implement rendering logic
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
 
     @Override
     public void requestTaskListRefresh() {
-        requestedTaskListRefresh = true;
     }
 
     @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
-        return isFirstRenderingStageForCurrentFrame;
+        return true;
     }
 
     /**
@@ -360,9 +268,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
-        renderGraph.dispose();
-        // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
-        SetViewportToSizeOf.disposeDefaultInstance();
     }
 
     @Override
@@ -431,91 +336,12 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public RenderingStage getCurrentRenderStage() {
-        return currentRenderingStage;
+        return RenderingStage.LEFT_EYE;
     }
 
     @Override
     public RenderGraph getRenderGraph() {
-        return renderGraph;
+        return null;
     }
 
-    /**
-     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature, allows developers to
-     * hot-swap shaders for easy development.
-     * <p>
-     * To run the command simply type "recompileShaders" and then press Enter in the console.
-     */
-    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission =
-            PermissionManager.NO_PERMISSION)
-    public void recompileShaders() {
-        console.addMessage("Recompiling shaders... ", false);
-        shaderManager.recompileAllShaders();
-        console.addMessage("done!");
-    }
-
-    /**
-     * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
-     * concerned Nodes, which in turn take care of executing them.
-     * <p>
-     * Usage: {@code dagNodeCommand <nodeUri> <command> <parameters>}
-     * <p>
-     * Example: dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
-     */
-    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri,
-                               @CommandParam("command") final String command,
-                               @CommandParam(value = "arguments") final String... arguments) {
-        Node node = renderGraph.findNode(nodeUri);
-        if (node == null) {
-            node = renderGraph.findAka(nodeUri);
-            if (node == null) {
-                throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
-            }
-        }
-        node.handleCommand(command, arguments);
-    }
-
-    /**
-     * Redirect output FBO from one node to another's input
-     * <p>
-     * Usage: {@code dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>}
-     * <p>
-     * Example: dagRedirect fbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1 dagRedirect bufferpair
-     * backdrop 1 AdvancedRendering:intermediateHazeNode 1
-     */
-    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagRedirect(@CommandParam("fromNodeUri") final String connectionTypeString, @CommandParam(
-            "fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
-                            @CommandParam("toNodeUri") final String toNodeUri,
-                            @CommandParam(value = "inputFboId") final int inputFboId) {
-        RenderGraph.ConnectionType connectionType;
-        if (connectionTypeString.equalsIgnoreCase("fbo")) {
-            connectionType = RenderGraph.ConnectionType.FBO;
-        } else if (connectionTypeString.equalsIgnoreCase("bufferpair")) {
-            connectionType = RenderGraph.ConnectionType.BUFFER_PAIR;
-        } else {
-            throw new RuntimeException(("Unsupported connection type: '" + connectionTypeString + "'. Expected 'fbo' " +
-                    "or 'bufferpair'.\n"));
-        }
-
-        Node toNode = renderGraph.findNode(toNodeUri);
-        if (toNode == null) {
-            toNode = renderGraph.findAka(toNodeUri);
-            if (toNode == null) {
-                throw new RuntimeException(("No node is associated with URI '" + toNodeUri + "'"));
-            }
-        }
-
-        Node fromNode = renderGraph.findNode(fromNodeUri);
-        if (fromNode == null) {
-            fromNode = renderGraph.findAka(fromNodeUri);
-            if (fromNode == null) {
-                throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
-            }
-        }
-        renderGraph.reconnectInputToOutput(fromNode, outputFboId, toNode, inputFboId, connectionType, true);
-        toNode.clearDesiredStateChanges();
-        requestTaskListRefresh();
-
-    }
 }

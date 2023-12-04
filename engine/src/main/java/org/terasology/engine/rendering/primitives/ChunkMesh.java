@@ -97,6 +97,14 @@ public interface ChunkMesh {
         public static final int COLOR_INDEX = 8; // vec4
 
         public final VertexResource buffer;
+
+//        public final VertexResource positionBuffer;
+//        public final VertexResource NormalBuffer;
+//        public final VertexResource uvBuffer;
+//        public final VertexResource ColroBuffer;
+//        public final VertexResource AttributeBuffer;
+
+
         public final IndexResource indices = new IndexResource();
 
         public final VertexAttributeBinding<Vector3fc, Vector3f> position;

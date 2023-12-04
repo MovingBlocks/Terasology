@@ -92,7 +92,6 @@ class RenderableWorldImpl implements RenderableWorld {
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, frontToBackComparator),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, backToFrontComparator));
 
-
     }
 
     @Override

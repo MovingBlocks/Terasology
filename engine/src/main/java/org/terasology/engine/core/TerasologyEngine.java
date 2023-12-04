@@ -43,6 +43,7 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.gltf.ByteBufferAsset;
+import org.terasology.engine.rust.EngineKernel;
 import org.terasology.engine.version.TerasologyVersion;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
@@ -161,6 +162,7 @@ public class TerasologyEngine implements GameEngine {
         rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
+
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -564,6 +566,7 @@ public class TerasologyEngine implements GameEngine {
      */
     @Override
     public void shutdown() {
+
         shutdownRequested = true;
     }
 
