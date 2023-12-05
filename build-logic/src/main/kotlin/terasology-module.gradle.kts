@@ -79,7 +79,7 @@ if (project.name == "ModuleTestingEnvironment") {
         runtimeOnly("org.codehaus.janino:janino:3.1.3") {
             because("logback filters")
         }
-        add("implementation", platform("org.junit:junit-bom:5.8.1"))
+        add("implementation", platform("org.junit:junit-bom:5.10.1"))
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.12.4")
     }
