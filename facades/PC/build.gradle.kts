@@ -81,7 +81,7 @@ dependencies {
         because("redirects java.util.logging from miscellaneous dependencies through slf4j")
     }
 
-    testImplementation(platform("org.junit:junit-bom:5.7.1")) {
+    testImplementation(platform("org.junit:junit-bom:5.10.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
     testImplementation("org.junit.jupiter:junit-jupiter-api")

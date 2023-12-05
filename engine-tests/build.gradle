@@ -68,7 +68,7 @@ dependencies {
 
 
     // Test lib dependencies
-    implementation(platform("org.junit:junit-bom:5.10.0")) {
+    implementation(platform("org.junit:junit-bom:5.10.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
     api("org.junit.jupiter:junit-jupiter-api") {
