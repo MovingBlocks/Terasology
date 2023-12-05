@@ -30,7 +30,7 @@ dependencies {
     testRuntimeOnly("org.slf4j:slf4j-simple:1.7.32") {
         because("log output during tests")
     }
-    testImplementation(platform("org.junit:junit-bom:5.8.1")) {
+    testImplementation(platform("org.junit:junit-bom:5.10.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
     testImplementation("org.junit.jupiter:junit-jupiter-api")
