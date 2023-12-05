@@ -9,7 +9,7 @@ public class GetterSetterComponent implements Component<GetterSetterComponent> {
     public transient boolean getterUsed;
     public transient boolean setterUsed;
 
-    private Vector3f value = new Vector3f(0, 0, 0);
+    public Vector3f value = new Vector3f(0, 0, 0);
 
     public Vector3f getValue() {
         getterUsed = true;
