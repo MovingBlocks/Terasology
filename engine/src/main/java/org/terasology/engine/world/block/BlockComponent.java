@@ -12,9 +12,9 @@ import org.terasology.gestalt.entitysystem.component.Component;
  */
 public final class BlockComponent implements Component<BlockComponent> {
     @Replicate
-    protected Vector3i position = new Vector3i();
+    public Vector3i position = new Vector3i();
     @Replicate
-    protected Block block;
+    public Block block;
 
     public BlockComponent() {
     }

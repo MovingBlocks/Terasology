@@ -30,22 +30,22 @@ public final class LocationComponent implements Component<LocationComponent>, Re
 
     // Relative to
     @Replicate
-    EntityRef parent = EntityRef.NULL;
+    public EntityRef parent = EntityRef.NULL;
     @Replicate
-    List<EntityRef> children = Lists.newArrayList();
+    public List<EntityRef> children = Lists.newArrayList();
     // Standard position/rotation
     @Replicate
     @TextField
-    final Vector3f position = new Vector3f();
+    public final Vector3f position = new Vector3f();
     @Replicate
-    Quaternionf rotation = new Quaternionf();
+    public Quaternionf rotation = new Quaternionf();
     @Replicate
-    float scale = 1.0f;
+    public float scale = 1.0f;
     @Replicate
-    Vector3f lastPosition = new Vector3f();
+    public Vector3f lastPosition = new Vector3f();
     @Replicate
-    Quaternionf lastRotation = new Quaternionf();
-    private boolean isDirty = false;
+    public Quaternionf lastRotation = new Quaternionf();
+    public boolean isDirty = false;
 
     public LocationComponent() {
     }

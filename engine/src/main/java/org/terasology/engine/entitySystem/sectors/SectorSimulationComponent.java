@@ -46,7 +46,7 @@ public class SectorSimulationComponent implements Component<SectorSimulationComp
      * This is used to calculate the delta between simulation events, and should not be changed outside of this class
      * or the {@link SectorSimulationSystem}.
      */
-    protected long lastSimulationTime;
+    public long lastSimulationTime;
 
     /**
      * Create a new {@link SectorSimulationComponent} with the default max delta.
