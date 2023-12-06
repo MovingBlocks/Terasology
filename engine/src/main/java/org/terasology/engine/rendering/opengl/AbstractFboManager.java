@@ -40,16 +40,17 @@ public abstract class AbstractFboManager extends AbstractSubscribable implements
     protected FBO generateWithDimensions(FboConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
         FBO fbo = FBO.create(fboConfig);
+        SimpleUri fboConfigName = fboConfig.getName();
 
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
         // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
         if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-            logger.error("FBO {} is incomplete. Look earlier in the log for details.", fboConfig.getName());
+            logger.error("FBO {} is incomplete. Look earlier in the log for details.", fboConfigName);
         } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-            logger.error("FBO {} has generated an unexpected status code. Look earlier in the log for details.", fboConfig.getName());
+            logger.error("FBO {} has generated an unexpected status code. Look earlier in the log for details.", fboConfigName);
         }
-        fboLookup.put(fboConfig.getName(), fbo);
-        fboConfigs.put(fboConfig.getName(), fboConfig);
+        fboLookup.put(fboConfigName, fbo);
+        fboConfigs.put(fboConfigName, fboConfig);
         return fbo;
     }
 

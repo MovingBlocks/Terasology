@@ -25,7 +25,7 @@ dependencies {
     pmd("net.sourceforge.pmd:pmd-core:7.0.0-rc4")
     pmd("net.sourceforge.pmd:pmd-java:7.0.0-rc4")
 
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.12") {
         because("runtime: to configure logging during tests with logback.xml")
     }
     testRuntimeOnly("org.codehaus.janino:janino:3.1.7") {

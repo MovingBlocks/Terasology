@@ -48,15 +48,15 @@ public final class RenderTaskListGenerator {
             if (node.isEnabled()) {
 
                 // printing out node name
-                logger.info(String.format(("----- %s"), node.getClass().getSimpleName()));
+                logger.info("----- {}", node.getClass().getSimpleName());
 
                 // printing out individual desired state changes
                 for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
-                    logger.info(desiredStateChange.toString());
+                    logger.info("{}", desiredStateChange);
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s: process()", node.toString()));
+                logger.info("{}: process()", node);
             }
         }
     }
@@ -172,9 +172,9 @@ public final class RenderTaskListGenerator {
             logger.debug("===== RENDERER TASK LIST =================================");
             logList(taskList);
             logger.debug("----------------------------------------------------------");
-            logger.debug(String.format("Task list generated in %.3f ms", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
-            logger.debug(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
-                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
+            logger.debug("Task list generated in {} ms", String.format("%.3f", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
+            logger.debug("{} nodes, {} enabled - {} tasks (excluding marker tasks) out of {} potential tasks.",
+                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks);
             logger.debug("----------------------------------------------------------");
         // }
 
@@ -183,7 +183,7 @@ public final class RenderTaskListGenerator {
 
     private void logList(List<?> list) {
         for (Object object : list) {
-            logger.debug(object.toString());
+            logger.debug("{}", object);
         }
     }
 
