@@ -17,9 +17,9 @@ import java.util.Set;
  */
 @ForceBlockActive
 public final class PeriodicActionComponent implements Component<PeriodicActionComponent> {
-    private Map<String, Long> actionIdsWakeUp = new HashMap<>();
-    private Map<String, Long> actionIdsPeriod = new HashMap<>();
-    private long lowestWakeUp = Long.MAX_VALUE;
+    public Map<String, Long> actionIdsWakeUp = new HashMap<>();
+    public Map<String, Long> actionIdsPeriod = new HashMap<>();
+    public long lowestWakeUp = Long.MAX_VALUE;
 
     public PeriodicActionComponent() {
     }

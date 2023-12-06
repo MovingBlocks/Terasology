@@ -17,8 +17,8 @@ import java.util.Set;
  */
 @ForceBlockActive
 public final class DelayedActionComponent implements Component<DelayedActionComponent> {
-    private Map<String, Long> actionIdsWakeUp = new HashMap<>();
-    private long lowestWakeUp = Long.MAX_VALUE;
+    public Map<String, Long> actionIdsWakeUp = new HashMap<>();
+    public long lowestWakeUp = Long.MAX_VALUE;
 
     public DelayedActionComponent() {
     }
