@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Enumerates all default key bindings and writes them sorted by ID to the console
  */
+@SuppressWarnings("PMD.SystemPrintln") // main entrypoint used to generate documentation
 public final class BindingScraper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BindingScraper.class);
 
@@ -89,10 +90,10 @@ public final class BindingScraper {
         }
 
         for (InputCategory row : categories.keySet()) {
-            LOGGER.info("# {}", row.displayName());
+            System.out.println("# " + row.displayName());
 
             categories.get(row).stream().filter(entry -> entry != null).forEach(entry ->
-                    LOGGER.info("{}: {}", desc.get(entry), keys.get(entry)));
+                    System.out.println(desc.get(entry) + ": " + keys.get(entry)));
         }
     }
 

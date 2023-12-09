@@ -78,7 +78,6 @@ public final class PathManager {
             URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
             Path codeLocation = Paths.get(urlToSource);
             installationSearchPaths.add(codeLocation);
-            // Not using logger because it's usually initialized after PathManager.
             LOGGER.info("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
         } catch (URISyntaxException e) {
             LOGGER.error("PathManager: Failed to convert code location to path.", e);

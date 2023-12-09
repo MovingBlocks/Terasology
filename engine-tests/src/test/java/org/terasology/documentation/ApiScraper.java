@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Enumerates all classes and packages that are annotated with {@link API}.
  */
+@SuppressWarnings("PMD.SystemPrintln") // main entrypoint used to generate documentation
 public final class ApiScraper {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiScraper.class);
 
@@ -62,18 +63,18 @@ public final class ApiScraper {
 
                     // Find out what jar it came from and consider that the category
                     String categoryFragment = location.getPath();
-                    LOGGER.debug("category fragment as path: {}", categoryFragment);
+                    //System.out.println("category fragment as path: " + categoryFragment);
                     int bang = categoryFragment.lastIndexOf("!");
                     int hyphen = categoryFragment.lastIndexOf("-", bang);
                     int slash = categoryFragment.lastIndexOf("/", hyphen);
                     category = categoryFragment.substring(slash + 1, hyphen);
-                    LOGGER.debug("category fragment pared down: {}", category);
+                    //System.out.println("category fragment pared down: " + category);
 
                     if (isPackage) {
-                        LOGGER.debug("Jar-based Package: {}, came from {}", apiPackage, location);
+                        //System.out.println("Jar-based Package: " + apiPackage + ", came from " + location);
                         sortedApi.put(category, apiPackage + " (PACKAGE)");
                     } else {
-                        LOGGER.debug("Jar-based Class: {}, came from {}", apiClass, location);
+                        //System.out.println("Jar-based Class: " + apiClass + ", came from " + location);
                         sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
                     }
 
@@ -85,10 +86,10 @@ public final class ApiScraper {
                     category = "terasology engine";
 
                     if (isPackage) {
-                        LOGGER.debug("Local Package: {}, came from {}", apiPackage, location);
+                        //System.out.println("Local Package: " + apiPackage + ", came from " + location);
                         sortedApi.put(category, apiPackage + " (PACKAGE)");
                     } else {
-                        LOGGER.debug("Local Class: {}, came from {}", apiClass, location);
+                        //System.out.println("Local Class: " + apiClass + ", came from " + location);
                         sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
                     }
 
@@ -103,13 +104,13 @@ public final class ApiScraper {
         sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
                 .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
-        LOGGER.info("# Modding API:\n");
+        System.out.println("# Modding API:\n");
         for (String key : sortedApi.keySet()) {
-            LOGGER.info("## " + key + "\n");
+            System.out.println("## " + key + "\n");
             for (String value : sortedApi.get(key)) {
-                LOGGER.info("* {}", value);
+                System.out.println("* " + value);
             }
-            LOGGER.info("");
+            System.out.println("");
         }
     }
 }
