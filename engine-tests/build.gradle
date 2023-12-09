@@ -62,7 +62,7 @@ dependencies {
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
-    testImplementation("ch.qos.logback:logback-classic:1.4.11") {
+    testImplementation("ch.qos.logback:logback-classic:1.4.14") {
         because("implementation: a test directly uses logback.classic classes")
     }
 

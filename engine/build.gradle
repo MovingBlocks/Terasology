@@ -112,10 +112,10 @@ dependencies {
     implementation("de.matthiasmann.twl:PNGDecoder:1111")
 
     // Logging
-    implementation("org.slf4j:slf4j-api:1.7.36") {
+    implementation("org.slf4j:slf4j-api:2.0.11") {
         because("a backend-independent Logger")
     }
-    implementation("ch.qos.logback:logback-classic:1.2.12") {
+    implementation("ch.qos.logback:logback-classic:1.4.14") {
         because("telemetry implementation uses logback to send to logstash " +
                 "and we bundle org.terasology.logback for the regex filter")
     }
