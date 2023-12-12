@@ -61,7 +61,7 @@ configurations {
     }
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         // always pick reflections fork
         dependencySubstitution {
@@ -194,7 +194,8 @@ sourceSets {
     }
 }
 
-task jmh(type: JavaExec, dependsOn: jmhClasses) {
+tasks.register("jmh", JavaExec) {
+    dependsOn jmhClasses
     mainClass = "org.openjdk.jmh.Main"
     classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
 }
@@ -264,7 +265,7 @@ tasks.named("processResources", Copy) {
 }
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
-task copyResourcesToClasses(type: Copy) {
+tasks.register("copyResourcesToClasses", Copy) {
     from processResources
     into sourceSets.main.output.classesDirs.first()
 
