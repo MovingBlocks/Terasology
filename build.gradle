@@ -36,7 +36,7 @@ plugins {
     id "java-platform"
 
     // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
-    //apply plugin: 'eclipse'
+    //apply plugin: "eclipse"
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
@@ -103,38 +103,38 @@ dependencies {
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '2.2.0', ext: 'zip'
+    codeMetrics(group: "org.terasology.config", name: "codemetrics", version: "2.2.0", ext: "zip")
 
     // Natives for JNLua (Kallisti, KComputers)
-    natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+    natives(group: "org.terasology.jnlua", name: "jnlua_natives", version: "0.1.0-SNAPSHOT", ext: "zip")
 
     // Natives for JNBullet
-    natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
+    natives(group: "org.terasology.jnbullet", name: "JNBullet", version: "1.0.2", ext: "zip")
 
 }
 
 task extractWindowsNatives(type: Copy) {
     description = "Extracts the Windows natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('natives-windows') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains("natives-windows") ? zipTree(it) : [] }
     }
     into("$dirNatives/windows")
-    exclude('META-INF/**')
+    exclude("META-INF/**")
 }
 
 task extractMacOSXNatives(type: Copy) {
     description = "Extracts the OSX natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('natives-macos') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains("natives-macos") ? zipTree(it) : [] }
     }
     into("$dirNatives/macosx")
-    exclude('META-INF/**')
+    exclude("META-INF/**")
 }
 
 task extractLinuxNatives(type: Copy) {
     description = "Extracts the Linux natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('natives-linux') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains("natives-linux") ? zipTree(it) : [] }
     }
     into("$dirNatives/linux")
     exclude('META-INF/**')
@@ -143,7 +143,7 @@ task extractLinuxNatives(type: Copy) {
 task extractJNLuaNatives(type: Copy) {
     description = "Extracts the JNLua natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('jnlua') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains("jnlua") ? zipTree(it) : [] }
     }
     into("$dirNatives")
 }
@@ -151,7 +151,7 @@ task extractJNLuaNatives(type: Copy) {
 task extractNativeBulletNatives(type: Copy) {
     description = "Extracts the JNBullet natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('JNBullet') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains("JNBullet") ? zipTree(it) : [] }
     }
     into("$dirNatives")
 }
@@ -210,7 +210,7 @@ project(":modules").subprojects.forEach { proj ->
     }
 }
 
-tasks.named('wrapper') {
+tasks.named("wrapper") {
     // ALL distributionType because IntelliJ prefers having its sources for analysis and reference.
     distributionType = Wrapper.DistributionType.ALL
 }
@@ -224,7 +224,7 @@ tasks.register("copyInMissingTemplates", CopyButNeverOverwrite) {
     description = "Copies in placeholders from the /templates dir to project root if not present yet"
     from(templatesDir)
     into(rootDir)
-    include('gradle.properties', 'override.cfg')
+    include("gradle.properties", "override.cfg")
 }
 
 tasks.register("jmxPassword", CopyButNeverOverwrite) {
@@ -252,21 +252,21 @@ idea {
 
     // Exclude Eclipse dirs
     // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
-    module.excludeDirs += file('bin')
-    module.excludeDirs += file('.settings')
+    module.excludeDirs += file("bin")
+    module.excludeDirs += file(".settings")
     // TODO: Add a single file exclude for facades/PC/Terasology.launch ?
 
     // Exclude special dirs
-    module.excludeDirs += file('natives')
-    module.excludeDirs += file('protobuf')
+    module.excludeDirs += file("natives")
+    module.excludeDirs += file("protobuf")
 
     // Exclude output dirs
-    module.excludeDirs += file('configs')
-    module.excludeDirs += file('logs')
-    module.excludeDirs += file('saves')
-    module.excludeDirs += file('screenshots')
-    module.excludeDirs += file('terasology-server')
-    module.excludeDirs += file('terasology-2ndclient')
+    module.excludeDirs += file("configs")
+    module.excludeDirs += file("logs")
+    module.excludeDirs += file("saves")
+    module.excludeDirs += file("screenshots")
+    module.excludeDirs += file("terasology-server")
+    module.excludeDirs += file("terasology-2ndclient")
 
     module.downloadSources = true
 
@@ -277,55 +277,55 @@ idea {
 }
 
 cleanIdea.doLast {
-    new File('Terasology.iws').delete()
+    new File("Terasology.iws").delete()
 }
 
-// A task to assemble various files into a single zip for distribution as 'build-harness.zip' for module builds
+// A task to assemble various files into a single zip for distribution as "build-harness.zip" for module builds
 task assembleBuildHarness(type: Zip) {
-    description 'Assembles a zip of files useful for module development'
+    description "Assembles a zip of files useful for module development"
 
     dependsOn extractNatives
-    from('natives'){
-        include '**/*'
+    from("natives"){
+        include "**/*"
         // TODO: use output of extractNatives?
         // TODO: which module needs natives to build?
-        into 'natives'
+        into "natives"
     }
 
     dependsOn extractConfig
-    from('config'){
-        //include 'gradle/**/*', 'metrics/**/*'
-        include '**/*'
+    from("config"){
+        //include "gradle/**/*", "metrics/**/*"
+        include "**/*"
         // TODO: depend on output of extractConfig?
-        into 'config'
+        into "config"
     }
 
-    from('gradle'){
-        include '**/*' // include all files in 'gradle'
+    from("gradle"){
+        include "**/*" // include all files in "gradle"
         // TODO: exclude groovy jar?
-        into 'gradle'
+        into "gradle"
     }
 
-    from('build-logic'){
-        include 'src/**', '*.kts'
-        into 'build-logic'
+    from("build-logic"){
+        include "src/**", "*.kts"
+        into "build-logic"
     }
 
-    from('templates') {
-        include 'build.gradle'
+    from("templates") {
+        include "build.gradle"
     }
 
-    from('.') {
-        include 'gradlew'
+    from(".") {
+        include "gradlew"
     }
 
-    // include file 'templates/module.logback-test.xml' as 'src/test/resources/logback-test.xml'
-    from('templates'){
-        include 'module.logback-test.xml'
-        rename 'module.logback-test.xml', 'logback-test.xml'
-        into 'src/test/resources'
+    // include file "templates/module.logback-test.xml" as "src/test/resources/logback-test.xml"
+    from("templates"){
+        include "module.logback-test.xml"
+        rename "module.logback-test.xml", "logback-test.xml"
+        into "src/test/resources"
     }
 
     // set the archive name
-    archiveFileName.set('build-harness.zip')
+    archiveFileName.set("build-harness.zip")
 }
