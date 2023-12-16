@@ -67,14 +67,14 @@ located at ${System.getProperty("java.home")}
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
-    dirNatives = 'natives'
-    dirConfigMetrics = 'config/metrics'
-    templatesDir = file('templates')
+    dirNatives = "natives"
+    dirConfigMetrics = "config/metrics"
+    templatesDir = file("templates")
 
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
-    subDirLibs = 'libs'
+    subDirLibs = "libs"
 
-    LwjglVersion = '3.3.3'
+    LwjglVersion = "3.3.3"
 }
 
 
@@ -112,7 +112,7 @@ dependencies {
 
 }
 
-task extractWindowsNatives(type: Copy) {
+tasks.register("extractWindowsNatives", Copy) {
     description = "Extracts the Windows natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains("natives-windows") ? zipTree(it) : [] }
@@ -121,7 +121,7 @@ task extractWindowsNatives(type: Copy) {
     exclude("META-INF/**")
 }
 
-task extractMacOSXNatives(type: Copy) {
+tasks.register("extractMacOSXNatives", Copy) {
     description = "Extracts the OSX natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains("natives-macos") ? zipTree(it) : [] }
@@ -130,16 +130,16 @@ task extractMacOSXNatives(type: Copy) {
     exclude("META-INF/**")
 }
 
-task extractLinuxNatives(type: Copy) {
+tasks.register("extractLinuxNatives", Copy) {
     description = "Extracts the Linux natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains("natives-linux") ? zipTree(it) : [] }
     }
     into("$dirNatives/linux")
-    exclude('META-INF/**')
+    exclude("META-INF/**")
 }
 
-task extractJNLuaNatives(type: Copy) {
+tasks.register("extractJNLuaNatives", Copy) {
     description = "Extracts the JNLua natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains("jnlua") ? zipTree(it) : [] }
@@ -147,7 +147,7 @@ task extractJNLuaNatives(type: Copy) {
     into("$dirNatives")
 }
 
-task extractNativeBulletNatives(type: Copy) {
+tasks.register("extractNativeBulletNatives", Copy) {
     description = "Extracts the JNBullet natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains("JNBullet") ? zipTree(it) : [] }
@@ -156,7 +156,7 @@ task extractNativeBulletNatives(type: Copy) {
 }
 
 
-task extractNatives {
+tasks.register("extractNatives") {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
@@ -169,7 +169,7 @@ task extractNatives {
 // Helper tasks                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-task extractConfig(type: Copy) {
+tasks.register("extractConfig", Copy) {
     description = "Extracts our configuration files from the zip we fetched as a dependency"
     from {
         configurations.codeMetrics.collect {
