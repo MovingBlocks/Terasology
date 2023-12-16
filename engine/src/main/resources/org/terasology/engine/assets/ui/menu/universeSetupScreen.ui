@@ -71,8 +71,23 @@
             "family": "left-label"
           },
           {
-            "type": "UIText",
-            "id": "seed"
+            "type": "RowLayout",
+            "id": "seedRow",
+            "horizontalSpacing": 4,
+            "contents": [
+              {
+                "type": "UIText",
+                "id": "seed",
+                "layoutInfo": {
+                  "relativeWidth": 0.85
+                }
+              },
+              {
+                "type": "UIButton",
+                "text": "${engine:menu#re-roll}",
+                "id": "reRoll"
+              }
+            ]
           },
           {
             "type": "UISpace",
@@ -110,18 +125,14 @@
         },
         "contents": [
           {
-            "type": "UIImage",
-            "skin": "framed_image",
-            "id": "preview"
-          },
-          {
             "type": "ColumnLayout",
             "columns": 1,
             "verticalSpacing": 4,
             "contents": [
               {
-                "type": "UILabel",
-                "text": "${engine:menu#pregeneration-description}"
+                "type": "UIImage",
+                "skin": "framed_image",
+                "id": "preview"
               },
               {
                 "type": "UILabel",
@@ -152,23 +163,22 @@
                     "widget": "zoomLabel"
                   }
                 }
+              }
+            ]
+          },
+          {
+            "type": "ColumnLayout",
+            "columns": 1,
+            "verticalSpacing": 4,
+            "contents": [
+              {
+                "type": "UILabel",
+                "text": "${engine:menu#pregeneration-description}"
               },
               {
-                "type": "RowLayout",
-                "id": "worldGenActions",
-                "horizontalSpacing": 4,
-                "contents": [
-                  {
-                    "type": "UIButton",
-                    "text": "${engine:menu#re-roll}",
-                    "id": "reRoll"
-                  },
-                  {
-                    "type": "UIButton",
-                    "text": "${engine:menu#config}",
-                    "id": "config"
-                  }
-                ]
+                "type": "UIButton",
+                "text": "${engine:menu#config}",
+                "id": "config"
               }
             ]
           }
