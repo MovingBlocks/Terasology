@@ -75,7 +75,6 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
         }
     }
 
-    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     private EntityRef getWorldEntity() {
         for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
             return entity;
