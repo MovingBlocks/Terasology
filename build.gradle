@@ -1,6 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+import org.jetbrains.gradle.ext.ActionDelegationConfig
+import org.terasology.gradology.CopyButNeverOverwrite
+
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
@@ -30,27 +36,20 @@ buildscript {
 
 plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
-    id "base"
+    id("base")
 
     // needs for native platform("org.lwjgl") handling.
-    id "java-platform"
+    id("java-platform")
 
     // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
     //apply plugin: "eclipse"
-    id "idea"
+    id("idea")
     // For the "Build and run using: Intellij IDEA | Gradle" switch
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
 
     id("com.google.protobuf") version "0.9.4" apply false
     id("terasology-repositories")
 }
-
-
-import org.gradle.internal.logging.text.StyledTextOutputFactory
-import org.jetbrains.gradle.ext.ActionDelegationConfig
-import org.terasology.gradology.CopyButNeverOverwrite
-
-import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
