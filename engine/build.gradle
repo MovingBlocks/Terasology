@@ -3,6 +3,11 @@
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
+import groovy.json.JsonSlurper
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
@@ -13,14 +18,6 @@ plugins {
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
-
-import groovy.json.JsonSlurper
-
-import java.text.SimpleDateFormat
-
-def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
-
 // Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
@@ -29,7 +26,7 @@ ext {
     templatesDir = new File(rootDir, "templates")
 
     // Stuff for our automatic version file setup
-    startDateTimeString = dateTimeFormat.format(new Date())
+    startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
 }
