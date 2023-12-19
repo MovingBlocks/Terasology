@@ -34,6 +34,16 @@ import java.nio.ByteOrder;
 public class OggReader extends FilterInputStream {
     private static final Logger logger = LoggerFactory.getLogger(OggReader.class);
 
+    /**
+     * The mono 16 bit format
+     */
+    private static final int FORMAT_MONO16 = 1;
+
+    /**
+     * The stereo 16 bit format
+     */
+    private static final int FORMAT_STEREO16 = 2;
+
     /// Conversion buffer size
     private static int convsize = 4096 * 2;
 
@@ -406,7 +416,7 @@ public class OggReader extends FilterInputStream {
                     val = Math.max(-32768, Math.min(32767, val));
                     val |= (val < 0 ? 0x8000 : 0);
 
-                    CONVBUFFER[ptr] = (byte) (bigEndian ? val >>> 8 : val);
+                    CONVBUFFER[ptr + 0] = (byte) (bigEndian ? val >>> 8 : val);
                     CONVBUFFER[ptr + 1] = (byte) (bigEndian ? val : val >>> 8);
 
                     ptr += (info.channels) << 1;

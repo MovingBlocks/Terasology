@@ -85,7 +85,7 @@ public class ChatSystem extends BaseComponentSystem {
             @Sender EntityRef sender,
             @CommandParam("message") String[] message
     ) {
-        String messageToString = join(message);
+        String messageToString = joinWithWhitespace(message);
 
         logger.debug("Received chat message from {} : '{}'", sender, messageToString);
 
@@ -96,7 +96,7 @@ public class ChatSystem extends BaseComponentSystem {
         return "Message sent";
     }
 
-    private String join(String[] words) {
+    private String joinWithWhitespace(String[] words) {
         return String.join(" ", words);
     }
 
@@ -108,7 +108,7 @@ public class ChatSystem extends BaseComponentSystem {
             @CommandParam(value = "user", suggester = OnlineUsernameSuggester.class) String username,
             @CommandParam("message") String[] message
     ) {
-        String messageToString = join(message);
+        String messageToString = joinWithWhitespace(message);
 
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;

@@ -68,8 +68,12 @@ public final class OperatingSystemMemory {
         SHARED(2),
         /** text (code) */
         TEXT(3),
+        /** unused since Linux 2.6 */
+        LIB(4),
         /** data + stack */
-        DATA(5);
+        DATA(5),
+        /** unused since Linux 2.6 */
+        DT(6);
 
         private final short index;
 

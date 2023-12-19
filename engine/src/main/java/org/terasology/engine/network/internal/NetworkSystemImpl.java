@@ -95,6 +95,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.requireNonNull;
 import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
 
 
@@ -157,7 +158,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void host(int port, boolean dedicatedServer) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
-                hibernationSettings.ifPresent(hibernationManager -> hibernationManager.setHibernationAllowed(false));
+                if (hibernationSettings.isPresent()) {
+                    hibernationSettings.get().setHibernationAllowed(false);
+                }
                 mode = dedicatedServer ? NetworkMode.DEDICATED_SERVER : NetworkMode.LISTEN_SERVER;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
@@ -444,7 +447,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             netComponent.setNetworkId(nextNetId++);
             entity.saveComponent(netComponent);
             netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
-            switch (java.util.Objects.requireNonNull(netComponent.replicateMode)) {
+            switch (requireNonNull(netComponent.replicateMode)) {
                 case OWNER:
                     NetClient clientPlayer = getNetOwner(entity);
                     if (clientPlayer != null) {
