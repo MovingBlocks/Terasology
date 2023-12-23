@@ -4,11 +4,12 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 import Terasology_dist_gradle.ValidateZipDistribution
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.terasology.gradology.RunTerasology
 import org.terasology.gradology.nativeSubdirectoryName
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -20,9 +21,6 @@ plugins {
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply(from = "$rootDir/config/gradle/publish.gradle")
-
-val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
 // Default path to store server data if running headless via Gradle
 val localServerDataPath by extra("terasology-server")
@@ -40,7 +38,7 @@ val distsDirectory: DirectoryProperty by project
 val env: MutableMap<String, String> = System.getenv()!!
 
 // Version related
-val startDateTimeString = dateTimeFormat.format(Date())!!
+val startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
 val versionFileName = "VERSION"
 val versionBase by lazy { File(templatesDir, "version.txt").readText().trim() }
 val displayVersion = versionBase
