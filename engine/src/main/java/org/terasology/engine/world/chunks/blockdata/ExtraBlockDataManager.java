@@ -52,8 +52,8 @@ public class ExtraBlockDataManager {
         TERA_ARRAY_FACTORIES.put(16, new TeraSparseArray16Bit.Factory());
     }
 
-    private Map<String, Integer> slots;
-    private TeraArray.Factory<? extends TeraArray>[] slotFactories;
+    private final Map<String, Integer> slots;
+    private final TeraArray.Factory[] slotFactories;
 
     /**
      * Construct a trivial instance for testing purposes: don't add any data-fields.
@@ -84,13 +84,13 @@ public class ExtraBlockDataManager {
         });
         slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
 
-        String loggingOutput = "Extra data slots registered:";
+        StringBuilder loggingOutput = new StringBuilder("Extra data slots registered:");
         boolean first = true;
         for (Map.Entry<String, Integer> entry : slots.entrySet()) {
-            loggingOutput += (first ? " " : ", ") + entry.getKey() + " -> " + entry.getValue();
+            loggingOutput.append(first ? " " : ", ").append(entry.getKey()).append(" -> ").append(entry.getValue());
             first = false;
         }
-        logger.info(loggingOutput);
+        logger.info(loggingOutput.toString());
     }
 
     // Find requests for extensions and which blocks they apply to.
@@ -230,8 +230,8 @@ public class ExtraBlockDataManager {
      * Used to represent the overlaps between requested extra-data fields.
      */
     private static class Graph {
-        private String[] verts;
-        private Map<String, Set<String>> edges;
+        private final String[] verts;
+        private final Map<String, Set<String>> edges;
 
         private Graph(String[] verts, Map<String, Set<String>> edges) {
             this.verts = verts;
@@ -242,7 +242,7 @@ public class ExtraBlockDataManager {
             this.verts = verts.clone();
             this.edges = new HashMap<>();
             for (String vert : verts) {
-                edges.put(vert, new HashSet());
+                edges.put(vert, new HashSet<>());
             }
         }
 
@@ -272,12 +272,8 @@ public class ExtraBlockDataManager {
 
         // Creates a new graph containing the complement of the contraction of the complement.
         public Graph ntract(String s0, String s1) {
-            int v0 = -1;
             int v1 = -1;
             for (int i = 0; i < verts.length; i++) {
-                if (verts[i].equals(s0)) {
-                    v0 = i;
-                }
                 if (verts[i].equals(s1)) {
                     v1 = i;
                 }
@@ -305,15 +301,15 @@ public class ExtraBlockDataManager {
         }
 
         public String toString() {
-            String result = "Graph:";
-            for (int i = 0; i < verts.length; i++) {
-                result += " (" + verts[i] + " ->";
-                for (String v : edges.get(verts[i])) {
-                    result += " " + v;
+            StringBuilder result = new StringBuilder("Graph:");
+            for (String vert : verts) {
+                result.append(" (").append(vert).append(" ->");
+                for (String v : edges.get(vert)) {
+                    result.append(" ").append(v);
                 }
-                result += ")";
+                result.append(")");
             }
-            return result;
+            return result.toString();
         }
     }
 }

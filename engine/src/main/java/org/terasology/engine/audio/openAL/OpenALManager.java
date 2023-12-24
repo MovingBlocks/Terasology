@@ -13,7 +13,6 @@ import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.AudioEndListener;
@@ -51,7 +50,7 @@ public class OpenALManager implements AudioManager {
 
     private final Vector3f listenerPosition = new Vector3f();
 
-    private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
+    private final Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
     public OpenALManager(AudioConfig config) throws OpenALException {
         logger.info("Initializing OpenAL audio manager");
@@ -63,7 +62,7 @@ public class OpenALManager implements AudioManager {
         long context = ALC10.alcCreateContext(device, (int[]) null);
         ALC10.alcMakeContextCurrent(context);
         ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
-        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+        AL.createCapabilities(alcCapabilities);
 
         logger.info("OpenAL {} initialized!", AL10.alGetString(AL10.AL_VERSION));
 

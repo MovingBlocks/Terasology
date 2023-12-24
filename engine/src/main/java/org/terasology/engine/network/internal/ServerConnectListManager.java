@@ -25,7 +25,7 @@ import java.util.Set;
 public class ServerConnectListManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectListManager.class);
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     private Context context;
     private Set<String> blacklistedIDs;
@@ -44,8 +44,8 @@ public class ServerConnectListManager {
     private void loadLists() {
         try {
             if (createFiles()) {
-                blacklistedIDs = gson.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
-                whitelistedIDs = gson.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
+                blacklistedIDs = GSON.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
+                whitelistedIDs = GSON.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
                 if (blacklistedIDs == null) {
                     blacklistedIDs = new HashSet<>();
                 }
@@ -63,8 +63,8 @@ public class ServerConnectListManager {
             if (createFiles()) {
                 Writer blacklistWriter = Files.newBufferedWriter(blacklistPath);
                 Writer whitelistWriter = Files.newBufferedWriter(whitelistPath);
-                blacklistWriter.write(gson.toJson(blacklistedIDs));
-                whitelistWriter.write(gson.toJson(whitelistedIDs));
+                blacklistWriter.write(GSON.toJson(blacklistedIDs));
+                whitelistWriter.write(GSON.toJson(whitelistedIDs));
                 blacklistWriter.close();
                 whitelistWriter.close();
             }

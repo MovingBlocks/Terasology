@@ -27,26 +27,6 @@ public class ChunkExecutorCompletionService implements CompletionService<Chunk> 
     private final ThreadPoolExecutor threadPoolExecutor;
     private final BlockingQueue<Future<Chunk>> completionQueue;
 
-    private final class ChunkFutureWithCompletion extends PositionFuture<Chunk> {
-        ChunkFutureWithCompletion(Callable callable, Vector3ic position) {
-            super(callable, position);
-        }
-
-        ChunkFutureWithCompletion(Runnable runnable, Chunk result, Vector3ic position) {
-            super(runnable, result, position);
-        }
-
-        @Override
-        protected void done() {
-            super.done();
-            try {
-                completionQueue.put(this);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     public ChunkExecutorCompletionService(ThreadPoolExecutor threadPoolExecutor, BlockingQueue<Future<Chunk>> completionQueue) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.completionQueue = completionQueue;
@@ -122,5 +102,25 @@ public class ChunkExecutorCompletionService implements CompletionService<Chunk> 
     @Override
     public Future<Chunk> poll(long l, TimeUnit timeUnit) throws InterruptedException {
         return completionQueue.poll(l, timeUnit);
+    }
+
+    private final class ChunkFutureWithCompletion extends PositionFuture<Chunk> {
+        ChunkFutureWithCompletion(Callable callable, Vector3ic position) {
+            super(callable, position);
+        }
+
+        ChunkFutureWithCompletion(Runnable runnable, Chunk result, Vector3ic position) {
+            super(runnable, result, position);
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            try {
+                completionQueue.put(this);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

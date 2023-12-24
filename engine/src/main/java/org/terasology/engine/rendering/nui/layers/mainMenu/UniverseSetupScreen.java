@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -83,8 +81,6 @@ import java.util.stream.Collectors;
  */
 public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
-
-    private static final Logger logger = LoggerFactory.getLogger(UniverseSetupScreen.class);
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
