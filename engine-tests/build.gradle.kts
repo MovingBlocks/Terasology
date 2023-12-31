@@ -9,41 +9,33 @@ plugins {
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply(from: "$rootDir/config/gradle/publish.gradle")
+apply(from = "$rootDir/config/gradle/publish.gradle")
 
-ext {
-    // Read environment variables, including variables passed by jenkins continuous integration server
-    env = System.getenv()
-}
+// Read environment variables, including variables passed by jenkins continuous integration server
+val env = System.getenv()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Read the internal version out of the engine-tests module.txt
-def moduleFile = file("src/main/resources/org/terasology/unittest/module.txt")
-
-if (!moduleFile.exists()) {
-    println "Failed to find module.txt for engine-tests"
-    throw new GradleException("Failed to find module.txt for engine-tests")
-}
+val moduleFile = layout.projectDirectory.file("src/main/resources/org/terasology/unittest/module.txt").asFile
 
 println("Scanning for version in module.txt for engine-tests")
-def slurper = new JsonSlurper()
-def moduleConfig = slurper.parseText(moduleFile.text)
+val moduleConfig = groovy.json.JsonSlurper().parseText(moduleFile.readText()) as Map<String, String>
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
-version = moduleConfig.version
+version = moduleConfig["version"]!!
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.engine"
 
 println("Version for $project.name loaded as $version for group $group")
 
-sourceSets {
+configure<SourceSetContainer> {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main.java.destinationDirectory = new File("$buildDir/classes")
-    test.java.destinationDirectory = new File("$buildDir/testClasses")
+    main { java.destinationDirectory.set(layout.buildDirectory.dir("classes")) }
+    test { java.destinationDirectory.set(layout.buildDirectory.dir("testClasses")) }
 }
 
 // Primary dependencies definition
@@ -87,47 +79,44 @@ dependencies {
 }
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-task copyResourcesToClasses(type:Copy) {
-    from tasks.named("processResources")
-    into sourceSets.main.output.classesDirs.first()
+tasks.register<Copy>("copyResourcesToClasses") {
+    from("processResources")
+    into(sourceSets["main"].output.classesDirs.first())
 }
 
-tasks.named("compileJava"){
-    dependsOn(copyResourcesToClasses)
+tasks.named("compileJava") {
+    dependsOn("copyResourcesToClasses")
 }
 
-jar { // Workaround about previous copy to classes. idk why engine-tests:jar called before :engine ...
-    duplicatesStrategy = "EXCLUDE"
+tasks.withType<Jar> {
+    // Workaround about previous copy to classes. idk why engine-tests:jar called before :engine ...
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-test {
-    dependsOn rootProject.extractNatives
-
-    description("Runs all tests (slow)")
-
+tasks.named<Test>("test") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    description = "Runs all tests (slow)"
+    useJUnitPlatform ()
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
 }
 
-task unitTest(type: Test) {
-    dependsOn rootProject.extractNatives
-
-    group "Verification"
-    description("Runs unit tests (fast)")
-
+tasks.register<Test>("unitTest") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    group =  "Verification"
+    description = "Runs unit tests (fast)"
     useJUnitPlatform {
-        excludeTags "MteTest", "TteTest"
+        excludeTags = setOf("MteTest", "TteTest")
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
 }
 
-task integrationTest(type: Test) {
-    dependsOn rootProject.extractNatives
-
-    group "Verification"
-    description("Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'")
+tasks.register<Test>("integrationTest") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    group = "Verification"
+    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'"
 
     useJUnitPlatform {
-        includeTags "MteTest", "TteTest"
+        includeTags = setOf("MteTest", "TteTest")
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
 }
@@ -138,6 +127,6 @@ idea {
         inheritOutputDirs = false
         outputDir = file("build/classes")
         testOutputDir = file("build/testClasses")
-        downloadSources = true
+        isDownloadSources = true
     }
 }
