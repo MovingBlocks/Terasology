@@ -9,7 +9,6 @@ import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
@@ -78,7 +77,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
      *
      * @param subContext    the new environment created in {@link UniverseSetupScreen}
      * @param universe      the universe whose world's configurations are to be changed.
-     * @throws UnresolvedWorldGeneratorException
      */
     public void setWorld(Context subContext, UniverseWrapper universe) {
         this.universe = universe;

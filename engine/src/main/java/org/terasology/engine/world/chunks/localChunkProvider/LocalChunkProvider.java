@@ -76,8 +76,7 @@ import java.util.function.Consumer;
  * {@link BeforeChunkUnload} when chunk ready to remove from provider.
  * <p>
  * {@link BeforeDeactivateBlocks} when chunk ready to remove and have block lifecycle.
- * <p>
- * @see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>
+ * <p> @see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>
  */
 public class LocalChunkProvider implements ChunkProvider {
 
