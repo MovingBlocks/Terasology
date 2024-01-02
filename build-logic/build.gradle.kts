@@ -14,7 +14,7 @@ repositories {
 
     maven {
         name = "Terasology Artifactory"
-        url = URI("http://artifactory.terasology.org/artifactory/virtual-repo-live")
+        url = URI("https://artifactory.terasology.io/artifactory/virtual-repo-live")
         @Suppress("UnstableApiUsage")
         isAllowInsecureProtocol = true  // 😱
     }
@@ -23,7 +23,7 @@ repositories {
     // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
     maven {
         name = "Terasology snapshot locals"
-        url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
+        url = URI("https://artifactory.terasology.io/artifactory/terasology-snapshot-local")
         @Suppress("UnstableApiUsage")
         isAllowInsecureProtocol = true  // 😱
     }

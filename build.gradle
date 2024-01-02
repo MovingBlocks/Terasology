@@ -11,7 +11,7 @@ buildscript {
         maven {
             // required to provide runtime dependencies to build-logic.
             name = "Terasology Artifactory"
-            url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            url = "https://artifactory.terasology.io/artifactory/virtual-repo-live"
             allowInsecureProtocol = true  // 😱
         }
 
@@ -19,7 +19,7 @@ buildscript {
         // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
         maven {
             name = "Terasology snapshot locals"
-            url = "http://artifactory.terasology.org/artifactory/terasology-snapshot-local"
+            url = "https://artifactory.terasology.io/artifactory/terasology-snapshot-local"
             allowInsecureProtocol = true  // 😱
         }
     }
