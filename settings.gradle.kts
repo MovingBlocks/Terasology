@@ -7,7 +7,7 @@ include("engine", "engine-tests", "facades", "metas", "libs", "modules")
 rootDir.listFiles()?.forEach { possibleSubprojectDir ->
     if (possibleSubprojectDir.isDirectory && possibleSubprojectDir.name != ".gradle") {
         possibleSubprojectDir.walkTopDown().forEach { it.listFiles { file -> 
-            file.isFile && file.name == "subprojects.settings.gradle" }?.forEach { subprojectsSpecificationScript ->
+            file.isFile && file.name == "subprojects.settings.gradle.kts" }?.forEach { subprojectsSpecificationScript ->
                 //println("Magic is happening, applying from $subprojectsSpecificationScript")
                 apply {
                     from(subprojectsSpecificationScript)
