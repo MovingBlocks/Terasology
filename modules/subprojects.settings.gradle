@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-new File(rootDir, 'modules').eachDir { possibleSubprojectDir ->
-    def subprojectName = ':modules:' + possibleSubprojectDir.name
+new File(rootDir, "modules").eachDir { possibleSubprojectDir ->
+    def subprojectName = ":modules:" + possibleSubprojectDir.name
     File buildFile = new File(possibleSubprojectDir, "build.gradle")
     File moduleTxt = new File(possibleSubprojectDir, "module.txt")
     if (!buildFile.exists()) {
-        logger.warn("***** WARNING: Found a module without a build.gradle, corrupt dir? NOT including $subprojectName *****")
+        logger.warn("***** WARNING: Found a module without a build.gradle, corrupt dir? NOT including {} *****", subprojectName)
         return
     }
     if (!moduleTxt.exists()) {
-        logger.warn("Module $subprojectName has build.gradle, but no module.txt? NOT including $subprojectName")
+        logger.warn("Module {} has build.gradle, but no module.txt? NOT including it.", subprojectName)
         return
     }
-    logger.info("Module {} has a build file so counting it complete and including it", subprojectName)
-    include subprojectName
+    logger.info("Module {} has a build file so counting it complete and including it.", subprojectName)
+    include(subprojectName)
 }
 
