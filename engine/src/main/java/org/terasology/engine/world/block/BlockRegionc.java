@@ -488,7 +488,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
-     * @param dest will hold the result
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
