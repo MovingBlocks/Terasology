@@ -1,11 +1,11 @@
 // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-new File(rootDir, "metas").eachDir { possibleSubprojectDir ->
+File(rootDir, "facades").listFiles()?.filter { it.isDirectory }?.forEach { possibleSubprojectDir ->
     if (!possibleSubprojectDir.name.startsWith(".")) {
-        def subprojectName = "metas:" + possibleSubprojectDir.name
-        println("Processing meta module $subprojectName, including it as a sub-project")
+        val subprojectName = "facades:" + possibleSubprojectDir.name
+        println("Processing facade $subprojectName, including it as a sub-project")
         include(subprojectName)
-        def subprojectPath = ":" + subprojectName
-        def subproject = project(subprojectPath)
+        val subprojectPath = ":" + subprojectName
+        val subproject = project(subprojectPath)
         subproject.projectDir = possibleSubprojectDir
     } else {
         println("Ignoring entry $possibleSubprojectDir as it starts with .")
