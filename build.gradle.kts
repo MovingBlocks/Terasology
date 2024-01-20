@@ -209,7 +209,7 @@ tasks.register<CopyButNeverOverwrite>("copyInMissingTemplates") {
 tasks.register<CopyButNeverOverwrite>("jmxPassword") {
     description = "Create config/jmxremote.password from a template."
 
-    fileMode = 600  // passwords must be accessible only by owner
+    filePermissions { unix("600") } // passwords must be accessible only by owner
 
     // there is a template file in $JAVA_HOME/conf/management
     from(java.nio.file.Path.of(System.getProperty("java.home"), "conf", "management"))
