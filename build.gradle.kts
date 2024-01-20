@@ -1,11 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.jetbrains.gradle.ext.ActionDelegationConfig
+import org.jetbrains.gradle.ext.delegateActions
+import org.jetbrains.gradle.ext.settings
 import org.terasology.gradology.CopyButNeverOverwrite
-
-import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
@@ -17,14 +16,14 @@ buildscript {
         maven {
             // required to provide runtime dependencies to build-logic.
             name = "Terasology Artifactory"
-            url = "https://artifactory.terasology.io/artifactory/virtual-repo-live"
+            url = uri("https://artifactory.terasology.io/artifactory/virtual-repo-live")
         }
 
         // TODO MYSTERY: As of November 7th 2011 virtual-repo-live could no longer be relied on for latest snapshots - Pro feature?
         // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
         maven {
             name = "Terasology snapshot locals"
-            url = "https://artifactory.terasology.io/artifactory/terasology-snapshot-local"
+            url = uri("https://artifactory.terasology.io/artifactory/terasology-snapshot-local")
         }
     }
 
@@ -52,13 +51,11 @@ plugins {
 }
 
 // Test for right version of Java in use for running this script
-assert org.gradle.api.JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
-if (!(JavaVersion.current() == JavaVersion.VERSION_17)) {
-    def out = services.get(StyledTextOutputFactory).create("an-ouput")
-    out.withStyle(Style.FailureHeader).println("""
-WARNING: Compiling with a JDK of not version 17. While some other Javas may be
-safe to use, any newer than 17 may cause issues.
-If you encounter oddities try Java 17.
+assert(org.gradle.api.JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17))
+if (JavaVersion.current() != JavaVersion.VERSION_17) {
+    logger.warn("""
+WARNING:
+Compiling with a JDK of not version 17. If you encounter oddities try Java 17.
 Current detected Java version is ${JavaVersion.current()}
  from vendor ${System.getProperty("java.vendor")}
 located at ${System.getProperty("java.home")}
@@ -66,124 +63,105 @@ located at ${System.getProperty("java.home")}
 }
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
-ext {
-    dirNatives = "natives"
-    dirConfigMetrics = "config/metrics"
-    templatesDir = file("templates")
-
-    // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
-    subDirLibs = "libs"
-
-    LwjglVersion = "3.3.3"
-}
-
+val dirNatives by extra("natives")
+val dirConfigMetrics by extra("config/metrics")
+val templatesDir by extra(file("templates"))
+// Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
+val subDirLibs by extra("libs")
+val LwjglVersion by extra("3.3.3")
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Natives - Handles pulling in and extracting native libraries for LWJGL                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Define configurations for natives and config
-configurations {
-    natives
-    codeMetrics
-}
+val natives = configurations.create("natives")
+val codeMetrics = configurations.create("codeMetrics")
 
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
-    natives platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
-    ["natives-linux", "natives-windows", "natives-macos"].forEach {
-        natives "org.lwjgl:lwjgl::$it"
-        natives "org.lwjgl:lwjgl-assimp::$it"
-        natives "org.lwjgl:lwjgl-glfw::$it"
-        natives "org.lwjgl:lwjgl-openal::$it"
-        natives "org.lwjgl:lwjgl-opengl::$it"
-        natives "org.lwjgl:lwjgl-stb::$it"
+    natives(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
+    listOf("natives-linux", "natives-windows", "natives-macos").forEach {
+        natives("org.lwjgl:lwjgl::$it")
+        natives("org.lwjgl:lwjgl-assimp::$it")
+        natives("org.lwjgl:lwjgl-glfw::$it")
+        natives("org.lwjgl:lwjgl-openal::$it")
+        natives("org.lwjgl:lwjgl-opengl::$it")
+        natives("org.lwjgl:lwjgl-stb::$it")
     }
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics(group: "org.terasology.config", name: "codemetrics", version: "2.2.0", ext: "zip")
+    codeMetrics(group = "org.terasology.config", name = "codemetrics", version = "2.2.0", ext = "zip")
 
     // Natives for JNLua (Kallisti, KComputers)
-    natives(group: "org.terasology.jnlua", name: "jnlua_natives", version: "0.1.0-SNAPSHOT", ext: "zip")
+    natives(group = "org.terasology.jnlua", name = "jnlua_natives", version = "0.1.0-SNAPSHOT", ext = "zip")
 
     // Natives for JNBullet
-    natives(group: "org.terasology.jnbullet", name: "JNBullet", version: "1.0.2", ext: "zip")
+    natives(group = "org.terasology.jnbullet", name = "JNBullet", version = "1.0.2", ext = "zip")
 
 }
 
-tasks.register("extractWindowsNatives", Copy) {
+tasks.register<Copy>("extractWindowsNatives") {
     description = "Extracts the Windows natives from the downloaded zip"
-    from {
-        configurations.natives.collect { it.getName().contains("natives-windows") ? zipTree(it) : [] }
-    }
+    from(configurations["natives"].filter { it.name.contains("natives-windows") }.map { zipTree(it) })
     into("$dirNatives/windows")
     exclude("META-INF/**")
 }
 
-tasks.register("extractMacOSXNatives", Copy) {
+tasks.register<Copy>("extractMacOSXNatives") {
     description = "Extracts the OSX natives from the downloaded zip"
-    from {
-        configurations.natives.collect { it.getName().contains("natives-macos") ? zipTree(it) : [] }
-    }
+    from(configurations["natives"].filter { it.name.contains("natives-macos") }.map { zipTree(it) })
     into("$dirNatives/macosx")
     exclude("META-INF/**")
 }
 
-tasks.register("extractLinuxNatives", Copy) {
+tasks.register<Copy>("extractLinuxNatives") {
     description = "Extracts the Linux natives from the downloaded zip"
-    from {
-        configurations.natives.collect { it.getName().contains("natives-linux") ? zipTree(it) : [] }
-    }
+    from(configurations["natives"].filter { it.name.contains("natives-linux") }.map { zipTree(it) })
     into("$dirNatives/linux")
     exclude("META-INF/**")
 }
 
-tasks.register("extractJNLuaNatives", Copy) {
+tasks.register<Copy>("extractJNLuaNatives") {
     description = "Extracts the JNLua natives from the downloaded zip"
-    from {
-        configurations.natives.collect { it.getName().contains("jnlua") ? zipTree(it) : [] }
-    }
+    from(configurations["natives"].filter { it.name.contains("jnlua") }.map { zipTree(it) })
     into("$dirNatives")
 }
 
-tasks.register("extractNativeBulletNatives", Copy) {
+tasks.register<Copy>("extractNativeBulletNatives") {
     description = "Extracts the JNBullet natives from the downloaded zip"
-    from {
-        configurations.natives.collect { it.getName().contains("JNBullet") ? zipTree(it) : [] }
-    }
+    from(configurations["natives"].filter { it.name.contains("JNBullet") }.map { zipTree(it) })
     into("$dirNatives")
 }
-
 
 tasks.register("extractNatives") {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
-    dependsOn extractWindowsNatives
-    dependsOn extractLinuxNatives
-    dependsOn extractMacOSXNatives
-    dependsOn extractJNLuaNatives
-    dependsOn extractNativeBulletNatives
+    dependsOn(
+        "extractWindowsNatives",
+        "extractLinuxNatives",
+        "extractMacOSXNatives",
+        "extractJNLuaNatives",
+        "extractNativeBulletNatives"
+    )
+    // specifying the outputs directory lets gradle have an up-to-date check, and automatic clean task
+    outputs.dir("$dirNatives")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Helper tasks                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-tasks.register("extractConfig", Copy) {
+tasks.register<Copy>("extractConfig") {
     description = "Extracts our configuration files from the zip we fetched as a dependency"
-    from {
-        configurations.codeMetrics.collect {
-            zipTree(it)
-        }
-    }
-    into "$rootDir/$dirConfigMetrics"
+    from(configurations["codeMetrics"].map { zipTree(it) })
+    into("$rootDir/$dirConfigMetrics")
 }
 
-// Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
-clean.doLast {
-    new File(dirNatives).deleteDir()
-    new File(dirConfigMetrics).deleteDir()
-    println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so"
+tasks.named("clean") {
+    // gradle autocreates a clean task for tasks if outputs is specified, just link them to general clean.
+    dependsOn("cleanExtractConfig", "cleanExtractNatives")
+    println("Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so")
 }
 
 // Magic for replace remote dependency on local project (source)
@@ -191,8 +169,9 @@ clean.doLast {
 allprojects {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
-            substitute module("org.terasology.engine:engine") using project(":engine") because "we have sources!"
-            substitute module("org.terasology.engine:engine-tests") using project(":engine-tests") because "we have sources!"
+            substitute(module("org.terasology.engine:engine")).using(project(":engine")).because("we have sources!")
+            substitute(module("org.terasology.engine:engine-tests")).using(project(":engine-tests"))
+                .because("we have sources!")
         }
     }
 }
@@ -203,13 +182,14 @@ project(":modules").subprojects.forEach { proj ->
     project(":modules").subprojects {
         configurations.all {
             resolutionStrategy.dependencySubstitution {
-                substitute module("org.terasology.modules:${proj.name}") using project(":modules:${proj.name}") because "we have sources!"
+                substitute(module("org.terasology.modules:${proj.name}")).using(project(":modules:${proj.name}"))
+                    .because("we have sources!")
             }
         }
     }
 }
 
-tasks.named("wrapper") {
+tasks.withType<Wrapper> {
     // ALL distributionType because IntelliJ prefers having its sources for analysis and reference.
     distributionType = Wrapper.DistributionType.ALL
 }
@@ -219,55 +199,58 @@ tasks.named("wrapper") {
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-tasks.register("copyInMissingTemplates", CopyButNeverOverwrite) {
+tasks.register<CopyButNeverOverwrite>("copyInMissingTemplates") {
     description = "Copies in placeholders from the /templates dir to project root if not present yet"
     from(templatesDir)
     into(rootDir)
     include("gradle.properties", "override.cfg")
 }
 
-tasks.register("jmxPassword", CopyButNeverOverwrite) {
+tasks.register<CopyButNeverOverwrite>("jmxPassword") {
     description = "Create config/jmxremote.password from a template."
 
-    setFileMode(0600)  // passwords must be accessible only by owner
+    filePermissions { unix("600") } // passwords must be accessible only by owner
 
     // there is a template file in $JAVA_HOME/conf/management
     from(java.nio.file.Path.of(System.getProperty("java.home"), "conf", "management"))
     include("jmxremote.password.template")
-    rename("(.*).template", '$1')
+    rename("(.*).template", "$1")
     into("config")
 
     doLast {
-        logger.warn("${it.outputs.files.singleFile}/jmxremote.password:100: Edit this to set your password.")
+        logger.warn("${this.outputs.files.singleFile}/jmxremote.password:100: Edit this to set your password.")
     }
 }
 
 // Make sure the IDE prep includes extraction of natives
-ideaModule.dependsOn extractNatives
-ideaModule.dependsOn copyInMissingTemplates
+tasks.named("ideaModule") {
+    dependsOn("extractNatives", "copyInMissingTemplates")
+}
 
 // For IntelliJ add a bunch of excluded directories
 idea {
+    module {
+        excludeDirs = setOf(
+            // Exclude Eclipse dirs
+            // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
+            file("bin"),
+            file(".settings"),
+            // TODO: Add a single file exclude for facades/PC/Terasology.launch ?
 
-    // Exclude Eclipse dirs
-    // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
-    module.excludeDirs += file("bin")
-    module.excludeDirs += file(".settings")
-    // TODO: Add a single file exclude for facades/PC/Terasology.launch ?
+            // Exclude special dirs
+            file("natives"),
+            file("protobuf"),
 
-    // Exclude special dirs
-    module.excludeDirs += file("natives")
-    module.excludeDirs += file("protobuf")
-
-    // Exclude output dirs
-    module.excludeDirs += file("configs")
-    module.excludeDirs += file("logs")
-    module.excludeDirs += file("saves")
-    module.excludeDirs += file("screenshots")
-    module.excludeDirs += file("terasology-server")
-    module.excludeDirs += file("terasology-2ndclient")
-
-    module.downloadSources = true
+            // Exclude output dirs
+            file("configs"),
+            file("logs"),
+            file("saves"),
+            file("screenshots"),
+            file("terasology-server"),
+            file("terasology-2ndclient")
+        )
+        isDownloadSources = true
+    }
 
     project.settings.delegateActions {
         delegateBuildRunToGradle = false
@@ -275,54 +258,60 @@ idea {
     }
 }
 
-cleanIdea.doLast {
-    new File("Terasology.iws").delete()
+tasks.register("cleanIdeaIws") {
+    doLast {
+        File("Terasology.iws").delete()
+    }
+}
+
+tasks.named("cleanIdea") {
+    dependsOn("cleanIdeaIws")
 }
 
 // A task to assemble various files into a single zip for distribution as "build-harness.zip" for module builds
-task assembleBuildHarness(type: Zip) {
-    description "Assembles a zip of files useful for module development"
+tasks.register<Zip>("assembleBuildHarness") {
+    description = "Assembles a zip of files useful for module development"
 
-    dependsOn extractNatives
-    from("natives"){
-        include "**/*"
+    dependsOn("extractNatives")
+    from("natives") {
+        include("**/*")
         // TODO: use output of extractNatives?
         // TODO: which module needs natives to build?
-        into "natives"
+        into("natives")
     }
 
-    dependsOn extractConfig
-    from("config"){
+    dependsOn("extractConfig")
+    from("config") {
         //include "gradle/**/*", "metrics/**/*"
-        include "**/*"
+        include("**/*")
         // TODO: depend on output of extractConfig?
-        into "config"
+        into("config")
     }
 
-    from("gradle"){
-        include "**/*" // include all files in "gradle"
+    from("gradle") {
+        include("**/*") // include all files in "gradle"
         // TODO: exclude groovy jar?
-        into "gradle"
+        into("gradle")
     }
 
-    from("build-logic"){
-        include "src/**", "*.kts"
-        into "build-logic"
+    from("build-logic") {
+        include("src/**", "*.kts")
+        into("build-logic")
     }
 
     from("templates") {
-        include "build.gradle"
+        include("build.gradle")
     }
 
     from(".") {
-        include "gradlew"
+        include("gradlew")
     }
 
     // include file "templates/module.logback-test.xml" as "src/test/resources/logback-test.xml"
-    from("templates"){
-        include "module.logback-test.xml"
-        rename "module.logback-test.xml", "logback-test.xml"
-        into "src/test/resources"
+    from("templates") {
+        include("module.logback-test.xml")
+        rename("module.logback-test.xml", "logback-test.xml")
+        into("src/test/resources")
     }
 
     // set the archive name
