@@ -3,6 +3,7 @@
 
 package org.terasology.engine.persistence.typeHandling;
 
+import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector2f;
@@ -31,6 +32,7 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.TextureRegi
 import org.terasology.engine.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.ComponentTypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.mathTypes.AABBfTypeHandler;
 import org.terasology.engine.persistence.typeHandling.mathTypes.AABBiTypeHandler;
@@ -72,6 +74,7 @@ import org.terasology.nui.UITextureRegion;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.reflection.reflect.ConstructorLibrary;
 
 /**
  * A library of type handlers. This is used for the construction of class metadata. This library should be initialised
@@ -159,6 +162,8 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Quaternionfc.class, new QuaternionfcTypeHandler());
 
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
+
+        serializationLibrary.addTypeHandlerFactory(new ComponentTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap())));
     }
 
 }
