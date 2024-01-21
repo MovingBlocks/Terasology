@@ -15,8 +15,6 @@
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
-
-    <include resource="org/terasology/engine/logback/filter-reflections.xml" />
   </appender>
 
   <root level="${logOverrideLevel:-debug}">
