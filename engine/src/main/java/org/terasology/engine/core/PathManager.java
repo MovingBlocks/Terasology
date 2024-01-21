@@ -6,6 +6,8 @@ package org.terasology.engine.core;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.utilities.OS;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * Manager class that keeps track of the game's various paths and save directories.
  */
 public final class PathManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PathManager.class);
     private static final String TERASOLOGY_FOLDER_NAME = "Terasology";
     private static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
@@ -75,11 +78,9 @@ public final class PathManager {
             URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
             Path codeLocation = Paths.get(urlToSource);
             installationSearchPaths.add(codeLocation);
-            // Not using logger because it's usually initialized after PathManager.
-            System.out.println("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
+            LOGGER.info("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
         } catch (URISyntaxException e) {
-            System.err.println("PathManager: Failed to convert code location to path.");
-            e.printStackTrace();
+            LOGGER.error("PathManager: Failed to convert code location to path.", e);
         }
 
         // But that's not always true. This jar may be loaded from somewhere else on the classpath.
@@ -89,7 +90,7 @@ public final class PathManager {
         // Use the current directory as a fallback.
         Path currentDirectory = Paths.get("").toAbsolutePath();
         installationSearchPaths.add(currentDirectory);
-        System.out.println("PathManager: Working directory is " + currentDirectory);
+        LOGGER.info("PathManager: Working directory is " + currentDirectory);
 
         for (Path startPath : installationSearchPaths) {
             Path installationPath = findNativesHome(startPath, 5);
