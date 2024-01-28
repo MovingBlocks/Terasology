@@ -47,7 +47,6 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
 
     id("com.google.protobuf") version "0.9.4" apply false
-    id("me.champeau.jmh") version "0.7.2" apply false
     id("terasology-repositories")
 }
 
