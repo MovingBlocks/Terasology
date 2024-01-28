@@ -10,7 +10,6 @@ plugins {
     id("java-library")
     id("org.jetbrains.gradle.plugin.idea-ext")
     id("com.google.protobuf")
-    id("me.champeau.jmh")
     id("terasology-common")
 }
 
@@ -218,13 +217,41 @@ tasks.named("compileJava") {
 tasks.withType<Jar> {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    exclude("src/jmh")
     manifest {
         attributes["Class-Path"] = "libs/" + configurations.runtimeClasspath.get().joinToString(" libs/") { it.name }
         attributes["Implementation-Title"] = "Terasology"
         attributes["Implementation-Version"] =
             "$displayVersion, engine v${project.version}, build number ${env["BUILD_NUMBER"]}"
     }
+}
+
+// JMH related tasks
+
+sourceSets {
+    create("jmh") {
+        java.srcDir("src/jmh/java")
+        resources.srcDir("src/jmh/resources")
+        compileClasspath += sourceSets["main"].runtimeClasspath
+        java.destinationDirectory.set(layout.buildDirectory.dir("jmhClasses"))
+    }
+}
+
+tasks.register<JavaCompile>("jmhClasses") {
+    source = sourceSets.jmh.get().java
+    classpath = sourceSets.jmh.get().compileClasspath
+    destinationDirectory.set(sourceSets.jmh.get().java.destinationDirectory)
+}
+
+tasks.register<JavaExec>("jmh") {
+    dependsOn("jmhClasses")
+    mainClass.set("org.openjdk.jmh.Main")
+    classpath = sourceSets.jmh.get().compileClasspath + sourceSets.jmh.get().runtimeClasspath
+}
+
+dependencies {
+    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+    jmhImplementation("org.openjdk.jmh:jmh-core:1.27")
+    jmhImplementation("org.openjdk.jmh:jmh-generator-annprocess:1.27")
 }
 
 // following tasks use the output of jmh, so declare explicit dependency
