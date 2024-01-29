@@ -91,7 +91,8 @@ public class ComponentTypeHandlerFactory implements TypeHandlerFactory {
                     }
 
                     if (!Modifier.isPublic(field.getModifiers())) {
-                        logger.warn("Field {}#{} will not be serialised. Terasology no longer supports serialising private fields.", field.getName(), rawType.getTypeName());
+                        logger.atWarn().addArgument(field.getName()).addArgument(rawType.getTypeName()).
+                                log("Field {}#{} will not be serialised. Terasology no longer supports serialising private fields.");
                         continue;
                     }
 
