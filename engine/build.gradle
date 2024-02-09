@@ -158,7 +158,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.17.0"
+        artifact = "com.google.protobuf:protoc:3.18.0"
     }
     plugins {
     }
