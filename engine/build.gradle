@@ -133,11 +133,10 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
     // Our developed libs
-    api("org.terasology.gestalt:gestalt-asset-core:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-module:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-entity-system:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-util:7.2.0-SNAPSHOT")
-    api("com.github.zafarkhaja:java-semver:0.10.0")  // ASAP: Remove after https://github.com/MovingBlocks/gestalt/pull/110
+    api("org.terasology.gestalt:gestalt-asset-core:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-module:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-entity-system:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-util:7.2.1-SNAPSHOT")
 
     api("org.terasology:TeraMath:1.5.0")
     api("org.terasology:splash-screen:1.1.1")
