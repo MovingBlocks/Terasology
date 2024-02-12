@@ -526,8 +526,7 @@ public class PojoEntityManager implements EngineEntityManager {
         if (!oldComponent.isPresent()) {
             notifyComponentAdded(getEntity(entityId), component.getClass());
         } else {
-            logger.atError().addArgument(() -> component.getClass()).addArgument(() -> entityId).
-                    log("Adding a component ({}) over an existing component for entity {}");
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId); //NOPMD
             notifyComponentChanged(getEntity(entityId), component.getClass());
         }
 
@@ -581,8 +580,7 @@ public class PojoEntityManager implements EngineEntityManager {
                 .map(pool -> pool.getComponentStore().put(entityId, component));
 
         if (!oldComponent.isPresent()) {
-            logger.atError().addArgument(() -> component.getClass()).addArgument(() -> entityId).
-                    log("Saving a component ({}) that doesn't belong to this entity {}");
+            logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId); //NOPMD
         }
         if (eventSystem != null) {
             EntityRef entityRef = getEntity(entityId);

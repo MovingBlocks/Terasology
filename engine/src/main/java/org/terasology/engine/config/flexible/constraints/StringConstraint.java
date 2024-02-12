@@ -49,13 +49,12 @@ public class StringConstraint implements SettingConstraint<String> {
     }
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void warnUnsatisfiedBy(String value) {
-        logger.atWarn().
-                addArgument(value).
-                addArgument(() -> predicates.stream()
+        logger.warn("String [{}] does not match the conditions: {}", value,
+                predicates.stream()
                         .filter(p -> !p.test(value))
                         .map(StringConstraint::getDescription)
-                        .collect(Collectors.joining(",", "[", "]"))).
-                log("String [{}] does not match the conditions: {}");
+                        .collect(Collectors.joining(",", "[", "]")));
     }
 }

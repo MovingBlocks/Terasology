@@ -52,6 +52,7 @@ public class OpenALManager implements AudioManager {
 
     private final Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
+    @SuppressWarnings("PMD.GuardLogStatement")
     public OpenALManager(AudioConfig config) throws OpenALException {
         logger.info("Initializing OpenAL audio manager");
 
@@ -66,14 +67,13 @@ public class OpenALManager implements AudioManager {
 
         logger.atInfo().addArgument(() -> AL10.alGetString(AL10.AL_VERSION)).log("OpenAL {} initialized!");
 
-        logger.atInfo().addArgument(() -> AL10.alGetString(AL10.AL_RENDERER)).addArgument(() -> AL10.alGetString(AL10.AL_VENDOR)).
-                log("Using OpenAL: {} by {}");
-        logger.atInfo().addArgument(() -> ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER)).log("Using device: {}");
-        logger.atInfo().addArgument(() -> AL10.alGetString(AL10.AL_EXTENSIONS)).log("Available AL extensions: {}");
-        logger.atInfo().addArgument(() -> ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS)).log("Available ALC extensions: {}");
-        logger.atInfo().addArgument(() -> ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES)).log("Max mono sources: {}");
-        logger.atInfo().addArgument(() -> ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES)).log("Max stereo sources: {}");
-        logger.atInfo().addArgument(() -> ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY)).log("Mixer frequency: {}");
+        logger.info("Using OpenAL: {} by {}", AL10.alGetString(AL10.AL_RENDERER), AL10.alGetString(AL10.AL_VENDOR));
+        logger.info("Using device: {}", ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
+        logger.info("Available AL extensions: {}", AL10.alGetString(AL10.AL_EXTENSIONS));
+        logger.info("Available ALC extensions: {}", ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS));
+        logger.info("Max mono sources: {}", ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES));
+        logger.info("Max stereo sources: {}", ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES));
+        logger.info("Mixer frequency: {}", ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY));
 
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 

@@ -48,7 +48,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
                 Module module = moduleManager.registerArchiveModule(filePath);
                 newInstalledModules.add(module);
             } catch (IOException e) {
-                logger.atWarn().addArgument(() -> filePath.getFileName()).addArgument(e).log("Could not load module {}");
+                logger.warn("Could not load module {}", filePath.getFileName(), e); //NOPMD
             }
         }
         logger.info("Finished loading the downloaded modules");

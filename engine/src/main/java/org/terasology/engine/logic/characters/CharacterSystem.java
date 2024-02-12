@@ -155,7 +155,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return damageType.getComponent(DisplayNameComponent.class).name;
         } else {
             String damageTypeName = damageType.getName();
-            logger.atInfo().addArgument(damageTypeName).log("{} is missing a readable DisplayName");
+            logger.info("{} is missing a readable DisplayName", damageTypeName);
             //damageType.getName() returns a ResourceUrn String such as "engine:directDamage"
             //The following calls change the damage type to be more readable
             //For instance, "engine:directDamage" becomes "Direct Damage"

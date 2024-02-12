@@ -94,7 +94,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             worldInfo.setSeed(random.nextString(16));
         }
 
-        logger.atInfo().addArgument(() -> worldInfo.getSeed()).log("World seed: \"{}\"");
+        logger.info("World seed: \"{}\"", worldInfo.getSeed()); //NOPMD
 
         // TODO: Separate WorldRenderer from world handling in general
         WorldGeneratorManager worldGeneratorManager = context.get(WorldGeneratorManager.class);
@@ -105,8 +105,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             worldGenerator.setWorldSeed(worldInfo.getSeed());
             context.put(WorldGenerator.class, worldGenerator);
         } catch (UnresolvedWorldGeneratorException e) {
-            logger.atError().addArgument(() -> worldInfo.getWorldGenerator()).addArgument(() -> worldGeneratorManager.getWorldGenerators()).
-                    log("Unable to load world generator {}. Available world generators: {}");
+            logger.error("Unable to load world generator {}. Available world generators: {}",
+                    worldInfo.getWorldGenerator(), worldGeneratorManager.getWorldGenerators()); //NOPMD
             context.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }

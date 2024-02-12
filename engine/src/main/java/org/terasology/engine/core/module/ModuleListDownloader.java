@@ -59,13 +59,13 @@ public class ModuleListDownloader implements Callable<ModuleRegistry> {
                 String json = gson.toJson(jObject);
 
                 ModuleMetadata meta = metaReader.read(new StringReader(json));
-                logger.atDebug().addArgument(() -> meta.getId()).addArgument(() -> meta.getVersion()).log("Read module {} - {}");
+                logger.debug("Read module {} - {}", meta.getId(), meta.getVersion()); //NOPMD
                 modules.add(new Module(meta, new EmptyFileSource(), Collections.emptyList(), new Reflections(),
                         (c) -> false));
             }
 
             int count = modules.size();
-            logger.atInfo().addArgument(() -> count).addArgument(() -> (count == 1) ? "entry" : "entries").log("Retrieved {} {}");
+            logger.info("Retrieved {} {}", count, (count == 1) ? "entry" : "entries"); //NOPMD
         }
         return modules;
     }

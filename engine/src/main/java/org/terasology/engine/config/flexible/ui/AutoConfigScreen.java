@@ -46,7 +46,7 @@ public class AutoConfigScreen extends CoreScreenLayer {
             if (widget.isPresent()) {
                 mainContainer.addWidget(widget.get());
             } else {
-                logger.atWarn().addArgument(() -> config.getId()).log("Cannot create widget for config: {}");
+                logger.warn("Cannot create widget for config: {}", config.getId()); //NOPMD
             }
         }
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());

@@ -173,10 +173,9 @@ public class ModuleManager {
                     continue;
                 }
                 if (registry.add(module)) {
-                    logger.atInfo().addArgument(() -> module.getId()).addArgument(() -> path).log("Loaded {} from {}");
+                    logger.info("Loaded {} from {}", module.getId(), path); //NOPMD
                 } else {
-                    logger.atInfo().addArgument(() -> module.getId()).addArgument(() -> path).
-                            log("Module {} from {} was a duplicate; not registering this copy.");
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path); //NOPMD
                 }
             }
         }

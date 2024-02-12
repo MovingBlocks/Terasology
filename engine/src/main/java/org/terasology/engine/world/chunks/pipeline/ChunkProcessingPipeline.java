@@ -116,8 +116,7 @@ public class ChunkProcessingPipeline {
                     chunkProcessingInfo.getChunkTaskProvider() == null
                             ? "Generation or Loading"
                             : chunkProcessingInfo.getChunkTaskProvider().getName();
-            logger.atError().addArgument(chunkProcessingInfo.getPosition()).addArgument(stageName).addArgument(e.getMessage()).
-                    log("ChunkTask at position {} and stage [{}] catch error: {}");
+logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProcessingInfo.getPosition(), stageName, e); //NOPMD
             chunkProcessingInfo.getExternalFuture().setException(e);
         } catch (CancellationException ignored) {
         }
