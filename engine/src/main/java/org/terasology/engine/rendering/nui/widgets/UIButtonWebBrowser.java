@@ -68,7 +68,7 @@ public class UIButtonWebBrowser extends UIButton {
             try {
                 desktop.browse(new URI(this.url));
             } catch (IOException | URISyntaxException e) {
-                logger.atWarn().addArgument(() -> this.url).log("Can't open {} in default browser of your system.");
+                logger.warn("Can't open {} in default browser of your system.", this.url); //NOPMD
                 showErrorPopup("Can't open " + this.url + " in default browser of your system.");
             }
         } else {
@@ -83,7 +83,7 @@ public class UIButtonWebBrowser extends UIButton {
                     runtime.exec(createCommand("xdg-open", this.url));
                 }
             } catch (IOException e) {
-                logger.atWarn().addArgument(() -> this.url).log("Can't recognize your OS and open the url {}.");
+                logger.warn("Can't recognize your OS and open the url {}.", this.url); //NOPMD
                 showErrorPopup("Can't recognize your OS and open the url " + this.url);
             }
         }
@@ -125,7 +125,7 @@ public class UIButtonWebBrowser extends UIButton {
                 confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
             }
         } catch (MalformedURLException e) {
-            logger.atError().addArgument(() -> this.url).addArgument(e).log("{} is malformed");
+            logger.error("{} is malformed", this.url, e); //NOPMD
         }
     }
 

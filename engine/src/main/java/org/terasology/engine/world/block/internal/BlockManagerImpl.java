@@ -95,8 +95,7 @@ public class BlockManagerImpl extends BlockManager {
                         if (id != null) {
                             block.setId(id);
                         } else {
-                            logger.atError().addArgument(() -> block.getURI()).addArgument(() -> family.get().getURI()).
-                                    log("Missing id for block {} in provided family {}");
+                            logger.error("Missing id for block {} in provided family {}", block.getURI(), family.get().getURI()); //NOPMD
                             if (generateNewIds) {
                                 block.setId(getNextId());
                             } else {
@@ -157,8 +156,7 @@ public class BlockManagerImpl extends BlockManager {
                     if (id != null) {
                         block.setId((short) id.intValue());
                     } else {
-                        logger.atError().addArgument(() -> block.getURI()).addArgument(() -> familyUri).
-                                log("Missing id for block {} in registered family {}");
+                        logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri); //NOPMD
                         block.setId(UNKNOWN_ID);
                     }
                 }
@@ -191,7 +189,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private void registerBlock(Block block, RegisteredState newState) {
         if (block.getId() != UNKNOWN_ID) {
-            logger.atInfo().addArgument(() -> block).addArgument(() -> block.getId()).log("Registered Block {} with id {}");
+            logger.info("Registered Block {} with id {}", block, block.getId()); //NOPMD
             newState.blocksById.put(block.getId(), block);
             newState.idByUri.put(block.getURI(), block.getId());
         } else {

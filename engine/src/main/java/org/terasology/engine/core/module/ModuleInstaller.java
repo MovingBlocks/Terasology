@@ -38,7 +38,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
     @Override
     public List<Module> call() throws Exception {
         Map<URI, Path> filesToDownload = getDownloadUrls(moduleList);
-        logger.atInfo().addArgument(() -> filesToDownload.size()).log("Started downloading {} modules");
+        logger.info("Started downloading {} modules", filesToDownload.size()); //NOPMD
         MultiFileDownloader downloader = new MultiFileDownloader(filesToDownload, downloadProgressListener);
         List<Path> downloadedModulesPaths = downloader.call();
         logger.info("Module download completed, loading the new modules...");

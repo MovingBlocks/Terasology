@@ -65,8 +65,7 @@ public class OpenALManager implements AudioManager {
         ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
         AL.createCapabilities(alcCapabilities);
 
-        logger.atInfo().addArgument(() -> AL10.alGetString(AL10.AL_VERSION)).log("OpenAL {} initialized!");
-
+        logger.info("OpenAL {} initialized!", AL10.alGetString(AL10.AL_VERSION));
         logger.info("Using OpenAL: {} by {}", AL10.alGetString(AL10.AL_RENDERER), AL10.alGetString(AL10.AL_VENDOR));
         logger.info("Using device: {}", ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
         logger.info("Available AL extensions: {}", AL10.alGetString(AL10.AL_EXTENSIONS));
@@ -261,7 +260,7 @@ public class OpenALManager implements AudioManager {
                 try {
                     entry.getValue().onAudioEnd(interrupted);
                 } catch (Exception e) {
-                    logger.atError().addArgument(() -> entry.getValue()).addArgument(e).log("onAudioEnd() notification failed for {}");
+                    logger.error("onAudioEnd() notification failed for {}", entry.getValue(), e); //NOPMD
                 }
             }
         }

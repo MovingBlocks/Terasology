@@ -349,7 +349,7 @@ public class ServerImpl implements Server {
                     }
                     blockManager.receiveFamilyRegistration(family, registrationMap);
                 } catch (BlockUriParseException e) {
-                    logger.atError().addArgument(() -> blockFamily.getBlockUri(0)).log("Received invalid block uri {}");
+                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0)); //NOPMD
                 }
             }
         }

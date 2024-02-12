@@ -82,7 +82,7 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         BlockFamily blockFamily = blockItemComponent.blockFamily;
 
         if (blockFamily == null) {
-            LOGGER.atWarn().addArgument(() -> itemEntity.getParentPrefab().getName()).log("Prefab {} does not have a block family");
+            LOGGER.warn("Prefab {} does not have a block family", itemEntity.getParentPrefab().getName()); //NOPMD
             return;
         }
 

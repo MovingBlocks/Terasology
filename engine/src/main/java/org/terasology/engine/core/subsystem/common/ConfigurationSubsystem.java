@@ -66,7 +66,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         checkServerIdentity();
 
         // TODO: Move to display subsystem
-        logger.atInfo().addArgument(() -> config.renderConfigAsJson(config.getRendering())).log("Video Settings: {}");
+        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering())); //NOPMD
 
         rootContext.put(Config.class, config);
         //add facades

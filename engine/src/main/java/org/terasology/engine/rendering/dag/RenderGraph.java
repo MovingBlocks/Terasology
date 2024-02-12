@@ -52,8 +52,8 @@ public class RenderGraph {
         }
         if (akaNodeMap.containsKey(nodeAka)) {
             Node aNode = akaNodeMap.get(nodeAka);
-            logger.atInfo().addArgument(nodeUri).addArgument(nodeAka).addArgument(() -> aNode.getUri()).
-                    log("Node {} also known as {} already matches existing node with uri {} - attempting replacing...");
+            logger.info("Node {} also known as {} already matches existing node with uri {} - attempting replacing...",
+                    nodeUri, nodeAka, aNode.getUri()); //NOPMD
             replaceNode(aNode, node);
         } else {
             nodeMap.put(nodeUri, node);
@@ -149,8 +149,7 @@ public class RenderGraph {
                 if (!graph.hasEdgeConnecting(fromNode, toNode)) {
                     graph.putEdge(fromNode, toNode);
                 } else {
-                    logger.atWarn().addArgument(fromNode.getUri()).addArgument(toNode.getUri()).
-                            log("Trying to connect two already connected nodes, {} and {}", fromNode.getUri(), toNode.getUri());
+                    logger.warn("Trying to connect two already connected nodes, {} and {}", fromNode.getUri(), toNode.getUri()); //NOPMD
                 }
             }
 
@@ -170,8 +169,7 @@ public class RenderGraph {
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
         if (!graph.hasEdgeConnecting(fromNode, toNode)) {
-            logger.atWarn().addArgument(() -> fromNode.getUri()).addArgument(() -> toNode.getUri()).
-                    log("Trying to disconnect two nodes that aren't connected, {} and {}");
+            logger.warn("Trying to disconnect two nodes that aren't connected, {} and {}", fromNode.getUri(), toNode.getUri()); //NOPMD
         }
 
         graph.removeEdge(fromNode, toNode);
@@ -277,8 +275,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.atInfo().addArgument(() -> toNode.getUri()).addArgument(inputFboId).addArgument(() -> fromConnection.getName()).
-                    log("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..");
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputFboId, fromConnection.getName()); //NOPMD
             DependencyConnection localConnection = toNode.getInputFboConnection(inputFboId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -342,8 +340,8 @@ public class RenderGraph {
 
         } else { // if adding new input failed, it already existed - check for connections
             //TODO update
-            logger.atInfo().addArgument(() -> toNode.getUri()).addArgument(inputConnectionId).addArgument(() -> fromConnection.getName()).
-                    log("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..");
+            logger.info("{}.connectFbo({}, {}): Connection already existed. Testing for its connections..",
+                    toNode.getUri(), inputConnectionId, fromConnection.getName()); //NOPMD
             DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
             // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
             // if our input is connected
@@ -533,14 +531,13 @@ public class RenderGraph {
      */
     private void reconnectInputToOutput(Node toNode, int inputId, DependencyConnection fromConnection,
                                         ConnectionType connectionType, boolean disconnectPrevious) {
-        logger.atDebug().addArgument(() -> toNode.getUri()).addArgument(() -> fromConnection.getParentNode()).
-                log("Attempting reconnection of {} to {}'s output.");
+        logger.debug("Attempting reconnection of {} to {}'s output.", toNode.getUri(), fromConnection.getParentNode()); //NOPMD
         Node fromNode;
 
         fromNode = findNode(fromConnection.getParentNode());
         if (!fromConnection.getConnectedConnections().isEmpty()) {
-            logger.atWarn().addArgument(fromConnection).addArgument(() -> fromConnection.getConnectedConnections()).
-                    log("WARNING: destination connection ({}) is already connected to ({})");
+            logger.warn("WARNING: destination connection ({}) is already connected to ({})",
+                    fromConnection, fromConnection.getConnectedConnections()); //NOPMD
             // TODO update the hashmap to string to be pretty
             // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
             // + fromConnection.getConnectedConnections() + "). Remove connection first.");

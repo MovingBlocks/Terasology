@@ -83,7 +83,7 @@ public class EventSystemImpl implements EventSystem {
     @Override
     public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
-        logger.atDebug().addArgument(() -> eventType.getSimpleName()).log("Registering event {}");
+        logger.debug("Registering event {}", eventType.getSimpleName()); //NOPMD
         for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
@@ -95,11 +95,11 @@ public class EventSystemImpl implements EventSystem {
     public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
-            logger.atError().addArgument(() -> handlerClass.getName()).log("Cannot register handler {}, must be public");
+            logger.error("Cannot register handler {}, must be public", handlerClass.getName()); //NOPMD
             return;
         }
 
-        logger.atDebug().addArgument(() -> handlerClass.getName()).log("Registering event handler {}");
+        logger.debug("Registering event handler {}", handlerClass.getName()); //NOPMD
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
@@ -129,7 +129,7 @@ public class EventSystemImpl implements EventSystem {
 
                 logger.debug("Found method: {}", method);
                 if (!Event.class.isAssignableFrom(types[0]) || !EntityRef.class.isAssignableFrom(types[1])) {
-                    logger.atError().addArgument(() -> method.getName()).log("Invalid event handler method: {}");
+                    logger.error("Invalid event handler method: {}", method.getName()); //NOPMD
                     return;
                 }
 

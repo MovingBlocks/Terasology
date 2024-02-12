@@ -253,7 +253,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
-        logger.atInfo().addArgument(() -> String.format("%.2f", seconds)).log("Initialization completed in {}sec.");
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds)); //NOPMD
     }
 
     private void verifyInitialisation() {
