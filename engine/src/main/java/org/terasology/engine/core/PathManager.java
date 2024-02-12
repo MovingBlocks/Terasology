@@ -90,7 +90,7 @@ public final class PathManager {
         // Use the current directory as a fallback.
         Path currentDirectory = Paths.get("").toAbsolutePath();
         installationSearchPaths.add(currentDirectory);
-        LOGGER.atInfo().addArgument(currentDirectory).log("PathManager: Working directory is {}");
+        LOGGER.info("PathManager: Working directory is {}", currentDirectory);
 
         for (Path startPath : installationSearchPaths) {
             Path installationPath = findNativesHome(startPath, 5);

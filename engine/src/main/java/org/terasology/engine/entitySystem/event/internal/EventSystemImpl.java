@@ -137,8 +137,8 @@ public class EventSystemImpl implements EventSystem {
                 List<Class<? extends Component>> componentParams = Lists.newArrayList();
                 for (int i = 2; i < types.length; ++i) {
                     if (!Component.class.isAssignableFrom(types[i])) {
-                        logger.atError().addArgument(() -> method.getName()).addArgument(types[i]).
-                                log("Invalid event handler method: {} - {} is not a component class");
+                        logger.error("Invalid event handler method: {} - {} is not a component class",
+                                method.getName(), types[i]); //NOPMD
                         return;
                     }
                     requiredComponents.add((Class<? extends Component>) types[i]);

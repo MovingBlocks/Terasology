@@ -68,7 +68,7 @@ public class ComponentSystemManager {
         ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
         for (Class<?> type : environment.getTypesAnnotatedWith(RegisterSystem.class)) {
             if (!ComponentSystem.class.isAssignableFrom(type)) {
-                logger.atError().addArgument(type.getSimpleName()).log("Cannot load {}, must be a subclass of ComponentSystem");
+                logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName()); //NOPMD
                 continue;
             }
             Name moduleId = environment.getModuleProviding(type);

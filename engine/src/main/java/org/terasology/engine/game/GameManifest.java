@@ -188,14 +188,13 @@ public class GameManifest {
     public String mainWorldDisplayName(WorldGeneratorManager manager) {
         var world = getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (world == null) {
-            logger.atWarn().addArgument(() -> this).log("{} has no MAIN_WORLD");
+            logger.warn("{} has no MAIN_WORLD", this);
             return "ERROR: No main world";
         }
         SimpleUri generatorUri = world.getWorldGenerator();
         var generator = manager.getWorldGeneratorInfo(generatorUri);
         if (generator == null) {
-            logger.atWarn().addArgument(() -> this).addArgument(() -> manager).addArgument(() -> generatorUri).
-                    log("{}: {} has no generator for {}");
+            logger.warn("{}: {} has no generator for {}", this, manager, generatorUri);
             return "ERROR: No generator found for " + generatorUri;
         }
         return generator.getDisplayName();
