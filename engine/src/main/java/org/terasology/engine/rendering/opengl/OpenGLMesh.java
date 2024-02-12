@@ -54,7 +54,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
         try {
             GameThread.synch(() -> buildMesh(newData));
         } catch (InterruptedException e) {
-            logger.atError().addArgument(() -> getUrn()).addArgument(e).log("Failed to reload {}");
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 
@@ -86,7 +86,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
             }
             GL30.glBindVertexArray(0);
         } else {
-            logger.atError().addArgument(() -> getUrn()).log("Attempted to render disposed mesh: {}");
+            logger.error("Attempted to render disposed mesh: {}", getUrn()); //NOPMD
         }
     }
 

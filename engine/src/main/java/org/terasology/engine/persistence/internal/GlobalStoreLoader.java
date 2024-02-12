@@ -93,7 +93,7 @@ final class GlobalStoreLoader {
             try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                 return createPrefab(prefabData);
             } catch (Exception e) {
-                logger.atError().addArgument(() -> prefabData.getParentName()).addArgument(e).log("Failed to load prefab {}");
+                logger.error("Failed to load prefab {}", prefabData.getParentName(), e); //NOPMD
                 return null;
             }
         }

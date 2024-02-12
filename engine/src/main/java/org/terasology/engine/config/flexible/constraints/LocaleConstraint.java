@@ -31,12 +31,13 @@ public class LocaleConstraint implements SettingConstraint<Locale> {
     }
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void warnUnsatisfiedBy(Locale value) {
-        logger.atWarn().
-                addArgument(value).
-                addArgument(() -> locales.stream()
+        logger.warn("Locale {} should be one of {}",
+                value,
+                locales.stream()
                         .map(Locale::getLanguage)
-                        .collect(Collectors.joining(",", "[", "]"))).
-                log("Locale {} should be one of {}");
+                        .collect(Collectors.joining(",", "[", "]"))
+        );
     }
 }

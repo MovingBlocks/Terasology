@@ -48,8 +48,7 @@ public class DecoratorNode extends ActionNode {
             try {
                 action.construct(actor);
             } catch (Exception e) {
-                logger.atInfo().addArgument(() -> action).addArgument(() -> actor.getEntity()).
-                        log("Exception while running construct() of action {} from entity {}:");
+                logger.info("Exception while running construct() of action {} from entity {}:", action, actor.getEntity()); //NOPMD
             }
         }
     }
@@ -81,8 +80,7 @@ public class DecoratorNode extends ActionNode {
         try {
             modifiedState = action.modify(actor, lastState);
         } catch (Exception e) {
-            logger.atInfo().addArgument(() -> action).addArgument(() -> actor.getEntity()).addArgument(() -> e.getStackTrace()).
-                    log("Exception while running action {} from entity {}: {}");
+            logger.info("Exception while running action {} from entity {}: {}", action, actor.getEntity(), e.getStackTrace()); //NOPMD
             // TODO maybe returning UNDEFINED would be more canonical?
             return BehaviorState.FAILURE;
         }

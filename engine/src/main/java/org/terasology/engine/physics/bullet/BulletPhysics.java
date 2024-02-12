@@ -241,8 +241,7 @@ public class BulletPhysics implements PhysicsEngine {
                             hitNormalWorld,
                             voxelPosition);
                 } else { //we hit something we don't understand, assume its nothing and log a warning
-                    logger.atWarn().addArgument(() -> collisionObject.userData).
-                            log("Unidentified object was hit in the physics engine: {}");
+                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                 }
             }
 
@@ -306,8 +305,7 @@ public class BulletPhysics implements PhysicsEngine {
                                 hitNormalWorld,
                                 voxelPosition);
                     } else { //we hit something we don't understand, assume its nothing and log a warning
-                        logger.atWarn().addArgument(() -> collisionObject.userData).
-                                log("Unidentified object was hit in the physics engine: {}");
+                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                     }
                 }
             }
