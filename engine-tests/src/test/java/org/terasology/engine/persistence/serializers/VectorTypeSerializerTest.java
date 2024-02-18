@@ -59,13 +59,13 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(new Vector2f(1.0f, 2.0f), o.v3, .00001f);
     }
 
-    static class TestObject {
+    public static class TestObject {
         public Vector3f v1;
         public Vector2f v2;
         public Vector4f v3;
     }
 
-    static class TestObject2 {
+    public static class TestObject2 {
         public Vector3fc v1;
         public Vector4fc v2;
         public Vector2fc v3;
