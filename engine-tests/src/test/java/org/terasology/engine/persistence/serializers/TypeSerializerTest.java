@@ -110,14 +110,14 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(INSTANCE, deserializedInstance);
     }
 
-    private static final class SomeClass<T> {
+    public static final class SomeClass<T> {
         @SerializedName("generic-t")
-        private T data;
-        private final List<T> list = Lists.newArrayList();
-        private final Set<Animal<?>> animals = Sets.newHashSet();
-        private Animal<T> singleAnimal;
+        public T data;
+        public List<T> list = Lists.newArrayList();
+        public Set<Animal<?>> animals = Sets.newHashSet();
+        public Animal<T> singleAnimal;
 
-        private SomeClass(T data) {
+        public SomeClass(T data) {
             this.data = data;
         }
 
@@ -151,10 +151,10 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @SuppressWarnings("checkstyle:FinalClass")
-    private static class Animal<T> {
-        protected final T data;
+    public static class Animal<T> {
+        public T data;
 
-        private Animal(T data) {
+        public Animal(T data) {
             this.data = data;
         }
 
@@ -176,11 +176,11 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static final class Dog<T> extends Animal<T> {
-        private final Vector3f tailPosition;
-        private final Vector3f headPosition;
+    public static final class Dog<T> extends Animal<T> {
+        public Vector3f tailPosition;
+        public Vector3f headPosition;
 
-        private Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
+        public Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
             this.headPosition = headPosition;
@@ -216,10 +216,10 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static final class Cheetah<T> extends Animal<T> {
-        private final Color spotColor;
+    public static final class Cheetah<T> extends Animal<T> {
+        public Color spotColor;
 
-        private Cheetah(T data, Color spotColor) {
+        public Cheetah(T data, Color spotColor) {
             super(data);
             this.spotColor = spotColor;
         }
