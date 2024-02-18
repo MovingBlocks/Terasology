@@ -12,9 +12,12 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
+import org.terasology.reflection.ReflectionUtil;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,9 +51,16 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
             Object val;
 
             try {
-                val = field.get(value);
+                if (Modifier.isPrivate(field.getModifiers())) {
+                    val = ReflectionUtil.findGetter(field).invoke(value);
+                } else {
+                    val = field.get(value);
+                }
             } catch (IllegalAccessException e) {
                 logger.error("Field {} is inaccessible", field);
+                continue;
+            } catch (InvocationTargetException e) {
+                logger.error("Failed to involve getter for field {}", field);
                 continue;
             }
 
@@ -101,7 +111,11 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 Optional<?> fieldValue = handler.deserialize(entry.getValue());
 
                 if (fieldValue.isPresent()) {
-                    field.set(result, fieldValue.get());
+                    if (Modifier.isPrivate(field.getModifiers())) {
+                        ReflectionUtil.findSetter(field).invoke(result);
+                    } else {
+                        field.set(result, fieldValue.get());
+                    }
                 } else {
                     logger.error("Could not deserialize field {}", field.getName());
                 }
