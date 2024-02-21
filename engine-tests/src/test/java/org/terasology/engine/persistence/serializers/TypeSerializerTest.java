@@ -117,7 +117,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         public Set<Animal<?>> animals = Sets.newHashSet();
         public Animal<T> singleAnimal;
 
-        public SomeClass(T data) {
+        SomeClass(T data) {
             this.data = data;
         }
 
@@ -154,7 +154,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     public static class Animal<T> {
         public T data;
 
-        public Animal(T data) {
+        Animal(T data) {
             this.data = data;
         }
 
@@ -180,7 +180,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         public Vector3f tailPosition;
         public Vector3f headPosition;
 
-        public Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
+        Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
             this.headPosition = headPosition;
@@ -219,7 +219,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     public static final class Cheetah<T> extends Animal<T> {
         public Color spotColor;
 
-        public Cheetah(T data, Color spotColor) {
+        Cheetah(T data, Color spotColor) {
             super(data);
             this.spotColor = spotColor;
         }
