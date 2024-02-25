@@ -81,7 +81,7 @@ val codeMetrics = configurations.create("codeMetrics")
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
     natives(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
-    listOf("natives-linux", "natives-windows", "natives-macos").forEach {
+    listOf("natives-linux", "natives-windows", "natives-macos", "natives-macos-arm64").forEach {
         natives("org.lwjgl:lwjgl::$it")
         natives("org.lwjgl:lwjgl-assimp::$it")
         natives("org.lwjgl:lwjgl-glfw::$it")
