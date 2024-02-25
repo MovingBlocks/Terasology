@@ -60,7 +60,7 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 logger.error("Field {} is inaccessible", field);
                 continue;
             } catch (InvocationTargetException e) {
-                logger.error("Failed to involve getter for field {}", field);
+                logger.error("Failed to invoke getter for field {}", field);
                 continue;
             }
 
@@ -103,7 +103,7 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 Field field = fieldByName.get(fieldName);
 
                 if (field == null) {
-                    logger.error("Cound not find field with name {}", fieldName);
+                    logger.error("Could not find field with name {}", fieldName);
                     continue;
                 }
 
@@ -112,7 +112,11 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
                 if (fieldValue.isPresent()) {
                     if (Modifier.isPrivate(field.getModifiers())) {
-                        ReflectionUtil.findSetter(field).invoke(result);
+                        try {
+                            ReflectionUtil.findSetter(field).invoke(result);
+                        } catch (InvocationTargetException e) {
+                            logger.error("Failed to invoke setter for field {}", field);
+                        }
                     } else {
                         field.set(result, fieldValue.get());
                     }
