@@ -74,7 +74,7 @@ dependencies {
     api("com.google.code.gson:gson:2.8.6")
     api("net.sf.trove4j:trove4j:3.0.3")
     implementation("io.netty:netty-all:4.1.77.Final")
-    implementation("com.google.protobuf:protobuf-java:3.16.1")
+    implementation("com.google.protobuf:protobuf-java:3.22.0")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     // Javax for protobuf due to @Generated - needed on Java 9 or newer Javas
@@ -112,10 +112,10 @@ dependencies {
     implementation("de.matthiasmann.twl:PNGDecoder:1111")
 
     // Logging
-    implementation("org.slf4j:slf4j-api:1.7.36") {
+    implementation("org.slf4j:slf4j-api:2.0.11") {
         because("a backend-independent Logger")
     }
-    implementation("ch.qos.logback:logback-classic:1.2.12") {
+    implementation("ch.qos.logback:logback-classic:1.4.14") {
         because("telemetry implementation uses logback to send to logstash " +
                 "and we bundle org.terasology.logback for the regex filter")
     }
@@ -133,11 +133,10 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
     // Our developed libs
-    api("org.terasology.gestalt:gestalt-asset-core:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-module:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-entity-system:7.2.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-util:7.2.0-SNAPSHOT")
-    api("com.github.zafarkhaja:java-semver:0.10.0")  // ASAP: Remove after https://github.com/MovingBlocks/gestalt/pull/110
+    api("org.terasology.gestalt:gestalt-asset-core:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-module:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-entity-system:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-util:7.2.1-SNAPSHOT")
 
     api("org.terasology:TeraMath:1.5.0")
     api("org.terasology:splash-screen:1.1.1")
@@ -159,7 +158,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.17.0"
+        artifact = "com.google.protobuf:protoc:3.22.0"
     }
     plugins {
     }

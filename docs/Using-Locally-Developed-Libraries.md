@@ -50,4 +50,5 @@ Subprojects and included builds are similar in many respects, but the root proje
 
 ## Implementation Details
 
-Our [`libs/subprojects.settings.gradle`](https://github.com/MovingBlocks/Terasology/blob/develop/libs/subprojects.settings.gradle) checks each subdirectory to see if it contains files that look like a Gradle root project, and if it finds them it [adds that directory as an included build](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html#org.gradle.api.initialization.Settings:includeBuild(java.lang.Object)).
+Our [`libs/subprojects.settings.gradle.kts`](https://github.com/MovingBlocks/Terasology/blob/develop/libs/subprojects.settings.gradle.kts) checks each subdirectory
+to see if it contains files that look like a Gradle root project, and if it finds them it [adds that directory as an included build](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html#org.gradle.api.initialization.Settings:includeBuild(java.lang.Object)).
