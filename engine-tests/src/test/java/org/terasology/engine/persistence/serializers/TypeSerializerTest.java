@@ -110,15 +110,19 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(INSTANCE, deserializedInstance);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     public static final class SomeClass<T> {
         @SerializedName("generic-t")
         public T data;
         public List<T> list = Lists.newArrayList();
         public Set<Animal<?>> animals = Sets.newHashSet();
         public Animal<T> singleAnimal;
+        @SerializedName("private-generic-t")
+        private final T privateData;
 
         SomeClass(T data) {
             this.data = data;
+            this.privateData = data;
         }
 
         @Override
