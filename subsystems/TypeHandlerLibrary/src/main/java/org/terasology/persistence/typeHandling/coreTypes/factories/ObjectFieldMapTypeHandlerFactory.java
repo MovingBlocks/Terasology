@@ -3,6 +3,8 @@
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
@@ -17,10 +19,14 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
+    private static final Logger logger = LoggerFactory.getLogger(ObjectFieldMapTypeHandlerFactory.class);
+    private static final List<String> PRIVATE_OVERRIDE_ANNOTATIONS = List.of("org.terasology.nui.LayoutConfig");
 
     private ConstructorLibrary constructorLibrary;
 
@@ -77,7 +83,18 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
                         continue;
                     }
 
-                    field.setAccessible(true);
+                    if (Arrays.stream(field.getAnnotations())
+                            .anyMatch(annotation -> PRIVATE_OVERRIDE_ANNOTATIONS.contains(annotation.getClass().getCanonicalName()))) {
+                        field.setAccessible(true);
+                    } else {
+                        if (Modifier.isPrivate(field.getModifiers()) && ReflectionUtil.findGetter(field) == null
+                                && ReflectionUtil.findSetter(field) == null) {
+                            logger.atWarn().addArgument(field.getName()).addArgument(rawType.getTypeName()).
+                                    log("Field {}#{} will not be serialised. Terasology no longer supports serialising private fields.");
+                             continue;
+                        }
+                    }
+
                     Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
                     fields.put(field, fieldType);
                 }

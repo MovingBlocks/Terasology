@@ -105,12 +105,12 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     }
 
     private static class SingleTypeClass<T> {
-        private T t;
+        public T t;
     }
 
     private static class MultiTypeClass<T, U> {
-        private T t;
-        private U u;
+        public T t;
+        public U u;
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
@@ -119,7 +119,7 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
                     " creation based on member types of input class TypeInfo. ")
     @SuppressWarnings("PMD.UnusedPrivateField")
     private static class SomeClass<T> {
-        private T t;
-        private List<T> list;
+        public T t;
+        public List<T> list;
     }
 }
