@@ -114,7 +114,7 @@ Of note is that IntelliJ is known to not behave nicely when it comes to disablin
 
 We use the [Checkstyle](http://checkstyle.sourceforge.net/) project to help keep the codebase consistent with some code conventions. 
 The Terasology engine and all modules use the same configuration as defined in [MovingBlocks/TeraConfig](https://github.com/MovingBlocks/TeraConfig).
-You can find the local copy of the configuration file at [`checkstyle/checkstyle.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/checkstyle/checkstyle.xml).
+You can find the local copy of the configuration file at [`config/metrics/checkstyle/checkstyle.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/checkstyle/checkstyle.xml).
 
 When working an area please keep an eye out for existing warnings to fix in files you're impacting anyway.
 Make sure to run Checkstyle on any new files you add since that's the best time to fix warnings.
@@ -144,7 +144,7 @@ For instance, have a look at the [Checkstyle Report for the engine](http://jenki
 
 We use the [PMD](https://pmd.github.io/) project to help keep the codebase free from common programming flaws like unused variables, empty catch blocks, unnecessary object creation, etc.
 The Terasology engine's configuration is defined in [MovingBlocks/TeraConfig](https://github.com/MovingBlocks/TeraConfig).
-You can find the local copy of the configuration file at [`pmd/pmd.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/pmd/pmd.xml).
+You can find the local copy of the configuration file at [`config/metrics/pmd/pmd.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/pmd/pmd.xml).
 
 When working an area please keep an eye out for existing warnings to fix in files you're impacting anyway.
 Make sure to run PMD on any new files you add since that's the best time to fix warnings.
