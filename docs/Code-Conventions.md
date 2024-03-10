@@ -229,7 +229,7 @@ If parameter substitution is insufficient, local variable creation is not suitab
 logger.atDebug().log("log something {} and {}", method(), param);
 ```
 
-Please do not use the more verbose variant(s) of the fluent logging API to keep complexity low and your log statements readable.
+Please do not use the more verbose variant(s) utilizing the `setMessage()`, `addArgument()`, `addKeyValue()` and similar methods of the fluent logging API's [LoggingEventBuilder](https://www.slf4j.org/apidocs/org/slf4j/spi/LoggingEventBuilder.html) to keep complexity low and your log statements readable.
 
 ## Testing
 
