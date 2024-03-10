@@ -6,6 +6,7 @@ Note that we try and stick to the standard Java conventions as much as possible.
 - [Starred Imports](#starred-imports)
 - [Others](#others)
 - [Checkstyle](#checkstyle)
+- [PMD](#pmd)
 - [Testing](#testing)
 - [JavaDoc](#javadoc)
 
@@ -138,6 +139,97 @@ The Checkstyle configuration file is located at `config/metrics/checkstyle/check
 
 Checkstyle statistics are automatically calculated per build and turned into nifty metrics per build.
 For instance, have a look at the [Checkstyle Report for the engine](http://jenkins.terasology.io/teraorg/job/Terasology/job/engine/job/develop/checkstyle).
+
+## PMD
+
+We use the [PMD](https://pmd.github.io/) project to help keep the codebase free from common programming flaws like unused variables, empty catch blocks, unnecessary object creation, etc.
+The Terasology engine's configuration is defined in [MovingBlocks/TeraConfig](https://github.com/movingblocks/teraconfig).
+You can find the local copy of the configuration file at `config/metrics/pmd/pmd.xml`.
+
+When working an area please keep an eye out for existing warnings to fix in files you're impacting anyway.
+Make sure to run PMD on any new files you add since that's the best time to fix warnings.
+
+### Check Execution
+
+#### Gradle
+
+You can easily run PMD via the Gradle wrapper `gradlew`. 
+See [PMD Gradle Plugin](https://docs.gradle.org/current/userguide/pmd_plugin.html) for more information.
+
+- `gradlew check` to run all checks and tests (incl. PMD)
+- `gradlew engine:pmdMain` to run PMD for just the engine's main source directory
+
+#### IntelliJ Integration
+
+We recommend to use the [PMD IDEA Plugin](https://plugins.jetbrains.com/plugin/15412-pmd-idea).
+IntelliJ IDEA allows to easily run PMD checks for the whole project, specific folders, or just single files.
+
+In case the IDE does not pick put the correct PMD rules automatically you may have to configure it manually.
+The PMD configuration file is located at `config/metrics/checkstyle/pmd.xml`.
+
+### Guard Log Statement Warnings
+
+The [PMD GuardLogStatement rule](https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#guardlogstatement) identifies logs that are not guarded resulting in the String creation and manipulation as well as any associated calculations be performed even if the respective log level or the entire logging support are disabled.
+
+See the following example for a non-guarded log statement:
+```java
+log.debug("log something" + method() + " and " + param.toString() + "concat strings");
+```
+
+#### Parameter Substitution
+
+In general, parameter substitution is a sufficient log guard.
+It also removes the need for explicit `toString()` calls.
+Parameter substitution can be applied to the above-mentioned non-guarded log statement as follows:
+```java
+log.debug("log something {} and {}", method(), param);
+```
+
+Unfortunately, PMD is currently subject to a [bug](https://github.com/pmd/pmd/issues/4703) that can lead to warnings still being reported despite the parametrized logging approach.
+If you utilized parameter substitution but are still facing the `GuardLogStatement` PMD warning, alternative approaches need to be found until the bug is resolved.
+These include local variable creation, suppression, and the fluent log API.
+For a decision about the appropriate approach, the context, the log level, and the individual performance impact of any relevant case should be taken into consideration.
+
+#### Local Variable Creation
+
+If the calculation performed was already performed before or will be performed after the log line (including in further log lines), introducing a local variable and referencing it in the log is a suitable approach.
+In some cases a respective local variable may already exist and simply be referenced in your log statement.
+```java
+String localVar = method();
+log.debug("log something {} and {}", localVar, param);
+[...]
+log.debug("log something else {}", localVar);
+```
+
+#### Suppression
+
+For Terasology complete disablement of the logging support is very unlikely, as is the disablement of the `error` log level.
+While `warn` and `info` log levels may be disabled in rare cases, they're usually not.
+Accordingly, any reported cases on `error`, `warn`, and `debug` log levels should be considered for suppression.
+
+Especially, if the performance impact is neglectable, e.g. for variable references (no method call) or simple getter or setter methods, or if the log frequency is very limited, e.g. only during initialization or cleanup, the PMD warning can be suppressed using an inline comment as follows:
+```java
+log.warn("log something {} and {}", method(), param); //NOPMD
+```
+
+If the logs are part of a logging-specific method, that is intentionally called (only) for logging specific aspects like machine specs or config values, the warning can be suppressed for the entire method like so:
+```java
+@SuppressWarnings("PMD.GuardLogStatement")
+public logSpecs() {
+log.info("log something {} and {}", method(), param)
+}
+```
+
+Suppressing warnings allows for easier identification and reversion once the PMD bug is resolved.
+
+#### Fluent Logging API
+
+If parameter substitution is insufficient, local variable creation is not suitable, and suppression is not desired, the fluent logging API can be utilized as follows:
+```java
+log.atDebug().log("log something {} and {}", method(), param);
+```
+
+Please do not use the more verbose variant(s) of the fluent logging API to keep complexity low and your log statements readable.
 
 ## Testing
 
