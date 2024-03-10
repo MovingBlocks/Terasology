@@ -113,8 +113,8 @@ Of note is that IntelliJ is known to not behave nicely when it comes to disablin
 ## Checkstyle
 
 We use the [Checkstyle](http://checkstyle.sourceforge.net/) project to help keep the codebase consistent with some code conventions. 
-The Terasology engine and all modules use the same configuration as defined in [MovingBlocks/TeraConfig](https://github.com/movingblocks/teraconfig).
-You can find the local copy of the configuration file at `config/metrics/checkstyle/checkstyle.xml`.
+The Terasology engine and all modules use the same configuration as defined in [MovingBlocks/TeraConfig](https://github.com/MovingBlocks/TeraConfig).
+You can find the local copy of the configuration file at [`checkstyle/checkstyle.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/checkstyle/checkstyle.xml).
 
 When working an area please keep an eye out for existing warnings to fix in files you're impacting anyway.
 Make sure to run Checkstyle on any new files you add since that's the best time to fix warnings.
@@ -143,8 +143,8 @@ For instance, have a look at the [Checkstyle Report for the engine](http://jenki
 ## PMD
 
 We use the [PMD](https://pmd.github.io/) project to help keep the codebase free from common programming flaws like unused variables, empty catch blocks, unnecessary object creation, etc.
-The Terasology engine's configuration is defined in [MovingBlocks/TeraConfig](https://github.com/movingblocks/teraconfig).
-You can find the local copy of the configuration file at `config/metrics/pmd/pmd.xml`.
+The Terasology engine's configuration is defined in [MovingBlocks/TeraConfig](https://github.com/MovingBlocks/TeraConfig).
+You can find the local copy of the configuration file at [`pmd/pmd.xml`](https://github.com/MovingBlocks/TeraConfig/blob/master/pmd/pmd.xml).
 
 When working an area please keep an eye out for existing warnings to fix in files you're impacting anyway.
 Make sure to run PMD on any new files you add since that's the best time to fix warnings.
@@ -173,7 +173,7 @@ The [PMD GuardLogStatement rule](https://pmd.github.io/pmd/pmd_rules_java_bestpr
 
 See the following example for a non-guarded log statement:
 ```java
-log.debug("log something" + method() + " and " + param.toString() + "concat strings");
+logger.debug("log something" + method() + " and " + param.toString() + "concat strings");
 ```
 
 #### Parameter Substitution
@@ -182,7 +182,7 @@ In general, parameter substitution is a sufficient log guard.
 It also removes the need for explicit `toString()` calls.
 Parameter substitution can be applied to the above-mentioned non-guarded log statement as follows:
 ```java
-log.debug("log something {} and {}", method(), param);
+logger.debug("log something {} and {}", method(), param);
 ```
 
 Unfortunately, PMD is currently subject to a [bug](https://github.com/pmd/pmd/issues/4703) that can lead to warnings still being reported despite the parametrized logging approach.
@@ -196,9 +196,9 @@ If the calculation performed was already performed before or will be performed a
 In some cases a respective local variable may already exist and simply be referenced in your log statement.
 ```java
 String localVar = method();
-log.debug("log something {} and {}", localVar, param);
+logger.debug("log something {} and {}", localVar, param);
 [...]
-log.debug("log something else {}", localVar);
+logger.debug("log something else {}", localVar);
 ```
 
 #### Suppression
@@ -209,14 +209,14 @@ Accordingly, any reported cases on `error`, `warn`, and `debug` log levels shoul
 
 Especially, if the performance impact is neglectable, e.g. for variable references (no method call) or simple getter or setter methods, or if the log frequency is very limited, e.g. only during initialization or cleanup, the PMD warning can be suppressed using an inline comment as follows:
 ```java
-log.warn("log something {} and {}", method(), param); //NOPMD
+logger.warn("log something {} and {}", method(), param); //NOPMD
 ```
 
 If the logs are part of a logging-specific method, that is intentionally called (only) for logging specific aspects like machine specs or config values, the warning can be suppressed for the entire method like so:
 ```java
 @SuppressWarnings("PMD.GuardLogStatement")
 public logSpecs() {
-log.info("log something {} and {}", method(), param)
+logger.info("log something {} and {}", method(), param)
 }
 ```
 
@@ -226,7 +226,7 @@ Suppressing warnings allows for easier identification and reversion once the PMD
 
 If parameter substitution is insufficient, local variable creation is not suitable, and suppression is not desired, the fluent logging API can be utilized as follows:
 ```java
-log.atDebug().log("log something {} and {}", method(), param);
+logger.atDebug().log("log something {} and {}", method(), param);
 ```
 
 Please do not use the more verbose variant(s) of the fluent logging API to keep complexity low and your log statements readable.
