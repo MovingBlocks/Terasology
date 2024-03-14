@@ -10,6 +10,7 @@ import org.terasology.persistence.serializers.PersistedDataWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -39,5 +40,10 @@ public class GsonPersistedDataWriter implements PersistedDataWriter<GsonPersiste
             gson.toJson(data.getElement(), writer);
         }
 
+    }
+
+    @Override
+    public void writeTo(GsonPersistedData data, ByteBuffer byteBuffer) throws IOException {
+        byteBuffer.put(writeBytes(data));
     }
 }

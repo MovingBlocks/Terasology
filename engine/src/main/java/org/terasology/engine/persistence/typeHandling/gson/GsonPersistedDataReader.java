@@ -4,12 +4,13 @@
 package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import org.terasology.persistence.serializers.PersistedDataReader;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -30,13 +31,18 @@ public class GsonPersistedDataReader implements PersistedDataReader<GsonPersiste
 
     @Override
     public GsonPersistedData read(InputStream inputStream) throws IOException {
-        JsonObject jsonObject = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class);
+        JsonElement jsonObject = gson.fromJson(new InputStreamReader(inputStream), JsonElement.class);
         return new GsonPersistedData(jsonObject);
     }
 
     @Override
     public GsonPersistedData read(byte[] byteBuffer) throws IOException {
-        JsonObject jsonObject = gson.fromJson(new String(byteBuffer, charset), JsonObject.class);
+        JsonElement jsonObject = gson.fromJson(new String(byteBuffer, charset), JsonElement.class);
         return new GsonPersistedData(jsonObject);
+    }
+
+    @Override
+    public GsonPersistedData read(ByteBuffer byteBuffer) throws IOException {
+        throw new UnsupportedOperationException("Idk how to parse this.");
     }
 }
