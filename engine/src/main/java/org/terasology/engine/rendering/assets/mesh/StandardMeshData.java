@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.assets.mesh;
 
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -122,6 +123,39 @@ public class StandardMeshData extends MeshData {
         colorBuffer.allocateElements(numVerts);
         indices.allocateElements(numIndices);
     }
+
+
+    /**
+     * append mesh data to current mesh
+     * @param transform transformation to apply to target
+     * @param target target mesh
+     */
+    public void combine(Matrix4f transform, StandardMeshData target) {
+        int start = this.position.getPosition();
+        if (!position.isEmpty() || !target.position.isEmpty()) {
+            position.setPosition(start);
+            Vector3f temp = new Vector3f();
+            for (int i = 0; i < target.position.elements(); i++) {
+                this.position.put(transform.transformPosition(target.position.get(i, temp)));
+            }
+        }
+        if (!normal.isEmpty() || !target.normal.isEmpty()) {
+            VertexAttributeBinding.copy(target.normal, start, this.normal, new Vector3f());
+        }
+        if (!uv0.isEmpty() || !target.uv0.isEmpty()) {
+            VertexAttributeBinding.copy(target.uv0, start, this.uv0, new Vector2f());
+        }
+        if (!uv1.isEmpty() || !target.uv1.isEmpty()) {
+            VertexAttributeBinding.copy(target.uv1, start, this.uv1, new Vector2f());
+        }
+        if (!color0.isEmpty() || !target.color0.isEmpty()) {
+            VertexAttributeBinding.copy(target.color0, start, this.color0, new Color());
+        }
+        if (!light0.isEmpty() || !target.light0.isEmpty()) {
+            VertexAttributeBinding.copy(target.light0, start, this.light0, new Vector3f());
+        }
+    }
+
 
     @Override
     public VertexAttributeBinding<Vector3fc, Vector3f> positions() {
