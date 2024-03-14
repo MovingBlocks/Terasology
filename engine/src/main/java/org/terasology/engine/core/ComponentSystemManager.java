@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
@@ -200,7 +200,7 @@ public class ComponentSystemManager {
     }
 
     private void initialiseSystem(ComponentSystem system) {
-        InjectionHelper.inject(system);
+        InjectionHelper.inject(system, context);
 
         if (console != null) {
             MethodCommand.registerAvailable(system, console, context);

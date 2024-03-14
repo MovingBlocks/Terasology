@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.nui;
 
@@ -12,14 +12,14 @@ import org.abego.treelayout.util.FixedNodeExtentProvider;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.behavior.BehaviorSystem;
+import org.terasology.engine.logic.behavior.DefaultBehaviorTreeRunner;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.core.BehaviorState;
 import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.engine.logic.behavior.core.Visitor;
-import org.terasology.engine.logic.behavior.BehaviorSystem;
-import org.terasology.engine.logic.behavior.DefaultBehaviorTreeRunner;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
@@ -31,7 +31,6 @@ import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseOverEvent;
 import org.terasology.nui.events.NUIMouseReleaseEvent;
 import org.terasology.nui.layouts.ZoomableLayout;
-import org.terasology.engine.registry.CoreRegistry;
 
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
@@ -45,6 +44,7 @@ import java.util.Map;
  * (Ideally the logic would be moved to the BehaviorEditorScreen instead)
  */
 public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTreeRunner.Callback {
+    private Context context;
     private Port activeConnectionStart;
     private RenderableNode selectedNode;
     private RenderableNode newNode;
@@ -90,7 +90,9 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         super(id);
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public void initialize(Context context) {
+        this.context = context;
         this.behaviorNodeFactory = context.get(BehaviorNodeFactory.class);
         this.behaviorSystem = context.get(BehaviorSystem.class);
     }
@@ -117,7 +119,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     public String save() {
-        BehaviorTreeFormat loader = new BehaviorTreeFormat();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat(context);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         try {
             loader.save(baos, tree.getData());
@@ -246,7 +248,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     public void copyNode(RenderableNode node) {
-        BehaviorTreeBuilder treeBuilder = CoreRegistry.get(BehaviorTreeBuilder.class);
+        BehaviorTreeBuilder treeBuilder = context.getValue(BehaviorTreeBuilder.class);
         String json = treeBuilder.toJson(node.getNode());
         BehaviorNode nodeCopy = treeBuilder.fromJson(json);
         List<RenderableNode> renderables = createRenderables(nodeCopy);
@@ -260,7 +262,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     private RenderableNode createRenderableNode(BehaviorNode node) {
-        BehaviorNodeComponent nodeComponent = CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node);
+        BehaviorNodeComponent nodeComponent = context.getValue(BehaviorNodeFactory.class).getNodeComponent(node);
         RenderableNode self = new RenderableNode(nodeComponent);
         self.setNode(node);
         return self;
