@@ -45,8 +45,8 @@ public class ConsoleImpl implements Console {
     private final Map<Name, ConsoleCommand> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newHashSet();
 
-    private NetworkSystem networkSystem;
-    private Context context;
+    private final NetworkSystem networkSystem;
+    private final Context context;
 
     public ConsoleImpl(Context context) {
         this.networkSystem = context.get(NetworkSystem.class);
@@ -231,7 +231,8 @@ public class ConsoleImpl implements Console {
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            callingClient.send(new ErrorMessageEvent("You do not have enough permissions to execute this command (" + requiredPermission + ")."));
+            callingClient.send(
+                    new ErrorMessageEvent("You do not have enough permissions to execute this command (" + requiredPermission + ")."));
             return false;
         }
 

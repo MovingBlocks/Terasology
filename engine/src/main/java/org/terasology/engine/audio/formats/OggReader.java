@@ -48,38 +48,38 @@ public class OggReader extends FilterInputStream {
     private static int convsize = 4096 * 2;
 
     // Conversion buffer
-    private static byte[] convbuffer = new byte[convsize];
+    private static final byte[] CONVBUFFER = new byte[convsize];
 
     // temp vars
-    private float[][][] pcm = new float[1][][];
+    private final float[][][] pcm = new float[1][][];
     private int[] index;
 
     // end of stream
     private boolean eos;
 
     // sync and verify incoming physical bitstream
-    private SyncState syncState = new SyncState();
+    private final SyncState syncState = new SyncState();
 
     // take physical pages, weld into a logical stream of packets
-    private StreamState streamState = new StreamState();
+    private final StreamState streamState = new StreamState();
 
     // one Ogg bitstream page.  Vorbis packets are inside
-    private Page page = new Page();
+    private final Page page = new Page();
 
     // one raw packet of data for decode
-    private Packet packet = new Packet();
+    private final Packet packet = new Packet();
 
     // struct that stores all the static vorbis bitstream settings
-    private Info info = new Info();
+    private final Info info = new Info();
 
     // struct that stores all the bitstream user comments
-    private Comment comment = new Comment();
+    private final Comment comment = new Comment();
 
     // central working state for the packet->PCM decoder
-    private DspState dspState = new DspState();
+    private final DspState dspState = new DspState();
 
     // local working space for packet->PCM decode
-    private Block block = new Block(dspState);
+    private final Block block = new Block(dspState);
 
     // where we are in the convbuffer
     private int convbufferOff;
@@ -88,7 +88,7 @@ public class OggReader extends FilterInputStream {
     private int convbufferSize;
 
     // a dummy used by read() to read 1 byte.
-    private byte[] readDummy = new byte[1];
+    private final byte[] readDummy = new byte[1];
 
     /**
      * Creates an OggInputStream that decompressed the specified ogg file.
@@ -154,7 +154,7 @@ public class OggReader extends FilterInputStream {
             fillConvbuffer();
             if (!eos) {
                 int bytesToCopy = Math.min(bytesRemaining, convbufferSize - convbufferOff);
-                System.arraycopy(convbuffer, convbufferOff, b, offset, bytesToCopy);
+                System.arraycopy(CONVBUFFER, convbufferOff, b, offset, bytesToCopy);
                 convbufferOff += bytesToCopy;
                 bytesRead += bytesToCopy;
                 bytesRemaining -= bytesToCopy;
@@ -184,7 +184,7 @@ public class OggReader extends FilterInputStream {
             fillConvbuffer();
             if (!eos) {
                 int bytesToCopy = Math.min(bytesRemaining, convbufferSize - convbufferOff);
-                b.put(convbuffer, convbufferOff, bytesToCopy);
+                b.put(CONVBUFFER, convbufferOff, bytesToCopy);
                 convbufferOff += bytesToCopy;
                 bytesRead += bytesToCopy;
                 bytesRemaining -= bytesToCopy;
@@ -400,7 +400,7 @@ public class OggReader extends FilterInputStream {
         int samples;
         while ((samples = dspState.synthesis_pcmout(pcm, index)) > 0) {
             float[][] localPcm = this.pcm[0];
-            int bout = (samples < convsize ? samples : convsize);
+            int bout = (Math.min(samples, convsize));
 
             // convert floats to 16 bit signed ints (host order) and interleave
             for (int i = 0; i < info.channels; i++) {
@@ -416,8 +416,8 @@ public class OggReader extends FilterInputStream {
                     val = Math.max(-32768, Math.min(32767, val));
                     val |= (val < 0 ? 0x8000 : 0);
 
-                    convbuffer[ptr + 0] = (byte) (bigEndian ? val >>> 8 : val);
-                    convbuffer[ptr + 1] = (byte) (bigEndian ? val : val >>> 8);
+                    CONVBUFFER[ptr + 0] = (byte) (bigEndian ? val >>> 8 : val);
+                    CONVBUFFER[ptr + 1] = (byte) (bigEndian ? val : val >>> 8);
 
                     ptr += (info.channels) << 1;
                 }

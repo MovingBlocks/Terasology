@@ -3,33 +3,30 @@
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
+import groovy.json.JsonSlurper
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
-    id "java-library"
-    id "org.jetbrains.gradle.plugin.idea-ext"
-    id "com.google.protobuf"
-    id "terasology-common"
+    id("java-library")
+    id("org.jetbrains.gradle.plugin.idea-ext")
+    id("com.google.protobuf")
+    id("terasology-common")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
-
-
-import groovy.json.JsonSlurper
-
-import java.text.SimpleDateFormat
-
-def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
 // Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
 
-    templatesDir = new File(rootDir, 'templates')
+    templatesDir = new File(rootDir, "templates")
 
     // Stuff for our automatic version file setup
-    startDateTimeString = dateTimeFormat.format(new Date())
+    startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
 }
@@ -41,7 +38,7 @@ ext {
 sourceSets {
     main {
         proto {
-            srcDir 'src/main/protobuf'
+            srcDir "src/main/protobuf"
         }
         java {
             // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
@@ -56,12 +53,12 @@ configurations {
 
     // Exclude a couple JWJGL modules that aren't needed during compilation (OS specific stuff in these two perhaps)
     implementation {
-        exclude module: 'lwjgl-platform'
-        exclude module: 'jinput-platform'
+        exclude module: "lwjgl-platform"
+        exclude module: "jinput-platform"
     }
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         // always pick reflections fork
         dependencySubstitution {
@@ -73,96 +70,95 @@ configurations.all {
 // Primary dependencies definition
 dependencies {
     // Storage and networking
-    api group: 'com.google.guava', name: 'guava', version: '31.0-jre'
-    api group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-    api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    implementation group: 'io.netty', name: 'netty-all', version: '4.1.77.Final'
-    implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.16.1'
-    implementation group: 'org.lz4', name: 'lz4-java', version: '1.8.0'
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    api("com.google.guava:guava:31.0-jre")
+    api("com.google.code.gson:gson:2.8.6")
+    api("net.sf.trove4j:trove4j:3.0.3")
+    implementation("io.netty:netty-all:4.1.77.Final")
+    implementation("com.google.protobuf:protobuf-java:3.22.0")
+    implementation("org.lz4:lz4-java:1.8.0")
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
     // Javax for protobuf due to @Generated - needed on Java 9 or newer Javas
     // TODO: Can likely replace with protobuf Gradle task and omit the generated source files instead
-    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     //Utilities
-    api group: 'org.codehaus.plexus', name: 'plexus-utils', version: '3.0.16'
+    api("org.codehaus.plexus:plexus-utils:3.0.16")
 
     // Java magic
-    implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
-    implementation "org.terasology:reflections:0.9.12-MB"
-    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
+    implementation("net.java.dev.jna:jna-platform:5.6.0")
+    implementation("org.terasology:reflections:0.9.12-MB")
+    implementation("com.esotericsoftware:reflectasm:1.11.9")
 
     // Graphics, 3D, UI, etc
-    api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
-    api "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-assimp"
-    api "org.lwjgl:lwjgl-glfw"
-    implementation "org.lwjgl:lwjgl-openal"
-    api "org.lwjgl:lwjgl-opengl"
-    implementation "org.lwjgl:lwjgl-stb"
+    api(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
+    api("org.lwjgl:lwjgl")
+    implementation("org.lwjgl:lwjgl-assimp")
+    api("org.lwjgl:lwjgl-glfw")
+    implementation("org.lwjgl:lwjgl-openal")
+    api("org.lwjgl:lwjgl-opengl")
+    implementation("org.lwjgl:lwjgl-stb")
 
-    implementation 'io.micrometer:micrometer-core:1.9.12'
-    implementation 'io.micrometer:micrometer-registry-jmx:1.9.12'
-    api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.18'
-    api group: 'io.projectreactor.addons', name: 'reactor-extra', version: '3.4.8'
-    implementation 'io.projectreactor.netty:reactor-netty-core:1.0.19'
+    implementation("io.micrometer:micrometer-core:1.9.12")
+    implementation("io.micrometer:micrometer-registry-jmx:1.9.12")
+    api("io.projectreactor:reactor-core:3.4.18")
+    api("io.projectreactor.addons:reactor-extra:3.4.8")
+    implementation("io.projectreactor.netty:reactor-netty-core:1.0.19")
 
-    api group: 'org.joml', name: 'joml', version: '1.10.0'
-    api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '0.1.0'
+    api("org.joml:joml:1.10.0")
+    api("org.terasology.joml-ext:joml-geometry:0.1.0")
 
-    implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
-    api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
-    implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
+    implementation("org.abego.treelayout:org.abego.treelayout.core:1.0.3")
+    api("com.miglayout:miglayout-core:5.0")
+    implementation("de.matthiasmann.twl:PNGDecoder:1111")
 
     // Logging
-    implementation('org.slf4j:slf4j-api:1.7.36') {
-        because('a backend-independent Logger')
+    implementation("org.slf4j:slf4j-api:2.0.11") {
+        because("a backend-independent Logger")
     }
-    implementation("ch.qos.logback:logback-classic:1.2.12") {
+    implementation("ch.qos.logback:logback-classic:1.4.14") {
         because("telemetry implementation uses logback to send to logstash " +
                 "and we bundle org.terasology.logback for the regex filter")
     }
 
     // audio
-    implementation group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
+    implementation("com.projectdarkstar.ext.jorbis:jorbis:0.0.17")
 
-    // Small-time 3rd party libs we've stored in our Artifactory for access
-    implementation group: 'ec.util', name: 'MersenneTwister', version: '20'
+    // Small-time 3rd party libs we"ve stored in our Artifactory for access
+    implementation("ec.util:MersenneTwister:20")
 
     // telemetry
-    implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.12.1') {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    implementation("com.snowplowanalytics:snowplow-java-tracker:0.12.1") {
+        exclude group: "org.slf4j", module: "slf4j-simple"
     }
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
+    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
     // Our developed libs
-    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.2.0-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.2.0-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-entity-system', version: '7.2.0-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.2.0-SNAPSHOT'
-    api "com.github.zafarkhaja:java-semver:0.10.0"  // ASAP: Remove after https://github.com/MovingBlocks/gestalt/pull/110
+    api("org.terasology.gestalt:gestalt-asset-core:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-module:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-entity-system:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-util:7.2.1-SNAPSHOT")
 
-    api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
-    api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
-    api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
-    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
-    api group: 'org.terasology.nui', name: 'nui', version: '3.0.0'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0'
-    api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0'
+    api("org.terasology:TeraMath:1.5.0")
+    api("org.terasology:splash-screen:1.1.1")
+    api("org.terasology.jnlua:JNLua:0.1.0-SNAPSHOT")
+    api("org.terasology.jnbullet:JNBullet:1.0.2")
+    api("org.terasology.nui:nui:3.0.0")
+    api("org.terasology.nui:nui-reflect:3.0.0")
+    api("org.terasology.nui:nui-gestalt7:3.0.0")
 
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
-    api fileTree(dir: 'libs', include: '*.jar')
+    api fileTree(dir: "libs", include: "*.jar")
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
-    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '5.0.0'
+    implementation("org.terasology.crashreporter:cr-terasology:5.0.0")
 
     api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.17.0'
+        artifact = "com.google.protobuf:protoc:3.22.0"
     }
     plugins {
     }
@@ -187,30 +183,31 @@ jar {
 
 sourceSets {
     jmh {
-        java.srcDirs = ['src/jmh/java']
-        resources.srcDirs = ['src/jmh/resources']
+        java.srcDirs = ["src/jmh/java"]
+        resources.srcDirs = ["src/jmh/resources"]
         compileClasspath += sourceSets.main.runtimeClasspath
         java.destinationDirectory = new File("$buildDir/jmhClasses")
     }
 }
 
-task jmh(type: JavaExec, dependsOn: jmhClasses) {
-    mainClass = 'org.openjdk.jmh.Main'
+tasks.register("jmh", JavaExec) {
+    dependsOn jmhClasses
+    mainClass = "org.openjdk.jmh.Main"
     classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
 }
 
 dependencies {
-    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
-    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
-    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
+    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+    jmhImplementation("org.openjdk.jmh:jmh-core:1.27")
+    jmhImplementation("org.openjdk.jmh:jmh-generator-annprocess:1.27")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// First read the internal version out of the engine's module.txt
-def moduleFile = file('src/main/resources/org/terasology/engine/module.txt')
+// First read the internal version out of the engine"s module.txt
+def moduleFile = file("src/main/resources/org/terasology/engine/module.txt")
 
 if (!moduleFile.exists()) {
     println "Failed to find module.txt for engine"
@@ -225,7 +222,7 @@ def moduleConfig = slurper.parseText(moduleFile.text)
 version = moduleConfig.version
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = 'org.terasology.engine'
+group = "org.terasology.engine"
 
 println "Version for $project.name loaded as $version for group $group"
 
@@ -264,7 +261,7 @@ tasks.named("processResources", Copy) {
 }
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
-task copyResourcesToClasses(type: Copy) {
+tasks.register("copyResourcesToClasses", Copy) {
     from processResources
     into sourceSets.main.output.classesDirs.first()
 
@@ -282,8 +279,8 @@ idea {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = file('build/classes')
-        testOutputDir = file('build/testClasses')
+        outputDir = file("build/classes")
+        testOutputDir = file("build/testClasses")
         downloadSources = true
     }
 }

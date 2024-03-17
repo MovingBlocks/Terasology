@@ -45,7 +45,6 @@
 
 ## Start Contributing
 
-* Take the [Gooey Tour](https://terasology.org/AdventureSite/) to find resources for the contribution area you're interested in
 * Look through the code, change small things and see how they affect your game
 * Find some ["Good First Issues"](https://github.com/MovingBlocks/Terasology/labels/Good%20First%20Issue) to work on
 * Code and test your changes locally in-game

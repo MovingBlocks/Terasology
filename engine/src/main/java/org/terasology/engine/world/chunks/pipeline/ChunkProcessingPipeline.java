@@ -115,7 +115,7 @@ public class ChunkProcessingPipeline {
                     chunkProcessingInfo.getChunkTaskProvider() == null
                             ? "Generation or Loading"
                             : chunkProcessingInfo.getChunkTaskProvider().getName();
-            logger.error("ChunkTask at position {} and stage [{}] catch error: {}", chunkProcessingInfo.getPosition(), stageName, e.getMessage());
+            logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProcessingInfo.getPosition(), stageName, e);
             chunkProcessingInfo.getExternalFuture().setException(e);
         } catch (CancellationException ignored) {
         }
@@ -178,6 +178,7 @@ public class ChunkProcessingPipeline {
         return thread;
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void rejectQueueHandler(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
         logger.error("Cannot run {}  because queue is full", runnable);
     }
