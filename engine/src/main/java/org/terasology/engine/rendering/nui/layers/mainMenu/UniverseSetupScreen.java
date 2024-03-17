@@ -11,6 +11,7 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.game.GameManifest;
@@ -35,6 +36,7 @@ import org.terasology.engine.world.block.shapes.BlockShapeImpl;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.block.tiles.BlockTile;
 import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
@@ -46,6 +48,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
@@ -58,6 +61,11 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.OneOfProviderFactory;
+import org.terasology.nui.properties.Property;
+import org.terasology.nui.properties.PropertyOrdering;
+import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UIImage;
@@ -65,12 +73,15 @@ import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -108,75 +119,101 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     private UIImage previewImage;
     private long previewUpdateRequiredSince = Long.MAX_VALUE;
 
+    /**
+     * Initialise and populate screen and add event handlers to control elements.
+     * Screen elements (x - control elements):
+     * - (x) World Generator Dropdown
+     * - (x) Seed Display & Edit Field
+     * - (x) Seed Re-Roll Button
+     * - Preview Display
+     * - (x) Zoom Slider
+     * - multiple text fields
+     * - (x) return button
+     * - (x) exit button
+     * - (x) start button
+     */
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
+        /*
+         * initialize world generator dropdown:
+         * - bind options read-only
+         * - set visible options & rendering
+         * - bind selection read & write
+         */
         final UIDropdownScrollable<WorldGeneratorInfo> worldGenerators = find("worldGenerators", UIDropdownScrollable.class);
-        if (worldGenerators != null) {
-            worldGenerators.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
-                @Override
-                public List<WorldGeneratorInfo> get() {
-                    // grab all the module names and their dependencies
-                    // This grabs modules from `config.getDefaultModSelection()` which is updated in AdvancedGameSetupScreen
-                    final Set<Name> enabledModuleNames = new HashSet<>(getAllEnabledModuleNames());
-                    final List<WorldGeneratorInfo> result = Lists.newArrayList();
-                    for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
-                        //TODO: There should not be a reference from the engine to some module.
-                        //      The engine must be agnostic to what modules may do.
-                        if (enabledModuleNames.contains(option.getUri().getModuleName())
-                                && !option.getUri().toString().equals("CoreWorlds:heightMap")) {
-                            result.add(option);
-                        }
-                    }
-
-                    return result;
-                }
-            });
-            worldGenerators.setVisibleOptions(worldGenerators.getOptions().size());
-            worldGenerators.bindSelection(new Binding<WorldGeneratorInfo>() {
-                @Override
-                public WorldGeneratorInfo get() {
-                    // get the default generator from the config. This is likely to have a user triggered selection.
-                    WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
-                    if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
-                        set(info);
-                        return info;
-                    }
-
-                    // just use the first available generator
-                    for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
-                        if (getAllEnabledModuleNames().contains(worldGenInfo.getUri().getModuleName())) {
-                            set(worldGenInfo);
-                            return worldGenInfo;
-                        }
-                    }
-
-                    return null;
-                }
-
-                @Override
-                public void set(WorldGeneratorInfo worldGeneratorInfo) {
-                    if (worldGeneratorInfo != null) {
-                        if (context.get(UniverseWrapper.class).getWorldGenerator() == null
-                                || !worldGeneratorInfo.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
-                            config.getWorldGeneration().setDefaultGenerator(worldGeneratorInfo.getUri());
-                            addNewWorld(worldGeneratorInfo);
-                        }
+        worldGenerators.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
+            @Override
+            public List<WorldGeneratorInfo> get() {
+                // grab all the module names and their dependencies
+                // This grabs modules from `config.getDefaultModSelection()` which is updated in AdvancedGameSetupScreen
+                final Set<Name> enabledModuleNames = new HashSet<>(getAllEnabledModuleNames());
+                final List<WorldGeneratorInfo> result = Lists.newArrayList();
+                for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
+                    //TODO: There should not be a reference from the engine to some module.
+                    //      The engine must be agnostic to what modules may do.
+                    if (enabledModuleNames.contains(option.getUri().getModuleName())
+                            && !option.getUri().toString().equals("CoreWorlds:heightMap")) {
+                        result.add(option);
                     }
                 }
-            });
-            worldGenerators.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
-                @Override
-                public String getString(WorldGeneratorInfo value) {
-                    if (value != null) {
-                        return value.getDisplayName();
-                    }
-                    return "";
-                }
-            });
-        }
 
+                return result;
+            }
+        });
+        worldGenerators.setVisibleOptions(worldGenerators.getOptions().size());
+        worldGenerators.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
+            @Override
+            public String getString(WorldGeneratorInfo value) {
+                if (value != null) {
+                    return value.getDisplayName();
+                }
+                return "";
+            }
+        });
+        worldGenerators.bindSelection(new Binding<WorldGeneratorInfo>() {
+            @Override
+            public WorldGeneratorInfo get() {
+                // get the default generator from the config. This is likely to have a user triggered selection.
+                WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
+                if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
+                    set(info);
+                    return info;
+                }
+
+                // just use the first available generator
+                for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
+                    if (getAllEnabledModuleNames().contains(worldGenInfo.getUri().getModuleName())) {
+                        set(worldGenInfo);
+                        return worldGenInfo;
+                    }
+                }
+
+                //logger.error("{} world generators registered but non compatible with enabled modules", worldGeneratorManager.getWorldGenerators().size());
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("No selectable world generators!",
+                        "Please select at least one module that supports a registered world generator!");
+
+                return null;
+            }
+
+            @Override
+            public void set(WorldGeneratorInfo worldGeneratorInfo) {
+                if (worldGeneratorInfo != null) {
+                    if (context.get(UniverseWrapper.class).getWorldGenerator() == null
+                            || !worldGeneratorInfo.getUri().equals(context.get(UniverseWrapper.class).getWorldGenerator().getUri())) {
+                        config.getWorldGeneration().setDefaultGenerator(worldGeneratorInfo.getUri());
+                        addNewWorld(worldGeneratorInfo);
+                    }
+                }
+            }
+        });
+
+        /*
+         * initialize seed field:
+         * - bind text read - get seed from universe wrapper from context
+         * - bind text write - call "setSeed(value)"
+         */
         final UIText seedField = find("seed", UIText.class);
         seedField.bindText(new Binding<String>() {
             @Override
@@ -190,37 +227,34 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             }
         });
 
+        /*
+         * initialize zoom slider
+         * TODO: use binding?
+         */
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
             zoomSlider.setValue(2f);
             zoomSlider.setUiSliderOnChangeTriggeredListener(this);
         }
 
+        /*
+         * initialize seed re-roll button
+         */
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
-            if (context.get(UniverseWrapper.class).getWorldGenerator() != null) {
-                setSeed(createRandomSeed());
-            } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("No world generator selected!", "Please select a world generator first!");
-            }
+            setSeed(createRandomSeed());
         });
 
-        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-        WidgetUtil.trySubscribe(this, "config", button -> {
-            if (context.get(UniverseWrapper.class).getWorldGenerator() != null) {
-                worldSetupScreen.setWorld(context, context.get(UniverseWrapper.class));
-                triggerForwardAnimation(worldSetupScreen);
-            } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("No world generator selected!", "Please select a world generator first!");
-            }
-        });
-
+        /*
+         * initialize close button
+         */
         WidgetUtil.trySubscribe(this, "close", button -> {
             CoreRegistry.put(UniverseWrapper.class, context.get(UniverseWrapper.class));
             triggerBackAnimation();
         });
 
+        /*
+         * initialize play button
+         */
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (context.get(UniverseWrapper.class).getWorldGenerator() == null) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
@@ -238,6 +272,9 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             }
         });
 
+        /*
+         * initialize main menu button
+         */
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
             getManager().pushScreen("engine:mainMenuScreen");
         });
@@ -246,6 +283,11 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     @Override
     public void onScreenOpened() {
         super.onScreenOpened();
+
+        if (worldGeneratorManager.getWorldGenerators().isEmpty()) {
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("No world generators registered!",
+                    "Please select at least one module that provides a world generator!");
+        }
 
         if (texture != null) {
             updatePreview();
@@ -299,10 +341,13 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             WorldGenerator worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGeneratorInfo.getUri(), context, environment);
             worldGenerator.setWorldSeed(universeWrapper.getSeed());
             universeWrapper.setWorldGenerator(worldGenerator);
+            context.put(UniverseWrapper.class, universeWrapper);
         } catch (UnresolvedWorldGeneratorException e) {
             //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
             e.printStackTrace();
         }
+
+        configureProperties();
 
         texture = generateTexture();
         previewImage = find("preview", UIImage.class);
@@ -315,7 +360,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             previewGen = new FacetLayerPreview(environment, universeWrapper.getWorldGenerator());
         }
 
-        updatePreview();
+        previewUpdateRequiredSince = time.getRealTimeInMs();
     }
 
     /**
@@ -424,6 +469,136 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     public void onSliderValueChanged(float val) {
         if (context.get(UniverseWrapper.class).getWorldGenerator() != null) {
             previewUpdateRequiredSince = time.getRealTimeInMs();
+        }
+    }
+
+    /**
+     * Assigns a {@link WorldConfigurator} for every world if it doesn't exist. Using
+     * the WorldConfigurator it gets the properties associated with that world.
+     */
+    private void configureProperties() {
+
+        PropertyLayout propLayout = find("properties", PropertyLayout.class);
+        propLayout.setOrdering(PropertyOrdering.byLabel());
+        propLayout.clear();
+        WorldConfigurator worldConfig;
+        UniverseWrapper universe = context.get(UniverseWrapper.class);
+        WorldGenerator worldGenerator = universe.getWorldGenerator();
+        if (universe.getWorldConfigurator() != null) {
+            worldConfig = universe.getWorldConfigurator();
+        } else {
+            worldConfig = worldGenerator.getConfigurator();
+            universe.setWorldConfigurator(worldConfig);
+        }
+
+        Map<String, Component> params = worldConfig.getProperties();
+
+        for (String key : params.keySet()) {
+            Class<? extends Component> clazz = params.get(key).getClass();
+            Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
+            if (comp != null) {
+                // use the data from the config instead of defaults
+                worldConfig.setProperty(key, comp);
+            }
+        }
+
+        ComponentLibrary compLib = context.get(ComponentLibrary.class);
+
+        for (String label : params.keySet()) {
+
+            PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), context.get(OneOfProviderFactory.class)) {
+                @Override
+                protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
+                    return new WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);
+                }
+
+                @Override
+                protected Binding<Float> createFloatBinding(Object target, FieldMetadata<Object, ?> fieldMetadata) {
+                    return new WorldConfigNumberBinding(worldConfig, label, compLib, fieldMetadata);
+                }
+            };
+
+            Component target = params.get(label);
+            List<Property<?, ?>> properties = provider.createProperties(target);
+            propLayout.addProperties(label, properties);
+        }
+    }
+
+    /**
+     * Updates a world configurator through setProperty() whenever Binding#set() is called.
+     */
+    private static class WorldConfigBinding<T> implements Binding<T> {
+        private final String label;
+        private final WorldConfigurator worldConfig;
+        private final FieldMetadata<Object, T> fieldMetadata;
+        private final ComponentLibrary compLib;
+
+        protected WorldConfigBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, T> fieldMetadata) {
+            this.worldConfig = config;
+            this.label = label;
+            this.compLib = compLib;
+            this.fieldMetadata = fieldMetadata;
+        }
+
+        @Override
+        public T get() {
+            Component comp = worldConfig.getProperties().get(label);
+            return fieldMetadata.getValue(comp);
+        }
+
+        @Override
+        public void set(T value) {
+            T old = get();
+
+            if (!Objects.equals(old, value)) {
+                cloneAndSet(label, value);
+            }
+        }
+
+        private void cloneAndSet(String group, Object value) {
+            Component comp = worldConfig.getProperties().get(group);
+            Component clone = compLib.copy(comp);
+            fieldMetadata.setValue(clone, value);
+
+            // notify the world generator about the new component
+            worldConfig.setProperty(label, clone);
+        }
+    }
+
+    private static class WorldConfigNumberBinding implements Binding<Float> {
+
+        private WorldConfigBinding<? extends Number> binding;
+
+        @SuppressWarnings("unchecked")
+        protected WorldConfigNumberBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, ?> field) {
+            Class<?> type = field.getType();
+            if (type == Integer.TYPE || type == Integer.class) {
+                this.binding = new WorldConfigBinding<>(config, label, compLib, (FieldMetadata<Object, Integer>) field);
+            } else if (type == Float.TYPE || type == Float.class) {
+                this.binding = new WorldConfigBinding<>(config, label, compLib, (FieldMetadata<Object, Float>) field);
+            }
+        }
+
+        @Override
+        public Float get() {
+            Number val = binding.get();
+            if (val instanceof Float) {
+                // use boxed instance directly
+                return (Float) val;
+            }
+            // create a boxed instance otherwise
+            return val.floatValue();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void set(Float value) {
+            Class<? extends Number> type = binding.fieldMetadata.getType();
+            if (type == Integer.TYPE || type == Integer.class) {
+                ((Binding<Integer>) binding).set(value.intValue());
+            } else if (type == Float.TYPE || type == Float.class) {
+                ((Binding<Float>) binding).set(value);
+            }
         }
     }
 }
