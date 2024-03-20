@@ -278,7 +278,7 @@ public class GLSLShader extends Shader {
             disposalAction.vertexPrograms.put(featureHash, vertShaderId);
         }
 
-        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
+        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn()); //NOPMD
     }
 
     private String assembleShader(int type, Set<ShaderProgramFeature> features) {
@@ -364,7 +364,7 @@ public class GLSLShader extends Shader {
     protected void doReload(ShaderData data) {
         try {
             GameThread.synch(() -> {
-                logger.debug("Recompiling shader {}.", getUrn());
+                logger.debug("Recompiling shader {}.", getUrn()); //NOPMD
 
                 disposalAction.disposeData();
                 shaderProgramBase = data;
@@ -376,11 +376,11 @@ public class GLSLShader extends Shader {
                 try {
                     registerAllShaderPermutations();
                 } catch (RuntimeException e) {
-                    logger.warn("{}", e.getMessage());
+                    logger.warn("{}", e.getMessage()); //NOPMD
                 }
             });
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 

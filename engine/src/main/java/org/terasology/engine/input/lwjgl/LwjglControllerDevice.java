@@ -107,20 +107,20 @@ public class LwjglControllerDevice implements ControllerDevice {
     private void handleJoystickConnect(int jid) {
         if (GLFW.glfwJoystickIsGamepad(jid)) {
             gamepadIds.add(jid);
-            logger.info("JoyStick connected: {}", GLFW.glfwGetJoystickName(jid));
+            logger.atInfo().addArgument(() -> GLFW.glfwGetJoystickName(jid)).log("JoyStick connected: {}");
         } else {
             joystickIds.add(jid);
-            logger.info("Gamepad connected: {}", GLFW.glfwGetGamepadName(jid));
+            logger.atInfo().addArgument(() -> GLFW.glfwGetGamepadName(jid)).log("Gamepad connected: {}");
         }
     }
 
     private void handleJoystickDisconnect(int jid) {
         if (GLFW.glfwJoystickIsGamepad(jid)) {
             gamepadIds.remove(jid);
-            logger.info("JoyStick disconnected: {}", GLFW.glfwGetJoystickName(jid));
+            logger.atInfo().addArgument(() -> GLFW.glfwGetJoystickName(jid)).log("JoyStick disconnected: {}");
         } else {
             joystickIds.remove(jid);
-            logger.info("Gamepad disconnected: {}", GLFW.glfwGetGamepadName(jid));
+            logger.atInfo().addArgument(() -> GLFW.glfwGetGamepadName(jid)).log("Gamepad disconnected: {}");
         }
     }
 
@@ -186,7 +186,7 @@ public class LwjglControllerDevice implements ControllerDevice {
                     buttonIndex++;
                 }
             } else {
-                logger.error("Cannot get states for {}", GLFW.glfwGetGamepadName(jid));
+                logger.atError().addArgument(() -> GLFW.glfwGetGamepadName(jid)).log("Cannot get states for {}");
             }
 
         }

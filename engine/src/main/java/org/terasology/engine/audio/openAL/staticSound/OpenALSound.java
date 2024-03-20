@@ -104,7 +104,7 @@ public final class OpenALSound extends StaticSound {
                 length = (float) size / channels / (bits / 8) / frequency;
             });
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 

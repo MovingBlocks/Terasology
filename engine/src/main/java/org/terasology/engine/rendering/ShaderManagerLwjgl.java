@@ -49,11 +49,11 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     private void logCapabilities() {
         logger.info("Loading Terasology shader manager...");
-        logger.info("LWJGL: {} / {}", Version.getVersion(), Platform.get().getName());
-        logger.info("GL_VENDOR: {}", GL11.glGetString(GL11.GL_VENDOR));
-        logger.info("GL_RENDERER: {}", GL11.glGetString(GL11.GL_RENDERER));
-        logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
-        logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        logger.atInfo().addArgument(() -> Version.getVersion()).addArgument(() -> Platform.get().getName()).log("LWJGL: {} / {}");
+        logger.atInfo().addArgument(() -> GL11.glGetString(GL11.GL_VENDOR)).log("GL_VENDOR: {}");
+        logger.atInfo().addArgument(() -> GL11.glGetString(GL11.GL_RENDERER)).log("GL_RENDERER: {}");
+        logger.atInfo().addArgument(() -> GL11.glGetString(GL11.GL_VERSION)).log("GL_VERSION: {}");
+        logger.atInfo().addArgument(() -> GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)).log("SHADING_LANGUAGE VERSION: {}");
 
         int[] extension = new int[1];
         GL30.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, extension);

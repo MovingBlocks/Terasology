@@ -253,7 +253,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
-        logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds)); //NOPMD
     }
 
     private void verifyInitialisation() {
@@ -265,6 +265,7 @@ public class TerasologyEngine implements GameEngine {
     /**
      * Logs software, environment and hardware information.
      */
+    @SuppressWarnings("PMD.GuardLogStatement")
     private void logEnvironmentInfo() {
         logger.info("{}", TerasologyVersion.getInstance());
         logger.info("Home path: {}", PathManager.getInstance().getHomePath());
@@ -543,7 +544,7 @@ public class TerasologyEngine implements GameEngine {
             try {
                 subsystem.preShutdown();
             } catch (RuntimeException e) {
-                logger.error("Error preparing to shutdown {} subsystem", subsystem.getName(), e);
+                logger.error("Error preparing to shutdown {} subsystem", subsystem.getName(), e); //NOPMD
             }
         }
 
@@ -553,7 +554,7 @@ public class TerasologyEngine implements GameEngine {
             try {
                 subsystem.shutdown();
             } catch (RuntimeException e) {
-                logger.error("Error shutting down {} subsystem", subsystem.getName(), e);
+                logger.error("Error shutting down {} subsystem", subsystem.getName(), e); //NOPMD
             }
         }
     }

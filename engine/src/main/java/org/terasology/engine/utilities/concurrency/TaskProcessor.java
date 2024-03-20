@@ -42,7 +42,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
                 logger.error("Thread interrupted", e);
             } catch (RuntimeException e) {
                 ThreadMonitor.addError(e);
-                logger.error("Error in thread {}", Thread.currentThread().getName(), e);
+                logger.error("Error in thread {}", Thread.currentThread().getName(), e); //NOPMD
             } catch (Error e) {
                 GameThread.asynch(() -> {
                     throw e;  // re-throw on game thread to terminate the entire application

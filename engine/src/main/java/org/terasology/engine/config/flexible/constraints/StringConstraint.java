@@ -49,6 +49,7 @@ public class StringConstraint implements SettingConstraint<String> {
     }
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void warnUnsatisfiedBy(String value) {
         logger.warn("String [{}] does not match the conditions: {}", value,
                 predicates.stream()

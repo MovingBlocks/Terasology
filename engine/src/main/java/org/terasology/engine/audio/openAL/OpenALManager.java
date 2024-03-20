@@ -52,6 +52,7 @@ public class OpenALManager implements AudioManager {
 
     private final Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
+    @SuppressWarnings("PMD.GuardLogStatement")
     public OpenALManager(AudioConfig config) throws OpenALException {
         logger.info("Initializing OpenAL audio manager");
 
@@ -65,7 +66,6 @@ public class OpenALManager implements AudioManager {
         AL.createCapabilities(alcCapabilities);
 
         logger.info("OpenAL {} initialized!", AL10.alGetString(AL10.AL_VERSION));
-
         logger.info("Using OpenAL: {} by {}", AL10.alGetString(AL10.AL_RENDERER), AL10.alGetString(AL10.AL_VENDOR));
         logger.info("Using device: {}", ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
         logger.info("Available AL extensions: {}", AL10.alGetString(AL10.AL_EXTENSIONS));
@@ -260,7 +260,7 @@ public class OpenALManager implements AudioManager {
                 try {
                     entry.getValue().onAudioEnd(interrupted);
                 } catch (Exception e) {
-                    logger.error("onAudioEnd() notification failed for {}", entry.getValue(), e);
+                    logger.error("onAudioEnd() notification failed for {}", entry.getValue(), e); //NOPMD
                 }
             }
         }

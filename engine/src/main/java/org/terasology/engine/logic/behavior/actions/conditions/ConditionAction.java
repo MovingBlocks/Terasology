@@ -98,7 +98,7 @@ public class ConditionAction extends BaseAction {
                                 secondValue = "";
                                 break;
                             default:
-                                logger.error("Unsupported guard value type: {}", tokens[0]);
+                                logger.error("Unsupported guard value type: {}", tokens[0]); //NOPMD
                                 secondValue = "";
 
                         }
@@ -115,7 +115,7 @@ public class ConditionAction extends BaseAction {
                                     passing = (Boolean) fieldValue != Boolean.parseBoolean(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for boolean values: {}", tokens[2]);
+                                    logger.error("Unsupported operation for boolean values: {}", tokens[2]); //NOPMD
 
                             }
 
@@ -142,7 +142,7 @@ public class ConditionAction extends BaseAction {
                                     passing = ((Number) fieldValue).doubleValue() < Double.parseDouble(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for numeric values: {}", tokens[2]);
+                                    logger.error("Unsupported operation for numeric values: {}", tokens[2]); //NOPMD
 
                             }
 
@@ -157,7 +157,7 @@ public class ConditionAction extends BaseAction {
                                     passing = !fieldValue.equals(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for strings: {}", tokens[2]);
+                                    logger.error("Unsupported operation for strings: {}", tokens[2]); //NOPMD
 
                             }
                         } else {
@@ -190,7 +190,7 @@ public class ConditionAction extends BaseAction {
                                         break;
 
                                     default:
-                                        logger.error("Unknown field type or operation: {} {}", fieldValue.getClass(), tokens[2]);
+                                        logger.error("Unknown field type or operation: {} {}", fieldValue.getClass(), tokens[2]); //NOPMD
                                 }
                             }
                         }

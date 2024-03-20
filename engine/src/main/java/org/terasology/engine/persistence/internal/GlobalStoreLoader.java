@@ -93,7 +93,7 @@ final class GlobalStoreLoader {
             try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                 return createPrefab(prefabData);
             } catch (Exception e) {
-                logger.error("Failed to load prefab {}", prefabData.getParentName(), e);
+                logger.error("Failed to load prefab {}", prefabData.getParentName(), e); //NOPMD
                 return null;
             }
         }
@@ -108,11 +108,12 @@ final class GlobalStoreLoader {
     private void loadComponentMapping(EntityData.GlobalStore globalStore) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < globalStore.getComponentClassCount(); ++index) {
-            ComponentMetadata<?> componentMetadata = componentLibrary.resolve(globalStore.getComponentClass(index));
+            String componentClass = globalStore.getComponentClass(index);
+            ComponentMetadata<?> componentMetadata = componentLibrary.resolve(componentClass);
             if (componentMetadata != null) {
                 componentIdTable.put(componentMetadata.getType(), index);
             } else {
-                logger.warn("Unable to resolve component '{}'", globalStore.getComponentClass(index));
+                logger.warn("Unable to resolve component '{}'", componentClass);
             }
         }
 

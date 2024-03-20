@@ -363,7 +363,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     void send(NetData.NetMessage data) {
-        logger.trace("Sending packet with size {}", data.getSerializedSize());
+        logger.atTrace().addArgument(() -> data.getSerializedSize()).log("Sending packet with size {}");
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.writeAndFlush(data);
@@ -507,7 +507,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
                 EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                    logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                    logger.atWarn().addArgument(() -> metadata).addArgument(() -> getName()).
+                            log("Received non-server event '{}' from client '{}'");
                     continue;
                 }
                 if (!lagCompensated && metadata.isLagCompensated()) {
@@ -524,7 +525,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                     if (Objects.equal(networkSystem.getOwner(target), this)) {
                         target.send(event);
                     } else {
-                        logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
+                        logger.atWarn().addArgument(() -> event).addArgument(target).addArgument(() -> this).
+                                log("Received event {} for non-owned entity {} from {}");
                     }
                 }
             } catch (DeserializationException e) {

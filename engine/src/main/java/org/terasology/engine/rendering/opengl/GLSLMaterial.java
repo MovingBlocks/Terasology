@@ -156,7 +156,7 @@ public class GLSLMaterial extends BaseMaterial {
                 rebindVariables(data);
             });
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 
@@ -228,7 +228,7 @@ public class GLSLMaterial extends BaseMaterial {
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
             activeFeaturesChanged = true;
         } else {
-            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getUrn(), shader.getUrn());
+            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getUrn(), shader.getUrn()); //NOPMD
         }
     }
 
