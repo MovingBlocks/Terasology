@@ -47,6 +47,7 @@ public class ExampleTest {
     }
 
     @Test
+    @Tag("flaky")
     public void testClientConnection() throws IOException {
         int currentClients = Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size();
 

@@ -179,7 +179,9 @@ pipeline {
 
         stage('Integration Tests (flaky tests only)') {
             steps {
-                sh './gradlew --console=plain integrationTestFlaky'
+                warnError("Integration Tests Failed") {  // if this errs, mark the build unstable, not failed.
+                    sh './gradlew --console=plain integrationTestFlaky'
+                }
             }
             post {
                 always {

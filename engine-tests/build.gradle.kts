@@ -3,7 +3,7 @@
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 // while locally all tests should be run, when building via github, tests can be run separated in the github pipeline
-// file. for integrationtests a tag "flaky" was instroduced to mark tests which are not always successful on github.
+// file. for integrationtests a tag "flaky" was introduced to mark tests which frequently fail pipelines
 //      gradle test
 //      gradle --consoleplan unitTest
 //      gradle --console=plain integrationTest
@@ -120,7 +120,7 @@ tasks.register<Test>("unitTest") {
 tasks.register<Test>("integrationTest") {
     dependsOn(tasks.getByPath(":extractNatives"))
     group = "Verification"
-    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest', no tests tagged 'flaky'."
+    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest', exclude tests tagged 'flaky'."
 
     useJUnitPlatform {
         excludeTags("flaky")
@@ -132,7 +132,7 @@ tasks.register<Test>("integrationTest") {
 tasks.register<Test>("integrationTestFlaky") {
     dependsOn(tasks.getByPath(":extractNatives"))
     group = "Verification"
-    description = "Runs flaky integration tests tagged with 'MteTest', 'TteTest' AND tag 'flaky'."
+    description = "Runs integration tests tagged with 'flaky' and either 'MteTest' or 'TteTest'."
 
     useJUnitPlatform {
         includeTags("MteTest & flaky", "TteTest & flaky")
