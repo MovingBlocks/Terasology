@@ -21,6 +21,8 @@ The `TypeHandlerLibrary` caches type handlers for various types. Since a single 
 
 The `@RegisterTypeHandler` and the `@RegisterTypeHandlerFactory` annotations can also be used to register type handlers and type handler factories to the `TypeHandlerLibrary` in the `Context`.
 
+[Read more about the TypeHandlerLibrary](https://github.com/MovingBlocks/Terasology/tree/develop/subsystems/TypeHandlerLibrary)
+
 ### Examples
 
 #### `TypeHandler` without a `TypeHandlerFactory`

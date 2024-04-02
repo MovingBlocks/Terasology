@@ -55,7 +55,7 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }
 
-    static class TestObject {
+    public static class TestObject {
         public BlockArea b1;
         public BlockAreac b2;
     }

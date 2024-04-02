@@ -56,6 +56,16 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     }
 
     @Test
+    @DisplayName("Test that type handler is correctly created via type handler factory")
+    public void testMixedVisibilityTypeClassTypeHandlerCreationViaFactory() {
+        Optional<TypeHandler<PublicPrivateMixedClass<Integer, List<Integer>>>> typeHandler =
+                typeHandlerFactory.create(new TypeInfo<PublicPrivateMixedClass<Integer, List<Integer>>>() { }, context);
+
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
+    }
+
+    @Test
     @DisplayName("Test implicit type handler loading for plain old java objects (pojo)")
     public void testPojo() {
         typeHandlerFactory.create(new TypeInfo<SingleTypeClass<Integer>>() { }, context);
@@ -92,6 +102,18 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     }
 
     @Test
+    @DisplayName("Test implicit type handler loading for multiple objects of same type but differing visibility")
+    public void testMixedVisibilityMultipleObjectsOfSameType() {
+        typeHandlerFactory.create(new TypeInfo<PublicPrivateMixedClass<Integer, Integer>>() { }, context);
+
+        // Verify that the Integer TypeHandler loading was called on the TypeHandlerLibrary
+        verify(typeHandlerLibrary, times(1)).getTypeHandler((Type) any());
+        verify(typeHandlerLibrary, times(1)).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeHandlerLibrary, never()).getTypeHandler((Class<Object>) any());
+        verify(typeHandlerLibrary, never()).getTypeHandler((TypeInfo<Object>) any());
+    }
+
+    @Test
     @DisplayName("Test implicit type handler loading for multiple objects of different type")
     public void testMultipleObjectsOfDifferentType() {
         typeHandlerFactory.create(new TypeInfo<MultiTypeClass<Integer, List<Integer>>>() { }, context);
@@ -105,11 +127,16 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     }
 
     private static class SingleTypeClass<T> {
-        private T t;
+        public T t;
     }
 
     private static class MultiTypeClass<T, U> {
-        private T t;
+        public T t;
+        public U u;
+    }
+
+    private static class PublicPrivateMixedClass<T, U> {
+        public T t;
         private U u;
     }
 
@@ -119,7 +146,7 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
                     " creation based on member types of input class TypeInfo. ")
     @SuppressWarnings("PMD.UnusedPrivateField")
     private static class SomeClass<T> {
-        private T t;
-        private List<T> list;
+        public T t;
+        public List<T> list;
     }
 }
