@@ -158,7 +158,7 @@ pipeline {
             }
         }
 
-        stage('Integration Tests') {
+        stage('Integration Tests (without flaky tests)') {
             steps {
                 sh './gradlew --console=plain integrationTest'
             }
@@ -173,6 +173,25 @@ pipeline {
                     // Jenkins truncates large test outputs, so archive it as well.
                     tar file: 'build/integrationTest-results.tgz', archive: true, compress: true, overwrite: true,
                         glob: '**/build/test-results/integrationTest/*.xml'
+                }
+            }
+        }
+
+        stage('Integration Tests (flaky tests only)') {
+            steps {
+                sh './gradlew --console=plain integrationTestFlaky'
+            }
+            post {
+                always {
+                    // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*`
+                    // and XML reports to `build/test-results/*`.
+                    // We need to upload the XML reports for visualization in Jenkins.
+                    //
+                    // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
+                    junit testResults: '**/build/test-results/integrationTestFlaky/*.xml', allowEmptyResults: true
+                    // Jenkins truncates large test outputs, so archive it as well.
+                    tar file: 'build/integrationTestFlaky-results.tgz', archive: true, compress: true, overwrite: true,
+                        glob: '**/build/test-results/integrationTestFlaky/*.xml'
                 }
             }
         }
