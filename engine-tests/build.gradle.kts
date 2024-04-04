@@ -3,9 +3,9 @@
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 // while locally all tests should be run, when building via github, tests can be run separated in the github pipeline
-// file. for integrationtests a tag "flaky" was introduced to mark tests which frequently fail pipelines
+// file. For integration tests, a tag "flaky" was introduced to mark tests which frequently fail pipelines
 //      gradle test
-//      gradle --consoleplan unitTest
+//      gradle --console=plain unitTest
 //      gradle --console=plain integrationTest
 //      gradle --console=plain integrationTestFlaky
 
