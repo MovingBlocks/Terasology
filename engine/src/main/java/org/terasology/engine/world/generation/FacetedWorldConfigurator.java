@@ -14,7 +14,6 @@ import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,6 +66,7 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
                         listener.propertyChange(event);
                     });
                 }
+
                 return;
             }
         }
@@ -74,12 +74,23 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
         logger.warn("No property {} found", key);
     }
 
+    /**
+     * Subscribes a new listener to receive change notifications for all properties.
+     * @param changeListener
+     */
     @Override
     public void subscribe(PropertyChangeListener changeListener) {
         Set<PropertyChangeListener> ls = listeners.computeIfAbsent("*", k -> new HashSet<>());
         ls.add(changeListener);
     }
 
+    /**
+     * Unsubscribes an existing listener from receiving change notifications for all properties.
+     * If the listener was subscribed to a specific property separately
+     * via {@link FacetedWorldConfigurator#unsubscribe(String, PropertyChangeListener)},
+     * it will continue to receive change notifications for that property.
+     * @param changeListener
+     */
     @Override
     public void unsubscribe(PropertyChangeListener changeListener) {
         listeners.computeIfPresent("*", (k, v) -> {
@@ -88,12 +99,25 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
         });
     }
 
+    /**
+     * Subscribes a new listener to receive change notifications for the specified property.
+     * @param propertyName
+     * @param changeListener
+     */
     @Override
     public void subscribe(String propertyName, PropertyChangeListener changeListener) {
         Set<PropertyChangeListener> ls = listeners.computeIfAbsent(propertyName, k -> new HashSet<>());
         ls.add(changeListener);
     }
 
+    /**
+     * Unsubscribes an existing listener from receiving change notifications for the specified property.
+     * If the listener was subscribed to all properties separately
+     * via {@link FacetedWorldConfigurator#unsubscribe(PropertyChangeListener)},
+     * it will continue to receive change notifications for all properties including the one it is being unsubscribed from now.
+     * @param propertyName
+     * @param changeListener
+     */
     @Override
     public void unsubscribe(String propertyName, PropertyChangeListener changeListener) {
         listeners.computeIfPresent(propertyName, (k, v) -> {
