@@ -6,7 +6,6 @@ import org.terasology.engine.utilities.subscribables.Subscribable;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
-import java.util.Observable;
 
 /**
  * Allows for configuration of world generators.
