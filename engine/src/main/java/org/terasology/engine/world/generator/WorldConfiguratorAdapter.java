@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.generator;
 
-import org.terasology.engine.core.Observer;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.beans.PropertyChangeListener;
