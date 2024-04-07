@@ -78,6 +78,8 @@ import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.List;
@@ -91,7 +93,7 @@ import java.util.stream.Collectors;
  * Sets up the Universe for a user. Displays a list of {@link WorldGenerator}
  * for a particular game template.
  */
-public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener, Observer<WorldConfigurator> {
+public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener, PropertyChangeListener {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
 
     @In
@@ -307,11 +309,15 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     }
 
     /**
-     Called whenever there's a change to WorldConfigurator
+     Called whenever there's a change to WorldConfigurator properties
+     Provides information about the changed property as well as old and new value in {@link PropertyChangeEvent}
      */
     @Override
-    public void update(WorldConfigurator layer) {
-        previewUpdateRequiredSince = time.getRealTimeInMs();
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        System.out.println(propertyChangeEvent.getPropertyName());
+        if (propertyChangeEvent.getPropertyName() == "Trees") {
+            previewUpdateRequiredSince = time.getRealTimeInMs();
+        }
     }
 
     private void setSeed(String value) {
@@ -498,7 +504,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             worldConfig = worldGenerator.getConfigurator();
             universe.setWorldConfigurator(worldConfig);
         }
-        worldConfig.addObserver(this);
+        worldConfig.subscribe(this);
 
         Map<String, Component> params = worldConfig.getProperties();
 

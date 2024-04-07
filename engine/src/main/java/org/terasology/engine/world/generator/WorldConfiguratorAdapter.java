@@ -5,6 +5,7 @@ package org.terasology.engine.world.generator;
 import org.terasology.engine.core.Observer;
 import org.terasology.gestalt.entitysystem.component.Component;
 
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Map;
 
@@ -24,12 +25,22 @@ public class WorldConfiguratorAdapter implements WorldConfigurator {
     }
 
     @Override
-    public void addObserver(Observer<WorldConfigurator> observer) {
+    public void subscribe(PropertyChangeListener changeListener) {
         // simply ignore
     }
 
     @Override
-    public void removeObserver(Observer<WorldConfigurator> observer) {
+    public void unsubscribe(PropertyChangeListener changeListener) {
+        // simply ignore
+    }
+
+    @Override
+    public void subscribe(String propertyName, PropertyChangeListener changeListener) {
+        // simply ignore
+    }
+
+    @Override
+    public void unsubscribe(String propertyName, PropertyChangeListener changeListener) {
         // simply ignore
     }
 }

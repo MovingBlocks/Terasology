@@ -3,6 +3,7 @@
 package org.terasology.engine.world.generator;
 
 import org.terasology.engine.core.Observer;
+import org.terasology.engine.utilities.subscribables.Subscribable;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Observable;
 /**
  * Allows for configuration of world generators.
  */
-public interface WorldConfigurator {
+public interface WorldConfigurator extends Subscribable {
 
     /**
      * The values are supposed to be annotated with {@link org.terasology.nui.properties.Property}
@@ -25,8 +26,4 @@ public interface WorldConfigurator {
      * @param comp the configuration component
      */
     void setProperty(String key, Component comp);
-
-    void addObserver(Observer<WorldConfigurator> observer);
-
-    void removeObserver(Observer<WorldConfigurator> observer);
 }
