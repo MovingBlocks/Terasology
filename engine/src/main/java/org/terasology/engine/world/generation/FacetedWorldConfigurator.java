@@ -3,12 +3,8 @@
 package org.terasology.engine.world.generation;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.SetMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.Observer;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.gestalt.entitysystem.component.Component;
 
