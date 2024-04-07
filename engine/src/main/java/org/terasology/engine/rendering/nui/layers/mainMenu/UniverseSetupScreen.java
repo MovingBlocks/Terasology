@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.Observer;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.StateLoading;
@@ -90,7 +91,7 @@ import java.util.stream.Collectors;
  * Sets up the Universe for a user. Displays a list of {@link WorldGenerator}
  * for a particular game template.
  */
-public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
+public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener, Observer<WorldConfigurator> {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
 
     @In
@@ -297,13 +298,20 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     @Override
     public void update(float delta) {
         super.update(delta);
-
         if (previewUpdateRequiredSince < time.getRealTimeInMs() - 1000) {
             UniverseWrapper universeWrapper = context.get(UniverseWrapper.class);
             universeWrapper.getWorldGenerator().setWorldSeed(universeWrapper.getSeed());
             updatePreview();
             previewUpdateRequiredSince = Long.MAX_VALUE;
         }
+    }
+
+    /**
+     Called whenever there's a change to WorldConfigurator
+     */
+    @Override
+    public void update(WorldConfigurator layer) {
+        previewUpdateRequiredSince = time.getRealTimeInMs();
     }
 
     private void setSeed(String value) {
@@ -490,6 +498,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             worldConfig = worldGenerator.getConfigurator();
             universe.setWorldConfigurator(worldConfig);
         }
+        worldConfig.addObserver(this);
 
         Map<String, Component> params = worldConfig.getProperties();
 

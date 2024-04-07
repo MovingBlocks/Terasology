@@ -5,12 +5,16 @@ package org.terasology.engine.world.generation;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.Observer;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.gestalt.entitysystem.component.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FacetedWorldConfigurator implements WorldConfigurator {
 
@@ -19,6 +23,7 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
     private final Map<String, Component> properties = Maps.newHashMap();
 
     private final List<ConfigurableFacetProvider> providers;
+    private Set<Observer<WorldConfigurator>> observers = new HashSet<>();
 
     public FacetedWorldConfigurator(List<ConfigurableFacetProvider> providersList) {
         for (ConfigurableFacetProvider provider : providersList) {
@@ -41,10 +46,23 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
             if (key.equals(facetProvider.getConfigurationName())) {
                 facetProvider.setConfiguration(comp);
                 properties.put(key, comp);
+                observers.forEach(observer -> {
+                    observer.update(this);
+                });
                 return;
             }
         }
 
         logger.warn("No property {} found", key);
+    }
+
+    @Override
+    public void addObserver(Observer<WorldConfigurator> observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer<WorldConfigurator> observer) {
+        observers.remove(observer);
     }
 }
