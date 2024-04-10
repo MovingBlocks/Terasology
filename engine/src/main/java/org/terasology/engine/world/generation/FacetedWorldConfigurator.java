@@ -24,7 +24,7 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
     private final Map<String, Component> properties = Maps.newHashMap();
 
     private final List<ConfigurableFacetProvider> providers;
-    private HashMap<String, Set<PropertyChangeListener>> listeners = new HashMap<>();
+    private HashMap<String, Set<PropertyChangeListener>> listeners = new HashMap<>(); // OK
 
     public FacetedWorldConfigurator(List<ConfigurableFacetProvider> providersList) {
         for (ConfigurableFacetProvider provider : providersList) {
