@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.core.Observer;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.StateLoading;
@@ -193,7 +192,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
                     }
                 }
 
-                //logger.error("{} world generators registered but non compatible with enabled modules", worldGeneratorManager.getWorldGenerators().size());
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("No selectable world generators!",
                         "Please select at least one module that supports a registered world generator!");
 
