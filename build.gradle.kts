@@ -98,7 +98,7 @@ dependencies {
     natives(group = "org.terasology.jnlua", name = "jnlua_natives", version = "0.1.0-SNAPSHOT", ext = "zip")
 
     // Natives for JNBullet
-    natives(group = "org.terasology.jnbullet", name = "JNBullet", version = "1.0.4-SNAPSHOT", ext = "zip")
+    natives(group = "org.terasology.jnbullet", name = "JNBullet", version = "1.0.4", ext = "zip")
 
 }
 
