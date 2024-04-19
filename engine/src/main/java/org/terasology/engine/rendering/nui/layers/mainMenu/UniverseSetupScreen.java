@@ -232,7 +232,6 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
         /*
          * initialize zoom slider
-         * TODO: use binding?
          */
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
@@ -309,15 +308,12 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
     }
 
     /**
-     Called whenever there's a change to WorldConfigurator properties
-     Provides information about the changed property as well as old and new value in {@link PropertyChangeEvent}
+     * Called whenever there's a change to WorldConfigurator properties
+     * Provides information about the changed property as well as old and new value in {@link PropertyChangeEvent}
      */
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        System.out.println(propertyChangeEvent.getPropertyName());
-        if (propertyChangeEvent.getPropertyName() == "Trees") {
-            previewUpdateRequiredSince = time.getRealTimeInMs();
-        }
+        previewUpdateRequiredSince = time.getRealTimeInMs();
     }
 
     private void setSeed(String value) {
