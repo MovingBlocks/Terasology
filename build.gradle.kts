@@ -100,6 +100,8 @@ dependencies {
     // Natives for JNBullet
     natives(group = "org.terasology.jnbullet", name = "JNBullet", version = "1.0.4", ext = "zip")
 
+    // Natives for Tracy bindings (embedded in JAR)
+    natives("io.github.benjaminamos.TracyJavaBindings:TracyJavaBindings:1.0.0-SNAPSHOT")
 }
 
 tasks.register<Copy>("extractWindowsNatives") {
@@ -135,6 +137,13 @@ tasks.register<Copy>("extractNativeBulletNatives") {
     into("$dirNatives")
 }
 
+tasks.register<Copy>("extractTracyJNINatives") {
+    description = "Extracts the Tracy JNI natives from the module jar"
+    from(configurations["natives"].filter { it.name.contains("TracyJavaBindings") }.map { zipTree(it) })
+    into(dirNatives)
+    exclude("io/**", "META-INF/**")
+}
+
 tasks.register("extractNatives") {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn(
@@ -142,7 +151,8 @@ tasks.register("extractNatives") {
         "extractLinuxNatives",
         "extractMacOSXNatives",
         "extractJNLuaNatives",
-        "extractNativeBulletNatives"
+        "extractNativeBulletNatives",
+        "extractTracyJNINatives"
     )
     // specifying the outputs directory lets gradle have an up-to-date check, and automatic clean task
     outputs.dir("$dirNatives")

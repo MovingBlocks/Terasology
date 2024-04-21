@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.monitoring.impl;
 
+import io.github.benjaminamos.tracy.Tracy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import gnu.trove.map.TObjectDoubleMap;
@@ -78,6 +79,8 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         timer = (EngineTime) CoreRegistry.get(Time.class);
         mainThread = Thread.currentThread();
+
+        Tracy.startupProfiler();
     }
 
     @Override
@@ -101,6 +104,10 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         currentExecutionData = new TObjectLongHashMap<>();
         currentAllocationData = new TObjectLongHashMap<>();
+
+        activityStack.clear();
+
+        Tracy.markFrame();
     }
 
     @Override
@@ -110,6 +117,11 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
 
         ActivityInfo newActivity = new ActivityInfo(activityName).initialize();
+
+        StackWalker.StackFrame caller = java.security.AccessController.doPrivileged((java.security.PrivilegedAction<StackWalker.StackFrame>) () ->
+                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(s -> s.skip(4).findFirst()).get());
+        long sourceLocation = Tracy.allocSourceLocation(caller.getLineNumber(), caller.getFileName(), caller.getClassName() + "#" + caller.getMethodName(), activityName, 0);
+        newActivity.zoneContext = Tracy.zoneBegin(sourceLocation, 1);
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
@@ -133,6 +145,8 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         ActivityInfo oldActivity = activityStack.pop();
 
+        Tracy.zoneEnd(oldActivity.zoneContext);
+
         long endTime = timer.getRealTimeInMs();
         long totalTime = (oldActivity.resumeTime > 0)
                 ? oldActivity.ownTime + endTime - oldActivity.resumeTime
@@ -151,6 +165,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             currentActivity.startMem = endMem;
         }
     }
+
 
     @Override
     public TObjectDoubleMap<String> getRunningMean() {
@@ -186,6 +201,8 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         public long ownTime;
         public long startMem;
         public long ownMem;
+        public StackWalker.StackFrame caller;
+        public Tracy.ZoneContext zoneContext;
 
          ActivityInfo(String activityName) {
             this.name = activityName;
