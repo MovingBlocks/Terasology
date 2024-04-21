@@ -14,7 +14,7 @@
           "position-horizontal-center": {},
           "position-top": {
             "target": "TOP",
-            "offset": 48
+            "offset": 24
           }
         }
       },
@@ -22,74 +22,26 @@
         "type": "UIBox",
         "id": "container",
         "layoutInfo": {
-          "width": 720,
           "position-horizontal-center": {},
           "position-top": {
             "target": "TOP",
-            "offset": -16,
-            "widget": "generator"
+            "widget": "coreLayout",
+            "offset": -16
           },
           "position-bottom": {
             "target": "BOTTOM",
+            "widget": "coreLayout",
+            "offset": -16
+          },
+          "position-left": {
+            "target": "LEFT",
             "offset": -16,
             "widget": "coreLayout"
-          }
-        }
-      },
-      {
-        "type": "ColumnLayout",
-        "id": "generator",
-        "columns": 1,
-        "verticalSpacing": 4,
-        "horizontalSpacing": 4,
-        "contents": [
-          {
-            "type": "UILabel",
-            "text": "${engine:menu#universe-setup-description}"
           },
-          {
-            "type": "UILabel",
-            "text": "${engine:menu#game-world-generators}:",
-            "family": "left-label"
-          },
-          {
-            "type": "RowLayout",
-            "horizontalSpacing": 4,
-            "contents": [
-              {
-                "type": "UIDropdownScrollable",
-                "id": "worldGenerators",
-                "layoutInfo": {
-                  "relativeWidth": 1.00
-                }
-              }
-            ]
-          },
-          {
-            "type": "UILabel",
-            "text": "${engine:menu#world-seed}:",
-            "family": "left-label"
-          },
-          {
-            "type": "UIText",
-            "id": "seed"
-          },
-          {
-            "type": "UISpace",
-            "size": [
-              1,
-              8
-            ]
-          }
-        ],
-        "layoutInfo": {
-          "width": 500,
-          "use-content-height": true,
-          "position-horizontal-center": {},
-          "position-bottom": {
-            "target": "TOP",
-            "offset": 16,
-            "widget": "coreLayout"
+          "position-right": {
+            "target": "RIGHT",
+            "widget": "coreLayout",
+            "offset": -16
           }
         }
       },
@@ -97,56 +49,61 @@
         "type": "ColumnLayout",
         "id": "coreLayout",
         "columns": 2,
+        "column-widths": [0.2, 0.8],
+        "verticalSpacing": 16,
         "horizontalSpacing": 8,
-        "column-widths": [
-          0.53,
-          0.47
-        ],
         "layoutInfo": {
-          "width": 704,
           "use-content-height": true,
           "position-horizontal-center": {},
-          "position-vertical-center": {}
+          "position-top": {
+            "target": "TOP",
+            "offset": 150
+          },
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": 150
+          },
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "close",
+            "offset": 80
+          },
+          "position-right": {
+            "target": "RIGHT",
+            "offset": 200
+          }
         },
         "contents": [
           {
-            "type": "UIImage",
-            "skin": "framed_image",
-            "id": "preview"
-          },
-          {
             "type": "ColumnLayout",
             "columns": 1,
-            "verticalSpacing": 4,
             "contents": [
               {
                 "type": "UILabel",
-                "text": "${engine:menu#pregeneration-description}"
+                "text": "${engine:menu#universe-setup-description}"
               },
               {
                 "type": "UILabel",
-                "text": "${engine:menu#time-progression-during-pre-generation}:",
-                "id": "timeLabel",
-                "family": "left-label",
-                "enabled": false
+                "text": "${engine:menu#game-world-generators}:",
+                "family": "left-label"
               },
               {
-                "type": "UISlider",
-                "id": "timeSlider",
-                "minimum": 0.0,
-                "range": 9.0,
-                "increment": 1.0,
-                "precision": 0,
-                "value": 0.0,
-                "enabled": false,
-                "layoutInfo": {
-                  "position-horizontal-center": {},
-                  "position-top": {
-                    "target": "BOTTOM",
-                    "widget": "timeLabel",
-                    "offset": 0
+                "type": "RowLayout",
+                "horizontalSpacing": 4,
+                "contents": [
+                  {
+                    "type": "UIDropdownScrollable",
+                    "id": "worldGenerators",
+                    "layoutInfo": {
+                      "relativeWidth": 1.00
+                    }
                   }
-                }
+                ]
+              },
+              {
+                "type": "UIImage",
+                "skin": "framed_image",
+                "id": "preview"
               },
               {
                 "type": "UILabel",
@@ -177,23 +134,61 @@
                     "widget": "zoomLabel"
                   }
                 }
+              }
+            ]
+          },
+          {
+            "type": "ColumnLayout",
+            "columns": 1,
+            "contents": [
+              {
+                "type": "UILabel",
+                "text": "${engine:menu#pregeneration-description}"
+              },
+              {
+                "type": "UILabel",
+                "text": "${engine:menu#world-seed}: ",
+                "family": "left-label",
+                "layoutInfo": {
+                  "relativeWidth": 0.1,
+                  "height": 24
+                }
               },
               {
                 "type": "RowLayout",
-                "id": "worldGenActions",
-                "horizontalSpacing": 4,
+                "id": "seedLayout",
+                "layoutInfo": {
+                  "height": 30,
+                  "position-top": {
+                    "target": "TOP"
+                  }
+                },
                 "contents": [
+                  {
+                    "type": "UIText",
+                    "id": "seed",
+                    "layoutInfo": {
+                      "relativeWidth": 0.85,
+                      "height": 24
+                    }
+                  },
                   {
                     "type": "UIButton",
                     "text": "${engine:menu#re-roll}",
                     "id": "reRoll"
-                  },
-                  {
-                    "type": "UIButton",
-                    "text": "${engine:menu#config}",
-                    "id": "config"
                   }
                 ]
+              },
+              {
+                "type": "ScrollableArea",
+                "content": {
+                  "type": "propertyLayout",
+                  "id": "properties",
+                  "layoutInfo": {
+                    "use-content-height": true
+                  },
+                  "rowConstraints": "[min]"
+                }
               }
             ]
           }
@@ -233,14 +228,10 @@
         "layoutInfo": {
           "width": 120,
           "height": 80,
-          "position-vertical-center": {
-            "target": "CENTER",
-            "widget": "container"
-          },
-          "position-right": {
+          "position-vertical-center": {},
+          "position-left": {
             "target": "LEFT",
-            "widget": "container",
-            "offset": 16
+            "offset": 50
           }
         }
       },
