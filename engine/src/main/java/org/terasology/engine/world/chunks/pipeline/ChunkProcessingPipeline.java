@@ -39,8 +39,8 @@ import static com.google.common.primitives.Ints.constrainToRange;
 public class ChunkProcessingPipeline {
 
     @SuppressWarnings("UnstableApiUsage")
-    private static final int NUM_TASK_THREADS = constrainToRange(
-            Runtime.getRuntime().availableProcessors() - 1, 1, 8);
+    private static final int DEFAULT_TASK_THREADS = constrainToRange(
+            Runtime.getRuntime().availableProcessors() - 2, 1, 4);
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
@@ -54,17 +54,18 @@ public class ChunkProcessingPipeline {
     /**
      * Create ChunkProcessingPipeline.
      */
-    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Comparator<Future<Chunk>> comparable) {
+    public ChunkProcessingPipeline(int chunkThreads, Function<Vector3ic, Chunk> chunkProvider, Comparator<Future<Chunk>> comparable) {
         this.chunkProvider = chunkProvider;
 
+        int taskThreads = (chunkThreads == 0) ? DEFAULT_TASK_THREADS : chunkThreads;
         executor = new ThreadPoolExecutor(
-                NUM_TASK_THREADS,
-                NUM_TASK_THREADS, 0L,
+                taskThreads,
+                taskThreads, 0L,
                 TimeUnit.MILLISECONDS,
                 new PriorityBlockingQueue(800, comparable),
                 this::threadFactory,
                 this::rejectQueueHandler);
-        logger.debug("allocated {} threads", NUM_TASK_THREADS);
+        logger.debug("allocated {} threads", taskThreads);
         chunkProcessor = new ChunkExecutorCompletionService(executor,
                 new PriorityBlockingQueue<>(800, comparable));
         reactor = new Thread(this::chunkTaskHandler);

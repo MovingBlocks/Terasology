@@ -426,6 +426,7 @@
     "view-distance-moderate": "view-distance-moderate",
     "view-distance-near": "view-distance-near",
     "view-distance-ultra": "view-distance-ultra",
+    "chunk-threads": "chunk-threads",
     "vignette": "vignette",
     "volumetric-fog": "volumetric-fog",
     "warn-modules": "warn-modules",

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.BlockEntityRegistry;
@@ -54,6 +55,7 @@ class LocalChunkProviderTest {
     private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
+    private Config config;
     private Map<Vector3ic, Chunk> chunkCache;
     private Block blockAtBlockManager;
     private TestStorageManager storageManager;
@@ -71,6 +73,7 @@ class LocalChunkProviderTest {
         blockEntityRegistry = mock(BlockEntityRegistry.class);
         worldEntity = mock(EntityRef.class);
         chunkCache = Maps.newConcurrentMap();
+        config = mock(Config.class);
         storageManager = new TestStorageManager();
         generator = new TestWorldGenerator(blockManager);
         chunkProvider = new LocalChunkProvider(storageManager,
@@ -78,6 +81,7 @@ class LocalChunkProviderTest {
                 generator,
                 blockManager,
                 extraDataManager,
+                config,
                 chunkCache);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
