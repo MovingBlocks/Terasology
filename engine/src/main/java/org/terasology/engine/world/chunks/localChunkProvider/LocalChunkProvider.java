@@ -82,6 +82,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
+    private static final int UPDATE_PROCESSING_DEADLINE_MS = 24;
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
@@ -229,8 +230,16 @@ public class LocalChunkProvider implements ChunkProvider {
         deactivateBlocks();
         checkForUnload();
         Chunk chunk;
+
+        long processingStartTime = System.currentTimeMillis();
         while ((chunk = readyChunks.poll()) != null) {
             processReadyChunk(chunk);
+            long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
+            if (!readyChunks.isEmpty() && totalProcessingTime > UPDATE_PROCESSING_DEADLINE_MS) {
+                logger.warn("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
+                        UPDATE_PROCESSING_DEADLINE_MS, readyChunks.size());
+                break;
+            }
         }
     }
 
