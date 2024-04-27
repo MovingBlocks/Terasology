@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.BlockEntityRegistry;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeoutException;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class LocalChunkProviderTest {
 
@@ -74,6 +76,9 @@ class LocalChunkProviderTest {
         worldEntity = mock(EntityRef.class);
         chunkCache = Maps.newConcurrentMap();
         config = mock(Config.class);
+        RenderingConfig renderConfig = mock(RenderingConfig.class);
+        when(renderConfig.getChunkThreads()).thenReturn(0);
+        when(config.getRendering()).thenReturn(renderConfig);
         storageManager = new TestStorageManager();
         generator = new TestWorldGenerator(blockManager);
         chunkProvider = new LocalChunkProvider(storageManager,
