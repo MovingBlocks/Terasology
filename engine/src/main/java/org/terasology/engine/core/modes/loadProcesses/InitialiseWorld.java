@@ -6,6 +6,7 @@ package org.terasology.engine.core.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
@@ -136,6 +137,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
                 worldGenerator,
                 blockManager,
                 extraDataManager,
+                context.get(Config.class),
                 Maps.newConcurrentMap());
         RelevanceSystem relevanceSystem = new RelevanceSystem(chunkProvider);
         context.put(RelevanceSystem.class, relevanceSystem);

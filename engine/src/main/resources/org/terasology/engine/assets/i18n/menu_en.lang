@@ -443,6 +443,7 @@
     "view-distance-moderate": "Moderate",
     "view-distance-near": "Near",
     "view-distance-ultra": "Ultra",
+    "chunk-threads": "Chunk Threads",
     "vignette": "Vignette",
     "volumetric-fog": "Volumetric Fog",
     "warn-modules": "WARNING: Enabling extra modules, especially all or those not in the stable lineup can cause game crashes or broken worlds.\nPlease handle with care.",
