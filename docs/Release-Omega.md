@@ -1,23 +1,34 @@
-This is a guide for maintainers to explain how the [CI/CD pipeline](http://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/) for the Omega game bundle of [Terasology :octocat: ](https://github.com/MovingBlocks/Terasology) works, and what steps should be taken to release a new (stable) version of the game. 
+This is a guide for maintainers to explain how the [CI/CD pipeline](https://jenkins.terasology.io/job/Terasology/job/Omega/) for
+the Omega game bundle of [Terasology :octocat: ](https://github.com/MovingBlocks/Terasology) works, and what steps should be 
+taken to release a new (stable) version of the game. 
 
 # CI/CD Setup
 
-The Terasology engine repository at [MovingBlocks/Terasology :octocat:](https://github.com/MovingBlocks/Terasology) follows a **two-branch setup** with `master` and `develop`.
-Commits to these branches are automatically built and published to our [Artifactory], either as a release or as snapshots.
-For more details, see our [Build-Setup](Build-Setup.md).
+The Terasology engine repository at [MovingBlocks/Terasology :octocat:](https://github.com/MovingBlocks/Terasology) 
+follows a **two-branch setup** with `master` and `develop`. Commits to these branches are automatically built and
+published to our [Artifactory], either as a release or as snapshots. For more details, see our
+[Build-Setup](Build-Setup.md).
 
 ## Branches
 
 - **`master`** • the _release_ branch 
-  > In the current state, the engine only evolves forward and is not tied to a support or maintenance window. There is only a single track for releases (e.g., no bug fixes or patches on older releases). The release branch is infrequently updated with the latest state from the develop branch to form a new release. Release commits SHOULD NOT contain dependencies to unreleased modules (e.g., snapshot releases).
+  > In the current state, the engine only evolves forward and is not tied to a support or maintenance window.
+  > There is only a single track for releases (e.g., no bug fixes or patches on older releases). The release
+  > branch is infrequently updated with the latest state from the develop branch to form a new release. Release
+  >  commits SHOULD NOT contain dependencies to unreleased modules (e.g., snapshot releases).
 - **`develop`** • central place for _active development_
-  > All active development happens on this branch. PRs SHOULD be directed against the `develop` branch. This branch is to be considered **unstable** and may hold experimental features and/or even fail compilation during active development. During development, the engine MAY depend on unreleased dependencies (e.g., SNAPSHOTs of libraries).
+  > All active development happens on this branch. PRs SHOULD be directed against the `develop` branch. This
+  > branch is to be considered **unstable** and may hold experimental features and/or even fail compilation
+  > during active development. During development, the engine MAY depend on unreleased dependencies (e.g.,
+  > SNAPSHOTs of libraries).
 
 PRs against the engine are built and checked by the pipeline, but not published to [Artifactory].
 
 ## Versioning
 
-The engine SHOULD be versioned according to [Semantic Versioning 2.0.0 (SemVer)](https://semver.org/). The engine version is defined in multiple places. Best to search for the current version number to find them - for instance one in `engine/`, one in `engine-tests/`.
+The engine SHOULD be versioned according to [Semantic Versioning 2.0.0 (SemVer)](https://semver.org/).
+The engine version is defined in multiple places. Best to search for the current version number to find 
+them - for instance one in `engine/`, one in `engine-tests/`.
 
 > _State of August 8, 2021: The engine version is defined in the following files:_
 > * _[Engine `module.txt`](https://github.com/MovingBlocks/Terasology/blob/develop/engine/src/main/resources/org/terasology/engine/module.txt)_
@@ -25,20 +36,31 @@ The engine SHOULD be versioned according to [Semantic Versioning 2.0.0 (SemVer)]
 >
 > _Please also search for other occurrences in case this has changed since._
 
-In addition, the _maturity level_ for the overall project is tracked in `templates/version.txt`. It lists the maturity, e.g., "alpha", and has an _increment_ for the release. When we release the engine and bump to a new snapshot version the increment should also be bumped (for instance, bump from "alpha-18" to "alpha-19").
+In addition, the _maturity level_ for the overall project is tracked in `templates/version.txt`. It lists 
+the maturity, e.g., "alpha", and has an _increment_ for the release. When we release the engine and bump 
+to a new snapshot version the increment should also be bumped (for instance, bump from "alpha-18" to "alpha-19").
 
-The version on `develop` MUST be appended with `-SNAPSHOT` for snapshot builds. Note, that there is only one snapshot build for a specific base version (e.g., `1.2.3-SNAPSHOT`) and subsequent snapshot builds will just override the artifact (read more about [What exactly is a Maven Snapshot and why do we need it?](https://stackoverflow.com/questions/5901378/what-exactly-is-a-maven-snapshot-and-why-do-we-need-it) on StackOverflow).
-If the engine was already released with that version, publishing it to [Artifactory] again will fail and only the existing release will be available.
+The version on `develop` MUST be appended with `-SNAPSHOT` for snapshot builds. Note, that there is only
+one snapshot build for a specific base version (e.g., `1.2.3-SNAPSHOT`) and subsequent snapshot builds will
+just override the artifact (read more about [What exactly is a Maven Snapshot and why do we need it?](https://stackoverflow.com/questions/5901378/what-exactly-is-a-maven-snapshot-and-why-do-we-need-it) on StackOverflow). If the engine was already released with that version, publishing it to [Artifactory] again
+will fail and only the existing release will be available.
 
 # Omega Release Process
 
-**Note:** Building the Omega release bundle for Terasology will always include the latest versions of modules available at the point in time the build is triggered. This means that re-triggering an Omega build might result in a different result when modules have been built in the meantime, e.g., because of merging changes.
+**Note:** Building the Omega release bundle for Terasology will always include the latest versions of
+modules available at the point in time the build is triggered. This means that re-triggering an Omega
+build might result in a different result when modules have been built in the meantime, e.g., because
+of merging changes.
 
 ## Preview Builds
 
-With every commit to the main branch of [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology) both [an engine build](http://jenkins.terasology.io/teraorg/job/Terasology/job/engine/job/develop/) and, on success, [an Omega build](http://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/develop/) are automatically triggered.
+With every commit to the main branch of [MovingBlocks/Terasology](https://github.com/MovingBlocks/Terasology)
+both [an engine build](http://jenkins.terasology.io/teraorg/job/Terasology/job/engine/job/develop/) and,
+on success, [an Omega build](http://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/develop/)
+are automatically triggered.
 
-A manual preview build can be triggered on demand by just triggering the build job in Jenkins. This might be required to get a preview build with module changes even if the engine did not change.
+A manual preview build can be triggered on demand by just triggering the build job in Jenkins. This might
+be required to get a preview build with module changes even if the engine did not change.
 
 * Log in at http://jenkins.terasology.io - uses GitHub OAuth
 * Run the build for [teraorg/Terasology/Omega/develop](http://jenkins.terasology.io/teraorg/job/Terasology/job/Omega/job/develop/)
@@ -46,7 +68,8 @@ A manual preview build can be triggered on demand by just triggering the build j
 
 ## (Stable) Release Builds
 
-Releasing the engine (and with it, an Omega bundle) involves a couple of manual steps to merge changes into the _release branch_ and prepare the development branch for further contributions.
+Releasing the engine (and with it, an Omega bundle) involves a couple of manual steps to merge changes 
+into the _release branch_ and prepare the development branch for further contributions.
 
 1. **Decide on release version** • Make sure `develop` has the intended next version in the respective files (see above):
 
@@ -105,5 +128,5 @@ Releasing the engine (and with it, an Omega bundle) involves a couple of manual 
 
 <!-- References -->
 
-[artifactory]: http://artifactory.terasology.org
+[artifactory]: https://artifactory.terasology.io
 [git-tag]: https://www.atlassian.com/git/tutorials/inspecting-a-repository/git-tag
