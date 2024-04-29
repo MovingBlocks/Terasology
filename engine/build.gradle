@@ -141,7 +141,7 @@ dependencies {
     api("org.terasology:TeraMath:1.5.0")
     api("org.terasology:splash-screen:1.1.1")
     api("org.terasology.jnlua:JNLua:0.1.0-SNAPSHOT")
-    api("org.terasology.jnbullet:JNBullet:1.0.2")
+    api("org.terasology.jnbullet:JNBullet:1.0.4")
     api("org.terasology.nui:nui:3.0.0")
     api("org.terasology.nui:nui-reflect:3.0.0")
     api("org.terasology.nui:nui-gestalt7:3.0.0")

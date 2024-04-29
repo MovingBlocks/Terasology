@@ -5,6 +5,7 @@ package org.terasology.engine.integrationenvironment;
 import com.google.common.collect.Lists;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class ExampleTest {
     private ModuleTestingHelper helper;
 
     @Test
+    @Tag("flaky")
     public void testClientCreation() {
         logger.info("Starting test 'testClientCreation'");
         Assertions.assertDoesNotThrow(helper::createClient);
@@ -45,6 +47,7 @@ public class ExampleTest {
     }
 
     @Test
+    @Tag("flaky")
     public void testClientConnection() throws IOException {
         int currentClients = Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size();
 

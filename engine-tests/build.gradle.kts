@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
+// while locally all tests should be run, when building via github, tests can be run separated in the github pipeline
+// file. For integration tests, a tag "flaky" was introduced to mark tests which frequently fail pipelines
+//      gradle test
+//      gradle --console=plain unitTest
+//      gradle --console=plain integrationTest
+//      gradle --console=plain integrationTestFlaky
+
 plugins {
     id("java-library")
     id("org.jetbrains.gradle.plugin.idea-ext")
@@ -105,7 +112,7 @@ tasks.register<Test>("unitTest") {
     group =  "Verification"
     description = "Runs unit tests (fast)"
     useJUnitPlatform {
-        excludeTags = setOf("MteTest", "TteTest")
+        excludeTags("MteTest", "TteTest")
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
 }
@@ -113,10 +120,22 @@ tasks.register<Test>("unitTest") {
 tasks.register<Test>("integrationTest") {
     dependsOn(tasks.getByPath(":extractNatives"))
     group = "Verification"
-    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'"
+    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest', exclude tests tagged 'flaky'."
 
     useJUnitPlatform {
-        includeTags = setOf("MteTest", "TteTest")
+        excludeTags("flaky")
+        includeTags("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "5m")
+}
+
+tasks.register<Test>("integrationTestFlaky") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    group = "Verification"
+    description = "Runs integration tests tagged with 'flaky' and either 'MteTest' or 'TteTest'."
+
+    useJUnitPlatform {
+        includeTags("MteTest & flaky", "TteTest & flaky")
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
 }

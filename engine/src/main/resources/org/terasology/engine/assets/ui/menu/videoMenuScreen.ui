@@ -214,6 +214,14 @@
                                     "id": "viewDistance"
                                 },
                                 {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#chunk-threads}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "chunkThreads"
+                                },
+                                {
                                     "type": "UISpace",
                                     "size": [1, 13]
                                 },

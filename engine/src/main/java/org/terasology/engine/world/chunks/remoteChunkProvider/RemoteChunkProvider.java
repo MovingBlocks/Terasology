@@ -9,6 +9,7 @@ import com.google.common.collect.Queues;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
@@ -56,9 +57,9 @@ public class RemoteChunkProvider implements ChunkProvider {
     private EntityRef worldEntity = EntityRef.NULL;
     private ChunkReadyListener listener;
 
-    public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
+    public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer, Config config) {
         this.blockManager = blockManager;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk,
+        loadingPipeline = new ChunkProcessingPipeline(config.getRendering().getChunkThreads(), this::getChunk,
                 new LocalPlayerRelativeChunkComparator(localPlayer));
 
         loadingPipeline.addStage(

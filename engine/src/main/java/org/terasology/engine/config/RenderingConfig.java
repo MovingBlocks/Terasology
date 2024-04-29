@@ -26,6 +26,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
     public static final String CHUNK_LODS = "chunkLods";
+    public static final String CHUNK_THREADS = "chunkThreads";
     public static final String BILLBOARD_LIMIT = "billboardLimit";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
     public static final String ANIMATE_GRASS = "AnimateGrass";
@@ -76,6 +77,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean animatedMenu;
     private ViewDistance viewDistance;
     private float chunkLods;
+    private int chunkThreads;
     private float billboardLimit;
     private boolean flickeringLight;
     private boolean animateGrass;
@@ -268,6 +270,16 @@ public class RenderingConfig extends AbstractSubscribable {
         float oldLods = this.chunkLods;
         this.chunkLods = chunkLods;
         propertyChangeSupport.firePropertyChange(CHUNK_LODS, oldLods, chunkLods);
+    }
+
+    public int getChunkThreads() {
+        return chunkThreads;
+    }
+
+    public void setChunkThreads(int chunkThreads) {
+        float oldChunkThreads = this.chunkThreads;
+        this.chunkThreads = chunkThreads;
+        propertyChangeSupport.firePropertyChange(CHUNK_THREADS, oldChunkThreads, chunkThreads);
     }
 
     public float getBillboardLimit() {
