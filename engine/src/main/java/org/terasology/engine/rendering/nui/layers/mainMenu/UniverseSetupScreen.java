@@ -194,6 +194,8 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
 
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("No selectable world generators!",
                         "Please select at least one module that supports a registered world generator!");
+                CoreRegistry.put(UniverseWrapper.class, context.get(UniverseWrapper.class));
+                triggerBackAnimation();
 
                 return null;
             }
