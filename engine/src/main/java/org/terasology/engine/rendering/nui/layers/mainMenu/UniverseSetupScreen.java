@@ -51,6 +51,7 @@ import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManage
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.UnresolvedDependencyException;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
@@ -353,6 +354,10 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
             universeWrapper.setWorldGenerator(worldGenerator);
             context.put(UniverseWrapper.class, universeWrapper);
         } catch (UnresolvedWorldGeneratorException e) {
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Selected world generator cannot be resolved!",
+                "Please report this issue on Discord/GitHub and select a different world generator!");
+            e.printStackTrace();
+        } catch (UnresolvedDependencyException e) {
             //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
             e.printStackTrace();
         }

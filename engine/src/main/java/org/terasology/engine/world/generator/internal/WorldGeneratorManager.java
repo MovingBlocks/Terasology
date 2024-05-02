@@ -15,6 +15,7 @@ import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.UnresolvedDependencyException;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
@@ -128,12 +129,12 @@ public class WorldGeneratorManager {
      * @return a new world generator with the specified uri.
      */
     public static WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment)
-            throws UnresolvedWorldGeneratorException {
+            throws UnresolvedWorldGeneratorException, UnresolvedDependencyException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             Name moduleName = environment.getModuleProviding(generatorClass);
             if (moduleName == null) {
-                throw new UnresolvedWorldGeneratorException("Cannot find module for world generator " + generatorClass);
+                throw new UnresolvedDependencyException("Cannot find module for world generator " + generatorClass);
             }
             SimpleUri generatorUri = new SimpleUri(moduleName, annotation.id());
             if (generatorUri.equals(uri)) {
