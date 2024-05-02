@@ -54,6 +54,7 @@ import org.terasology.engine.world.sun.BasicCelestialModel;
 import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -104,7 +105,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             // setting the world seed will create the world builder
             worldGenerator.setWorldSeed(worldInfo.getSeed());
             context.put(WorldGenerator.class, worldGenerator);
-        } catch (UnresolvedWorldGeneratorException e) {
+        } catch (UnresolvedWorldGeneratorException | UnresolvedDependencyException e) {
             logger.error("Unable to load world generator {}. Available world generators: {}",
                     worldInfo.getWorldGenerator(), worldGeneratorManager.getWorldGenerators());
             context.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));

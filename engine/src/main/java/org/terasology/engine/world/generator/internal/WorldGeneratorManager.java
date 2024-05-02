@@ -15,7 +15,7 @@ import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.UnresolvedDependencyException;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
@@ -99,7 +99,8 @@ public class WorldGeneratorManager {
      * @param context objects from this context will be injected into the
      * @return The instantiated world generator.
      */
-    public static WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
+    public static WorldGenerator createGenerator(SimpleUri uri, Context context)
+            throws UnresolvedWorldGeneratorException, UnresolvedDependencyException {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {

@@ -51,7 +51,7 @@ import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManage
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.UnresolvedDependencyException;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
