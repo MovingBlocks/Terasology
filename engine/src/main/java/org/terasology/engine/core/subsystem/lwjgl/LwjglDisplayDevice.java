@@ -78,7 +78,6 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
         setDisplayModeSetting(displayModeSetting, true);
     }
 
-    @SuppressWarnings({"checkstyle:WhitespaceAround", "checkstyle:WhitespaceAfter"})
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting, boolean resize) {
         long window = GLFW.glfwGetCurrentContext();
         switch (displayModeSetting) {
