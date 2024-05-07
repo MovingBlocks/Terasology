@@ -98,8 +98,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                             vidMode.width(),
                             vidMode.height(),
                             GLFW.GLFW_DONT_CARE);
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
                 }
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
                 config.setDisplayModeSetting(displayModeSetting);
                 config.setWindowedFullscreen(true);
                 break;
