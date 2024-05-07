@@ -88,14 +88,18 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 break;
             case WINDOWED_FULLSCREEN:
                 GLFWVidMode vidMode = desktopResolution.get();
-                GLFW.glfwSetWindowMonitor(window,
-                        MemoryUtil.NULL,
-                        0,
-                        0,
-                        vidMode.width(),
-                        vidMode.height(),
-                        GLFW.GLFW_DONT_CARE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                // Attempt to go into fullscreen twice to fix the taskbar showing on-top of the game on Windows.
+                // See also: https://github.com/MovingBlocks/Terasology/issues/5228.
+                for (int i = 0; i < 2; i++) {
+                    GLFW.glfwSetWindowMonitor(window,
+                            MemoryUtil.NULL,
+                            0,
+                            0,
+                            vidMode.width(),
+                            vidMode.height(),
+                            GLFW.GLFW_DONT_CARE);
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                }
                 config.setDisplayModeSetting(displayModeSetting);
                 config.setWindowedFullscreen(true);
                 break;
