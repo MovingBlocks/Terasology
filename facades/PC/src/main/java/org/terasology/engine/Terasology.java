@@ -101,13 +101,13 @@ public final class Terasology implements Callable<Integer> {
     )
     private Integer outOfMemoryScore;
 
-    @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
+    @Option(names = "--crash-report", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
 
-    @Option(names = "--sound", defaultValue = "true", negatable = true, description = "Enable sound")
+    @Option(names = "--sound", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable sound")
     private boolean soundEnabled;
 
-    @Option(names = "--splash", defaultValue = "true", negatable = true, description = "Enable splash screen")
+    @Option(names = "--splash", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable splash screen")
     private boolean splashEnabled;
 
     @Option(names = "--load-last-game", description = "Load the latest game on startup")
@@ -119,7 +119,7 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = "--permissive-security")
     private boolean permissiveSecurity;
 
-    @Option(names = "--save-games", defaultValue = "true", negatable = true, description = "Enable new save games")
+    @Option(names = "--save-games", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable new save games")
     private boolean saveGamesEnabled;
 
     @Option(names = "--server-port", description = "Change the server port")
