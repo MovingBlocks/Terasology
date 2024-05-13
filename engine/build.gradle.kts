@@ -236,22 +236,16 @@ sourceSets {
     }
 }
 
-tasks.register<JavaCompile>("jmhClasses") {
-    source = sourceSets.jmh.get().java
-    classpath = sourceSets.jmh.get().compileClasspath
-    destinationDirectory.set(sourceSets.jmh.get().java.destinationDirectory)
-}
-
 tasks.register<JavaExec>("jmh") {
     dependsOn("jmhClasses")
     mainClass.set("org.openjdk.jmh.Main")
-    classpath = sourceSets.jmh.get().compileClasspath + sourceSets.jmh.get().runtimeClasspath
+    classpath = sourceSets.named("jmh").get().compileClasspath + sourceSets.named("jmh").get().runtimeClasspath
 }
 
 dependencies {
-    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.27")
-    jmhImplementation("org.openjdk.jmh:jmh-core:1.27")
-    jmhImplementation("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+    "jmhAnnotationProcessor"("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+    "jmhImplementation"("org.openjdk.jmh:jmh-core:1.27")
+    "jmhImplementation"("org.openjdk.jmh:jmh-generator-annprocess:1.27")
 }
 
 // following tasks use the output of jmh, so declare explicit dependency
