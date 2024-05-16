@@ -8,7 +8,7 @@
         "type": "UILabel",
         "id": "title",
         "family": "title",
-        "text": "${engine:menu#world-pre-generation}",
+        "text": "${engine:menu#universe-setup}",
         "layoutInfo": {
           "height": 48,
           "position-horizontal-center": {},
@@ -78,10 +78,6 @@
             "type": "ColumnLayout",
             "columns": 1,
             "contents": [
-              {
-                "type": "UILabel",
-                "text": "${engine:menu#universe-setup-description}"
-              },
               {
                 "type": "UILabel",
                 "text": "${engine:menu#game-world-generators}:",

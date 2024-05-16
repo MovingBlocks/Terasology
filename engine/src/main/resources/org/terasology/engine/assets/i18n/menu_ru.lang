@@ -291,7 +291,6 @@
     "water-reflections-ssr": "SSR (экспериментально)",
     "widget-selection-prompt": "Выбери виджет:",
     "widget-selection-title": "Выбор виджетов",
-    "world-config-preview": "Детали ...",
     "world-seed": "Уникальный посев мира (Seed)",
     "world-generator": "Генератор Мира"
 }
