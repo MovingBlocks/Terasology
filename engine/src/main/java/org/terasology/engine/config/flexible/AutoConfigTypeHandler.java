@@ -77,8 +77,7 @@ public class AutoConfigTypeHandler<T extends AutoConfig> extends TypeHandler<Aut
                         if (value.isPresent()) {
                             setting.set(value.get());
                         } else {
-                            logger.error("Cannot deserialize value [{}] to type [{}]", entry.getValue(),
-                                    setting.getValueType()); //NOPMD
+                            logger.error("Cannot deserialize value [{}] to type [{}]", entry.getValue(), setting.getValueType()); //NOPMD
                         }
                     } else {
                         logger.error("Cannot deserialize type [{}]", setting.getValueType()); //NOPMD
