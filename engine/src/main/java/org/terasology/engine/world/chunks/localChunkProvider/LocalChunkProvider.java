@@ -239,7 +239,7 @@ public class LocalChunkProvider implements ChunkProvider {
             processReadyChunk(chunk);
             long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
             if (!readyChunks.isEmpty() && totalProcessingTime > UPDATE_PROCESSING_DEADLINE_MS) {
-                logger.warn("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
+                logger.atWarn().log("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
                         UPDATE_PROCESSING_DEADLINE_MS, readyChunks.size());
                 break;
             }
@@ -301,7 +301,7 @@ public class LocalChunkProvider implements ChunkProvider {
         try {
             unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
         } catch (InterruptedException e) {
-            logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e);
+            logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e); //NOPMD
         }
 
         return true;
@@ -311,7 +311,7 @@ public class LocalChunkProvider implements ChunkProvider {
         try {
             deactivateBlocksQueue.put(createBatchBlockEventMappings(chunk));
         } catch (InterruptedException e) {
-            logger.error("Failed to queue deactivation of blocks for {}", chunk.getPosition());
+            logger.error("Failed to queue deactivation of blocks for {}", chunk.getPosition()); //NOPMD
         }
     }
 

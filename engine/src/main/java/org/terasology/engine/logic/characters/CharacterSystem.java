@@ -306,44 +306,41 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        Vector3f direction = location.getWorldDirection(new Vector3f());
-        if (!(event.getDirection().equals(direction, 0.0001f))) {
-            logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
+        Vector3f worldDirection = location.getWorldDirection(new Vector3f());
+        Vector3f eventDirection = event.getDirection();
+        if (!(eventDirection.equals(worldDirection, 0.0001f))) {
+            logger.error("Direction at client {} was different than direction at server {}", eventDirection, worldDirection);
         }
-        // Assume the exact same value in case there are rounding mistakes:
-        direction = event.getDirection();
 
+        String playerName = getPlayerNameFromCharacter(character);
         Vector3f originPos = location.getWorldPosition(new Vector3f());
-        if (!(event.getOrigin().equals(originPos, 0.0001f))) {
-            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}",
-                    getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
+        Vector3f eventOrigin = event.getOrigin();
+        if (!(eventOrigin.equals(originPos, 0.0001f))) {
+            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} " +
+                            "but the predicted position is {}", playerName, eventOrigin, originPos);
             return false;
         }
 
         if (event.isOwnedEntityUsage()) {
             if (!event.getUsedOwnedEntity().exists()) {
-                logger.info("Denied activation attempt by {} since the used entity does not exist on the authority",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the used entity does not exist on the authority", playerName);
                 return false;
             }
             if (!networkSystem.getOwnerEntity(event.getUsedOwnedEntity()).equals(networkSystem.getOwnerEntity(character))) {
-                logger.info("Denied activation attempt by {} since it does not own the entity at the authority",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since it does not own the entity at the authority", playerName);
                 return false;
             }
         } else {
             // check for cheats so that data can later be trusted:
             if (event.getUsedOwnedEntity().exists()) {
-                logger.info("Denied activation attempt by {} since it is not properly marked as owned entity usage",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since it is not properly marked as owned entity usage", playerName);
                 return false;
             }
         }
 
         if (event.isEventWithTarget()) {
             if (!event.getTarget().exists()) {
-                logger.info("Denied activation attempt by {} since the target does not exist on the authority",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the target does not exist on the authority", playerName);
                 return false; // can happen if target existed on client
             }
 
@@ -357,45 +354,42 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 interactionRange = characterComponent.interactionRange;
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, interactionRange, Sets.newHashSet(character),
+            HitResult result = physics.rayTrace(originPos, eventDirection, interactionRange, Sets.newHashSet(character),
                     DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
-                logger.info("Denied activation attempt by {} since at the authority there was nothing to activate at that place",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority there was nothing " +
+                        "to activate at that place", playerName);
                 return false;
             }
             EntityRef hitEntity = result.getEntity();
             if (!hitEntity.equals(event.getTarget())) {
-                /**
-                 * Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
-                 * server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
-                 * hit test.
+                /*
+                  Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
+                  server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
+                  hit test.
                  */
-                logger.info("Denied activation attempt by {} since at the authority another entity would have been activated",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority another entity would have been activated", playerName);
                 return false;
             }
 
             if (!(event.getHitPosition().equals(result.getHitPoint(), 0.0001f))) {
-                logger.info("Denied activation attempt by {} since at the authority the object got hit at a differnt position",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority the object " +
+                        "got hit at a different position", playerName);
                 return false;
             }
         } else {
             // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
             if (event.getTarget().exists()) {
-                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a target",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a target", playerName);
                 return false;
             }
             if (event.getHitPosition() != null) {
-                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit position",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled " +
+                        "as having a hit position", playerName);
                 return false;
             }
             if (event.getHitNormal() != null) {
-                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit delta",
-                        getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit delta", playerName);
                 return false;
             }
         }

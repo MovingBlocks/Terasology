@@ -151,17 +151,18 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         String moduleId = moduleDataHeader.getId();
+        String moduleVersion = moduleDataHeader.getVersion();
         if (missingModules.remove(moduleId.toLowerCase(Locale.ENGLISH))) {
             if (moduleDataHeader.hasError()) {
                 joinStatus.setErrorMessage("Module download error: " + moduleDataHeader.getError());
                 channelHandlerContext.channel().close();
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
+                int numOfMissingModules = missingModules.size();
                 joinStatus.setCurrentActivity(
-                        "Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
-                                + sizeString + "," + missingModules.size() + " modules remain)");
-                logger.info("Downloading {}: {} ({}, {} modules remain)", moduleDataHeader.getId(), moduleDataHeader.getVersion(),
-                        sizeString, missingModules.size());
+                        "Downloading " + moduleDataHeader.getId() + ":" + moduleVersion
+                                + " (" + sizeString + "," + numOfMissingModules + " modules remain)");
+                logger.info("Downloading {}: {} ({}, {} modules remain)", moduleId, moduleVersion, sizeString, numOfMissingModules);
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
@@ -176,7 +177,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         } else {
-            logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(), moduleDataHeader.getVersion());
+            logger.error("Received unwanted module {}:{} from server", moduleId, moduleVersion);
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.channel().close();
         }

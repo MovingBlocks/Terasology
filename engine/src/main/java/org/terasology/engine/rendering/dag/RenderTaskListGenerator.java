@@ -42,6 +42,7 @@ public final class RenderTaskListGenerator {
         taskList = Lists.newArrayList();
     }
 
+    @SuppressWarnings("PMD.GuardLogStatement")
     private void logIntermediateRendererListForDebugging(List<Node> orderedNodes) {
 
         for (Node node : orderedNodes) {
@@ -166,17 +167,17 @@ public final class RenderTaskListGenerator {
 
         long endTimeInNanoSeconds = System.nanoTime();
 
-        // if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
             logger.debug("===== RENDERER TASK LIST =================================");
             logList(taskList);
             logger.debug("----------------------------------------------------------");
-            logger.debug("Task list generated in {} ms", String.format("%.3f", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
-            logger.debug("{} nodes, {} enabled - {} tasks (excluding marker tasks) out of {} potential tasks.",
-                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks);
+            logger.debug(String.format("Task list generated in %.3f ms", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
+            logger.debug(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
+                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
             logger.debug("----------------------------------------------------------");
-        // }
+        }
 
         return taskList;
     }

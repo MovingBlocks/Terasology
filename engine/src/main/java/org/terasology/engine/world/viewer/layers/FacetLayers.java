@@ -78,7 +78,7 @@ public final class FacetLayers {
         }
 
         if (result.isEmpty()) {
-            logger.warn("No layers found for facet {}", facetClass.getName());
+            logger.warn("No layers found for facet {}", facetClass.getName());  //NOPMD
         }
 
         return result;

@@ -173,9 +173,9 @@ public class ModuleManager {
                     continue;
                 }
                 if (registry.add(module)) {
-                    logger.info("Loaded {} from {}", module.getId(), path);
+                    logger.info("Loaded {} from {}", module.getId(), path); //NOPMD
                 } else {
-                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path); //NOPMD
                 }
             }
         }

@@ -363,7 +363,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     void send(NetData.NetMessage data) {
-        logger.trace("Sending packet with size {}", data.getSerializedSize());
+        int dataSize = data.getSerializedSize();
+        logger.trace("Sending packet with size {}", dataSize);
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.writeAndFlush(data);
@@ -507,7 +508,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
                 EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                    logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                    logger.atWarn().log("Received non-server event '{}' from client '{}'", metadata, getName());
                     continue;
                 }
                 if (!lagCompensated && metadata.isLagCompensated()) {

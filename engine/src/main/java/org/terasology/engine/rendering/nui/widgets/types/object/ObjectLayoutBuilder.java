@@ -192,8 +192,8 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
                         library.getBaseTypeWidget((Binding) argumentBinding, parameterType);
 
                     if (!optionalWidget.isPresent()) {
-                        LOGGER.warn("Could not create widget for parameter of type {} of constructor {}",
-                            parameter, selectedConstructor.get());
+                        LOGGER.atWarn().log("Could not create widget for parameter of type {} of constructor {}",
+                                parameter, selectedConstructor.get());
                         continue;
                     }
 

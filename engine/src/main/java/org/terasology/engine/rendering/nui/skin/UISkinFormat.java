@@ -145,7 +145,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
                         builder.setElementClass(metadata.getType());
                         entry.getValue().apply(builder);
                     } else {
-                        logger.warn("Failed to resolve UIWidget class {}, skipping style information", entry.getKey());
+                        logger.atWarn().log("Failed to resolve UIWidget class {}, skipping style information", entry.getKey());
                     }
 
                 }

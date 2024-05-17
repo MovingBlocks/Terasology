@@ -59,12 +59,13 @@ public class ConsoleImpl implements Console {
      * @param command The command to be registered
      */
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void registerCommand(ConsoleCommand command) {
         Name commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
-            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
-                    commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
+            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'", commandName,
+                    commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
                     command.getSource().getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
@@ -135,7 +136,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void addMessage(Message message) {
         String uncoloredText = FontUnderline.strip(FontColor.stripColor(message.getMessage()));
-        logger.info("[{}] {}", message.getType(), uncoloredText);
+        logger.info("[{}] {}", message.getType(), uncoloredText); //NOPMD
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);

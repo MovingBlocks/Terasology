@@ -100,7 +100,7 @@ public class ComponentSerializer {
             Component component = componentMetadata.newInstance();
             return deserializeOnto(component, componentData, componentMetadata, FieldSerializeCheck.NullCheck.<Component>newInstance());
         } else {
-            logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
+            logger.atWarn().log("Unable to deserialize unknown component type: {}", componentData.getType());
         }
         return null;
     }
@@ -159,7 +159,7 @@ public class ComponentSerializer {
         if (componentMetadata != null) {
             return deserializeOnto(target, componentData, componentMetadata, fieldCheck);
         } else {
-            logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
+            logger.atWarn().log("Unable to deserialize unknown component type: {}", componentData.getType());
         }
         return target;
     }
@@ -179,7 +179,7 @@ public class ComponentSerializer {
             if (fieldInfo != null) {
                 dataMap.put(fieldInfo, new ProtobufPersistedData(field.getValue()));
             } else if (field.hasName()) {
-                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getId());
+                logger.atWarn().log("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getId());
             }
         }
         serializer.deserializeOnto(targetComponent, dataMap, fieldCheck);
@@ -205,9 +205,10 @@ public class ComponentSerializer {
      * @return The serialized component, or null if it could not be serialized.
      */
     public EntityData.Component serialize(Component component, FieldSerializeCheck<Component> check) {
+
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
-            logger.error("Unregistered component type: {}", component.getClass());
+            logger.atError().log("Unregistered component type: {}", component.getClass());
             return null;
         }
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
@@ -262,7 +263,7 @@ public class ComponentSerializer {
     public EntityData.Component serialize(Component base, Component delta, FieldSerializeCheck<Component> check) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
         if (componentMetadata == null) {
-            logger.error("Unregistered component type: {}", base.getClass());
+            logger.atError().log("Unregistered component type: {}", base.getClass());
             return null;
         }
 
@@ -325,7 +326,7 @@ public class ComponentSerializer {
                 }
             }
             if (metadata == null) {
-                logger.warn("Unable to deserialize unknown component with id: {}", componentData.getTypeIndex());
+                logger.atWarn().log("Unable to deserialize unknown component with id: {}", componentData.getTypeIndex());
                 return null;
             }
             return metadata;
@@ -337,7 +338,7 @@ public class ComponentSerializer {
                 metadata = componentLibrary.resolve(componentData.getType());
             }
             if (metadata == null) {
-                logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
+                logger.atWarn().log("Unable to deserialize unknown component type: {}", componentData.getType());
                 return null;
             }
             return metadata;

@@ -365,7 +365,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 }
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;
@@ -490,7 +490,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 addOverlay(overlay, overlayUri);
                 return overlay;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;

@@ -472,7 +472,7 @@ public abstract class AbstractNode implements Node {
     }
 
     public void disconnectInputFbo(int inputId) {
-        logger.info("Disconnecting {} input Fbo number {}", this.getUri(), inputId);
+        logger.info("Disconnecting {} input Fbo number {}", this.getUri(), inputId); //NOPMD
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputFboToOutput
@@ -547,7 +547,7 @@ public abstract class AbstractNode implements Node {
      */
     protected void addDesiredStateChange(StateChange stateChange) {
         if (stateChange.isTheDefaultInstance()) {
-            logger.error("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
+            logger.atError().log("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
                     stateChange.getClass().getSimpleName(), this);
         }
         desiredStateChanges.add(stateChange);

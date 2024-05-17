@@ -123,7 +123,7 @@ public final class OpenALStreamingSound extends StreamingSound {
         try {
             GameThread.synch(this::initializeBuffers);
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 

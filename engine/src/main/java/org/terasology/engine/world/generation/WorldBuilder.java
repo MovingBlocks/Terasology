@@ -175,22 +175,24 @@ public class WorldBuilder extends ProviderStore {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
         Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
         for (FacetProvider provider : providersList) {
-            Produces produces = provider.getClass().getAnnotation(Produces.class);
+            Class<? extends FacetProvider> providerClass = provider.getClass();
+            Produces produces = providerClass.getAnnotation(Produces.class);
             if (produces != null) {
                 facets.addAll(Arrays.asList(produces.value()));
             }
 
-            Requires requires = provider.getClass().getAnnotation(Requires.class);
+            Requires requires = providerClass.getAnnotation(Requires.class);
             if (requires != null) {
                 for (Facet facet : requires.value()) {
-                    if (!facets.contains(facet.value())) {
-                        logger.error("Facet provider for {} is missing. It is required by {}", facet.value(), provider.getClass());
+                    Class<? extends WorldFacet> facetValue = facet.value();
+                    if (!facets.contains(facetValue)) {
+                        logger.error("Facet provider for {} is missing. It is required by {}", facetValue, providerClass);
                         throw new IllegalStateException("Missing facet provider");
                     }
                 }
             }
 
-            Updates updates = provider.getClass().getAnnotation(Updates.class);
+            Updates updates = providerClass.getAnnotation(Updates.class);
             if (updates != null) {
                 for (Facet facet : updates.value()) {
                     facets.add(facet.value());
