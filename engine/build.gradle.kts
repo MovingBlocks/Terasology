@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // The engine build is the primary Java project and has the primary list of dependencies
-
-import groovy.json.JsonSlurper
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -16,36 +14,26 @@ plugins {
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
-apply from: "$rootDir/config/gradle/publish.gradle"
+apply(from = "$rootDir/config/gradle/publish.gradle")
 
-// Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
-ext {
-    // Read environment variables, including variables passed by jenkins continuous integration server
-    env = System.getenv()
+// Read environment variables, including variables passed by jenkins continuous integration server
+val env = System.getenv()
 
-    templatesDir = new File(rootDir, "templates")
-
-    // Stuff for our automatic version file setup
-    startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
-    versionBase = new File(templatesDir, "version.txt").text.trim()
-    displayVersion = versionBase
-}
+// Stuff for our automatic version file setup
+val startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
+val displayVersion by lazy { File("$rootDir/templates/version.txt").readText().trim() }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-sourceSets {
+configure<SourceSetContainer> {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main {
-        proto {
-            srcDir "src/main/protobuf"
-        }
-        java {
-            // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-            destinationDirectory = new File("$buildDir/classes")
-        }
-        test.java.destinationDirectory = new File("$buildDir/testClasses")
+        java.destinationDirectory.set(layout.buildDirectory.dir("classes"))
+        proto.srcDir("src/main/protobuf")
     }
+    test { java.destinationDirectory.set(layout.buildDirectory.dir("testClasses")) }
 }
 
 // Customizations for the main compilation configuration
@@ -53,8 +41,8 @@ configurations {
 
     // Exclude a couple JWJGL modules that aren't needed during compilation (OS specific stuff in these two perhaps)
     implementation {
-        exclude module: "lwjgl-platform"
-        exclude module: "jinput-platform"
+        exclude(module = "lwjgl-platform")
+        exclude(module = "jinput-platform")
     }
 }
 
@@ -90,7 +78,7 @@ dependencies {
     implementation("com.esotericsoftware:reflectasm:1.11.9")
 
     // Graphics, 3D, UI, etc
-    api(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
+    api(platform("org.lwjgl:lwjgl-bom:${rootProject.extra["LwjglVersion"]}"))
     api("org.lwjgl:lwjgl")
     implementation("org.lwjgl:lwjgl-assimp")
     api("org.lwjgl:lwjgl-glfw")
@@ -128,7 +116,7 @@ dependencies {
 
     // telemetry
     implementation("com.snowplowanalytics:snowplow-java-tracker:0.12.1") {
-        exclude group: "org.slf4j", module: "slf4j-simple"
+        exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
@@ -148,7 +136,7 @@ dependencies {
 
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
-    api fileTree(dir: "libs", include: "*.jar")
+    api(fileTree("libs") { include("*.jar") })
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation("org.terasology.crashreporter:cr-terasology:5.0.0")
@@ -164,95 +152,50 @@ protobuf {
     }
 }
 
-// Instructions for packaging a jar file for the engine
-jar {
-    // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
-    duplicatesStrategy = "EXCLUDE"
-
-    doFirst {
-        manifest {
-            def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
-                it.getName()
-            }.join(" $subDirLibs/")
-            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
-        }
-    }
-}
-
-// JMH related tasks
-
-sourceSets {
-    jmh {
-        java.srcDirs = ["src/jmh/java"]
-        resources.srcDirs = ["src/jmh/resources"]
-        compileClasspath += sourceSets.main.runtimeClasspath
-        java.destinationDirectory = new File("$buildDir/jmhClasses")
-    }
-}
-
-tasks.register("jmh", JavaExec) {
-    dependsOn jmhClasses
-    mainClass = "org.openjdk.jmh.Main"
-    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
-}
-
-dependencies {
-    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.27")
-    jmhImplementation("org.openjdk.jmh:jmh-core:1.27")
-    jmhImplementation("org.openjdk.jmh:jmh-generator-annprocess:1.27")
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // First read the internal version out of the engine"s module.txt
-def moduleFile = file("src/main/resources/org/terasology/engine/module.txt")
+val moduleFile = layout.projectDirectory.file("src/main/resources/org/terasology/engine/module.txt").asFile
 
-if (!moduleFile.exists()) {
-    println "Failed to find module.txt for engine"
-    throw new GradleException("Failed to find module.txt for engine")
-}
-
-println "Scanning for version in module.txt for engine"
-def slurper = new JsonSlurper()
-def moduleConfig = slurper.parseText(moduleFile.text)
+println("Scanning for version in module.txt for engine")
+val moduleConfig = groovy.json.JsonSlurper().parseText(moduleFile.readText()) as Map<String, String>
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
-version = moduleConfig.version
+version = moduleConfig["version"]!!
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.engine"
 
-println "Version for $project.name loaded as $version for group $group"
+println("Version for $project.name loaded as $version for group $group")
 
-// This version info file actually goes inside the built jar and can be used at runtime
-def createVersionInfoFile = tasks.register("createVersionInfoFile", WriteProperties) {
-    //noinspection GroovyAssignabilityCheck
-    properties([
-            buildNumber: env.BUILD_NUMBER,
-            buildId: env.BUILD_ID,
-            buildTag: env.BUILD_TAG,
-            buildUrl: env.BUILD_URL,
-            jobName: env.JOB_NAME,
-            gitCommit: env.GIT_COMMIT,
-            displayVersion: displayVersion,
-            engineVersion: version
-    ].findAll { it.value != null })
-    if (env.JOB_NAME != null) {
-        // Only set the dateTime property when there is a Jenkins JOB_NAME.
-        // It is a value we can always get (on Jenkins or otherwise) but we don't want local builds
-        // to invalidate their cache whenever the time changes.
-        // TODO: after upgrading to Gradle 6.8, see if we can have it ignore this property specifically:
-        //     https://docs.gradle.org/current/userguide/incremental_build.html#sec:property_file_normalization
+// This version info file actually goes inside the built jar and can be used at runtime, contents:
+// displayVersion=alpha-20
+// engineVersion=5.4.0-SNAPSHOT
+tasks.register<WriteProperties>("createVersionInfoFile") {
+    mapOf(
+        "buildNumber" to env["BUILD_NUMBER"],
+        "buildId" to env["BUILD_ID"],
+        "buildTag" to env["BUILD_TAG"],
+        "buildUrl" to env["BUILD_URL"],
+        "jobName" to env["JOB_NAME"],
+        "gitCommit" to env["GIT_COMMIT"],
+        "displayVersion" to displayVersion,
+        "engineVersion" to version
+    ).filterValues { it != null }.forEach { (key, value) ->
+        property(key, value!!)
+        inputs.property(key, value)
+    }
+    if (env["JOB_NAME"] != null) {
         property("dateTime", startDateTimeString)
     }
-
     destinationFile = layout.buildDirectory.dir("createrVersionInfoFile").get().file("versionInfo.properties")
 }
 
-tasks.named("processResources", Copy) {
-    from(createVersionInfoFile) {
+tasks.named<Copy>("processResources") {
+    from("createVersionInfoFile") {
         into("org/terasology/engine/version/")
     }
     from("$rootDir/docs") {
@@ -261,14 +204,60 @@ tasks.named("processResources", Copy) {
 }
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
-tasks.register("copyResourcesToClasses", Copy) {
-    from processResources
-    into sourceSets.main.output.classesDirs.first()
-
+tasks.register<Copy>("copyResourcesToClasses") {
+    from("processResources")
+    into(sourceSets["main"].output.classesDirs.first())
 }
 
 tasks.named("compileJava") {
     dependsOn(tasks.named("copyResourcesToClasses"))
+}
+
+// Instructions for packaging a jar file for the engine
+tasks.withType<Jar> {
+    // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Class-Path"] = "libs/" + configurations.runtimeClasspath.get().joinToString(" libs/") { it.name }
+        attributes["Implementation-Title"] = "Terasology"
+        attributes["Implementation-Version"] =
+            "$displayVersion, engine v${project.version}, build number ${env["BUILD_NUMBER"]}"
+    }
+}
+
+// JMH related tasks
+
+sourceSets {
+    create("jmh") {
+        java.srcDir("src/jmh/java")
+        resources.srcDir("src/jmh/resources")
+        compileClasspath += sourceSets["main"].runtimeClasspath
+        java.destinationDirectory.set(layout.buildDirectory.dir("jmhClasses"))
+    }
+}
+
+tasks.register<JavaExec>("jmh") {
+    dependsOn("jmhClasses")
+    mainClass.set("org.openjdk.jmh.Main")
+    classpath = sourceSets.named("jmh").get().compileClasspath + sourceSets.named("jmh").get().runtimeClasspath
+}
+
+dependencies {
+    "jmhAnnotationProcessor"("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+    "jmhImplementation"("org.openjdk.jmh:jmh-core:1.27")
+    "jmhImplementation"("org.openjdk.jmh:jmh-generator-annprocess:1.27")
+}
+
+// following tasks use the output of jmh, so declare explicit dependency
+listOf(
+    Checkstyle::class,
+    Pmd::class,
+    Javadoc::class,
+    com.github.spotbugs.snom.SpotBugsTask::class
+).forEach { taskClass ->
+    tasks.withType(taskClass.java).configureEach {
+        dependsOn(":engine:compileJmhJava")
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,11 +270,11 @@ idea {
         inheritOutputDirs = false
         outputDir = file("build/classes")
         testOutputDir = file("build/testClasses")
-        downloadSources = true
+        isDownloadSources = true
     }
 }
 
 // Make sure our config file for code analytics get extracted (vulnerability: non-IDE execution of single analytic)
-ideaModule.dependsOn rootProject.extractConfig
-tasks.eclipse.dependsOn rootProject.extractConfig
-check.dependsOn rootProject.extractConfig
+tasks.named("ideaModule") { dependsOn(tasks.getByPath(":extractConfig")) }
+tasks.named("eclipse") { dependsOn(tasks.getByPath(":extractConfig")) }
+tasks.named("check") { dependsOn(tasks.getByPath(":extractConfig")) }
