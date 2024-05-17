@@ -353,15 +353,16 @@ public class ServerImpl implements Server {
     }
 
     private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
-        EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
+        int entityNetId = updateEntity.getNetId();
+        EntityRef currentEntity = networkSystem.getEntity(entityNetId);
         if (currentEntity.exists()) {
             NetworkComponent netComp = currentEntity.getComponent(NetworkComponent.class);
             if (netComp == null) {
-                logger.atError().addArgument(() -> currentEntity).addArgument(() -> updateEntity.getNetId()).
-                        log("Updating entity with no network component: {}, expected netId {}");
+                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, entityNetId);
                 return;
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
+            int networkId = netComp.getNetworkId();
+            if (networkId != entityNetId) {
                 logger.error("Network ID wrong before update");
             }
             boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
@@ -371,15 +372,11 @@ public class ServerImpl implements Server {
                     && !blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                 logger.error("Failed to associated new block entity");
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
-                logger.atError().
-                        addArgument(() -> currentEntity).
-                        addArgument(() -> updateEntity.getNetId()).
-                        addArgument(() -> netComp.getNetworkId()).
-                        log("Network ID lost in update: {}, {} -> {}");
+            if (networkId != entityNetId) {
+                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, entityNetId, networkId);
             }
         } else {
-            logger.atWarn().addArgument(() -> updateEntity.getNetId()).log("Received update for non-existent entity {}");
+            logger.warn("Received update for non-existent entity {}", entityNetId);
         }
     }
 

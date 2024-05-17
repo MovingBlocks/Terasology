@@ -151,21 +151,18 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         String moduleId = moduleDataHeader.getId();
+        String moduleVersion = moduleDataHeader.getVersion();
         if (missingModules.remove(moduleId.toLowerCase(Locale.ENGLISH))) {
             if (moduleDataHeader.hasError()) {
                 joinStatus.setErrorMessage("Module download error: " + moduleDataHeader.getError());
                 channelHandlerContext.channel().close();
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
+                int numOfMissingModules = missingModules.size();
                 joinStatus.setCurrentActivity(
-                        "Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
-                                + sizeString + "," + missingModules.size() + " modules remain)");
-                logger.atInfo().
-                        addArgument(() -> moduleDataHeader.getId()).
-                        addArgument(() -> moduleDataHeader.getVersion()).
-                        addArgument(() -> sizeString).
-                        addArgument(() -> missingModules.size()).
-                        log("Downloading {}: {} ({}, {} modules remain)");
+                        "Downloading " + moduleDataHeader.getId() + ":" + moduleVersion
+                                + " (" + sizeString + "," + numOfMissingModules + " modules remain)");
+                logger.info("Downloading {}: {} ({}, {} modules remain)", moduleId, moduleVersion, sizeString, numOfMissingModules);
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
@@ -180,8 +177,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         } else {
-            logger.atError().addArgument(() -> moduleDataHeader.getId()).addArgument(() -> moduleDataHeader.getVersion()).
-                    log("Received unwanted module {}:{} from server");
+            logger.error("Received unwanted module {}:{} from server", moduleId, moduleVersion);
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.channel().close();
         }

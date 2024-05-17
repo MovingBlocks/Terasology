@@ -239,11 +239,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                             return connectionHandler.getJoinStatus();
                         }
                     } else {
-                        logger.atWarn().addArgument(connectCheck.cause()).log("Failed to connect to server");
+
+                        Throwable connectionFailureCause = connectCheck.cause();
+                        logger.warn("Failed to connect to server", connectionFailureCause);
                         connectCheck.channel().closeFuture().awaitUninterruptibly();
                         clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS)
                                 .syncUninterruptibly();
-                        return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
+                        return new JoinStatusImpl("Failed to connect to server - " + connectionFailureCause.getMessage());
                     }
                 }
                 connectCheck.channel().closeFuture().sync();
@@ -538,12 +540,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (mode != NetworkMode.CLIENT) {
             NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
             if (netComponent != null) {
-                logger.atDebug().addArgument(entity).addArgument(netComponent.getNetworkId()).
-                        log("Unregistering network entity: {} with netId {}");
-                netIdToEntityId.remove(netComponent.getNetworkId());
+                int networkId = netComponent.getNetworkId();
+                logger.debug("Unregistering network entity: {} with netId {}", entity, networkId);
+                netIdToEntityId.remove(networkId);
                 if (mode.isServer()) {
                     for (NetClient client : netClientList) {
-                        client.setNetRemoved(netComponent.getNetworkId());
+                        client.setNetRemoved(networkId);
                     }
                 }
                 netComponent.setNetworkId(NULL_NET_ID);
@@ -993,20 +995,21 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                                                                         ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
+            String infoName = info.getName();
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(infoName);
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {
-                    FieldMetadata<?, ?> field = metadata.getField(info.getFieldName(i));
+                    String fieldName = info.getFieldName(i);
+                    FieldMetadata<?, ?> field = metadata.getField(fieldName);
                     if (field != null) {
                         field.setId(info.getFieldIds().byteAt(i));
                     } else {
-                        logger.atError().addArgument(info.getFieldName(i)).addArgument(() -> info.getName()).
-                                log("Server has unknown field '{}' on '{}'");
+                        logger.error("Server has unknown field '{}' on '{}'", fieldName, infoName);
                     }
                 }
             } else {
-                logger.atError().addArgument(() -> info.getName()).log("Server has unknown class '{}'");
+                logger.error("Server has unknown class '{}'", infoName);
             }
         }
         return idTable;

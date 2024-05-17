@@ -363,7 +363,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     void send(NetData.NetMessage data) {
-        logger.atTrace().addArgument(() -> data.getSerializedSize()).log("Sending packet with size {}");
+        int dataSize = data.getSerializedSize();
+        logger.trace("Sending packet with size {}", dataSize);
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.writeAndFlush(data);

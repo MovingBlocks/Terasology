@@ -26,7 +26,9 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.NameVersion;
+import org.terasology.gestalt.naming.Version;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -350,25 +352,24 @@ public class GameDetailsScreen extends CoreScreenLayer {
         final List<ModuleSelectionInfo> sortedGameModules = gameInfo.getManifest().getModules().stream()
                 .sorted(Comparator.comparing(NameVersion::getName))
                 .map(nameVersion -> {
-                    Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
+                    Name name = nameVersion.getName();
+                    Version version = nameVersion.getVersion();
+                    Module module = moduleManager.getRegistry().getModule(name, version);
                     if (module != null) {
                         return ModuleSelectionInfo.strictVersion(module);
                     } else {
-                        logger.atWarn().addArgument(() -> nameVersion.getName()).addArgument(() -> nameVersion.getVersion()).
-                                log("Can't find module in your classpath - {}:{}");
-                        module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
+                        logger.warn("Can't find module in your classpath - {}:{}", name, version);
+                        module = moduleManager.getRegistry().getLatestModuleVersion(name);
                         if (module != null) {
-                            logger.atDebug().addArgument(() -> nameVersion.getName()).
-                                    log("Get the latest available version of module {} in your classpath");
+                            logger.debug("Get the latest available version of module {} in your classpath", name);
                             errors.add(String.format("Can't find module %s:%s in your classpath; " +
                                             "loaded description for the latest available version.",
-                                    nameVersion.getName(), nameVersion.getVersion()));
+                                    name, version));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
-                        logger.atError().addArgument(() -> nameVersion.getName()).
-                                log("Can't find any versions of module {} in your classpath!");
-                        errors.add(String.format("Can't find any versions of module %s in your classpath!", nameVersion.getName()));
-                        return ModuleSelectionInfo.unavailableVersion(nameVersion.getName().toString(), nameVersion.getVersion().toString());
+                        logger.error("Can't find any versions of module {} in your classpath!", name);
+                        errors.add(String.format("Can't find any versions of module %s in your classpath!", name));
+                        return ModuleSelectionInfo.unavailableVersion(name.toString(), version.toString());
                     }
                 })
                 .filter(Objects::nonNull)
