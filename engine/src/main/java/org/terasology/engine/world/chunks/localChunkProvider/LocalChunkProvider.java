@@ -239,7 +239,7 @@ public class LocalChunkProvider implements ChunkProvider {
             processReadyChunk(chunk);
             long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
             if (!readyChunks.isEmpty() && totalProcessingTime > UPDATE_PROCESSING_DEADLINE_MS) {
-                logger.warn("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
+                logger.atWarn().log("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
                         UPDATE_PROCESSING_DEADLINE_MS, readyChunks.size());
                 break;
             }

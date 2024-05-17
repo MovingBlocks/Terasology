@@ -90,7 +90,7 @@ public class ExtraBlockDataManager {
             loggingOutput.append(first ? " " : ", ").append(entry.getKey()).append(" -> ").append(entry.getValue());
             first = false;
         }
-        logger.info(loggingOutput.toString());
+        logger.info(loggingOutput);
     }
 
     // Find requests for extensions and which blocks they apply to.
@@ -107,7 +107,7 @@ public class ExtraBlockDataManager {
                 if (registerAnnotation != null) {
                     String errorType = validRegistrationMethod(method, registerAnnotation);
                     if (errorType != null) {
-                        logger.error("Unable to register extra block data: {} for {}.{}: should be \"public static"
+                        logger.atError().log("Unable to register extra block data: {} for {}.{}: should be \"public static"
                                         + " boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
                                 errorType, type.getName(), method.getName(), method.getName());
                         continue;
