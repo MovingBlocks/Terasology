@@ -90,7 +90,7 @@ public class ExtraBlockDataManager {
             loggingOutput.append(first ? " " : ", ").append(entry.getKey()).append(" -> ").append(entry.getValue());
             first = false;
         }
-        logger.info(loggingOutput);
+        logger.info("{}", loggingOutput);
     }
 
     // Find requests for extensions and which blocks they apply to.
