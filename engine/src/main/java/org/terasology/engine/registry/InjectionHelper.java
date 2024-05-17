@@ -73,10 +73,8 @@ public final class InjectionHelper {
                         logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
                     }
                 } else {
-                    logger.atWarn().
-                            addArgument(() -> object.getClass().getSimpleName()).
-                            addArgument(() -> field.getType().getSimpleName()).
-                            log("{} wanted {} injected but CoreRegistry has none.");
+                    logger.atWarn().log("{} wanted {} injected but CoreRegistry has none.",
+                            object.getClass().getSimpleName(), field.getType().getSimpleName());
                 }
             }
 

@@ -130,7 +130,7 @@ public class NetworkEntitySerializer {
                                          boolean componentInitial) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
         if (componentMetadata == null) {
-            logger.atError().addArgument(() -> oldComponent.getClass()).log("Unregistered component type: {}");
+            logger.atError().log("Unregistered component type: {}", oldComponent.getClass());
             return;
         }
 
@@ -165,7 +165,7 @@ public class NetworkEntitySerializer {
                                         boolean componentInitial) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
-            logger.atError().addArgument(() -> component.getClass()).log("Unregistered component type: {}");
+            logger.atError().log("Unregistered component type: {}", component.getClass());
             return;
         }
 
@@ -218,11 +218,8 @@ public class NetworkEntitySerializer {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
                 ReplicatedFieldMetadata fieldMetadata = metadata.getField(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserialize(metadata, fieldMetadata)) {
-                    logger.atTrace().
-                            addArgument(() -> fieldMetadata).
-                            addArgument(() -> metadata).
-                            addArgument(entityData.getFieldValue(fieldPos)).
-                            log("Deserializing field {} of component {} as value {}");
+                    logger.atTrace().log("Deserializing field {} of component {} as value {}",
+                            fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
                     serializer.deserializeOnto(component, fieldMetadata, new ProtobufPersistedData(entityData.getFieldValue(fieldPos)));
                 }
                 fieldPos++;

@@ -205,10 +205,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
-                logger.atInfo().
-                        addArgument(moduleRenderingInstance.getClass().getSimpleName()).
-                        addArgument(moduleRenderingInstance.getProvidingModule()).
-                        log("\nInitialising rendering class {} from {} module.\n");
+                logger.atInfo().log("\nInitialising rendering class {} from {} module.\n",
+                        moduleRenderingInstance.getClass().getSimpleName(),
+                        moduleRenderingInstance.getProvidingModule());
                 moduleRenderingInstance.initialise();
             }
         }

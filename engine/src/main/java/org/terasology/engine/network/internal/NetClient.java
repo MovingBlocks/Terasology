@@ -507,8 +507,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
                 EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                    logger.atWarn().addArgument(() -> metadata).addArgument(() -> getName()).
-                            log("Received non-server event '{}' from client '{}'");
+                    logger.atWarn().log("Received non-server event '{}' from client '{}'", metadata, getName());
                     continue;
                 }
                 if (!lagCompensated && metadata.isLagCompensated()) {

@@ -251,13 +251,11 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                 BindableButton positiveButton = getBindButton(new SimpleUri(info.positiveButton()));
                 BindableButton negativeButton = getBindButton(new SimpleUri(info.negativeButton()));
                 if (positiveButton == null) {
-                    logger.atWarn().addArgument(() -> id).addArgument(() -> info.positiveButton()).
-                            log("Failed to register axis \"{}\", missing positive button \"{}\"");
+                    logger.atWarn().log("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
                     continue;
                 }
                 if (negativeButton == null) {
-                    logger.atWarn().addArgument(() -> id).addArgument(() -> info.negativeButton()).
-                            log("Failed to register axis \"{}\", missing negative button \"{}\"");
+                    logger.atWarn().log("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
                     continue;
                 }
                 try {

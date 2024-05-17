@@ -28,12 +28,12 @@ public final class Jvm {
             Matcher asMavenCache = MAVEN_CACHE.matcher(pathEntry);
             if (asGradleCache.matches()) {
                 if (asGradleCache.group(1).contains(interestingGroup)) {
-                    aLogger.atDebug().addArgument(indent).addArgument(() -> asGradleCache.group(2)).log("{}gradle:{}");
+                    aLogger.atDebug().log("{}gradle:{}", indent, asGradleCache.group(2));
                 } else {
                     elidedCount++;
                 }
             } else if (asMavenCache.matches()) {
-                aLogger.atDebug().addArgument(indent).addArgument(() -> asMavenCache.group(1)).log("{}maven:{}");
+                aLogger.atDebug().log("{}maven:{}", indent, asMavenCache.group(1));
             } else {
                 String place = pathEntry;
                 if (pathEntry.startsWith(projectRoot)) {

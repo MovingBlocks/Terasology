@@ -30,7 +30,7 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
         for (ConfigurableFacetProvider provider : providersList) {
             Component old = properties.put(provider.getConfigurationName(), provider.getConfiguration());
             if (old != null) {
-                logger.atWarn().addArgument(() -> provider.getConfigurationName()).log("Duplicate property key: {}");
+                logger.atWarn().log("Duplicate property key: {}", provider.getConfigurationName());
             }
         }
         this.providers = providersList;

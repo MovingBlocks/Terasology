@@ -193,7 +193,7 @@ public class ServerImpl implements Server {
     }
 
     private void send(NetData.NetMessage data) {
-        logger.atTrace().addArgument(() -> data.getSerializedSize()).log("Sending with size {}");
+        logger.atTrace().log("Sending with size {}", data.getSerializedSize());
         channel.writeAndFlush(data);
     }
 
@@ -232,10 +232,7 @@ public class ServerImpl implements Server {
             if (target.exists()) {
                 target.send(event);
             } else {
-                logger.atInfo().
-                        addArgument(() -> event.getClass().getSimpleName()).
-                        addArgument(target).
-                        log("Dropping event {} for unavailable entity {}");
+                logger.atInfo().log("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
             }
         } catch (DeserializationException e) {
             logger.error("Failed to deserialize event", e);

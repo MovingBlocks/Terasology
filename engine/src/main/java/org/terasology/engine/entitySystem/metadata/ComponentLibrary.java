@@ -50,8 +50,7 @@ public class ComponentLibrary extends ModuleClassLibrary<Component> {
             return null;
         } catch (NoClassDefFoundError e) {
             // log what class was not found so that diagnosis is easier
-            logger.atError().addArgument(() -> type.getSimpleName()).addArgument(() -> e).
-                    log("Class not found, {}");
+            logger.atError().log("Class not found, {}", type.getSimpleName(), e);
             throw e;
         }
         return info;

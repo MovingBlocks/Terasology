@@ -302,8 +302,7 @@ public class RenderGraph {
 //        if (!areConnected(fromNode, toNode)) {
 //            connect(fromNode, toNode);
 //        }
-        logger.atDebug().addArgument(() -> fromNode.getOutputFboConnection(outputId)).addArgument(toNode).
-                log("Connected {} to {}.");
+        logger.atDebug().log("Connected {} to {}.", fromNode.getOutputFboConnection(outputId), toNode);
     }
 
     public void reconnectFbo(Node fromNode, int outputId, Node toNode, int inputId) {
@@ -402,8 +401,7 @@ public class RenderGraph {
 //        if (!areConnected(fromNode, toNode)) {
 //            connect(fromNode, toNode);
 //        }
-        logger.atDebug().addArgument(() -> fromNode.getOutputBufferPairConnection(outputId)).addArgument(toNode).
-                log("Connected {} to {}.");
+        logger.atDebug().log("Connected {} to {}.", fromNode.getOutputBufferPairConnection(outputId), toNode);
     }
 
     /**

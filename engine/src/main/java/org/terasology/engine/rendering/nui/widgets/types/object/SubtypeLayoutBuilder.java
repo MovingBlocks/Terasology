@@ -147,8 +147,7 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
                                                    .orElse(baseTypeWidgetBuilder);
 
                 if (builder == null) {
-                    LOGGER.atError().addArgument(() -> get()).addArgument(baseType).
-                            log("Could not find widget for type {}, editing as base type {}");
+                    LOGGER.atError().log("Could not find widget for type {}, editing as base type {}", get(), baseType);
                     return;
                 }
 

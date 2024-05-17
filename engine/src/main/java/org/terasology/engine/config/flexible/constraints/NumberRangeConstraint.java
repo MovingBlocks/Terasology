@@ -96,13 +96,12 @@ public class NumberRangeConstraint<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void warnUnsatisfiedBy(T value) {
-        LOGGER.atWarn().
-                addArgument(value).
-                addArgument(minInclusive ? "[" : "(").
-                addArgument(min != null ? min : "UNBOUNDED").
-                addArgument(max != null ? max : "UNBOUNDED").
-                addArgument(maxInclusive ? "]" : ")").
-                log("Value {} is not in the range {}{}, {}{}");
+        LOGGER.warn("Value {} is not in the range {}{}, {}{}", value,
+                minInclusive ? "[" : "(",
+                min != null ? min : "UNBOUNDED",
+                max != null ? max : "UNBOUNDED",
+                maxInclusive ? "]" : ")");
     }
 }

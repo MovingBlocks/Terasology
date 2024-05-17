@@ -68,8 +68,7 @@ public class RegisterMods extends SingleStepLoadProcess {
                 ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
 
                 for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
-                    logger.atInfo().addArgument(() -> moduleInfo.getId()).addArgument(() -> moduleInfo.getVersion()).
-                            log("Activating module: {}:{}");
+                    logger.atInfo().log("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
                 }
 
                 EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
