@@ -184,7 +184,7 @@ public final class RenderTaskListGenerator {
 
     private void logList(List<?> list) {
         for (Object object : list) {
-            logger.atDebug().addArgument(object).log("{}");
+            logger.debug("{}", object);
         }
     }
 

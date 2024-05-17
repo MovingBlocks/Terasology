@@ -183,7 +183,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
                 logger.info("Started server on port {}", port);
                 if (config.getServerMOTD() != null) {
-                    logger.atInfo().addArgument(() -> config.getServerMOTD()).log("Server MOTD is \"{}\"");
+                    logger.info("Server MOTD is \"{}\"", config.getServerMOTD()); //NOPMD
                 } else {
                     logger.info("No server MOTD is defined");
                 }

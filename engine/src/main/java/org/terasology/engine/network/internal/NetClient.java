@@ -525,8 +525,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                     if (Objects.equal(networkSystem.getOwner(target), this)) {
                         target.send(event);
                     } else {
-                        logger.atWarn().addArgument(() -> event).addArgument(target).addArgument(() -> this).
-                                log("Received event {} for non-owned entity {} from {}");
+                        logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
                     }
                 }
             } catch (DeserializationException e) {
