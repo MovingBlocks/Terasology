@@ -171,7 +171,8 @@
                   {
                     "type": "UIButton",
                     "text": "${engine:menu#re-roll}",
-                    "id": "reRoll"
+                    "id": "reRoll",
+                    "family": "button-text-field-height"
                   }
                 ]
               },
