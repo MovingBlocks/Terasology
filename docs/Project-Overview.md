@@ -42,7 +42,7 @@ These are indirect parts of the project, such as our supporting site work and la
 * [Applet](https://github.com/MovingBlocks/FacadeApplet) - the Facade running the applet version of the game you can [play in your browser](http://terasology.org/#play)
 * [Splash Site](https://github.com/MovingBlocks/movingblocks.github.com) - our GitHub-hosted front-end site at http://terasology.org offering a few quick links and what not - just in case our primary site gets slammed or something :-)
 * [Gooey](https://github.com/MovingBlocks/Gooey) - our handy little [Hubot](http://hubot.github.com/)-based IRC bot offering witty banter and useful functionality like auto-creating GitHub repos. When he feels like it, anyway!
-* [TeraMisc](https://github.com/MovingBlocks/TeraMisc) - a repository for miscellaneous stuff that doesn't really fit  anywhere else. Like raw model files, assorted utility scripts, stuff for our [XenForo](http://xenforo.com) site ([forum/portal](http://forum.movingblocks.net))
+* [TeraMisc](https://github.com/MovingBlocks/TeraMisc) - a repository for miscellaneous stuff that doesn't really fit  anywhere else. Like raw model files, assorted utility scripts, stuff for our [XenForo](http://xenforo.com) site ([forum/portal](http://forum.terasology.org))
 
 External projects
 ---------
@@ -51,8 +51,8 @@ These are noteworthy external projects we use
 
 * [LWJGL](http://lwjgl.org) - foundation for graphics, sound, and input
 * [Gradle-Git](https://github.com/ajoberstar/gradle-git) - makes Gradle even more magical by adding Git tasks
-* [Jenkins CI](http://jenkins-ci.org) - continuous integration tool, builds our stuff at http://jenkins.movingblocks.net
-* [Artifactory](http://www.jfrog.com/home/v_artifactory_opensource_overview) - repository manager, holds our builds and assorted library files, at http://artifactory.movingblocks.net
-* [XenForo](http://xenforo.com) - our portal/forum site at http://forum.movingblocks.net
+* [Jenkins CI](http://jenkins-ci.org) - continuous integration tool, builds our stuff at https://jenkins.terasology.io
+* [Artifactory](http://www.jfrog.com/home/v_artifactory_opensource_overview) - repository manager, holds our builds and assorted library files, at https://artifactory.terasology.io
+* [XenForo](http://xenforo.com) - our portal/forum site at http://forum.terasology.org
 
 
