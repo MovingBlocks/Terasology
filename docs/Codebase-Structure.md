@@ -27,9 +27,9 @@ The primary repo containing the engine is the first and only thing you need to r
 
 Along with the engine you get the PC Facade and a few embedded modules. Everything else lives in independent GitHub repos that can be added to your local workspace as sub-projects. You can edit several at once, commit files across multiple Git roots, and push it all to each affected repo on GitHub in one action.
 
-It also comes with several utility tasks, such as project file generation for [IDEA IntelliJ](http://www.jetbrains.com/idea). This is our recommended IDE (with a [freebie Ultimate Edition available](http://forum.movingblocks.net/threads/how-to-use-this-forum.33/#post-8778) for contributors) and the customized setup for it is fairly detailed.
+It also comes with several utility tasks, such as project file generation for [IDEA IntelliJ](http://www.jetbrains.com/idea). This is our recommended IDE (with a [freebie Ultimate Edition available](http://forum.terasology.org/threads/how-to-use-this-forum.33/#post-8778) for contributors) and the customized setup for it is fairly detailed.
 
-You can also use [Eclipse](http://www.eclipse.org/), [NetBeans](https://netbeans.org/), or anything else you like, but you might have to figure out some of the setup details yourself - and if you do please post them in the [forum](http://forum.movingblocks.net/forums/developer-portal.5/) so we can improve the instructions to set up with alternative IDEs :-)
+You can also use [Eclipse](http://www.eclipse.org/), [NetBeans](https://netbeans.org/), or anything else you like, but you might have to figure out some of the setup details yourself - and if you do please post them in the [forum](http://forum.terasology.org/forums/developer-portal.5/) so we can improve the instructions to set up with alternative IDEs :-)
 
 IntelliJ (versions 2020.1 and newer) will load the configuration from gradle after you "Import Gradle Project." The portions of the project configuration not detected from gradle are stored in the `/.idea` directory.
 
