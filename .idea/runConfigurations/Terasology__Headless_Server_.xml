@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="game (gradle)" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Terasology (Headless Server)" type="GradleRunConfiguration" factoryName="Gradle" folderName="Server/Client">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/facades/PC" />
@@ -11,11 +11,15 @@
       <option name="taskNames">
         <list>
           <option value="game" />
+          <option value="--args='--headless --homedir=terasology-server --override-default-config=override.cfg'" />
         </list>
       </option>
-      <option name="vmOptions" value="" />
+      <option name="vmOptions" value="-Xms256m -Xmx1536m" />
     </ExternalSystemSettings>
-    <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
     <method v="2" />
   </configuration>
 </component>
