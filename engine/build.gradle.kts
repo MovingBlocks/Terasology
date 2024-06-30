@@ -191,13 +191,10 @@ tasks.register<WriteProperties>("createVersionInfoFile") {
     if (env["JOB_NAME"] != null) {
         property("dateTime", startDateTimeString)
     }
-    destinationFile = layout.buildDirectory.dir("createrVersionInfoFile").get().file("versionInfo.properties")
+    destinationFile = layout.buildDirectory.dir("classes/org/terasology/engine/version").get().file("versionInfo.properties")
 }
 
 tasks.named<Copy>("processResources") {
-    from("createVersionInfoFile") {
-        into("org/terasology/engine/version/")
-    }
     from("$rootDir/docs") {
         include("Credits.md")
     }
@@ -210,7 +207,10 @@ tasks.register<Copy>("copyResourcesToClasses") {
 }
 
 tasks.named("compileJava") {
-    dependsOn(tasks.named("copyResourcesToClasses"))
+    dependsOn(
+        tasks.named("copyResourcesToClasses"),
+        tasks.named("createVersionInfoFile")
+    )
 }
 
 // Instructions for packaging a jar file for the engine
