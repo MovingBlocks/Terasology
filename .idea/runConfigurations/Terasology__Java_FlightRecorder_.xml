@@ -14,7 +14,7 @@
           <option value="--args='--homedir=. --no-crash-report'" />
         </list>
       </option>
-      <option name="vmOptions" value="-Xms256m -Xmx1536m -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true" />
+      <option name="vmOptions" value="-Xms256m -Xmx1536m -XX:+FlightRecorder -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
