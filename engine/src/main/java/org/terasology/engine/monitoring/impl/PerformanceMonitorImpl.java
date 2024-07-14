@@ -32,6 +32,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     // on the main thread. Not strictly necessary (these processes are ignored by the PerformanceMonitor
     // anyway) an instance of this class offers a slight performance improvement over standard Activity
     // implementations as it doesn't call the PerformanceMonitor.endActivity() method.
+    private static boolean tracyEnabled = false;
 
     private final Activity activityInstance = new ActivityInstance();
 
@@ -80,7 +81,10 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         timer = (EngineTime) CoreRegistry.get(Time.class);
         mainThread = Thread.currentThread();
 
-        Tracy.startupProfiler();
+        if (!tracyEnabled) {
+            Tracy.startupProfiler();
+            tracyEnabled = true;
+        }
     }
 
     @Override
@@ -107,7 +111,9 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         activityStack.clear();
 
-        Tracy.markFrame();
+        if (tracyEnabled) {
+            Tracy.markFrame();
+        }
     }
 
     @Override
@@ -118,10 +124,12 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         ActivityInfo newActivity = new ActivityInfo(activityName).initialize();
 
-        StackWalker.StackFrame caller = java.security.AccessController.doPrivileged((java.security.PrivilegedAction<StackWalker.StackFrame>) () ->
-                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(s -> s.skip(4).findFirst()).get());
-        long sourceLocation = Tracy.allocSourceLocation(caller.getLineNumber(), caller.getFileName(), caller.getClassName() + "#" + caller.getMethodName(), activityName, 0);
-        newActivity.zoneContext = Tracy.zoneBegin(sourceLocation, 1);
+        if (tracyEnabled) {
+            StackWalker.StackFrame caller = java.security.AccessController.doPrivileged((java.security.PrivilegedAction<StackWalker.StackFrame>) () ->
+                    StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(s -> s.skip(4).findFirst()).get());
+            long sourceLocation = Tracy.allocSourceLocation(caller.getLineNumber(), caller.getFileName(), caller.getClassName() + "#" + caller.getMethodName(), activityName, 0);
+            newActivity.zoneContext = Tracy.zoneBegin(sourceLocation, 1);
+        }
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
@@ -145,7 +153,9 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         ActivityInfo oldActivity = activityStack.pop();
 
-        Tracy.zoneEnd(oldActivity.zoneContext);
+        if (tracyEnabled) {
+            Tracy.zoneEnd(oldActivity.zoneContext);
+        }
 
         long endTime = timer.getRealTimeInMs();
         long totalTime = (oldActivity.resumeTime > 0)
@@ -192,6 +202,14 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         runningAllocationTotals.forEachEntry(setAllocatedMemoryRunningMean);
 
         return activityToMeanMap;
+    }
+
+    @Override
+    public void shutdown() {
+        if (tracyEnabled) {
+            tracyEnabled = false;
+            Tracy.shutdownProfiler();
+        }
     }
 
     private class ActivityInfo {

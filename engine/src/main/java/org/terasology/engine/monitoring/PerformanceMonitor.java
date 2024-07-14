@@ -136,8 +136,14 @@ public final class PerformanceMonitor {
      */
     public static void setEnabled(boolean enabled) {
         if (enabled && !(instance instanceof PerformanceMonitorImpl)) {
+            if (instance != null) {
+                instance.shutdown();
+            }
             instance = new PerformanceMonitorImpl();
         } else if (!enabled && !(instance instanceof NullPerformanceMonitor)) {
+            if (instance != null) {
+                instance.shutdown();
+            }
             instance = new NullPerformanceMonitor();
         }
     }
