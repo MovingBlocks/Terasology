@@ -7,8 +7,8 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.dag.StateChange;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
 /**
  * Binds the given FBO, setting it as the FBO to read from and write to.
@@ -58,8 +58,7 @@ public final class BindFbo implements StateChange {
 
     @Override
     public void process() {
-        // TODO: change the target argument to GL_DRAW_FRAMEBUFFER when we switch to OpenGL 3.0 and beyond.
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     }
 
     private static final class UnbindFbo implements StateChange {
@@ -85,7 +84,7 @@ public final class BindFbo implements StateChange {
 
         @Override
         public void process() {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
 }
