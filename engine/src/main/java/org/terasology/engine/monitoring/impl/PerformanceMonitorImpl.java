@@ -59,7 +59,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private final Thread mainThread;
     private final EngineTime timer;
 
-    public PerformanceMonitorImpl() {
+    public PerformanceMonitorImpl(boolean enableTracy) {
         activityStack  = Queues.newArrayDeque();
         executionData  = Lists.newLinkedList();
         allocationData = Lists.newLinkedList();
@@ -81,7 +81,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         timer = (EngineTime) CoreRegistry.get(Time.class);
         mainThread = Thread.currentThread();
 
-        if (!tracyEnabled) {
+        if (enableTracy && !tracyEnabled) {
             Tracy.startupProfiler();
             tracyEnabled = true;
         }
