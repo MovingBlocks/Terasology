@@ -68,13 +68,14 @@ tasks.withType<Test> {
     }
 }
 
- tasks.withType<Checkstyle> {
-    //FIXME: This is a workaround for module harness builds, where the config 
+tasks.withType<Checkstyle> {
+    //FIXME: This is a workaround for module harness builds, where the config
     //       files are part of the harness but the task is not defined.
     if (rootProject.name == "Terasology") {
         dependsOn(tasks.getByPath(":extractConfig"))
     }
- }
+    group = "verification"
+}
 
 tasks.withType<Pmd> {
     //FIXME: This is a workaround for module harness builds, where the config 
@@ -82,6 +83,7 @@ tasks.withType<Pmd> {
     if (rootProject.name == "Terasology") {
         dependsOn(tasks.getByPath(":extractConfig"))
     }
+    group = "verification"
 }
 
 tasks.withType<SpotBugsTask> {
