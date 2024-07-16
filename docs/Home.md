@@ -39,7 +39,7 @@ All Terasology modules reside in the [Terasology](https://github.com/Terasology)
 
 These pages offer more advanced insight into how specific features of the game are architected and why.
 
-- [Project Sturcture](Codebase-Structure.md) - a high-level overview of the code base
+- [Project Structure](Codebase-Structure.md) - a high-level overview of the code base
 - [Entity System Architecture](Entity-System-Architecture.md) - describes the structure and usage of the entity system.
 - [Events and Systems](Events-and-Systems.md) - describes how new game logic can be hooked in
 - [Block Architecture](https://github.com/Terasology/TutorialAssetSystem/wiki/Block-Attributes) - development overview of our Block system. (pending changes needed to make the game work in an applet again)
