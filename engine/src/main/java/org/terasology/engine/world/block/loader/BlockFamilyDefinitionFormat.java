@@ -19,7 +19,9 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.DefaultColorSource;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -311,7 +313,10 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
     }
 
-    private static class BlockFamilyHandler implements JsonDeserializer<Class<? extends BlockFamily>> {
+    private class BlockFamilyHandler implements JsonDeserializer<Class<? extends BlockFamily>> {
+        @In
+        private BlockFamilyLibrary library;
+
         BlockFamilyHandler() {
         }
 
@@ -319,7 +324,9 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
 
-            BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
+            if (library == null) {
+                return null;
+            }
             return library.getBlockFamily(json.getAsString());
         }
     }
