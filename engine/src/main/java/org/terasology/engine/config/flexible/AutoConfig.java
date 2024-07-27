@@ -4,6 +4,7 @@ package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.config.flexible.internal.SettingBuilder;
 import org.terasology.engine.config.flexible.internal.SettingImplBuilder;
 import org.terasology.engine.core.SimpleUri;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * Represents a config class that will be automatically initialized and rendered by the engine.
  * All settings must be contained in {@code public static} fields of type {@link Setting}.
  */
+@IndexInherited
 public abstract class AutoConfig {
     private SimpleUri id;
 

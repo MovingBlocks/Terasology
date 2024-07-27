@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.clipboard;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 @API // Temporarily in base permission set, until fixed - (permissionSet = "clipboard")
 public interface ClipboardManager {

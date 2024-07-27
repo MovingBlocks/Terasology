@@ -5,7 +5,7 @@ package org.terasology.engine.world.zones;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.generation.Region;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPlugin;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;

@@ -306,7 +306,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             public void draw(DependencyInfo value, Canvas canvas) {
                 Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
 
-                if (module == null || !(value.versionPredicate().test(module.getVersion()))) {
+                if (module == null || !value.versionRange().contains(module.getVersion())) {
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");

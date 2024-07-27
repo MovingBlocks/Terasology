@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadata;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 import org.terasology.unittest.ExampleClass;
@@ -56,9 +56,13 @@ public class ClasspathCompromisingModuleFactoryTest {
     public void archiveModuleContainsClass() throws IOException {
         Module module = factory.createArchiveModule(new File("FIXME.jar"));
 
-        Class<?> someClassInTheModule = module.getModuleManifest().getTypesAnnotatedWith(API.class).iterator().next();
+        String someClassInTheModule = module.getClassIndex().getTypesAnnotatedWith(API.class.getName()).iterator().next();
 
-        assertTrue(module.getClassPredicate().test(someClassInTheModule));
+        try {
+            assertTrue(module.getClassPredicate().test(Class.forName(someClassInTheModule)));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         assertFalse(module.getClassPredicate().test(SOME_CLASS_OUTSIDE_THE_MODULE));
     }
 

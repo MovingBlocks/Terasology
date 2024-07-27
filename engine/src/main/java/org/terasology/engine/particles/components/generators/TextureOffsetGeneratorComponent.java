@@ -6,7 +6,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.LinkedList;
 import java.util.List;

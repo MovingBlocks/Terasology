@@ -8,7 +8,7 @@ import org.joml.Vector4f;
 import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.sounds.BlockSounds;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.tiles.BlockTile;
 

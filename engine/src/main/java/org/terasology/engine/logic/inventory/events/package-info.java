@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.logic.inventory.events;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

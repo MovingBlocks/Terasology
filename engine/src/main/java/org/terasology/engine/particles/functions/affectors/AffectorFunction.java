@@ -7,7 +7,7 @@ import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.functions.ParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * A affector function is called on a particle's data when it is updated to set its fields (Ex. Apply a force to a particle).

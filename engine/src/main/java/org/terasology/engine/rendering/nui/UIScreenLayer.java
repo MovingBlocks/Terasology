@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.nui.ControlWidget;
 
+@IndexInherited
 public interface UIScreenLayer extends ControlWidget {
 
     boolean isLowerLayerVisible();

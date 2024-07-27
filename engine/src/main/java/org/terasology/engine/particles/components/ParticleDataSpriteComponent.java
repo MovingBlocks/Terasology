@@ -5,7 +5,7 @@ package org.terasology.engine.particles.components;
 import org.joml.Vector2f;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 
 @API

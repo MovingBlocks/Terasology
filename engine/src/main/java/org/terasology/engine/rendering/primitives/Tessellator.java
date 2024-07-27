@@ -9,7 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.utilities.Assets;

@@ -23,9 +23,11 @@ dependencies {
     implementation("net.sf.trove4j:trove4j:3.0.3")
 
     implementation("org.terasology:reflections:0.9.12-MB")
-    implementation("org.terasology.nui:nui-reflect:3.0.0")
-    implementation("org.terasology.gestalt:gestalt-module:7.2.0")
-    implementation("org.terasology.gestalt:gestalt-asset-core:7.2.0")
+    implementation("org.terasology.nui:nui-reflect:4.0.0-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-module:8.0.0-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-asset-core:8.0.0-SNAPSHOT")
+
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
 
     testRuntimeOnly("org.slf4j:slf4j-simple:2.0.11") {
         because("log output during tests")

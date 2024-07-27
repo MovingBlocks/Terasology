@@ -21,7 +21,7 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
 import java.util.List;

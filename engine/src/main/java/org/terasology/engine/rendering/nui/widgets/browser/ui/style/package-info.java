@@ -6,4 +6,4 @@
  */
 @API package org.terasology.engine.rendering.nui.widgets.browser.ui.style;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

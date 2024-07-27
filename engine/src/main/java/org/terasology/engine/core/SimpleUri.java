@@ -4,7 +4,7 @@ package org.terasology.engine.core;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
 /**

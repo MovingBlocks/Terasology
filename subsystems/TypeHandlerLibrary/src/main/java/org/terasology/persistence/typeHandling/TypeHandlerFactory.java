@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
  * Creates type handlers for a set of types. Type handler factories are generally used when a set of types
  * are similar in serialization structure.
  */
+@IndexInherited
 public interface TypeHandlerFactory {
     /**
      * Creates a {@link TypeHandler} for the given type {@link T}. If the type is not supported by
