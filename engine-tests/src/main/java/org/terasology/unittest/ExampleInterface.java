@@ -4,7 +4,9 @@
 package org.terasology.unittest;
 
 import org.terasology.context.annotation.API;
+import org.terasology.context.annotation.IndexInherited;
 
 @API
+@IndexInherited
 public interface ExampleInterface {
 }

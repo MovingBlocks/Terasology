@@ -59,6 +59,7 @@ dependencies {
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
     annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+    testAnnotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
