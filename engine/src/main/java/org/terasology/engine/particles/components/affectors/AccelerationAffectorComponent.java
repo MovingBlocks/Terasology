@@ -5,7 +5,7 @@ package org.terasology.engine.particles.components.affectors;
 import org.joml.Vector3f;
 import org.terasology.engine.network.Replicate;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 
 @API

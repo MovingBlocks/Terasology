@@ -5,4 +5,4 @@
 package org.terasology.engine.rendering.nui.editor.binds;
 
 import org.terasology.input.InputCategory;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

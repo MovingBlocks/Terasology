@@ -8,7 +8,7 @@ import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
 import org.terasology.engine.logic.console.MessageEvent;
 import org.terasology.engine.logic.players.PlayerUtil;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.network.OwnerEvent;
 
 /**

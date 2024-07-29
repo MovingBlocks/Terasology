@@ -66,8 +66,8 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
     }
 
     private fun versionStringFromGestaltDependency(gestaltDependency: DependencyInfo): String {
-        val version = if (gestaltDependency.versionPredicate() is VersionRange) {
-            gestaltDependency.versionPredicate().toString()
+        val version = if (gestaltDependency.versionRange() is VersionRange) {
+            gestaltDependency.versionRange().toString()
         } else {
             // TODO: gradle-compatible version expressions for gestalt dependencies
             //     https://github.com/MovingBlocks/gestalt/issues/114

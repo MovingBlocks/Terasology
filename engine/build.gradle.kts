@@ -120,19 +120,25 @@ dependencies {
     }
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
+    // JSemVer (Semantic Versioning) - A dependency of Gestalt
+    implementation("com.github.zafarkhaja:java-semver:0.10.2")
+
     // Our developed libs
-    api("org.terasology.gestalt:gestalt-asset-core:7.2.1-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-module:7.2.1-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-entity-system:7.2.1-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-util:7.2.1-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-asset-core:8.0.0-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-module:8.0.0-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-entity-system:8.0.0-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-util:8.0.0-SNAPSHOT")
+    api("org.terasology.gestalt:gestalt-inject:8.0.0-SNAPSHOT")
+
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
 
     api("org.terasology:TeraMath:1.5.0")
     api("org.terasology:splash-screen:1.1.1")
     api("org.terasology.jnlua:JNLua:0.1.0-SNAPSHOT")
     api("org.terasology.jnbullet:JNBullet:1.0.4")
-    api("org.terasology.nui:nui:3.0.0")
-    api("org.terasology.nui:nui-reflect:3.0.0")
-    api("org.terasology.nui:nui-gestalt7:3.0.0")
+    api("org.terasology.nui:nui:4.0.0-SNAPSHOT")
+    api("org.terasology.nui:nui-reflect:4.0.0-SNAPSHOT")
+    api("org.terasology.nui:nui-gestalt:4.0.0-SNAPSHOT")
 
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
@@ -206,11 +212,23 @@ tasks.register<Copy>("copyResourcesToClasses") {
     into(sourceSets["main"].output.classesDirs.first())
 }
 
-tasks.named("compileJava") {
+tasks.named<JavaCompile>("compileJava") {
     dependsOn(
         tasks.named("copyResourcesToClasses"),
         tasks.named("createVersionInfoFile")
     )
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.main.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.main.get().resources.srcDirs.joinToString(File.pathSeparator)}")
+}
+tasks.named<JavaCompile>("compileTestJava") {
+    dependsOn(
+        tasks.named("copyResourcesToClasses"),
+        tasks.named("createVersionInfoFile")
+    )
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.test.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.test.get().resources.srcDirs.joinToString(File.pathSeparator)}")
 }
 
 // Instructions for packaging a jar file for the engine

@@ -7,7 +7,7 @@ import org.terasology.engine.logic.selection.MovableSelectionStartEvent;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  *         <br><br>

@@ -7,5 +7,5 @@
         displayName = "${engine:menu#category-general}"
         ) package org.terasology.engine.input.binds.general;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.input.InputCategory;
