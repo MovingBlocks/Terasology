@@ -58,8 +58,8 @@ configurations.configureEach {
 // Primary dependencies definition
 dependencies {
     // Storage and networking
-    api("com.google.guava:guava:31.0-jre")
-    api("com.google.code.gson:gson:2.8.6")
+    api(libs.guava)
+    api(libs.gson)
     api("net.sf.trove4j:trove4j:3.0.3")
     implementation("io.netty:netty-all:4.1.77.Final")
     implementation("com.google.protobuf:protobuf-java:3.22.0")
@@ -100,10 +100,10 @@ dependencies {
     implementation("de.matthiasmann.twl:PNGDecoder:1111")
 
     // Logging
-    implementation("org.slf4j:slf4j-api:2.0.11") {
+    implementation(libs.slf4j.api) {
         because("a backend-independent Logger")
     }
-    implementation("ch.qos.logback:logback-classic:1.4.14") {
+    implementation(libs.logback) {
         because("telemetry implementation uses logback to send to logstash " +
                 "and we bundle org.terasology.logback for the regex filter")
     }
@@ -124,21 +124,21 @@ dependencies {
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
     // Our developed libs
-    api("org.terasology.gestalt:gestalt-asset-core:8.0.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-module:8.0.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-entity-system:8.0.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-util:8.0.0-SNAPSHOT")
-    api("org.terasology.gestalt:gestalt-inject:8.0.0-SNAPSHOT")
+    api(libs.gestalt.core)
+    api(libs.gestalt.module)
+    api(libs.gestalt.entitysystem)
+    api(libs.gestalt.util)
+    api(libs.gestalt.inject)
 
-    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+    annotationProcessor(libs.gestalt.injectjava)
 
     api("org.terasology:TeraMath:1.5.0")
     api("org.terasology:splash-screen:1.1.1")
     api("org.terasology.jnlua:JNLua:0.1.0-SNAPSHOT")
     api("org.terasology.jnbullet:JNBullet:1.0.4")
-    api("org.terasology.nui:nui:4.0.0-SNAPSHOT")
-    api("org.terasology.nui:nui-reflect:4.0.0-SNAPSHOT")
-    api("org.terasology.nui:nui-gestalt:4.0.0-SNAPSHOT")
+    api(libs.terasology.nui)
+    api(libs.terasology.nuireflect)
+    api(libs.terasology.nuigestalt)
 
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)

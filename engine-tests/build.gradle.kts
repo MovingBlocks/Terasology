@@ -51,34 +51,31 @@ dependencies {
     implementation(project(":engine"))
 
     // Dependency not provided for modules, but required for module-tests
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation(libs.gson)
     implementation("org.codehaus.plexus:plexus-utils:3.0.16")
     implementation("com.google.protobuf:protobuf-java:3.16.1")
     implementation("org.terasology:reflections:0.9.12-MB")
 
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
-    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
-    testAnnotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+    annotationProcessor(libs.gestalt.injectjava)
+    testAnnotationProcessor(libs.gestalt.injectjava)
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
-    testImplementation("ch.qos.logback:logback-classic:1.4.14") {
+    testImplementation(libs.logback) {
         because("implementation: a test directly uses logback.classic classes")
     }
 
 
     // Test lib dependencies
-    implementation(platform("org.junit:junit-bom:5.10.1")) {
-        // junit-bom will set version numbers for the other org.junit dependencies.
-    }
-    api("org.junit.jupiter:junit-jupiter-api") {
+    api(libs.junit.api) {
         because("we export jupiter Extensions for module tests")
     }
     api("com.google.truth:truth:1.1.3") {
         because("we provide some helper classes")
     }
-    implementation("org.mockito:mockito-core:5.6.0") {
+    implementation(libs.mockito.core) {
         because("classes like HeadlessEnvironment use mocks")
     }
     constraints {
