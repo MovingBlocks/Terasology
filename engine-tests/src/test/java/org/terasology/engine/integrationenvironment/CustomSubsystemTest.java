@@ -3,22 +3,17 @@
 
 package org.terasology.engine.integrationenvironment;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.TerasologyEngine;
-import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.terasology.engine.testUtil.Correspondences.instanceOfExpected;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(subsystem = CustomSubsystemTest.MySubsystem.class)
 public class CustomSubsystemTest {
 
@@ -43,20 +38,11 @@ public class CustomSubsystemTest {
      * it's a convenient way to keep it close to the test code and still be something we can give
      * to an annotation.
      */
-    static class MySubsystem implements EngineSubsystem {
-
+    static class MySubsystem extends NonPlayerVisibleSubsystem {
         @Override
         public void initialise(GameEngine engine, Context rootContext) {
             var config = rootContext.getValue(PlayerConfig.class);
             config.playerName.set(PLAYER_NAME);
-        }
-
-        @Override
-        public String getName() {
-            // TODO: provide default implementation of EngineSubsystem.getName.
-            //     The interface requires we implement this method, but test-only subsystems aren't
-            //     player-visible.
-            return this.getClass().getSimpleName();
         }
     }
 }

@@ -7,26 +7,25 @@ import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
+import org.terasology.unittest.stubs.DummyEvent;
 
 import java.io.IOException;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 public class ExampleTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExampleTest.class);
 
     @In
     private WorldProvider worldProvider;
@@ -40,6 +39,15 @@ public class ExampleTest {
     private ModuleTestingHelper helper;
 
     @Test
+    @Tag("flaky")
+    public void testClientCreation() {
+        logger.info("Starting test 'testClientCreation'");
+        Assertions.assertDoesNotThrow(helper::createClient);
+        logger.info("Done with test 'testClientCreation'");
+    }
+
+    @Test
+    @Tag("flaky")
     public void testClientConnection() throws IOException {
         int currentClients = Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size();
 
@@ -70,7 +78,7 @@ public class ExampleTest {
         Context clientContext = helper.createClient();
 
         // send an event to a client's local player just for fun
-        clientContext.get(LocalPlayer.class).getClientEntity().send(new ResetCameraEvent());
+        clientContext.get(LocalPlayer.class).getClientEntity().send(new DummyEvent());
     }
 
     @Test

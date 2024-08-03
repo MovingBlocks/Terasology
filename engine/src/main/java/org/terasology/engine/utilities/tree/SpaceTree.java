@@ -197,10 +197,9 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             }
 
             for (Node subNode : node.subNodes) {
-                if (subNode != null) {
-                    if (distanceFunction.getPointRegionDistance(position, subNode.minValues, subNode.maxValues) <= treeSearch.maxDistance) {
-                        executeSearchInNode(position, subNode, treeSearch);
-                    }
+                if (subNode != null && distanceFunction.getPointRegionDistance(position, subNode.minValues, subNode.maxValues)
+                        <= treeSearch.maxDistance) {
+                    executeSearchInNode(position, subNode, treeSearch);
                 }
             }
         } else {
@@ -358,10 +357,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             increment *= 2;
         }
 
-        if (index == 0) {
-            if (distanceFunction.getDistance(position, center) == 0) {
-                return -1;
-            }
+        if (index == 0 && distanceFunction.getDistance(position, center) == 0) {
+            return -1;
         }
         return index;
     }

@@ -169,7 +169,7 @@ public class EventSystemReplayImplTest {
         }
     }
 
-    private static class TestEvent extends AbstractConsumableEvent {
+    public static class TestEvent extends AbstractConsumableEvent {
 
     }
 }

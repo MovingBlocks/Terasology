@@ -14,6 +14,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.EntityStore;
@@ -62,27 +63,27 @@ import java.util.function.Consumer;
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
  * <p>
  * Loading/Unload chunks dependent on {@link RelevanceSystem}
- * <p/>
+ * <p>
  * Produces events:
  * <p>
  * {@link OnChunkGenerated} when chunk was generated {@link WorldGenerator}
  * <p>
  * {@link OnChunkLoaded} when chunk was loaded from {@link StorageManager}
  * <p>
- * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
- * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle
  * <p>
- * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
- * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?)
  * <p>
  * {@link BeforeChunkUnload} when chunk ready to remove from provider.
  * <p>
  * {@link BeforeDeactivateBlocks} when chunk ready to remove and have block lifecycle.
+ * <p> @see <a href="https://github.com/MovingBlocks/Terasology/issues/3244">Terasology Issue 3244</a>
  */
 public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
+    private static final int UPDATE_PROCESSING_DEADLINE_MS = 24;
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
@@ -94,6 +95,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private final WorldGenerator generator;
     private final BlockManager blockManager;
     private final ExtraBlockDataManager extraDataManager;
+    private final Config config;
     private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
     private EntityRef worldEntity = EntityRef.NULL;
@@ -102,13 +104,14 @@ public class LocalChunkProvider implements ChunkProvider {
     private RelevanceSystem relevanceSystem;
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, ExtraBlockDataManager extraDataManager,
+                              BlockManager blockManager, ExtraBlockDataManager extraDataManager, Config config,
                               Map<Vector3ic, Chunk> chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
         this.blockManager = blockManager;
         this.extraDataManager = extraDataManager;
+        this.config = config;
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkCache = chunkCache;
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -230,8 +233,16 @@ public class LocalChunkProvider implements ChunkProvider {
         deactivateBlocks();
         checkForUnload();
         Chunk chunk;
+
+        long processingStartTime = System.currentTimeMillis();
         while ((chunk = readyChunks.poll()) != null) {
             processReadyChunk(chunk);
+            long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
+            if (!readyChunks.isEmpty() && totalProcessingTime > UPDATE_PROCESSING_DEADLINE_MS) {
+                logger.atWarn().log("Chunk processing took too long this tick ({}/{}ms). {} chunks remain.", totalProcessingTime,
+                        UPDATE_PROCESSING_DEADLINE_MS, readyChunks.size());
+                break;
+            }
         }
     }
 
@@ -290,7 +301,7 @@ public class LocalChunkProvider implements ChunkProvider {
         try {
             unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
         } catch (InterruptedException e) {
-            logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e);
+            logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e); //NOPMD
         }
 
         return true;
@@ -300,7 +311,7 @@ public class LocalChunkProvider implements ChunkProvider {
         try {
             deactivateBlocksQueue.put(createBatchBlockEventMappings(chunk));
         } catch (InterruptedException e) {
-            logger.error("Failed to queue deactivation of blocks for {}", chunk.getPosition());
+            logger.error("Failed to queue deactivation of blocks for {}", chunk.getPosition()); //NOPMD
         }
     }
 
@@ -398,7 +409,8 @@ public class LocalChunkProvider implements ChunkProvider {
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
 
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
+        loadingPipeline = new ChunkProcessingPipeline(config.getRendering().getChunkThreads(), this::getChunk,
+                relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
@@ -433,7 +445,8 @@ public class LocalChunkProvider implements ChunkProvider {
     // TODO: move loadingPipeline initialization into constructor.
     public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
         this.relevanceSystem = relevanceSystem;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
+        loadingPipeline = new ChunkProcessingPipeline(config.getRendering().getChunkThreads(), this::getChunk,
+                relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
                         ChunkTaskProvider.create("Chunk generate internal lightning",
                                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))

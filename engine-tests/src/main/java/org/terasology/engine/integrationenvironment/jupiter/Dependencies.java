@@ -11,10 +11,11 @@ import java.lang.annotation.Target;
 /**
  * Declares the modules to load in the environment.
  *
- * @see MTEExtension
+ * @deprecated Replace with {@link IntegrationEnvironment#dependencies}
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated(since = "5.3.0", forRemoval = true)
 public @interface Dependencies {
     /**
      * Names of modules, as defined by the <code>id</code> in their module.txt.

@@ -175,17 +175,31 @@ public class WorldBuilder extends ProviderStore {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
         Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
         for (FacetProvider provider : providersList) {
-            Produces produces = provider.getClass().getAnnotation(Produces.class);
+            Class<? extends FacetProvider> providerClass = provider.getClass();
+            Produces produces = providerClass.getAnnotation(Produces.class);
             if (produces != null) {
                 facets.addAll(Arrays.asList(produces.value()));
             }
-            Updates updates = provider.getClass().getAnnotation(Updates.class);
+
+            Requires requires = providerClass.getAnnotation(Requires.class);
+            if (requires != null) {
+                for (Facet facet : requires.value()) {
+                    Class<? extends WorldFacet> facetValue = facet.value();
+                    if (!facets.contains(facetValue)) {
+                        logger.error("Facet provider for {} is missing. It is required by {}", facetValue, providerClass);
+                        throw new IllegalStateException("Missing facet provider");
+                    }
+                }
+            }
+
+            Updates updates = providerClass.getAnnotation(Updates.class);
             if (updates != null) {
                 for (Facet facet : updates.value()) {
                     facets.add(facet.value());
                 }
             }
         }
+
         for (Class<? extends WorldFacet> facet : facets) {
             if (!result.containsKey(facet)) {
                 Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
@@ -227,11 +241,10 @@ public class WorldBuilder extends ProviderStore {
         }
 
         for (FacetProvider provider : providersList) {
-            if (updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)) {
-                if (updatePriority(provider, facet) > minPriority) {
-                    providedBy.put(facet, provider);
-                    addRequirements(facet, provider, scalable, orderedProviders);
-                }
+            if (updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)
+                    && updatePriority(provider, facet) > minPriority) {
+                providedBy.put(facet, provider);
+                addRequirements(facet, provider, scalable, orderedProviders);
             }
         }
     }
@@ -401,7 +414,6 @@ public class WorldBuilder extends ProviderStore {
                 configurables.add((ConfigurableFacetProvider) facetProvider);
             }
         }
-        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator(configurables);
-        return worldConfigurator;
+        return new FacetedWorldConfigurator(configurables);
     }
 }

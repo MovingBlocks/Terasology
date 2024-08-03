@@ -7,6 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.context.internal.MockContext;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class IntMathTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntMathTest.class);
     public IntMathTest() {
     }
 
@@ -128,7 +131,7 @@ public class IntMathTest {
             value <<= 1;
         }
 
-        System.out.println(powersOfTwo.get(powersOfTwo.size() - 1));
+        LOGGER.info(String.valueOf(powersOfTwo.get(powersOfTwo.size() - 1)));
 
         return powersOfTwo;
     }

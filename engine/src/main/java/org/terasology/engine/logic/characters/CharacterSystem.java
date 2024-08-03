@@ -120,23 +120,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (instigator.hasComponent(CharacterComponent.class)) {
             EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
             EntityRef instigatorClientInfo = instigatorClient.getComponent(ClientComponent.class).clientInfo;
-            DisplayNameComponent displayNameComponent = instigatorClientInfo.getComponent(DisplayNameComponent.class);
-            return displayNameComponent.name;
+            return instigatorClientInfo.getComponent(DisplayNameComponent.class).name;
         } else if (instigator.getParentPrefab() != null) {
             //A DisplayName can be specified in the entity prefab
             //Otherwise, the game will attempt to generate one from the name of that prefab
             Prefab parentPrefab = instigator.getParentPrefab();
             if (parentPrefab.hasComponent(DisplayNameComponent.class)) {
-                DisplayNameComponent displayNameComponent = parentPrefab.getComponent(DisplayNameComponent.class);
-                return displayNameComponent.name;
+                return parentPrefab.getComponent(DisplayNameComponent.class).name;
             } else {
                 String instigatorName = parentPrefab.getName();
                 //getParentPrefab.getName() returns a ResourceUrn String such as "engine:player"
                 //The following calls change the damage type to be more readable
                 //For instance, "engine:player" becomes "Player"
                 instigatorName = instigatorName.replaceAll(".*:(.*)", "$1");
-                instigatorName = Character.toUpperCase(instigatorName.charAt(0)) + instigatorName.substring(1);
-                return instigatorName;
+                return Character.toUpperCase(instigatorName.charAt(0)) + instigatorName.substring(1);
             }
         } else {
             return null;
@@ -155,11 +152,10 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //A DisplayName can be specified in the damage type prefab
         //Otherwise, the game will attempt to generate one from the name of that prefab
         if (damageType.hasComponent(DisplayNameComponent.class)) {
-            DisplayNameComponent displayNameComponent = damageType.getComponent(DisplayNameComponent.class);
-            return displayNameComponent.name;
+            return damageType.getComponent(DisplayNameComponent.class).name;
         } else {
-            logger.info(String.format("%s is missing a readable DisplayName", damageType.getName()));
             String damageTypeName = damageType.getName();
+            logger.info("{} is missing a readable DisplayName", damageTypeName);
             //damageType.getName() returns a ResourceUrn String such as "engine:directDamage"
             //The following calls change the damage type to be more readable
             //For instance, "engine:directDamage" becomes "Direct Damage"
@@ -198,10 +194,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = LocationComponent.class)
     public void onAttackRequest(AttackRequest event, EntityRef character, CharacterComponent characterComponent) {
         // if an item is used,  make sure this entity is allowed to attack with it
-        if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getOwner())) {
-                return;
-            }
+        if (event.getItem().exists() && !character.equals(event.getItem().getOwner())) {
+            return;
         }
 
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
@@ -312,44 +306,41 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        Vector3f direction = location.getWorldDirection(new Vector3f());
-        if (!(event.getDirection().equals(direction, 0.0001f))) {
-            logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
+        Vector3f worldDirection = location.getWorldDirection(new Vector3f());
+        Vector3f eventDirection = event.getDirection();
+        if (!(eventDirection.equals(worldDirection, 0.0001f))) {
+            logger.error("Direction at client {} was different than direction at server {}", eventDirection, worldDirection);
         }
-        // Assume the exact same value in case there are rounding mistakes:
-        direction = event.getDirection();
 
+        String playerName = getPlayerNameFromCharacter(character);
         Vector3f originPos = location.getWorldPosition(new Vector3f());
-        if (!(event.getOrigin().equals(originPos, 0.0001f))) {
-            String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
-            logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
+        Vector3f eventOrigin = event.getOrigin();
+        if (!(eventOrigin.equals(originPos, 0.0001f))) {
+            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} " +
+                            "but the predicted position is {}", playerName, eventOrigin, originPos);
             return false;
         }
 
         if (event.isOwnedEntityUsage()) {
             if (!event.getUsedOwnedEntity().exists()) {
-                String msg = "Denied activation attempt by {} since the used entity does not exist on the authority";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the used entity does not exist on the authority", playerName);
                 return false;
             }
             if (!networkSystem.getOwnerEntity(event.getUsedOwnedEntity()).equals(networkSystem.getOwnerEntity(character))) {
-                String msg = "Denied activation attempt by {} since it does not own the entity at the authority";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since it does not own the entity at the authority", playerName);
                 return false;
             }
         } else {
             // check for cheats so that data can later be trusted:
             if (event.getUsedOwnedEntity().exists()) {
-                String msg = "Denied activation attempt by {} since it is not properly marked as owned entity usage";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since it is not properly marked as owned entity usage", playerName);
                 return false;
             }
         }
 
         if (event.isEventWithTarget()) {
             if (!event.getTarget().exists()) {
-                String msg = "Denied activation attempt by {} since the target does not exist on the authority";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the target does not exist on the authority", playerName);
                 return false; // can happen if target existed on client
             }
 
@@ -363,45 +354,42 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 interactionRange = characterComponent.interactionRange;
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, interactionRange, Sets.newHashSet(character),
+            HitResult result = physics.rayTrace(originPos, eventDirection, interactionRange, Sets.newHashSet(character),
                     DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
-                String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority there was nothing " +
+                        "to activate at that place", playerName);
                 return false;
             }
             EntityRef hitEntity = result.getEntity();
             if (!hitEntity.equals(event.getTarget())) {
-                /**
-                 * Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
-                 * server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
-                 * hit test.
+                /*
+                  Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
+                  server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
+                  hit test.
                  */
-                String msg = "Denied activation attempt by {} since at the authority another entity would have been activated";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority another entity would have been activated", playerName);
                 return false;
             }
 
             if (!(event.getHitPosition().equals(result.getHitPoint(), 0.0001f))) {
-                String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since at the authority the object " +
+                        "got hit at a different position", playerName);
                 return false;
             }
         } else {
             // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
             if (event.getTarget().exists()) {
-                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a target";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a target", playerName);
                 return false;
             }
             if (event.getHitPosition() != null) {
-                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit position";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled " +
+                        "as having a hit position", playerName);
                 return false;
             }
             if (event.getHitNormal() != null) {
-                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit delta";
-                logger.info(msg, getPlayerNameFromCharacter(character));
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit delta", playerName);
                 return false;
             }
         }

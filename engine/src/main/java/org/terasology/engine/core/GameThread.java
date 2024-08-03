@@ -30,7 +30,7 @@ public final class GameThread {
      * @return Whether the currentThread is the gameThread.
      */
     public static boolean isCurrentThread() {
-        return Thread.currentThread() == gameThread;
+        return Thread.currentThread().equals(gameThread);
     }
 
     /**
@@ -41,7 +41,7 @@ public final class GameThread {
      * @param process
      */
     public static void asynch(Runnable process) {
-        if (Thread.currentThread() != gameThread) {
+        if (!Thread.currentThread().equals(gameThread)) {
             pendingRunnables.push(process);
         } else {
             process.run();
@@ -56,7 +56,7 @@ public final class GameThread {
      * @param process
      */
     public static void synch(Runnable process) throws InterruptedException {
-        if (Thread.currentThread() != gameThread) {
+        if (!Thread.currentThread().equals(gameThread)) {
             BlockingProcess blockingProcess = new BlockingProcess(process);
             pendingRunnables.push(blockingProcess);
             blockingProcess.waitForCompletion();
@@ -69,7 +69,7 @@ public final class GameThread {
      * Runs all pending processes submitted from other threads
      */
     public static void processWaitingProcesses() {
-        if (Thread.currentThread() == gameThread) {
+        if (Thread.currentThread().equals(gameThread)) {
             List<Runnable> processes = Lists.newArrayList();
             pendingRunnables.drainTo(processes);
             processes.forEach(Runnable::run);
@@ -80,7 +80,7 @@ public final class GameThread {
      * Removes all pending processes without running them
      */
     public static void clearWaitingProcesses() {
-        if (gameThread == Thread.currentThread()) {
+        if (gameThread.equals(Thread.currentThread())) {
             pendingRunnables.clear();
         }
     }

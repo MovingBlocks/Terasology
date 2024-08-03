@@ -19,7 +19,6 @@ import org.terasology.engine.integrationenvironment.MainLoop;
 import org.terasology.engine.integrationenvironment.ModuleTestingHelper;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
-import org.terasology.unittest.worlds.DummyWorldGenerator;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,13 +36,10 @@ import static org.terasology.engine.registry.InjectionHelper.inject;
  * <p>
  * Example:
  * <pre><code>
- * import org.junit.jupiter.api.extension.ExtendWith;
  * import org.junit.jupiter.api.Test;
  * import org.terasology.engine.registry.In;
  *
- * &#64;{@link org.junit.jupiter.api.extension.ExtendWith ExtendWith}(MTEExtension.class)
- * &#64;{@link Dependencies}("MyModule")
- * &#64;{@link UseWorldGenerator}("Pathfinding:pathfinder")
+ * &#64;{@link IntegrationEnvironment}(worldGenerator="Pathfinding:pathfinder")
  * public class ExampleTest {
  *
  *     &#64;In
@@ -65,18 +61,8 @@ import static org.terasology.engine.registry.InjectionHelper.inject;
  * }
  * </code></pre>
  * <p>
- * You can configure the environment with these additional annotations:
- * <dl>
- *     <dt>{@link IntegrationEnvironment @IntegrationEnvironment}</dt>
- *     <dd>Configure the network mode and add subsystems.</dd>
- *     <dt>{@link Dependencies @Dependencies}</dt>
- *     <dd>Specify which modules to include in the environment. Put the name of your module under test here.
- *         Any dependencies these modules declare in <code>module.txt</code> will be pulled in as well.</dd>
- *     <dt>{@link UseWorldGenerator @UseWorldGenerator}</dt>
- *     <dd>The URN of the world generator to use. Defaults to {@link DummyWorldGenerator},
- *         a flat world.</dd>
- * </dl>
- *
+ * See {@link IntegrationEnvironment @IntegrationEnvironment} for information on how to configure the
+ * environment's dependencies, world type, and subsystems.
  * <p>
  * By default, JUnit uses a {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_METHOD PER_METHOD} lifecycle
  * for test instances. The <i>instance</i> of your test class—i.e. {@code this} when your test method executes—
@@ -163,14 +149,20 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
         }
     }
 
+    @SuppressWarnings("removal")  // TODO: replace UseWorldGenerator in modules
     public String getWorldGeneratorUri(ExtensionContext context) {
         return findAnnotation(context.getRequiredTestClass(), UseWorldGenerator.class)
-                .map(UseWorldGenerator::value).orElse(null);
+                .map(UseWorldGenerator::value)
+                .orElseGet(() -> getAnnotationWithDefault(context, IntegrationEnvironment::worldGenerator));
     }
 
+    @SuppressWarnings("removal")  // TODO: replace or remove Dependencies in modules
     public List<String> getDependencyNames(ExtensionContext context) {
         return findAnnotation(context.getRequiredTestClass(), Dependencies.class)
-                .map(a -> Arrays.asList(a.value())).orElse(Collections.emptyList());
+                .map(a -> Arrays.asList(a.value()))
+                .orElseGet(() -> Arrays.asList(
+                                getAnnotationWithDefault(context, IntegrationEnvironment::dependencies)
+                        ));
     }
 
     public NetworkMode getNetworkMode(ExtensionContext context) {
@@ -193,7 +185,7 @@ public class MTEExtension implements BeforeAllCallback, BeforeEachCallback, Para
     /**
      * Get the Engines for this test.
      * <p>
-     * The new Engines instance is configured using the {@link Dependencies} and {@link UseWorldGenerator}
+     * The new Engines instance is configured using the {@link IntegrationEnvironment}
      * annotations for the test class.
      * <p>
      * This will create a new instance when necessary. It will be stored in the

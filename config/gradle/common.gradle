@@ -10,14 +10,11 @@ apply plugin: 'idea'
 
 apply plugin: 'terasology-repositories'
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-}
-
 javadoc.options.encoding = 'UTF-8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.release.set(17)
 }
 
 task sourceJar(type: Jar) {

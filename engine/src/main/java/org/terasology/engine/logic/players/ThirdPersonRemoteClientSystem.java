@@ -288,13 +288,11 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
             // If an associated held item entity does *not* exist yet, consider making one if the player has an item
             // selected
-            if (currentHeldItem == EntityRef.NULL) {
-                if (remotePlayer.hasComponent(CharacterHeldItemComponent.class)) {
-                    CharacterHeldItemComponent characterHeldItemComponent =
-                            remotePlayer.getComponent(CharacterHeldItemComponent.class);
-                    if (characterHeldItemComponent != null && !characterHeldItemComponent.selectedItem.equals(EntityRef.NULL)) {
-                        linkHeldItemLocationForRemotePlayer(remotePlayer.getComponent(CharacterHeldItemComponent.class).selectedItem, remotePlayer);
-                    }
+            if (currentHeldItem == EntityRef.NULL && remotePlayer.hasComponent(CharacterHeldItemComponent.class)) {
+                CharacterHeldItemComponent characterHeldItemComponent =
+                        remotePlayer.getComponent(CharacterHeldItemComponent.class);
+                if (characterHeldItemComponent != null && !characterHeldItemComponent.selectedItem.equals(EntityRef.NULL)) {
+                    linkHeldItemLocationForRemotePlayer(remotePlayer.getComponent(CharacterHeldItemComponent.class).selectedItem, remotePlayer);
                 }
             }
 

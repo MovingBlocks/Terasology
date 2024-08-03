@@ -6,10 +6,9 @@ subprojects {
     plugins.apply('java')
     plugins.apply('idea')
 
-    def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
+    def sourceSets = project.getExtensions().getByType(SourceSetContainer.class)
 
-
-    sourceSets.main.java.outputDir = new File("$buildDir/classes")
+    sourceSets.main.java.destinationDirectory = new File("$buildDir/classes")
     idea {
         module {
             // Change around the output a bit

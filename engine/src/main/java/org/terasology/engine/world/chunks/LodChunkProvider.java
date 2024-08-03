@@ -283,15 +283,6 @@ public class LodChunkProvider {
         }
     }
 
-    /**
-     * Make the chunk a bit darker, so that it can be visually distinguished from an ordinary chunk.
-     */
-    private void tintChunk(Chunk chunk) {
-        for (Vector3ic pos : Chunks.CHUNK_REGION) {
-            chunk.setSunlight(pos, (byte) (0.75f * chunk.getSunlight(pos)));
-        }
-    }
-
     public int getChunkLods() {
         return chunkLods;
     }

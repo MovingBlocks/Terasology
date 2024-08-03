@@ -42,12 +42,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
 
     @Override
-    public void onOpened() {
-        super.onOpened();
-    }
-
-
-    @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 

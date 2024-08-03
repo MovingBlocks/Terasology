@@ -79,7 +79,7 @@ public class AutoConfigWidgetFactory implements TypeWidgetFactory {
             Optional<UIWidget> settingWidget = settingWidgetFactory.createWidgetFor(setting);
 
             if (!settingWidget.isPresent()) {
-                logger.error("Couldn't find a widget for the Setting [{}]", setting.getHumanReadableName());
+                logger.error("Couldn't find a widget for the Setting [{}]", setting.getHumanReadableName()); //NOPMD
                 continue;
             }
 

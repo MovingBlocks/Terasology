@@ -16,7 +16,7 @@ import java.util.Optional;
 public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumTypeHandler.class);
-    private Class<T> enumType;
+    private final Class<T> enumType;
     private Map<String, T> caseInsensitiveLookup = Maps.newHashMap();
 
     public EnumTypeHandler(Class<T> enumType) {

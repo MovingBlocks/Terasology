@@ -49,7 +49,7 @@ public class OnScaleEvent implements Event {
     /**
      * The scaling factor determined by the quotient of new and old value.
      * <p>
-     * This is guaranteed to be greater zero (> 0).
+     * This is guaranteed to be greater than 0.
      */
     public float getFactor() {
         return newValue / oldValue;

@@ -235,8 +235,8 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     /**
      * Set the size of the block area from the minimum corner.
      *
-     * @param x the x coordinate to set the size; must be > 0
-     * @param y the y coordinate to set the size; must be > 0
+     * @param x the x coordinate to set the size; must be greater than 0
+     * @param y the y coordinate to set the size; must be greater than 0
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
@@ -246,7 +246,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     /**
      * Set the size of the block area from the minimum corner.
      *
-     * @param size the size to set; all dimensions must be > 0
+     * @param size the size to set; all dimensions must be greater than 0
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
@@ -335,7 +335,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
      *
      * @param other {@link BlockArea}
      * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
+     * @return dest (after modification)
      */
     default BlockArea union(BlockAreac other, BlockArea dest) {
         return this.union(other.minX(), other.minY(), dest)

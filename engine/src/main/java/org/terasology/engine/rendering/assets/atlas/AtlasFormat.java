@@ -80,16 +80,17 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
     }
 
     private void process(FreeformDefinition freeform, Texture texture, Vector2ic size, Map<Name, SubtextureData> out) {
-        if (freeform.getName() == null || freeform.getName().isEmpty()) {
+        String freeformName = freeform.getName();
+        if (freeformName == null || freeformName.isEmpty()) {
             logger.error("Bad subimage definition - missing mandatory property name");
             return;
         }
         if (freeform.getMin() == null) {
-            logger.error("Bad subimage definition '{}' - missing mandatory property min", freeform.getName());
+            logger.error("Bad subimage definition '{}' - missing mandatory property min", freeformName);
             return;
         }
         if (freeform.getSize() == null && freeform.getMax() == null) {
-            logger.error("Bad subimage definition '{}' - requires one of max or size", freeform.getName());
+            logger.error("Bad subimage definition '{}' - requires one of max or size", freeformName);
             return;
         }
         Vector2f min = new Vector2f((float) freeform.getMin().x / size.x(), (float) freeform.getMin().y / size.y());
@@ -97,11 +98,11 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
             Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x(),
                 (float) freeform.getSize().y / size.y());
 
-            out.put(new Name(freeform.getName()), new SubtextureData(texture,
+            out.put(new Name(freeformName), new SubtextureData(texture,
                 shrinkRegion(new Rectanglef(min, min).setSize(itemSize))));
         } else if (freeform.getMax() != null) {
             Vector2f max = new Vector2f((float) freeform.getMax().x / size.x(), (float) freeform.getMax().y / size.y());
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, shrinkRegion(new Rectanglef(min, max))));
+            out.put(new Name(freeformName), new SubtextureData(texture, shrinkRegion(new Rectanglef(min, max))));
         }
     }
 

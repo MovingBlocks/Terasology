@@ -58,7 +58,7 @@ public class TranslationSystemImpl implements TranslationSystem {
                     TranslationProject proj = projects.computeIfAbsent(projectUrn, e -> new StandardTranslationProject());
                     proj.add(trans);
                     trans.subscribe(this::onAssetChanged);
-                    logger.info("Discovered " + trans);
+                    logger.info("Discovered {}", trans);
                 } else {
                     logger.warn("Ignoring invalid project projectUrn: {}", projectUrn);
                 }

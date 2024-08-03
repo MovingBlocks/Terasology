@@ -20,7 +20,7 @@ public class ServerInfoRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.warn("Could not query server info: {}", cause.toString());
+        logger.warn("Could not query server info: ", cause);
     }
 
     @Override

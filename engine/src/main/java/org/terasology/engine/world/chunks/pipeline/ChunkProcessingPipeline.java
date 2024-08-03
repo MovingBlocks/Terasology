@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.monitoring.ThreadActivity;
 import org.terasology.engine.monitoring.ThreadMonitor;
-import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
@@ -21,14 +20,10 @@ import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -44,13 +39,13 @@ import static com.google.common.primitives.Ints.constrainToRange;
 public class ChunkProcessingPipeline {
 
     @SuppressWarnings("UnstableApiUsage")
-    private static final int NUM_TASK_THREADS = constrainToRange(
-            Runtime.getRuntime().availableProcessors() - 1, 1, 8);
+    private static final int DEFAULT_TASK_THREADS = constrainToRange(
+            Runtime.getRuntime().availableProcessors() - 2, 1, 4);
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
     private final Thread reactor;
-    private final CompletionService<Chunk> chunkProcessor;
+    private final ChunkExecutorCompletionService chunkProcessor;
     private final ThreadPoolExecutor executor;
     private final Function<Vector3ic, Chunk> chunkProvider;
     private final Map<Vector3ic, ChunkProcessingInfo> chunkProcessingInfoMap = Maps.newConcurrentMap();
@@ -59,41 +54,24 @@ public class ChunkProcessingPipeline {
     /**
      * Create ChunkProcessingPipeline.
      */
-    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Comparator<Future<Chunk>> comparable) {
+    public ChunkProcessingPipeline(int chunkThreads, Function<Vector3ic, Chunk> chunkProvider, Comparator<Future<Chunk>> comparable) {
         this.chunkProvider = chunkProvider;
 
+        int taskThreads = (chunkThreads == 0) ? DEFAULT_TASK_THREADS : chunkThreads;
         executor = new ThreadPoolExecutor(
-                NUM_TASK_THREADS,
-                NUM_TASK_THREADS, 0L,
+                taskThreads,
+                taskThreads, 0L,
                 TimeUnit.MILLISECONDS,
-                new PriorityBlockingQueue(800, unwrappingComporator(comparable)),
+                new PriorityBlockingQueue(800, comparable),
                 this::threadFactory,
-                this::rejectQueueHandler) {
-            @Override
-            protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-                RunnableFuture<T> newTaskFor = super.newTaskFor(callable);
-                return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
-            }
-        };
-        logger.debug("allocated {} threads", NUM_TASK_THREADS);
-        chunkProcessor = new ExecutorCompletionService<>(executor,
+                this::rejectQueueHandler);
+        logger.debug("allocated {} threads", taskThreads);
+        chunkProcessor = new ChunkExecutorCompletionService(executor,
                 new PriorityBlockingQueue<>(800, comparable));
         reactor = new Thread(this::chunkTaskHandler);
         reactor.setDaemon(true);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
-    }
-
-    /**
-     * BlackMagic method: {@link ExecutorCompletionService} wraps task with QueueingFuture (private access)
-     * there takes wrapped task for comparing in {@link ThreadPoolExecutor}
-     */
-    private Comparator unwrappingComporator(Comparator<Future<Chunk>> comparable) {
-        return (o1, o2) -> {
-                Object unwrapped1 = ReflectionUtil.readField(o1, "task");
-                Object unwrapped2 = ReflectionUtil.readField(o2, "task");
-                return comparable.compare((Future<Chunk>) unwrapped1, (Future<Chunk>) unwrapped2);
-        };
     }
 
     /**
@@ -138,10 +116,7 @@ public class ChunkProcessingPipeline {
                     chunkProcessingInfo.getChunkTaskProvider() == null
                             ? "Generation or Loading"
                             : chunkProcessingInfo.getChunkTaskProvider().getName();
-            logger.error(
-                    String.format("ChunkTask at position %s and stage [%s] catch error: ",
-                            chunkProcessingInfo.getPosition(), stageName),
-                    e);
+logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProcessingInfo.getPosition(), stageName, e); //NOPMD
             chunkProcessingInfo.getExternalFuture().setException(e);
         } catch (CancellationException ignored) {
         }
@@ -190,11 +165,11 @@ public class ChunkProcessingPipeline {
     }
 
     private Future<Chunk> runTask(ChunkTask task, List<Chunk> chunks) {
-        return chunkProcessor.submit(new PositionalCallable(() -> {
+        return chunkProcessor.submit(() -> {
             try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
                 return task.apply(chunks);
             }
-        }, task.getPosition()));
+        }, task.getPosition());
     }
 
     private Thread threadFactory(Runnable runnable) {
@@ -204,6 +179,7 @@ public class ChunkProcessingPipeline {
         return thread;
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void rejectQueueHandler(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
         logger.error("Cannot run {}  because queue is full", runnable);
     }
@@ -236,8 +212,7 @@ public class ChunkProcessingPipeline {
             SettableFuture<Chunk> exitFuture = SettableFuture.create();
             chunkProcessingInfo = new ChunkProcessingInfo(position, exitFuture);
             chunkProcessingInfoMap.put(position, chunkProcessingInfo);
-            chunkProcessingInfo.setCurrentFuture(chunkProcessor.submit(new PositionalCallable(generatorTask::get,
-                    position)));
+            chunkProcessingInfo.setCurrentFuture(chunkProcessor.submit(generatorTask::get, position));
             return exitFuture;
         }
     }
@@ -316,27 +291,5 @@ public class ChunkProcessingPipeline {
      */
     public Iterable<Vector3ic> getProcessingPosition() {
         return chunkProcessingInfoMap.keySet();
-    }
-
-    /**
-     * Dummy callable for passthru position for {@link java.util.concurrent.ThreadPoolExecutor}#newTaskFor
-     */
-    private static final class PositionalCallable implements Callable<Chunk> {
-        private final Callable<Chunk> callable;
-        private final Vector3ic position;
-
-        private PositionalCallable(Callable<Chunk> callable, Vector3ic position) {
-            this.callable = callable;
-            this.position = position;
-        }
-
-        public Vector3ic getPosition() {
-            return position;
-        }
-
-        @Override
-        public Chunk call() throws Exception {
-            return callable.call();
-        }
     }
 }

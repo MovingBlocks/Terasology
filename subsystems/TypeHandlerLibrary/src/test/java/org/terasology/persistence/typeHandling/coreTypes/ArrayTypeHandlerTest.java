@@ -4,16 +4,23 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.inMemory.arrays.PersistedIntegerArray;
+import org.terasology.persistence.typeHandling.inMemory.arrays.PersistedValueArray;
 import org.terasology.reflection.TypeInfo;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -64,5 +71,21 @@ class ArrayTypeHandlerTest {
         typeHandler.deserialize(new PersistedIntegerArray(intList));
 
         verify(elementTypeHandler, times(intList.size())).deserialize(any());
+    }
+
+    @Test
+    @DisplayName("An empty array encoded as '[]' can be deserialized successfully.")
+    void testDeserializeEmpty() {
+        ArrayTypeHandler<String> typeHandler = new ArrayTypeHandler<>(
+                new StringTypeHandler(),
+                TypeInfo.of(String.class)
+        );
+
+        var testData = new PersistedValueArray(List.of());
+
+        var result = typeHandler.deserialize(testData);
+
+        assertThat(result).isPresent();
+        assertThat(Array.getLength(result.get())).isEqualTo(0);
     }
 }

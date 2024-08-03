@@ -90,13 +90,13 @@ fun moduleDependencyOrdering(modulesConfig: Configuration): List<String> {
     // configurations.resolvedConfiguration is more straightforward if you just want all the artifacts,
     // but using `.incoming` lets us turn on lenient mode as well as do more accurate filtering of local modules
     val resolvable = modulesConfig.incoming
-    val artifactView = resolvable.artifactView {
+    resolvable.artifactView {
         lenient(true)
     }
 
     val result = resolvable.resolutionResult
     val allDependencies = result.allDependencies
-    val resolvedDependencies = allDependencies.mapNotNull {
+    allDependencies.mapNotNull {
         if (it is ResolvedDependencyResult) {
             return@mapNotNull it
         }

@@ -40,9 +40,9 @@ import java.util.Map;
 
 /**
  * JSON deserializer to create trees using json:
- * <p/>
+ * <p>
  * { sequence:[action1, {action2:{ foo:bar, duration:7}}] }
- * <p/>
+ * <p>
  * Actions and Decorators need to be registered before parsing.
  */
 public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, JsonSerializer<BehaviorNode> {

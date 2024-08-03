@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * This component is attached to all character entities. It governs movement and stores associated paramenters, and can
- * be used instead of a CapsuleShapeComponent by the physics system to define the collision shape. <br/> The {@link
+ * be used instead of a CapsuleShapeComponent by the physics system to define the collision shape. <br> The {@link
  * AliveCharacterComponent} should necessarily be attached to the character entity for the movement systems to work.
  */
 public final class CharacterMovementComponent implements Component<CharacterMovementComponent> {

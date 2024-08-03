@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * When you create a TaskMaster, it is important to shut it down after you're finished with it, generally in the
  * shutdown method of a ComponentSystem. A basic usage example follows:
- * <p>
+ * <br>
  * <pre>
  * {@literal
  * TaskMaster<MyBaseTask> taskMaster = TaskMaster.createFIFOTaskMaster("MyTaskMaster", 1);
@@ -144,11 +144,9 @@ public final class TaskMaster<T extends Task> {
     /**
      * Get the {@link ExecutorService} underlying this TaskMaster. Note that by default the service will have a
      * {@link TaskProcessor} enqueued for each thread. In order to use the ExecutorService directly you will need to
-     * {@method offer} a {@link ShutdownTask} as shown:
+     * {@link TaskMaster#offer(Task)} a {@link ShutdownTask} as shown:
      * <p>
-     * {@code
-     * taskMaster.offer(new ShutdownTask());
-     * }
+     * {@code taskMaster.offer(new ShutdownTask());}
      * @return the {@link ExecutorService} used by this instance
      */
     public ExecutorService getExecutorService() {

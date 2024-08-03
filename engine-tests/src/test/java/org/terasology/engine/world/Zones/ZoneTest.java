@@ -8,8 +8,8 @@ import org.terasology.engine.world.zones.Zone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class ZoneTest {
 
@@ -27,12 +27,7 @@ public class ZoneTest {
         zone.addZone(child);
         assertFalse(zone.getChildZones().isEmpty());
         assertTrue(zone.getChildZones().contains(child));
-
-        try {
-            zone.getChildZone("Invalid name");
-            fail();
-        } catch (Exception e) { }
-
+        assertThrows(Exception.class, () -> zone.getChildZone("Invalid name"));
         assertEquals(child, zone.getChildZone("Child"));
     }
 

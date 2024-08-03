@@ -3,6 +3,7 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
+import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.TerasologyConstants;
@@ -54,7 +55,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         BlockManager blockManager = context.get(BlockManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer);
+        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer, context.get(Config.class));
 
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
                 blockManager.getBlock(BlockManager.UNLOADED_ID), context);

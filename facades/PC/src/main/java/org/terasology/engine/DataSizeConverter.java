@@ -43,7 +43,7 @@ public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
         }
     }
 
-    protected static final Pattern pattern = Pattern.compile(
+    protected static final Pattern PATTERN = Pattern.compile(
             "(?<n>\\d+([.,]\\d*)?)" + // digits, maybe also a decimal part
                     "\\s*" +
                     "(?<suffix>\\p{Alpha})?b?",  // a suffix character, optionally followed by B
@@ -55,7 +55,7 @@ public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
         if (value == null) {
             throw new CommandLine.TypeConversionException("null input");
         }
-        Matcher match = pattern.matcher(value);
+        Matcher match = PATTERN.matcher(value);
         if (!match.matches()) {
             throw new CommandLine.TypeConversionException(
                     "Expected a number followed by K, M, G, or T. " +

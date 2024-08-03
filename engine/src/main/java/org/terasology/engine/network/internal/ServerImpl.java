@@ -193,7 +193,7 @@ public class ServerImpl implements Server {
     }
 
     private void send(NetData.NetMessage data) {
-        logger.trace("Sending with size {}", data.getSerializedSize());
+        logger.atTrace().log("Sending with size {}", data.getSerializedSize());
         channel.writeAndFlush(data);
     }
 
@@ -232,7 +232,7 @@ public class ServerImpl implements Server {
             if (target.exists()) {
                 target.send(event);
             } else {
-                logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
+                logger.atInfo().log("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
             }
         } catch (DeserializationException e) {
             logger.error("Failed to deserialize event", e);
@@ -346,36 +346,37 @@ public class ServerImpl implements Server {
                     }
                     blockManager.receiveFamilyRegistration(family, registrationMap);
                 } catch (BlockUriParseException e) {
-                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0));
+                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0)); //NOPMD
                 }
             }
         }
     }
 
     private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
-        EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
+        int entityNetId = updateEntity.getNetId();
+        EntityRef currentEntity = networkSystem.getEntity(entityNetId);
         if (currentEntity.exists()) {
             NetworkComponent netComp = currentEntity.getComponent(NetworkComponent.class);
             if (netComp == null) {
-                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, updateEntity.getNetId());
+                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, entityNetId);
                 return;
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
+            int networkId = netComp.getNetworkId();
+            if (networkId != entityNetId) {
                 logger.error("Network ID wrong before update");
             }
             boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
-            if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
-                    logger.error("Failed to associated new block entity");
-                }
+            if (blockComponent != null && !blockEntityBefore
+                    && !blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
+                logger.error("Failed to associated new block entity");
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
-                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), netComp.getNetworkId());
+            if (networkId != entityNetId) {
+                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, entityNetId, networkId);
             }
         } else {
-            logger.warn("Received update for non-existent entity {}", updateEntity.getNetId());
+            logger.warn("Received update for non-existent entity {}", entityNetId);
         }
     }
 

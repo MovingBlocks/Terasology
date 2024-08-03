@@ -3,19 +3,15 @@
 package org.terasology.engine.world.chunks.internal;
 
 import com.google.common.base.Preconditions;
-import com.google.protobuf.ByteString;
-import gnu.trove.list.TByteList;
-import gnu.trove.list.array.TByteArrayList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.engine.world.chunks.blockdata.TeraArray;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.protobuf.EntityData;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.protobuf.EntityData;
 
 public final class ChunkSerializer {
 
@@ -76,34 +72,6 @@ public final class ChunkSerializer {
         return builder.build();
     }
 
-    private static EntityData.RunLengthEncoding8 runLengthEncode8(TeraArray array) {
-        EntityData.RunLengthEncoding8.Builder builder = EntityData.RunLengthEncoding8.newBuilder();
-        TByteList values = new TByteArrayList(16384);
-        byte lastItem = (byte) array.get(0, 0, 0);
-        int counter = 0;
-        for (int y = 0; y < array.getSizeY(); ++y) {
-            for (int z = 0; z < array.getSizeZ(); ++z) {
-                for (int x = 0; x < array.getSizeX(); ++x) {
-                    byte item = (byte) array.get(x, y, z);
-                    if (lastItem != item) {
-                        builder.addRunLengths(counter);
-                        values.add(lastItem);
-                        lastItem = item;
-                        counter = 1;
-                    } else {
-                        counter++;
-                    }
-                }
-            }
-        }
-        if (lastItem != 0) {
-            builder.addRunLengths(counter);
-            values.add(lastItem);
-        }
-        builder.setValues(ByteString.copyFrom(values.toArray()));
-        return builder.build();
-    }
-
     private static TeraArray runLengthDecode(EntityData.RunLengthEncoding16 data) {
         Preconditions.checkState(data.getValuesCount() == data.getRunLengthsCount(), "Expected same number of values as runs");
         short[] decodedData = new short[Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z];
@@ -116,21 +84,6 @@ public final class ChunkSerializer {
             }
         }
         return new TeraDenseArray16Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z, decodedData);
-    }
-
-    private static TeraArray runLengthDecode(EntityData.RunLengthEncoding8 data) {
-        Preconditions.checkState(data.getValues().size() == data.getRunLengthsCount(), "Expected same number of values as runs");
-        byte[] decodedData = new byte[Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z];
-        int index = 0;
-        ByteString.ByteIterator valueSource = data.getValues().iterator();
-        for (int pos = 0; pos < data.getRunLengthsCount(); ++pos) {
-            int length = data.getRunLengths(pos);
-            byte value = valueSource.nextByte();
-            for (int i = 0; i < length; ++i) {
-                decodedData[index++] = value;
-            }
-        }
-        return new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z, decodedData);
     }
 
     /**

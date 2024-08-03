@@ -13,27 +13,35 @@ plugins {
     id("org.sonarqube")
 }
 
-dependencies {
-    "pmd"("net.sourceforge.pmd:pmd-core:6.15.0")
-    "pmd"("net.sourceforge.pmd:pmd-java:6.15.0")
+// give test dependencies access to compileOnly dependencies to emulate providedCompile
+// only because of spotbugs-annotations in below dependencies.
+configurations.testImplementation.get().extendsFrom(configurations.compileOnly.get())
 
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+dependencies {
+    // spotbugs annotations to suppress warnings are not included via spotbugs plugin
+    // see bug: https://github.com/spotbugs/spotbugs-gradle-plugin/issues/1018
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.1")
+    pmd("net.sourceforge.pmd:pmd-ant:7.0.0-rc4")
+    pmd("net.sourceforge.pmd:pmd-core:7.0.0-rc4")
+    pmd("net.sourceforge.pmd:pmd-java:7.0.0-rc4")
+
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.4.14") {
         because("runtime: to configure logging during tests with logback.xml")
     }
     testRuntimeOnly("org.codehaus.janino:janino:3.1.7") {
         because("allows use of EvaluatorFilter in logback.xml")
     }
-    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.36") {
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:2.0.11") {
         because("redirects java.util.logging (from e.g. junit) through slf4j")
     }
 
-    add("testImplementation", platform("org.junit:junit-bom:5.8.1"))
+    add("testImplementation", platform("org.junit:junit-bom:5.10.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testImplementation("org.mockito:mockito-inline:3.12.4")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
+    testImplementation("org.mockito:mockito-core:5.6.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
 
     testImplementation("com.google.truth:truth:1.1.3")
     testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.3")
@@ -50,13 +58,37 @@ tasks.withType<Test> {
     // If false, the outputs are still collected and visible in the test report, but they don't spam the console.
     testLogging.showStandardStreams = false
     reports {
-        junitXml.isEnabled = true
+        junitXml.required.set(true)
     }
     jvmArgs("-Xms512m", "-Xmx1024m")
 
     // Make sure the natives have been extracted, but only for multi-workspace setups (not for solo module builds)
     if (project.name != project(":").name) {
         dependsOn(tasks.getByPath(":extractNatives"))
+    }
+}
+
+ tasks.withType<Checkstyle> {
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
+ }
+
+tasks.withType<Pmd> {
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
+    }
+}
+
+tasks.withType<SpotBugsTask> {
+    //FIXME: This is a workaround for module harness builds, where the config 
+    //       files are part of the harness but the task is not defined.
+    if (rootProject.name == "Terasology") {
+        dependsOn(tasks.getByPath(":extractConfig"))
     }
 }
 
@@ -81,9 +113,6 @@ configure<PmdExtension> {
 }
 
 configure<SpotBugsExtension> {
-    // The version of the spotbugs tool https://github.com/spotbugs/spotbugs
-    // not necessarily the same as the version of spotbugs-gradle-plugin
-    toolVersion.set("4.7.0")
     ignoreFailures.set(true)
     excludeFilter.set(file(rootDir.resolve("config/metrics/findbugs/findbugs-exclude.xml")))
 }

@@ -77,7 +77,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             LocationComponent location = entity.getComponent(LocationComponent.class);
 
             if (location == null) {
-                logger.warn("location component is not defined can't render text: {}", floatingText.text);
+                logger.warn("location component is not defined can't render text: {}", floatingText.text); //NOPMD
                 continue;
             }
 

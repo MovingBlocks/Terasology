@@ -1,0 +1,24 @@
+name: Close issues due to author inactivity
+on:
+  schedule:
+    - cron: "30 15 * * 6"
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v8
+        with:
+          only-labels: "Status: Needs Author Input"
+          days-before-issue-stale: 30
+          days-before-issue-close: 90
+          stale-issue-label: "Status: Stale"
+          stale-issue-message: "Hey there @ ${{ github.event.issue.user.login }} , we want to express our appreciation for your initial contribution to this issue. However, we now mark it as stale since we haven't received any response from you in the past 30 days. If you're still available, we would greatly appreciate it if you could provide answers to any open questions and/or share the requested feedback/input. Thank you for your consideration, we hope to hear from you soon!"
+          close-issue-message: "Hey there @ ${{ github.event.issue.user.login }} , we want to express our appreciation for your initial contribution to this issue. However, we now mark it as closed since we haven't received any response from you in the past 90 days. If you're still available, we would greatly appreciate it if you could provide answers to any open questions and/or share the requested feedback/input. Thank you for your consideration, we hope to hear from you soon!"
+          close-issue-reason: "not_planned"
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

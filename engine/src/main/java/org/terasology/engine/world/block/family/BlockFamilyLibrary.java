@@ -37,7 +37,7 @@ public class BlockFamilyLibrary {
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
 
             if (!BlockFamily.class.isAssignableFrom(entry)) {
-                logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName());
+                logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName()); //NOPMD
                 continue;
             }
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
@@ -96,7 +96,7 @@ public class BlockFamilyLibrary {
 
             return result;
         } catch (Exception e) {
-            logger.error("Failed to load blockFamily {}", blockFamily, e);
+            logger.error("Failed to load blockFamily {}", blockFamily, e); //NOPMD
         }
         return null;
     }

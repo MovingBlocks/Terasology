@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 /**
- * Defines translation data in the form of a map {ID -> value}.
+ * Defines translation data in the form of a map {ID → value}.
  */
 public class TranslationData implements AssetData {
 

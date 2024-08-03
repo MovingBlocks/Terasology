@@ -280,9 +280,9 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
     /**
      * Set the size of the block region from the minimum corner.
      *
-     * @param x the x coordinate to set the size; must be > 0
-     * @param y the y coordinate to set the size; must be > 0
-     * @param z the z coordinate to set the size; must be >
+     * @param x the x coordinate to set the size; must be greater than 0
+     * @param y the y coordinate to set the size; must be greater than 0
+     * @param z the z coordinate to set the size; must be greater than 0
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
@@ -292,7 +292,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
     /**
      * Set the size of the block region from the minimum corner.
      *
-     * @param size the size to set; all dimensions must be > 0
+     * @param size the size to set; all dimensions must be greater than 0
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
@@ -386,7 +386,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      *
      * @param other {@link BlockRegion}
      * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
+     * @return dest (after modification)
      */
     default BlockRegion union(BlockRegionc other, BlockRegion dest) {
         return this.union(other.minX(), other.minY(), other.minZ(), dest)
@@ -488,7 +488,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
-     * @param dest will hold the result
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}

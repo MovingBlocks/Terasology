@@ -99,12 +99,9 @@ public final class TelemetryUtils {
                 trackMetric(emitter, nameSpace, event);
             } else if (telemetryConfiguration.fetchBindingSize() != 0) {
                 TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
-                if (telemetryCategory != null) {
-                    if (telemetryConfiguration.containsField(telemetryCategory.id())) {
-                        if ((telemetryConfiguration.get(telemetryCategory.id()))) {
-                            trackMetric(emitter, nameSpace, event);
-                        }
-                    }
+                if (telemetryCategory != null && telemetryConfiguration.containsField(telemetryCategory.id())
+                        && telemetryConfiguration.get(telemetryCategory.id())) {
+                    trackMetric(emitter, nameSpace, event);
                 }
             }
             return null;
@@ -128,12 +125,8 @@ public final class TelemetryUtils {
                 trackMetric(emitter, nameSpace, event);
             } else if (bindingMap.size() != 0) {
                 TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
-                if (telemetryCategory != null) {
-                    if (bindingMap.containsKey(telemetryCategory.id())) {
-                        if ((bindingMap.get(telemetryCategory.id()))) {
-                            trackMetric(emitter, nameSpace, event);
-                        }
-                    }
+                if (telemetryCategory != null && bindingMap.containsKey(telemetryCategory.id()) && bindingMap.get(telemetryCategory.id())) {
+                    trackMetric(emitter, nameSpace, event);
                 }
             }
             return null;

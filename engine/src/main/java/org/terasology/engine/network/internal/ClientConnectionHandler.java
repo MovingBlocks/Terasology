@@ -34,6 +34,7 @@ import static org.terasology.engine.registry.InjectionHelper.createWithConstruct
 public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
+    private static final long TIMEOUT_THRESHOLD = 120000;
 
     private final Config config;
     private final Context context;
@@ -50,7 +51,6 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     private long lengthReceived;
     private Timer timeoutTimer = new Timer("Netty-Timeout-Timer", true);
     private long timeoutPoint = System.currentTimeMillis();
-    private final long timeoutThreshold = 120000;
     private Channel channel;
 
     /**
@@ -74,7 +74,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
      */
     private void scheduleTimeout(Channel inputChannel) {
         channel = inputChannel;
-        timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+        timeoutPoint = System.currentTimeMillis() + TIMEOUT_THRESHOLD;
         timeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
@@ -84,12 +84,12 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                             && joinStatus.getStatus() != JoinStatus.Status.FAILED) {
                         joinStatus.setErrorMessage("Server stopped responding.");
                         channel.close();
-                        logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
+                        logger.error("Server timeout threshold of {} ms exceeded.", TIMEOUT_THRESHOLD);
                     }
                 }
                 Thread.currentThread().stop();
             }
-        }, timeoutThreshold + 200);
+        }, TIMEOUT_THRESHOLD + 200);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
         }
 
         synchronized (joinStatus) {
-            timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+            timeoutPoint = System.currentTimeMillis() + TIMEOUT_THRESHOLD;
             if (message.hasServerInfo()) {
                 receivedServerInfo(ctx, message.getServerInfo());
             } else if (message.hasModuleDataHeader()) {
@@ -151,17 +151,18 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         String moduleId = moduleDataHeader.getId();
+        String moduleVersion = moduleDataHeader.getVersion();
         if (missingModules.remove(moduleId.toLowerCase(Locale.ENGLISH))) {
             if (moduleDataHeader.hasError()) {
                 joinStatus.setErrorMessage("Module download error: " + moduleDataHeader.getError());
                 channelHandlerContext.channel().close();
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
+                int numOfMissingModules = missingModules.size();
                 joinStatus.setCurrentActivity(
-                        "Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
-                                + sizeString + "," + missingModules.size() + " modules remain)");
-                logger.info("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " ("
-                        + sizeString + "," + missingModules.size() + " modules remain)");
+                        "Downloading " + moduleDataHeader.getId() + ":" + moduleVersion
+                                + " (" + sizeString + "," + numOfMissingModules + " modules remain)");
+                logger.info("Downloading {}: {} ({}, {} modules remain)", moduleId, moduleVersion, sizeString, numOfMissingModules);
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
@@ -176,8 +177,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         } else {
-            logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(),
-                    moduleDataHeader.getVersion());
+            logger.error("Received unwanted module {}:{} from server", moduleId, moduleVersion);
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.channel().close();
         }

@@ -7,7 +7,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -26,7 +25,6 @@ import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
 import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.dag.ModuleRendering;
 import org.terasology.engine.rendering.dag.Node;
@@ -37,7 +35,6 @@ import org.terasology.engine.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
-import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.utilities.Assets;
@@ -61,12 +58,10 @@ import static org.lwjgl.opengl.GL11.glViewport;
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with
  * elsewhere.
  * <p>
- * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
- * <p>
  * This implementation works closely with a number of support objects, in particular:
  * <p>
  * TODO: update this section to include new, relevant objects - a RenderableWorld instance, providing acceleration
- * structures caching blocks requiring different rendering treatments<br/>
+ * structures caching blocks requiring different rendering treatments<br>
  */
 public final class WorldRendererImpl implements WorldRenderer {
     /*
@@ -86,8 +81,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
-
-    private final OpenVRProvider vrProvider;
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
@@ -130,32 +123,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
-        // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
-        vrProvider = OpenVRProvider.getInstance();
-        if (renderingConfig.isVrSupport()) {
-            context.put(OpenVRProvider.class, vrProvider);
-            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
-            // reason (for example, no HMD is connected). In that case, even though the configuration requests
-            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
-            // the log.
-            if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
-                /*
-                 * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
-                 * such that the ground plane of the rendering system and the ground plane of the room the VR user is
-                 * in match.
-                 */
-                vrProvider.getState().setGroundPlaneYOffset(
-                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
-                currentRenderingStage = RenderingStage.LEFT_EYE;
-            } else {
-                playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-                currentRenderingStage = RenderingStage.MONO;
-            }
-        } else {
-            playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-            currentRenderingStage = RenderingStage.MONO;
-        }
+        playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
+        currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
@@ -236,9 +205,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
-                logger.info(String.format("\nInitialising rendering class %s from %s module.\n",
+                logger.atInfo().log("\nInitialising rendering class {} from {} module.\n",
                         moduleRenderingInstance.getClass().getSimpleName(),
-                        moduleRenderingInstance.getProvidingModule()));
+                        moduleRenderingInstance.getProvidingModule());
                 moduleRenderingInstance.initialise();
             }
         }

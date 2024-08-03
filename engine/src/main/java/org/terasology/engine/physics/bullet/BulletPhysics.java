@@ -241,7 +241,7 @@ public class BulletPhysics implements PhysicsEngine {
                             hitNormalWorld,
                             voxelPosition);
                 } else { //we hit something we don't understand, assume its nothing and log a warning
-                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                 }
             }
 
@@ -305,7 +305,7 @@ public class BulletPhysics implements PhysicsEngine {
                                 hitNormalWorld,
                                 voxelPosition);
                     } else { //we hit something we don't understand, assume its nothing and log a warning
-                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                     }
                 }
             }
@@ -692,22 +692,8 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    private void addRigidBody(BulletRigidBody body) {
-        short filter =
-                (short) (btBroadphaseProxy.CollisionFilterGroups.DefaultFilter
-                        | btBroadphaseProxy.CollisionFilterGroups.StaticFilter
-                        | btBroadphaseProxy.CollisionFilterGroups.SensorTrigger);
-        insertionQueue.add(new RigidBodyRequest(body, (short) btBroadphaseProxy.CollisionFilterGroups.DefaultFilter,
-                filter));
-    }
-
     private void addRigidBody(BulletRigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
         insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
-    }
-
-    private void addRigidBody(BulletRigidBody body, short groups, short filter) {
-        insertionQueue.add(new RigidBodyRequest(body, groups,
-                (short) (filter | btBroadphaseProxy.CollisionFilterGroups.SensorTrigger)));
     }
 
     private void removeRigidBody(BulletRigidBody body) {
@@ -839,7 +825,6 @@ public class BulletPhysics implements PhysicsEngine {
 
                             Vector3f a2 = new Vector3f();
                             manifoldPoint.getPositionWorldOnB(a2);
-                            int l = manifoldPoint.getLifeTime();
 
                             Vector3f a3 = new Vector3f();
                             manifoldPoint.getNormalWorldOnB(a3);

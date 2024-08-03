@@ -259,7 +259,7 @@ public class NUIEditorMenuTreeBuilder {
                 }
             }
         } else {
-            logger.warn("Could not get class for node {}", node.getValue().toString());
+            logger.warn("Could not get class for node {}", node.getValue()); //NOPMD
         }
     }
 
@@ -349,7 +349,7 @@ public class NUIEditorMenuTreeBuilder {
                 value = field.get(newInstance(clazz));
             }
 
-            if (value != null && value instanceof Boolean) {
+            if (value instanceof Boolean) {
                 value = !(Boolean) value;
             }
 

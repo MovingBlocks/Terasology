@@ -52,12 +52,11 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     @ReceiveEvent
     public void checkForSupport(DelayedActionTriggeredEvent event, EntityRef entity, BlockComponent block,
                                 SideBlockSupportRequiredComponent supportRequired) {
-        if (event.getActionId().equals(SUPPORT_CHECK_ACTION_ID)) {
-            if (!isSufficientlySupported(block.getPosition(), null, Collections.emptyMap(), supportRequired)) {
-                PrefabManager prefabManager = CoreRegistry.get(PrefabManager.class);
-                entity.send(new DestroyEvent(entity, EntityRef.NULL, prefabManager.getPrefab("engine" +
-                        ":supportRemovedDamage")));
-            }
+        if (event.getActionId().equals(SUPPORT_CHECK_ACTION_ID)
+                && !isSufficientlySupported(block.getPosition(), null, Collections.emptyMap(), supportRequired)) {
+            PrefabManager prefabManager = CoreRegistry.get(PrefabManager.class);
+            entity.send(new DestroyEvent(entity, EntityRef.NULL, prefabManager.getPrefab("engine" +
+                    ":supportRemovedDamage")));
         }
     }
 

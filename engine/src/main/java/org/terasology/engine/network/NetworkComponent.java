@@ -10,7 +10,7 @@ public class NetworkComponent implements Component<NetworkComponent> {
 
     // Network identifier for the entity
     @Replicate
-    private int networkId;
+    public int networkId;
 
     @Override
     public void copyFrom(NetworkComponent other) {

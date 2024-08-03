@@ -75,7 +75,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      * Iterates through the set of registered MetricsMode and returns the first instance whose method isAvailable()
      * returns true. Notice that this could be the MetricsMode that was current at the time this method was invoked.
      *
-     * @returns a MetricsMode instance
+     * @return a MetricsMode instance
      */
     public MetricsMode toggle() {
         do {

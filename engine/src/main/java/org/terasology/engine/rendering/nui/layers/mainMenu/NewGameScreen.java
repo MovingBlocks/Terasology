@@ -134,7 +134,7 @@ public class NewGameScreen extends CoreScreenLayer {
         AdvancedGameSetupScreen advancedSetupGameScreen = getManager().createScreen(AdvancedGameSetupScreen.ASSET_URI, AdvancedGameSetupScreen.class);
         WidgetUtil.trySubscribe(this, "advancedSetup", button -> {
             universeWrapper.setGameName(gameName.getText());
-            advancedSetupGameScreen.setUniverseWrapper(universeWrapper);
+            advancedSetupGameScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(advancedSetupGameScreen);
         });
 
@@ -281,12 +281,10 @@ public class NewGameScreen extends CoreScreenLayer {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
-            if (GameProvider.isSavesFolderEmpty()) {
-                // skip selectGameScreen and get back directly to main screen
-                getManager().pushScreen("engine:mainMenuScreen");
-                return true;
-            }
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE && GameProvider.isSavesFolderEmpty()) {
+            // skip selectGameScreen and get back directly to main screen
+            getManager().pushScreen("engine:mainMenuScreen");
+            return true;
         }
         return super.onKeyEvent(event);
     }

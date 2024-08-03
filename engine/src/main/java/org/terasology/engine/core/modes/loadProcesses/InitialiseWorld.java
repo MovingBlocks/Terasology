@@ -6,6 +6,7 @@ package org.terasology.engine.core.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
@@ -53,6 +54,7 @@ import org.terasology.engine.world.sun.BasicCelestialModel;
 import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -93,7 +95,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             worldInfo.setSeed(random.nextString(16));
         }
 
-        logger.info("World seed: \"{}\"", worldInfo.getSeed());
+        logger.info("World seed: \"{}\"", worldInfo.getSeed()); //NOPMD
 
         // TODO: Separate WorldRenderer from world handling in general
         WorldGeneratorManager worldGeneratorManager = context.get(WorldGeneratorManager.class);
@@ -103,8 +105,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             // setting the world seed will create the world builder
             worldGenerator.setWorldSeed(worldInfo.getSeed());
             context.put(WorldGenerator.class, worldGenerator);
-        } catch (UnresolvedWorldGeneratorException e) {
-            logger.error("Unable to load world generator {}. Available world generators: {}",
+        } catch (UnresolvedWorldGeneratorException | UnresolvedDependencyException e) {
+            logger.atError().log("Unable to load world generator {}. Available world generators: {}",
                     worldInfo.getWorldGenerator(), worldGeneratorManager.getWorldGenerators());
             context.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));
             return true; // We need to return true, otherwise the loading state will just call us again immediately
@@ -136,6 +138,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
                 worldGenerator,
                 blockManager,
                 extraDataManager,
+                context.get(Config.class),
                 Maps.newConcurrentMap());
         RelevanceSystem relevanceSystem = new RelevanceSystem(chunkProvider);
         context.put(RelevanceSystem.class, relevanceSystem);

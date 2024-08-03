@@ -77,33 +77,7 @@ set _SKIP=2
 :win9xME_args_slurp
 if "x%~1" == "x" goto execute
 
-@REM Escapes all arguments containing either "*" or "?" before passing them to the groovy process
-:process_args
-@REM If we have no more arguments to process then exit the loop
-IF "%1"=="" GOTO end
-SET ARG=%~1
-@REM "echo "%ARG%" will simply output the argument as an escaped text string
-@REM for piping to other applications. This is needed to ensure that the arguments are not expanded.
-@REM findstr is a built-in Windows utility (it has been since Windows 2000)
-@REM that finds matches in strings based on regular expressions.
-@REM The "&&" operator is followed if the findstr program returns an exit code of 0
-@REM Otherwise, the "||" operator is followed instead.
-echo "%ARG%" | findstr /C:"\*" 1>nul && (
-    SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%ARG%"
-) || (
-    echo "%ARG%" | findstr /C:"\?" 1>nul && (
-        SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%ARG%"
-    ) || (
-        SET CMD_LINE_ARGS=%CMD_LINE_ARGS% %ARG%
-    )
-)
-SHIFT
-GOTO process_args
-
-:end
-@REM For some reason, the escaped arguments always contain an extra space at the end, which confuses groovy.
-@REM This should remove it.
-SET CMD_LINE_ARGS=%CMD_LINE_ARGS:~1%
+set CMD_LINE_ARGS=%*
 
 :execute
 @rem Setup the command line

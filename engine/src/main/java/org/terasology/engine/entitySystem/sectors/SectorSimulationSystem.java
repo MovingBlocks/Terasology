@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
  * {@link EntityManager#createSectorEntity(long)} or its scope was set by
  * {@link BaseEntityRef#setScope(EntityScope)}.
  *
- * @see SectorUtil#getWatchedChunks(EntityRef) for the definition of wathed chunks.
- *
  * It periodically sends a {@link SectorSimulationEvent} to all sector-scope entities, which should trigger any
  * simulation that needs to happen regardless of the status of the entity's watched chunks.
  *
@@ -43,6 +41,8 @@ import java.util.stream.Collectors;
  * It also sends {@link OnChunkLoaded} and {@link BeforeChunkUnload} events to the entities, whenever the status of a
  * watched chunk changes. These should be captured by filtering only to entities with a
  * {@link SectorSimulationComponent}, to avoid capturing the event sent to the world entity.
+ *
+ * @see SectorUtil#getWatchedChunks(EntityRef) for the definition of watched chunks.
  */
 @RegisterSystem
 public class SectorSimulationSystem extends BaseComponentSystem {

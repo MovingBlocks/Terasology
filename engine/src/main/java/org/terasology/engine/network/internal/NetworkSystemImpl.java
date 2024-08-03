@@ -95,6 +95,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.requireNonNull;
 import static org.terasology.engine.registry.InjectionHelper.createWithConstructorInjection;
 
 
@@ -114,8 +115,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     // Shared
     private ContextImpl context;
-    private Optional<HibernationManager> hibernationSettings;
-    private NetworkConfig config;
+    private final Optional<HibernationManager> hibernationSettings;
+    private final NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
@@ -124,22 +125,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
-    private TIntLongMap netIdToEntityId = new TIntLongHashMap();
-    private EngineTime time;
+    private final TIntLongMap netIdToEntityId = new TIntLongHashMap();
+    private final EngineTime time;
     private long nextNetworkTick;
     private boolean kicked;
     // Server only
-    private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels", GlobalEventExecutor.INSTANCE);
+    private final ChannelGroup allChannels = new DefaultChannelGroup("tera-channels", GlobalEventExecutor.INSTANCE);
     private ChannelFuture serverChannelFuture;
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
 
-    private BlockingQueue<NetClient> newClients = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetClient> disconnectedClients = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<NetClient> newClients = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<NetClient> disconnectedClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
-    private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
-    private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
-    private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
+    private final Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
+    private final Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
+    private final SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
     private StorageManager storageManager;
 
     // Client only
@@ -182,7 +183,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
                 logger.info("Started server on port {}", port);
                 if (config.getServerMOTD() != null) {
-                    logger.info("Server MOTD is \"{}\"", config.getServerMOTD());
+                    logger.info("Server MOTD is \"{}\"", config.getServerMOTD()); //NOPMD
                 } else {
                     logger.info("No server MOTD is defined");
                 }
@@ -209,9 +210,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
-            if (hibernationSettings.isPresent()) {
-                hibernationSettings.get().setHibernationAllowed(false);
-            }
+            hibernationSettings.ifPresent(hibernationManager -> hibernationManager.setHibernationAllowed(false));
             ChannelFuture connectCheck = null;
 
             clientGroup = new NioEventLoopGroup();
@@ -240,11 +239,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                             return connectionHandler.getJoinStatus();
                         }
                     } else {
-                        logger.warn("Failed to connect to server", connectCheck.cause());
+
+                        Throwable connectionFailureCause = connectCheck.cause();
+                        logger.warn("Failed to connect to server", connectionFailureCause);
                         connectCheck.channel().closeFuture().awaitUninterruptibly();
                         clientGroup.shutdownGracefully(shutdownQuietMs, shutdownTimeoutMs, TimeUnit.MILLISECONDS)
                                 .syncUninterruptibly();
-                        return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
+                        return new JoinStatusImpl("Failed to connect to server - " + connectionFailureCause.getMessage());
                     }
                 }
                 connectCheck.channel().closeFuture().sync();
@@ -291,15 +292,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         server = null;
         nextNetId = 1;
         netIdToEntityId.clear();
-        if (mode != NetworkMode.CLIENT) {
-            if (this.entityManager != null) {
-                for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
-                    NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                    netComp.setNetworkId(0);
-                    entity.saveComponent(netComp);
-                }
-                this.entityManager.unsubscribe(this);
+        if (mode != NetworkMode.CLIENT && this.entityManager != null) {
+            for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
+                NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                netComp.setNetworkId(0);
+                entity.saveComponent(netComp);
             }
+            this.entityManager.unsubscribe(this);
         }
         mode = NetworkMode.NONE;
         entityManager = null;
@@ -328,24 +327,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public void update() {
-        if (mode != NetworkMode.NONE) {
-            if (entityManager != null) {
-                processPendingConnections();
-                processPendingDisconnects();
-                long currentTimer = time.getRealTimeInMs();
-                boolean netTick = false;
-                if (currentTimer > nextNetworkTick) {
-                    nextNetworkTick += NET_TICK_RATE;
-                    netTick = true;
-                }
-                PerformanceMonitor.startActivity("Client update");
-                for (Client client : clientList) {
-                    client.update(netTick);
-                }
-                PerformanceMonitor.endActivity();
-                if (server != null) {
-                    server.update(netTick);
-                }
+        if (mode != NetworkMode.NONE && entityManager != null) {
+            processPendingConnections();
+            processPendingDisconnects();
+            long currentTimer = time.getRealTimeInMs();
+            boolean netTick = false;
+            if (currentTimer > nextNetworkTick) {
+                nextNetworkTick += NET_TICK_RATE;
+                netTick = true;
+            }
+            PerformanceMonitor.startActivity("Client update");
+            for (Client client : clientList) {
+                client.update(netTick);
+            }
+            PerformanceMonitor.endActivity();
+            if (server != null) {
+                server.update(netTick);
             }
         }
     }
@@ -406,7 +403,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     public int getBandwidthPerClient() {
-        if (netClientList.size() > 0) {
+        if (!netClientList.isEmpty()) {
             return config.getUpstreamBandwidth() / netClientList.size();
         }
         return config.getUpstreamBandwidth();
@@ -452,7 +449,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             netComponent.setNetworkId(nextNetId++);
             entity.saveComponent(netComponent);
             netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
-            switch (netComponent.replicateMode) {
+            switch (requireNonNull(netComponent.replicateMode)) {
                 case OWNER:
                     NetClient clientPlayer = getNetOwner(entity);
                     if (clientPlayer != null) {
@@ -543,11 +540,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (mode != NetworkMode.CLIENT) {
             NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
             if (netComponent != null) {
-                logger.debug("Unregistering network entity: {} with netId {}", entity, netComponent.getNetworkId());
-                netIdToEntityId.remove(netComponent.getNetworkId());
+                int networkId = netComponent.getNetworkId();
+                logger.debug("Unregistering network entity: {} with netId {}", entity, networkId);
+                netIdToEntityId.remove(networkId);
                 if (mode.isServer()) {
                     for (NetClient client : netClientList) {
-                        client.setNetRemoved(netComponent.getNetworkId());
+                        client.setNetRemoved(networkId);
                     }
                 }
                 netComponent.setNetworkId(NULL_NET_ID);
@@ -597,14 +595,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
-            if (mode.isServer()) {
-                if (metadata.isReplicated()) {
-                    for (NetClient client : netClientList) {
-                        logger.debug("Component {} added to {}", component, entity);
-                        client.setComponentAdded(netComp.getNetworkId(), component);
-                    }
-                }
+        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID && mode.isServer() && metadata.isReplicated()) {
+            for (NetClient client : netClientList) {
+                logger.debug("Component {} added to {}", component, entity);
+                client.setComponentAdded(netComp.getNetworkId(), component);
             }
         }
         updatedOwnedEntities(entity, component, metadata);
@@ -614,14 +608,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
         ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
-            if (mode.isServer()) {
-                if (metadata.isReplicated()) {
-                    for (NetClient client : netClientList) {
-                        logger.debug("Component {} removed from {}", component, entity);
-                        client.setComponentRemoved(netComp.getNetworkId(), component);
-                    }
-                }
+        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID && mode.isServer() && metadata.isReplicated()) {
+            for (NetClient client : netClientList) {
+                logger.debug("Component {} removed from {}", component, entity);
+                client.setComponentRemoved(netComp.getNetworkId(), component);
             }
         }
         if (mode.isAuthority() && metadata.isReferenceOwner()) {
@@ -839,7 +829,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
-        logger.info("Client disconnected: " + client.getName());
+        logger.info("Client disconnected: {}", client.getName()); //NOPMD
         storageManager.deactivatePlayer(client);
         client.getEntity().send(new DisconnectedEvent());
         client.disconnect();
@@ -868,7 +858,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         connectClient(client);
 
         // log after connect so that the name has been set:
-        logger.info("New client entity: {}", client.getEntity());
+        logger.info("New client entity: {}", client.getEntity()); //NOPMD
         for (EntityRef netEntity : entityManager.getEntitiesWith(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
             if (netComp.getNetworkId() != NULL_NET_ID) {
@@ -944,7 +934,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
-                    .setName(metadata.getId().toString());
+                    .setName(metadata.getId());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -961,7 +951,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
-                    .setName(metadata.getId().toString());
+                    .setName(metadata.getId());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -985,8 +975,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             int fieldId = 0;
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
-                    logger.error("Class {} has too many fields (>255), serialization will be incomplete",
-                            metadata.getId());
+                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getId()); //NOPMD
                     break;
                 }
                 field.setId((byte) fieldId);
@@ -1006,19 +995,21 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                                                                         ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
+            String infoName = info.getName();
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(infoName);
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {
-                    FieldMetadata<?, ?> field = metadata.getField(info.getFieldName(i));
+                    String fieldName = info.getFieldName(i);
+                    FieldMetadata<?, ?> field = metadata.getField(fieldName);
                     if (field != null) {
                         field.setId(info.getFieldIds().byteAt(i));
                     } else {
-                        logger.error("Server has unknown field '{}' on '{}'", info.getFieldName(i), info.getName());
+                        logger.error("Server has unknown field '{}' on '{}'", fieldName, infoName);
                     }
                 }
             } else {
-                logger.error("Server has unknown class '{}'", info.getName());
+                logger.error("Server has unknown class '{}'", infoName);
             }
         }
         return idTable;

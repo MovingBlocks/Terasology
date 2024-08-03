@@ -30,7 +30,6 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
-import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
@@ -67,10 +66,12 @@ import static org.junit.platform.commons.support.ReflectionSupport.newInstance;
  * host. Currently all engine instances are headless, though it is possible to use headed engines in the future.
  */
 public class Engines {
+    public static final String DEFAULT_WORLD_GENERATOR = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+
     private static final Logger logger = LoggerFactory.getLogger(Engines.class);
 
-    protected final Set<String> dependencies = Sets.newHashSet("engine");
-    protected String worldGeneratorUri = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+    protected final Set<String> dependencies = Sets.newHashSet();
+    protected String worldGeneratorUri = DEFAULT_WORLD_GENERATOR;
     protected boolean doneLoading;
     protected Context hostContext;
     protected final List<TerasologyEngine> engines = Lists.newArrayList();
@@ -198,8 +199,7 @@ public class Engines {
                 .add(audio)
                 .add(new LwjglGraphics())
                 .add(new LwjglTimer())
-                .add(new LwjglInput())
-                .add(new OpenVRInput());
+                .add(new LwjglInput());
         createExtraSubsystems().forEach(terasologyEngineBuilder::add);
 
         return createEngine(terasologyEngineBuilder);
@@ -241,7 +241,11 @@ public class Engines {
 
     protected void mockPathManager() {
         PathManager originalPathManager = PathManager.getInstance();
-        pathManager = Mockito.spy(originalPathManager);
+        if (!Mockito.mockingDetails(originalPathManager).isMock()) {
+            pathManager = Mockito.spy(originalPathManager);
+        } else {
+            pathManager = originalPathManager;
+        }
         Mockito.when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
         pathManagerCleaner = new PathManagerProvider.Cleaner(originalPathManager, pathManager);
         PathManagerProvider.setPathManager(pathManager);
@@ -255,7 +259,7 @@ public class Engines {
         doneLoading = false;
         host.subscribeToStateChange(() -> {
             GameState newState = host.getState();
-            logger.debug("New engine state is {}", host.getState());
+            logger.debug("New engine state is {}", newState);
             if (newState instanceof StateIngame) {
                 hostContext = newState.getContext();
                 if (hostContext == null) {

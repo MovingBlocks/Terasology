@@ -83,7 +83,7 @@ public class EventSystemImpl implements EventSystem {
     @Override
     public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
-        logger.debug("Registering event {}", eventType.getSimpleName());
+        logger.debug("Registering event {}", eventType.getSimpleName()); //NOPMD
         for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
@@ -95,11 +95,11 @@ public class EventSystemImpl implements EventSystem {
     public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
-            logger.error("Cannot register handler {}, must be public", handler.getClass().getName());
+            logger.error("Cannot register handler {}, must be public", handlerClass.getName()); //NOPMD
             return;
         }
 
-        logger.debug("Registering event handler " + handlerClass.getName());
+        logger.debug("Registering event handler {}", handlerClass.getName()); //NOPMD
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
@@ -127,9 +127,9 @@ public class EventSystemImpl implements EventSystem {
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
 
-                logger.debug("Found method: " + method.toString());
+                logger.debug("Found method: {}", method);
                 if (!Event.class.isAssignableFrom(types[0]) || !EntityRef.class.isAssignableFrom(types[1])) {
-                    logger.error("Invalid event handler method: {}", method.getName());
+                    logger.error("Invalid event handler method: {}", method.getName()); //NOPMD
                     return;
                 }
 
@@ -138,7 +138,7 @@ public class EventSystemImpl implements EventSystem {
                 for (int i = 2; i < types.length; ++i) {
                     if (!Component.class.isAssignableFrom(types[i])) {
                         logger.error("Invalid event handler method: {} - {} is not a component class",
-                                method.getName(), types[i]);
+                                method.getName(), types[i]); //NOPMD
                         return;
                     }
                     requiredComponents.add((Class<? extends Component>) types[i]);
@@ -242,7 +242,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
@@ -281,7 +281,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (Thread.currentThread() != mainThread) {
+        if (!Thread.currentThread().equals(mainThread)) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers =

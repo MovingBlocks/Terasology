@@ -304,12 +304,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void setComponentRemoved(int networkId, Class<? extends Component> component) {
-        if (netRelevant.contains(networkId) && !netInitial.contains(networkId)) {
-            if (!addedComponents.remove(networkId, component)) {
-                removedComponents.put(networkId, component);
-                if (!dirtyComponents.remove(networkId, component)) {
-                    netDirty.add(networkId);
-                }
+        if (netRelevant.contains(networkId) && !netInitial.contains(networkId) && !addedComponents.remove(networkId, component)) {
+            removedComponents.put(networkId, component);
+            if (!dirtyComponents.remove(networkId, component)) {
+                netDirty.add(networkId);
             }
         }
     }
@@ -342,12 +340,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 }
             } else {
                 NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
-                if (networkComponent != null) {
-                    if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
-                        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetId(networkComponent.getNetworkId())
-                            .setEvent(eventSerializer.serialize(event)).build());
-                    }
+                if (networkComponent != null && netRelevant.contains(networkComponent.getNetworkId())
+                        || netInitial.contains(networkComponent.getNetworkId())) {
+                    queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                        .setTargetId(networkComponent.getNetworkId())
+                        .setEvent(eventSerializer.serialize(event)).build());
                 }
             }
         } catch (SerializationException e) {
@@ -366,7 +363,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     void send(NetData.NetMessage data) {
-        logger.trace("Sending packet with size {}", data.getSerializedSize());
+        int dataSize = data.getSerializedSize();
+        logger.trace("Sending packet with size {}", dataSize);
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.writeAndFlush(data);
@@ -510,7 +508,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
                 EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                    logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                    logger.atWarn().log("Received non-server event '{}' from client '{}'", metadata, getName());
                     continue;
                 }
                 if (!lagCompensated && metadata.isLagCompensated()) {

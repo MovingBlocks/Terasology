@@ -50,6 +50,7 @@ public class TelemetryScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:telemetryScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryScreen.class);
+    private static final int HORIZONTAL_SPACING = 12;
 
     @In
     private Config config;
@@ -69,7 +70,6 @@ public class TelemetryScreen extends CoreScreenLayer {
     @In
     private Emitter emitter;
 
-    private final int horizontalSpacing = 12;
 
     private Map<TelemetryCategory, Class> telemetryCategories;
 
@@ -310,7 +310,7 @@ public class TelemetryScreen extends CoreScreenLayer {
         uiCheckbox.bindChecked(binding);
         RowLayout newRow = new RowLayout(categoryHeader, new UISpace(), uiCheckbox)
                 .setColumnRatios(0.4f, 0.5f, 0.1f)
-                .setHorizontalSpacing(horizontalSpacing);
+                .setHorizontalSpacing(HORIZONTAL_SPACING);
         layout.addWidget(newRow);
 
         List<Map.Entry<String, ?>> telemetryFields = sortFields(map);
@@ -389,11 +389,11 @@ public class TelemetryScreen extends CoreScreenLayer {
             });
             newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()), uiCheckbox)
                     .setColumnRatios(0.4f, 0.5f, 0.1f)
-                    .setHorizontalSpacing(horizontalSpacing);
+                    .setHorizontalSpacing(HORIZONTAL_SPACING);
         } else {
             newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()))
                     .setColumnRatios(0.4f, 0.5f)
-                    .setHorizontalSpacing(horizontalSpacing);
+                    .setHorizontalSpacing(HORIZONTAL_SPACING);
         }
 
         layout.addWidget(newRow);

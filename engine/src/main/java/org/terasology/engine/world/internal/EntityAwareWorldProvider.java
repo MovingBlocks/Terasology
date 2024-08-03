@@ -247,10 +247,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
         }
 
         for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType()) {
-                if (entity.hasComponent(metadata.getType())) {
-                    return false;
-                }
+            if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType() && entity.hasComponent(metadata.getType())) {
+                return false;
             }
         }
         return true;

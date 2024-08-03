@@ -15,6 +15,7 @@ import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
@@ -64,13 +65,13 @@ public class WorldGeneratorManager {
                                 infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                                 logger.debug("{} added from {}", uri, generatorClass);
                             } else {
-                                logger.error("{} marked to be registered as a World Generator, " +
-                                                "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
+                                logger.error("{} marked to be registered as a World Generator, "
+                                        + "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
                             }
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
+                    logger.error("Error loading world generator in module {}, skipping", module.getId(), e); //NOPMD
                 }
             } else {
                 logger.warn("Could not resolve dependencies for module: {}", module);
@@ -98,7 +99,8 @@ public class WorldGeneratorManager {
      * @param context objects from this context will be injected into the
      * @return The instantiated world generator.
      */
-    public static WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
+    public static WorldGenerator createGenerator(SimpleUri uri, Context context)
+            throws UnresolvedWorldGeneratorException, UnresolvedDependencyException {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {
@@ -128,12 +130,12 @@ public class WorldGeneratorManager {
      * @return a new world generator with the specified uri.
      */
     public static WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment)
-            throws UnresolvedWorldGeneratorException {
+            throws UnresolvedWorldGeneratorException, UnresolvedDependencyException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             Name moduleName = environment.getModuleProviding(generatorClass);
             if (moduleName == null) {
-                throw new UnresolvedWorldGeneratorException("Cannot find module for world generator " + generatorClass);
+                throw new UnresolvedDependencyException("Cannot find module for world generator " + generatorClass);
             }
             SimpleUri generatorUri = new SimpleUri(moduleName, annotation.id());
             if (generatorUri.equals(uri)) {
@@ -159,12 +161,7 @@ public class WorldGeneratorManager {
 
     private static boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
-            if (WorldGenerator.class.isAssignableFrom(generatorClass)) {
-                if (generatorClass.getConstructor(SimpleUri.class) != null) {
-                    return true;
-                }
-            }
-            return false;
+            return WorldGenerator.class.isAssignableFrom(generatorClass) && generatorClass.getConstructor(SimpleUri.class) != null;
             // Being generous in catching here, because if the module is broken due to code changes or missing classes
             // the world generator is invalid
         } catch (NoSuchMethodException | RuntimeException e) {

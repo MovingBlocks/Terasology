@@ -146,14 +146,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quaternionf viewRotation = new Quaternionf();
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), 0, 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 break;
             case CLIMBING:
@@ -161,10 +156,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
             default:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), Math.toRadians(lookPitch), 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 relMove.y += relativeMovement.y;
                 break;

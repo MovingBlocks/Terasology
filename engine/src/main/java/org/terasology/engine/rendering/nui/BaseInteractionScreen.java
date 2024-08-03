@@ -18,9 +18,7 @@ public abstract class BaseInteractionScreen extends CoreScreenLayer {
 
     protected EntityRef getInteractionTarget() {
         EntityRef characterEntity = localPlayer.getCharacterEntity();
-        CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
-
-        return characterComponent.predictedInteractionTarget;
+        return characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget;
     }
 
     @Override

@@ -46,7 +46,6 @@ class ColorBlenderRgba implements ColorBlender {
         int mg = (a * sg + (0xFF - a) * dg) / 0xFF;
         int mr = (a * sr + (0xFF - a) * dr) / 0xFF;
 
-        int mix = (mb << 8) | (mg << 16) | (mr << 24) | 0xFF;
-        return mix;
+        return (mb << 8) | (mg << 16) | (mr << 24) | 0xFF;
     }
 }

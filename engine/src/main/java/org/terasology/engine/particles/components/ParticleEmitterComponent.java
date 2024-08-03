@@ -86,12 +86,12 @@ public class ParticleEmitterComponent implements Component<ParticleEmitterCompon
     public transient ParticlePool particlePool;
 
     /**
-     * Maps Generator component -> Function that processes that Generator
+     * Maps Generator component → Function that processes that Generator
      */
     public final Map<Component, GeneratorFunction> generatorFunctionMap = new LinkedHashMap<>();
 
     /**
-     * Maps Affector component -> Function that processes that Affector
+     * Maps Affector component → Function that processes that Affector
      */
     public final Map<Component, AffectorFunction> affectorFunctionMap = new LinkedHashMap<>();
 

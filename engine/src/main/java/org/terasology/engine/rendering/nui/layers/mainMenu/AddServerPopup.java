@@ -112,11 +112,6 @@ public class AddServerPopup extends CoreScreenLayer {
         getManager().setFocus(nameText);
     }
 
-    @Override
-    public void onClosed() {
-        super.onClosed();
-    }
-
     public void setServerInfo(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
 

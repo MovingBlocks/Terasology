@@ -526,7 +526,7 @@ public class PojoEntityManager implements EngineEntityManager {
         if (!oldComponent.isPresent()) {
             notifyComponentAdded(getEntity(entityId), component.getClass());
         } else {
-            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId); //NOPMD
             notifyComponentChanged(getEntity(entityId), component.getClass());
         }
 
@@ -580,7 +580,7 @@ public class PojoEntityManager implements EngineEntityManager {
                 .map(pool -> pool.getComponentStore().put(entityId, component));
 
         if (!oldComponent.isPresent()) {
-            logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId);
+            logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId); //NOPMD
         }
         if (eventSystem != null) {
             EntityRef entityRef = getEntity(entityId);
@@ -605,13 +605,9 @@ public class PojoEntityManager implements EngineEntityManager {
 
     public Optional<EngineEntityPool> getPool(long id) {
         Optional<EngineEntityPool> pool = Optional.ofNullable(poolMap.get(id));
-        if (!pool.isPresent()) {
-            if (id != NULL_ID) {
-                // TODO: Entity pools assignment is not needed as of now, can be enabled later on when necessary.
-                if (!isExistingEntity(id)) {
-                    logger.error("Entity {} doesn't exist", id);
-                }
-            }
+        // TODO: Entity pools assignment is not needed as of now, can be enabled later on when necessary.
+        if (!pool.isPresent() && id != NULL_ID && !isExistingEntity(id)) {
+            logger.error("Entity {} doesn't exist", id);
         }
         return pool;
     }
@@ -706,16 +702,6 @@ public class PojoEntityManager implements EngineEntityManager {
             subscriber.onEntityComponentChange(changedEntity, component);
         }
     }
-
-    /**
-     * This method gets called when the entity gets reactivated. e.g. after storage an entity needs to be reactivated.
-     */
-    private void notifyReactivation(EntityRef entity, Collection<Component> components) {
-        for (EntityChangeSubscriber subscriber : subscribers) {
-            subscriber.onReactivation(entity, components);
-        }
-    }
-
 
     /**
      * This method gets called before an entity gets deactivated (e.g. for storage).

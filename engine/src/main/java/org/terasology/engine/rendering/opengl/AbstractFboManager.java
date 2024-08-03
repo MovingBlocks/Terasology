@@ -40,16 +40,17 @@ public abstract class AbstractFboManager extends AbstractSubscribable implements
     protected FBO generateWithDimensions(FboConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
         FBO fbo = FBO.create(fboConfig);
+        SimpleUri fboConfigName = fboConfig.getName();
 
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
         // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
         if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-            logger.error("FBO " + fboConfig.getName() + " is incomplete. Look earlier in the log for details.");
+            logger.error("FBO {} is incomplete. Look earlier in the log for details.", fboConfigName);
         } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-            logger.error("FBO " + fboConfig.getName() + " has generated an unexpected status code. Look earlier in the log for details.");
+            logger.error("FBO {} has generated an unexpected status code. Look earlier in the log for details.", fboConfigName);
         }
-        fboLookup.put(fboConfig.getName(), fbo);
-        fboConfigs.put(fboConfig.getName(), fboConfig);
+        fboLookup.put(fboConfigName, fbo);
+        fboConfigs.put(fboConfigName, fboConfig);
         return fbo;
     }
 
@@ -103,7 +104,7 @@ public abstract class AbstractFboManager extends AbstractSubscribable implements
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.warn("Failed to retrieve FBO '" + fboName + "'!");
+            logger.warn("Failed to retrieve FBO '{}'!", fboName);
         }
 
         return fbo;
@@ -122,7 +123,7 @@ public abstract class AbstractFboManager extends AbstractSubscribable implements
         FboConfig fboConfig = fboConfigs.get(fboName);
 
         if (fboConfig == null) {
-            logger.warn("Failed to retrieve FboConfig '" + fboName + "'!");
+            logger.warn("Failed to retrieve FboConfig '{}'!", fboName);
         }
 
         return fboConfig;

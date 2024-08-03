@@ -23,9 +23,8 @@ public class UnorderedListDecorator implements ListDecorator {
 
     @Override
     public ParagraphData wrapParagraph(ParagraphData paragraphData) {
-        DefaultParagraphData defaultParagraphData = new DefaultParagraphData(paragraphData.getParagraphRenderStyle(),
+        return new DefaultParagraphData(paragraphData.getParagraphRenderStyle(),
                 new UnorderedListParagraphRenderable(paragraphData));
-        return defaultParagraphData;
     }
 
     private int getMaxIndent(Font font) {

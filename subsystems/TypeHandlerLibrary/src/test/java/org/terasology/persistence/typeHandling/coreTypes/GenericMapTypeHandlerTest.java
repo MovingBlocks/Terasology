@@ -119,6 +119,14 @@ class GenericMapTypeHandlerTest {
             ))
     ));
 
+    /**
+     * JSON equivalent:
+     * <pre><code>
+     * [ ]
+     * </code></pre>
+     */
+    private final PersistedData testDataValidEmpty = new PersistedValueArray(List.of());
+
     @Test
     @DisplayName("Data with valid formatting can be deserialized successfully.")
     void testDeserialize() {
@@ -195,6 +203,17 @@ class GenericMapTypeHandlerTest {
         );
 
         assertThat(th.deserialize(testDataValidAndInvalidMix)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("An empty map encoded as empty array '[]' can be deserialized successfully.")
+    void testDeserializeEmptyMap() {
+        var th = new GenericMapTypeHandler<>(new StringTypeHandler(), new LongTypeHandler());
+
+        var result = th.deserialize(testDataValidEmpty);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEmpty();
     }
 
     /** Never returns a value. */

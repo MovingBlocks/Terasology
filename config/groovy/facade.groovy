@@ -1,7 +1,7 @@
 
 class facade {
 
-    def excludedItems = ["PC", "TeraEd"]
+    def excludedItems = ["PC"]
 
     def getGithubDefaultHome(Properties properties) {
         return properties.alternativeGithubHome ?: "MovingBlocks"

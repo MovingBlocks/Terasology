@@ -18,23 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AABBTypeHandlerTest extends MathTypeAssert {
-
-    public static class AABB1Test {
-        public AABBi a1;
-    }
-
-    public static class AABB2Test {
-        public AABBf a1;
-    }
-
-    public static class AABB3Test {
-        public AABBf a1;
-        public AABBi a2;
-    }
-
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
     private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
-    private AABBiTypeHandler handler = new AABBiTypeHandler();
 
     private final Gson gson =
         GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
@@ -92,5 +77,18 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
         JsonObject obj = tree.getAsJsonObject();
         assertTrue(obj.has("a1"));
         assertAABBf(obj.get("a1"), 0, 2.0f, 1.5f, 10.0f, 5.0f, 10);
+    }
+
+    public static class AABB1Test {
+        public AABBi a1;
+    }
+
+    public static class AABB2Test {
+        public AABBf a1;
+    }
+
+    public static class AABB3Test {
+        public AABBf a1;
+        public AABBi a2;
     }
 }

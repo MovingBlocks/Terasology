@@ -29,10 +29,10 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
     main {
-        java.outputDir = buildDir.resolve("classes")
+        java.destinationDirectory.set(layout.buildDirectory.dir("classes"))
     }
     test {
-        java.outputDir = buildDir.resolve("testClasses")
+        java.destinationDirectory.set(layout.buildDirectory.dir("testClasses"))
     }
 }
 
@@ -75,11 +75,11 @@ if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
         implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
-        implementation("ch.qos.logback:logback-classic:1.2.3")
+        implementation("ch.qos.logback:logback-classic:1.4.14")
         runtimeOnly("org.codehaus.janino:janino:3.1.3") {
             because("logback filters")
         }
-        add("implementation", platform("org.junit:junit-bom:5.8.1"))
+        add("implementation", platform("org.junit:junit-bom:5.10.1"))
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.12.4")
     }
@@ -144,6 +144,10 @@ tasks.named("processResources") {
     dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
 }
 
+tasks.named("compileJava") {
+    dependsOn("processResources")
+}
+
 tasks.named<Test>("test") {
     description = "Runs all tests (slow)"
     useJUnitPlatform ()
@@ -174,8 +178,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = buildDir.resolve("classes")
-        testOutputDir = buildDir.resolve("testClasses")
+        outputDir = layout.buildDirectory.dir("classes").get().asFile
+        testOutputDir = layout.buildDirectory.dir("testClasses").get().asFile
         isDownloadSources = true
     }
 }

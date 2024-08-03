@@ -29,10 +29,6 @@ import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.nui.FontColor;
 
-import java.util.Arrays;
-
-import static java.util.stream.Collectors.joining;
-
 @RegisterSystem
 public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
@@ -72,12 +68,12 @@ public class ChatSystem extends BaseComponentSystem {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
             Message message = event.getFormattedMessage();
-            if (message.getType() == CoreMessageType.CHAT || message.getType() == CoreMessageType.NOTIFICATION) {
-
-                // show overlay only if chat and console are hidden
-                if (!nuiManager.isOpen(CHAT_UI) && !nuiManager.isOpen(CONSOLE_UI)) {
-                    overlay.setVisible(true);
-                }
+            // show overlay only if chat and console are hidden
+            if ((message.getType() == CoreMessageType.CHAT
+                    || message.getType() == CoreMessageType.NOTIFICATION)
+                    && !nuiManager.isOpen(CHAT_UI)
+                    && !nuiManager.isOpen(CONSOLE_UI)) {
+                overlay.setVisible(true);
             }
         }
     }
@@ -87,9 +83,9 @@ public class ChatSystem extends BaseComponentSystem {
             shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
-            @CommandParam(value = "message") String[] message
+            @CommandParam("message") String[] message
     ) {
-        String messageToString = join(message, " ");
+        String messageToString = joinWithWhitespace(message);
 
         logger.debug("Received chat message from {} : '{}'", sender, messageToString);
 
@@ -100,8 +96,8 @@ public class ChatSystem extends BaseComponentSystem {
         return "Message sent";
     }
 
-    private String join(String[] words, String sep) {
-        return Arrays.stream(words).collect(joining(sep));
+    private String joinWithWhitespace(String[] words) {
+        return String.join(" ", words);
     }
 
     @Command(runOnServer = true,
@@ -112,7 +108,7 @@ public class ChatSystem extends BaseComponentSystem {
             @CommandParam(value = "user", suggester = OnlineUsernameSuggester.class) String username,
             @CommandParam("message") String[] message
     ) {
-        String messageToString = join(message, " ");
+        String messageToString = joinWithWhitespace(message);
 
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;

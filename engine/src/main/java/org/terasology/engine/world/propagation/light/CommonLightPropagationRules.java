@@ -9,8 +9,6 @@ import org.terasology.engine.world.propagation.PropagationRules;
 
 /**
  * Defines a set of common rules for how light should propagate
- * <p>
- * {@inheritDoc}
  */
 public abstract class CommonLightPropagationRules implements PropagationRules {
 

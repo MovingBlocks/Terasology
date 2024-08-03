@@ -13,7 +13,7 @@ import java.util.List;
  *
  */
 @ServerEvent
-final class CommandEvent implements Event {
+public final class CommandEvent implements Event {
 
     private Name commandName;
     private List<String> parameters;

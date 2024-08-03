@@ -8,7 +8,7 @@ import org.terasology.gestalt.module.sandbox.API;
  * The action that is used by an action or decorator node. Every action node of a behavior tree has its own action
  * instance. There is only one action instance for all actors, that run a behavior tree - so all state information
  * needs to be stored at the actor.
- * <p/>
+ * <p>
  * Action instances are shown in the property panel of the behavior editor.
  */
 @API

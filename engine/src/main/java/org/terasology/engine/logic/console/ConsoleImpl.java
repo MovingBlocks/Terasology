@@ -45,8 +45,8 @@ public class ConsoleImpl implements Console {
     private final Map<Name, ConsoleCommand> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newHashSet();
 
-    private NetworkSystem networkSystem;
-    private Context context;
+    private final NetworkSystem networkSystem;
+    private final Context context;
 
     public ConsoleImpl(Context context) {
         this.networkSystem = context.get(NetworkSystem.class);
@@ -59,12 +59,13 @@ public class ConsoleImpl implements Console {
      * @param command The command to be registered
      */
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void registerCommand(ConsoleCommand command) {
         Name commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
-            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
-                    commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
+            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'", commandName,
+                    commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
                     command.getSource().getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
@@ -135,7 +136,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void addMessage(Message message) {
         String uncoloredText = FontUnderline.strip(FontColor.stripColor(message.getMessage()));
-        logger.info("[{}] {}", message.getType(), uncoloredText);
+        logger.info("[{}] {}", message.getType(), uncoloredText); //NOPMD
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
@@ -206,10 +207,8 @@ public class ConsoleImpl implements Console {
 
         ClientComponent cc = callingClient.getComponent(ClientComponent.class);
 
-        if (cc.local) {
-            if (!rawCommand.isEmpty() && (localCommandHistory.isEmpty() || !localCommandHistory.getLast().equals(rawCommand))) {
-                localCommandHistory.add(rawCommand);
-            }
+        if (cc.local && !rawCommand.isEmpty() && (localCommandHistory.isEmpty() || !localCommandHistory.getLast().equals(rawCommand))) {
+            localCommandHistory.add(rawCommand);
         }
 
         return execute(new Name(commandName), processedParameters, callingClient);
@@ -233,7 +232,8 @@ public class ConsoleImpl implements Console {
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            callingClient.send(new ErrorMessageEvent("You do not have enough permissions to execute this command (" + requiredPermission + ")."));
+            callingClient.send(
+                    new ErrorMessageEvent("You do not have enough permissions to execute this command (" + requiredPermission + ")."));
             return false;
         }
 
@@ -327,9 +327,7 @@ public class ConsoleImpl implements Console {
         String parameterPart = cleanedCommand.substring(commandEndIndex).trim();
 
         //get the parameters
-        List<String> params = splitParameters(parameterPart);
-
-        return params;
+        return splitParameters(parameterPart);
     }
 
     private static List<String> splitParameters(String paramStr) {

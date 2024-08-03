@@ -9,6 +9,8 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedBoolean;
 import java.util.Arrays;
 import java.util.Iterator;
 
+// TODO, see https://github.com/MovingBlocks/Terasology/issues/5176 for reasoning.
+@SuppressWarnings({"PMD.ArrayIsStoredDirectly", "PMD.MethodReturnsInternalArray"})
 public class PersistedBooleanArray extends AbstractPersistedArray {
 
     private final boolean[] booleans;

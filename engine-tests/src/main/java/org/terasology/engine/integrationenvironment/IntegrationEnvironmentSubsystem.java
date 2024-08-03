@@ -78,7 +78,7 @@ final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
                 logger.info("Install path does not appear to be a module: {}", installPath);
             }
         } catch (IOException e) {
-            logger.warn("Could not read install path as module at " + installPath);
+            logger.warn("Could not read install path as module at {}", installPath);
         }
     }
 }

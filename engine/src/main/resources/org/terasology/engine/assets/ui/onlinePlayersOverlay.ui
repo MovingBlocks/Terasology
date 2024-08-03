@@ -7,7 +7,7 @@
             {
                 "type": "UIBox",
                 "layoutInfo": {
-                    "width": 200,
+                    "width": 400,
                     "use-content-height": true,
                     "position-horizontal-center": {},
                     "position-vertical-center": {}

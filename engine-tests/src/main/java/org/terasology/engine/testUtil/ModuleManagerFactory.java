@@ -12,7 +12,7 @@ public final class ModuleManagerFactory {
     private ModuleManagerFactory() {
     }
 
-    public static ModuleManager create() throws Exception {
+    public static ModuleManager create() {
         // Loading screens, among other things, break when NUI classes are not added to engine.
         ModuleManager moduleManager = new ModuleManager("", ImmutableList.of(UIWidget.class));
         Module unittestModule = moduleManager.registerPackageModule("org.terasology.unittest");

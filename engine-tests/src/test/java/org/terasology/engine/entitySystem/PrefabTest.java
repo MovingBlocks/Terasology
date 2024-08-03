@@ -4,8 +4,6 @@ package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -45,9 +43,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PrefabTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(PrefabTest.class);
-
     private PrefabManager prefabManager;
 
     @BeforeEach
@@ -140,6 +135,14 @@ public class PrefabTest {
         ListOfObjectComponent mappedContainer = prefab.getComponent(ListOfObjectComponent.class);
         assertEquals(2, mappedContainer.elements.size());
         assertEquals("returnHome", mappedContainer.elements.get(1).id);
+    }
+
+
+    @Test
+    public void testPrefabWithEmptyListOfMappedContainers() {
+        Prefab prefab = prefabManager.getPrefab("unittest:withEmptyListContainer");
+        ListOfObjectComponent mappedContainer = prefab.getComponent(ListOfObjectComponent.class);
+        assertEquals(0, mappedContainer.elements.size());
     }
 
     @Test

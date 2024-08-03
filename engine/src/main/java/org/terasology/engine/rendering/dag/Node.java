@@ -168,9 +168,9 @@ public interface Node extends RenderPipelineTask {
     void removeRunOrderConnection(int id, DependencyConnection.Type type);
 
     /**
-     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * Is {@code thisNode} dependent on {@code anotherNode}?
      * @param anotherNode
-     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     * @return If this node has at least one {@code anotherNode}'s connection on input - true. Otherwise false.
      */
     boolean isDependentOn(Node anotherNode);
 

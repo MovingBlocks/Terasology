@@ -7,12 +7,9 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
@@ -25,8 +22,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.terasology.engine.world.block.BlockManager.AIR_ID;
 import static org.terasology.engine.world.block.BlockManager.UNLOADED_ID;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 class ChunkRegionFutureTest {
 

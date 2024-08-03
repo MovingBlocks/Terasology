@@ -248,10 +248,10 @@ public class GLSLShader extends Shader {
 
             // TODO: Have our own shader language and parse this stuff out properly
             if (shaderProgramBase.getFragmentProgram().contains(feature.toString())) {
-                logger.debug("Fragment shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Fragment shader feature '{}' is available...", feature);
                 availableFeatures.add(feature);
             } else if (shaderProgramBase.getVertexProgram().contains(feature.toString())) {
-                logger.debug("Vertex shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Vertex shader feature '{}' is available...", feature);
                 availableFeatures.add(feature);
             }
         }
@@ -278,7 +278,7 @@ public class GLSLShader extends Shader {
             disposalAction.vertexPrograms.put(featureHash, vertShaderId);
         }
 
-        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
+        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn()); //NOPMD
     }
 
     private String assembleShader(int type, Set<ShaderProgramFeature> features) {
@@ -364,7 +364,7 @@ public class GLSLShader extends Shader {
     protected void doReload(ShaderData data) {
         try {
             GameThread.synch(() -> {
-                logger.debug("Recompiling shader {}.", getUrn());
+                logger.debug("Recompiling shader {}.", getUrn()); //NOPMD
 
                 disposalAction.disposeData();
                 shaderProgramBase = data;
@@ -376,11 +376,11 @@ public class GLSLShader extends Shader {
                 try {
                     registerAllShaderPermutations();
                 } catch (RuntimeException e) {
-                    logger.warn(e.getMessage());
+                    logger.warn("{}", e.getMessage()); //NOPMD
                 }
             });
         } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+            logger.error("Failed to reload {}", getUrn(), e); //NOPMD
         }
     }
 

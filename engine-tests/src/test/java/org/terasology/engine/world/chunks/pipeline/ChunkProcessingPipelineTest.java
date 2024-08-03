@@ -51,7 +51,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -67,7 +67,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
@@ -106,7 +106,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, chunkCache::get, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -140,7 +140,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -169,7 +169,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
+        pipeline = new ChunkProcessingPipeline(0, chunkCache::get, (o1, o2) -> {
             if (position.get() != null) {
                 Vector3ic entityPos = position.get();
                 return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition())

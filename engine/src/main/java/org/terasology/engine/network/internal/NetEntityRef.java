@@ -65,9 +65,4 @@ public class NetEntityRef extends BaseEntityRef {
         super.invalidate();
         exists = false;
     }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-    }
 }

@@ -265,11 +265,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    private void closeScreenWithoutEvent(ResourceUrn screenUri) {
-        boolean sendEvents = false;
-        closeScreen(screenUri, sendEvents);
-    }
-
     @Override
     public ResourceUrn getUri(UIScreenLayer screen) {
         BiMap<ResourceUrn, UIScreenLayer> lookup = HashBiMap.create(screenLookup);
@@ -358,7 +353,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = !screenUri.isInstance() && assetManager.isLoaded(screenUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find screen '{}'", screenUri);
         } else {
             UIElement element = opt.get();
@@ -370,7 +365,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 }
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;
@@ -482,7 +477,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = assetManager.isLoaded(overlayUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find overlay '{}'", overlayUri);
         } else {
             UIElement element = opt.get();
@@ -495,7 +490,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 addOverlay(overlay, overlayUri);
                 return overlay;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;
@@ -720,20 +715,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void charEvent(CharEvent ev, EntityRef entity) {
         NUICharEvent nuiEvent = new NUICharEvent(mouse, keyboard, ev.getCharacter());
-        if (focus != null) {
-            if (focus.onCharEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onCharEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onCharEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onCharEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;
@@ -747,20 +739,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
         NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getState());
-        if (focus != null) {
-            if (focus.onKeyEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onKeyEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onKeyEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onKeyEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;

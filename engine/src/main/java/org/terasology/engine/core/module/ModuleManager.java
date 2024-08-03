@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanner;
@@ -50,9 +51,12 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.PropertyPermission;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Verify.verify;
 
 public class ModuleManager {
     /** Set this property to "true" to allow modules on the classpath. */
@@ -169,9 +173,9 @@ public class ModuleManager {
                     continue;
                 }
                 if (registry.add(module)) {
-                    logger.info("Loaded {} from {}", module.getId(), path);
+                    logger.info("Loaded {} from {}", module.getId(), path); //NOPMD
                 } else {
-                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path); //NOPMD
                 }
             }
         }
@@ -268,8 +272,13 @@ public class ModuleManager {
             permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
         }
 
-        Policy.setPolicy(new ModuleSecurityPolicy());
-        System.setSecurityManager(new ModuleSecurityManager());
+        if (Runtime.version().feature() < 18 || "allow".equals(System.getProperty("java.security.manager"))) {
+            Policy.setPolicy(new ModuleSecurityPolicy());
+            System.setSecurityManager(new ModuleSecurityManager());
+        } else {
+            logger.warn("SecurityManager is disabled starting with Java 18 - module sandbox functionality is limited!");
+            logger.warn("To enable SecurityManager, use the \"-Djava.security.manager=allow\" JVM option.");
+        }
     }
 
     /**
@@ -277,9 +286,37 @@ public class ModuleManager {
      *
      * @deprecated Use {@link #resolveAndLoadEnvironment} if you need module dependency resolution.
      */
-    @Deprecated/*(since="4.4.0")*/
+    @Deprecated(since = "4.4.0")
     public ModuleRegistry getRegistry() {
         return registry;
+    }
+
+    /**
+     * Look up the module registered with this path.
+     * <p>
+     * This queries modules that have already been registered. It does <em>not</em> register
+     * anything new for the path or make any addition to the current module search path.
+     *
+     * @return empty if no modules match the path
+     * @throws VerifyException if more than one module matches
+     */
+    public Optional<Module> getModuleAt(Path path) {
+        final var matchingModules = new HashSet<Module>();
+        final var absolutePath = path.toAbsolutePath().normalize();
+        for (Module module : registry) {
+            for (Path modulePath : module.getResources().getRootPaths()) {
+                if (modulePath.toAbsolutePath().normalize().equals(absolutePath)) {
+                    matchingModules.add(module);
+                }
+            }
+        }
+        if (matchingModules.isEmpty()) {
+            return Optional.empty();
+        } else {
+            verify(matchingModules.size() == 1,
+                    "Path {} matched multiple modules: {}", path, matchingModules);
+            return Optional.of(matchingModules.iterator().next());
+        }
     }
 
     public ModuleInstallManager getInstallManager() {

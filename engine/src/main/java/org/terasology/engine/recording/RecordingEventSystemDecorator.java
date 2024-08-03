@@ -11,7 +11,7 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
- * Decorator for recording Events to Record&Replay subsystem.
+ * Decorator for recording Events to Record&amp;Replay subsystem.
  */
 public class RecordingEventSystemDecorator extends AbstractEventSystemDecorator {
     private final EventCatcher eventCatcher;
@@ -26,20 +26,16 @@ public class RecordingEventSystemDecorator extends AbstractEventSystemDecorator 
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (currentThreadIsMain()) {
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                eventCatcher.addEvent(new PendingEvent(entity, event));
-            }
+        if (currentThreadIsMain() && recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
+            eventCatcher.addEvent(new PendingEvent(entity, event));
         }
         super.send(entity, event);
     }
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (currentThreadIsMain()) {
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                eventCatcher.addEvent(new PendingEvent(entity, event, component));
-            }
+        if (currentThreadIsMain() && recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
+            eventCatcher.addEvent(new PendingEvent(entity, event, component));
         }
         super.send(entity, event, component);
     }

@@ -11,10 +11,11 @@ import java.lang.annotation.Target;
 /**
  * Declares which {@index "world generator"} to use.
  *
- * @see MTEExtension
+ * @deprecated Replace with {@link IntegrationEnvironment#worldGenerator}
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated(since = "5.3.0", forRemoval = true)
 public @interface UseWorldGenerator {
 
     /**

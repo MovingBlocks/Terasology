@@ -111,6 +111,7 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
         return worldTime;
     }
 
+    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     protected EntityRef getWorldEntity() {
         for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
             return entity;

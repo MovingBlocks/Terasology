@@ -41,7 +41,6 @@ class ColorBlenderArgb implements ColorBlender {
         int mg = (a * sg + (0xFF - a) * dg) / 0xFF;
         int mr = (a * sr + (0xFF - a) * dr) / 0xFF;
 
-        int mix = 0xFF000000 | mb | (mg << 8) | (mr << 16);
-        return mix;
+        return 0xFF000000 | mb | (mg << 8) | (mr << 16);
     }
 }

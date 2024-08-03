@@ -2,7 +2,7 @@
   <copyright>
     <option name="allowReplaceRegexp" value="20\d\d" />
     <option name="keyword" value="Copyright.*(Moving\s?Blocks|Terasology)" />
-    <option name="notice" value="Copyright &amp;#36;today.year The Terasology Foundation&#10;SPDX-License-Identifier: Apache-2.0" />
+    <option name="notice" value="Copyright The Terasology Foundation&#10;SPDX-License-Identifier: Apache-2.0" />
     <option name="myName" value="Terasology Foundation" />
   </copyright>
 </component>
