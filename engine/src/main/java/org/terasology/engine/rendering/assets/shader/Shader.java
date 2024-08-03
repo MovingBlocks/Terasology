@@ -11,8 +11,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 public abstract class Shader extends Asset<ShaderData> {
 
     protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType, DisposableResource resource) {
-        super(urn, assetType);
-        setDisposableResource(resource);
+        super(urn, assetType, resource);
     }
 
     protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType) {

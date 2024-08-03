@@ -15,9 +15,6 @@ import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.utilities.Jvm;
-import org.terasology.gestalt.di.DefaultBeanContext;
-import org.terasology.gestalt.di.index.CompoundClassIndex;
-import org.terasology.gestalt.di.index.UrlClassIndex;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -201,10 +198,7 @@ public class ModuleManager {
         Module packageModule = moduleFactory.createPackageModule("org.terasology.engine");
 
         // We need to add reflections from our subsystems and other classes.
-        CompoundClassIndex packageClassIndex = new CompoundClassIndex();
-        packageClassIndex.add(packageModule.getClassIndex());
-
-        Reflections packageReflections = new Reflections();
+        Reflections packageReflections = packageModule.getModuleManifest();
         ConfigurationBuilder config = reflectionsConfigurationFrom(packageReflections);
 
         Collection<File> classPaths = new HashSet<>(packageModule.getClasspaths());
@@ -212,7 +206,6 @@ public class ModuleManager {
             URL url = ClasspathHelper.forClass(aClass);
             config.addUrls(url);  // include this in reflections scan
             classPaths.add(urlToFile(url));  // also include in Module.moduleClasspaths
-            packageClassIndex.add(UrlClassIndex.byClassLoader(aClass.getClassLoader()));
             logger.debug("Adding path to engine module for class: {} {}", url, aClass);
         }
 
@@ -228,7 +221,7 @@ public class ModuleManager {
                 packageModule.getMetadata(),
                 packageModule.getResources(),
                 classPaths,
-                packageClassIndex,
+                packageReflections,
                 clazz ->
                         packageModule.getClassPredicate().test(clazz)
                                 || config.getUrls().contains(ClasspathHelper.forClass(clazz))
@@ -260,9 +253,7 @@ public class ModuleManager {
         ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        for (Module module : registry) {
-            apiScanner.scan(module.getClassIndex());
-        }
+        registry.stream().map(Module::getModuleManifest).forEach(apiScanner::scan);
 
         permissionSet.grantPermission("com.google.gson", ReflectPermission.class);
         permissionSet.grantPermission("com.google.gson.internal", ReflectPermission.class);
@@ -375,9 +366,9 @@ public class ModuleManager {
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(new DefaultBeanContext(), finalModules, wrappingPermissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory);
         } else {
-            newEnvironment = new ModuleEnvironment(new DefaultBeanContext(), finalModules, permissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory);
         }
         if (asPrimary) {
             environment = newEnvironment;

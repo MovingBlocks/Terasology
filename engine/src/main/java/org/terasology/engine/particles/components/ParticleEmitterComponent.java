@@ -8,7 +8,7 @@ import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.functions.affectors.AffectorFunction;
 import org.terasology.engine.particles.functions.generators.GeneratorFunction;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

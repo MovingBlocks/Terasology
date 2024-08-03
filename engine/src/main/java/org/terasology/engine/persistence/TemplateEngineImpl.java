@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * A simple template engine that replaces <code>${text}</code> expressions

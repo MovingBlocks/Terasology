@@ -4,4 +4,4 @@
 @API
 package org.terasology.engine.rendering.opengl;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;

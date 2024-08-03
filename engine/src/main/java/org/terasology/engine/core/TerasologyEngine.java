@@ -487,12 +487,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         if (assetTypeManager instanceof AutoReloadAssetTypeManager) {
-            try {
-                ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
-            } catch (IllegalStateException ignore) {
-                // ignore: This can happen if a module environment switch is happening in a different thread.
-                return true;
-            }
+            ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
         }
 
         processPendingState();

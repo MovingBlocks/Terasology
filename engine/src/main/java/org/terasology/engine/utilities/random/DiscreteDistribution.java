@@ -3,7 +3,7 @@
 
 package org.terasology.engine.utilities.random;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.ArrayList;
 import java.util.List;

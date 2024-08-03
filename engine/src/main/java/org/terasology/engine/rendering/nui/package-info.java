@@ -16,4 +16,4 @@
  */
 @API package org.terasology.engine.rendering.nui;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;

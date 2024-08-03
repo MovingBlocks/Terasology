@@ -3,7 +3,7 @@
 
 package org.terasology.engine.persistence;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Transforms the input text that contains markers (e.g. <code>${text}</code> expressions).

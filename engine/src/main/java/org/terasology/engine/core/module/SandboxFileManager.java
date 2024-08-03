@@ -5,7 +5,7 @@ package org.terasology.engine.core.module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.PathManager;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

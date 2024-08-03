@@ -33,7 +33,7 @@ public class BlockFamilyLibrary {
     private ClassLibrary<BlockFamily> library;
 
     public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        library = new DefaultModuleClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
 
             if (!BlockFamily.class.isAssignableFrom(entry)) {

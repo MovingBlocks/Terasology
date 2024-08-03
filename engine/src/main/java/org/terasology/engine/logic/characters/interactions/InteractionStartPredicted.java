@@ -4,7 +4,7 @@ package org.terasology.engine.logic.characters.interactions;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Sent to the client by itself at the start of an interaction between a character and a target.

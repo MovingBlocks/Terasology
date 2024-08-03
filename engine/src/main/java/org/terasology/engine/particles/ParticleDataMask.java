@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Data mask used internally by the particle system.

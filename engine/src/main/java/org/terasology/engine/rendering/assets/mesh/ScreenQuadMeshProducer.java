@@ -10,7 +10,7 @@ import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.gestalt.assets.AssetDataProducer;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;

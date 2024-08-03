@@ -54,8 +54,6 @@ dependencies {
     implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
     testImplementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
-    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
-
     for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
@@ -146,17 +144,8 @@ tasks.named("processResources") {
     dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
 }
 
-tasks.named<JavaCompile>("compileJava") {
+tasks.named("compileJava") {
     dependsOn("processResources")
-    // Create an asset list during compilation (needed for Gestalt 8)
-    inputs.files(sourceSets.main.get().resources.srcDirs)
-    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.main.get().resources.srcDirs.joinToString(File.pathSeparator)}")
-}
-tasks.named<JavaCompile>("compileTestJava") {
-    dependsOn("processResources")
-    // Create an asset list during compilation (needed for Gestalt 8)
-    inputs.files(sourceSets.test.get().resources.srcDirs)
-    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.test.get().resources.srcDirs.joinToString(File.pathSeparator)}")
 }
 
 tasks.named<Test>("test") {

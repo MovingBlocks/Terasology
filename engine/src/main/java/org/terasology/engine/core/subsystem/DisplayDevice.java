@@ -4,7 +4,7 @@ package org.terasology.engine.core.subsystem;
 
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.engine.utilities.subscribables.Subscribable;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.List;
 
