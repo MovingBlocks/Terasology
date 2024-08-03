@@ -4,7 +4,7 @@ package org.terasology.engine.logic.selection;
 
 import org.terasology.engine.world.selection.BlockSelectionComponent;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This event should be sent by a system after it receives a {@link ApplyBlockSelectionEvent} which marks the end of a

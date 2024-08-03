@@ -3,7 +3,7 @@
 
 package org.terasology.unittest;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public class ExampleClass implements ExampleInterface {

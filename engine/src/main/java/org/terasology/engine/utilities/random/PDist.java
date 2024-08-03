@@ -3,7 +3,7 @@
 
 package org.terasology.engine.utilities.random;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public class PDist {

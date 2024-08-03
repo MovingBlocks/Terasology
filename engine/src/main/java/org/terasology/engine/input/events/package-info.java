@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.input.events;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;

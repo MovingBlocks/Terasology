@@ -6,10 +6,10 @@ package org.terasology.engine.core.module;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.gestalt.di.index.CompoundClassIndex;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
@@ -60,7 +60,7 @@ public class ModuleListDownloader implements Callable<ModuleRegistry> {
 
                 ModuleMetadata meta = metaReader.read(new StringReader(json));
                 logger.debug("Read module {} - {}", meta.getId(), meta.getVersion()); //NOPMD
-                modules.add(new Module(meta, new EmptyFileSource(), Collections.emptyList(), new CompoundClassIndex(),
+                modules.add(new Module(meta, new EmptyFileSource(), Collections.emptyList(), new Reflections(),
                         (c) -> false));
             }
 

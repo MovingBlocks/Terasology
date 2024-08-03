@@ -3,7 +3,6 @@
 
 package org.terasology.engine.world.viewer.layers;
 
-import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.core.Observer;
 import org.terasology.engine.world.generation.Region;
 import org.terasology.nui.Color;
@@ -13,7 +12,6 @@ import java.awt.image.BufferedImage;
 /**
  * A visual representation of a facet class
  */
-@IndexInherited
 public interface FacetLayer  {
 
     /**

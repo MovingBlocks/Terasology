@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.physics.components;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;

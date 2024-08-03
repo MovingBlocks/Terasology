@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.core;
 
-import org.terasology.context.annotation.API;
-import org.terasology.context.annotation.IndexInherited;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * The action that is used by an action or decorator node. Every action node of a behavior tree has its own action
@@ -13,7 +12,6 @@ import org.terasology.context.annotation.IndexInherited;
  * Action instances are shown in the property panel of the behavior editor.
  */
 @API
-@IndexInherited
 public interface Action {
 
     /**

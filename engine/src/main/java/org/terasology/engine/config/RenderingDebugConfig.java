@@ -5,7 +5,7 @@ package org.terasology.engine.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

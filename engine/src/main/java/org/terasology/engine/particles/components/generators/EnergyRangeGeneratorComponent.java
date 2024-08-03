@@ -3,7 +3,7 @@
 package org.terasology.engine.particles.components.generators;
 
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 
 @API

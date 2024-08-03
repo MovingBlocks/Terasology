@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
-import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleContext;
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
 
-public class TypeSerializerTest extends ModuleEnvironmentTest {
+class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
     private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53]," +
             "\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\"," +
@@ -156,7 +155,6 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @SuppressWarnings("checkstyle:FinalClass")
-    @IndexInherited
     public static class Animal<T> {
         public T data;
 
@@ -179,11 +177,6 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
         @Override
         public int hashCode() {
             return Objects.hash(data);
-        }
-
-        @Override
-        public String toString() {
-            return "Animal(data = " + data.toString() + ")";
         }
     }
 

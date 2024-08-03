@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;

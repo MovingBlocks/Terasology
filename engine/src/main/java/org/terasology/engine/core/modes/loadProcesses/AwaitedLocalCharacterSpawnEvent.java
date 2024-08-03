@@ -4,7 +4,7 @@ package org.terasology.engine.core.modes.loadProcesses;
 
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Event which is triggered when LocalPlayer is setup with a character entity. Allows for detection of when LocalPlayer is

@@ -3,7 +3,6 @@
 
 package org.terasology.engine.input;
 
-import org.terasology.context.annotation.Index;
 import org.terasology.input.ActivateMode;
 
 import java.lang.annotation.ElementType;
@@ -13,7 +12,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Index
 public @interface RegisterBindButton {
     String id();
 
