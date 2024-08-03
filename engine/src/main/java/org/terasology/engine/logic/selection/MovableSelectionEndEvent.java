@@ -4,7 +4,7 @@ package org.terasology.engine.logic.selection;
 
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * This event is sent when the player finalizes the position of a moving selection by clicking the left mouse button.

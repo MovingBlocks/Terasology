@@ -17,6 +17,9 @@ configure<SourceSetContainer> {
 
 dependencies {
     implementation(project(":engine"))
+
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+
     api("com.jagrosh:DiscordIPC:0.4")
 
     constraints {

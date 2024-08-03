@@ -56,6 +56,11 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java:3.16.1")
     implementation("org.terasology:reflections:0.9.12-MB")
 
+    implementation("com.github.zafarkhaja:java-semver:0.10.2")
+
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+    testAnnotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
     testImplementation("ch.qos.logback:logback-classic:1.4.14") {
@@ -91,8 +96,17 @@ tasks.register<Copy>("copyResourcesToClasses") {
     into(sourceSets["main"].output.classesDirs.first())
 }
 
-tasks.named("compileJava") {
+tasks.named<JavaCompile>("compileJava") {
     dependsOn("copyResourcesToClasses")
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.main.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.main.get().resources.srcDirs.joinToString(File.pathSeparator)}")
+}
+tasks.named<JavaCompile>("compileTestJava") {
+    dependsOn("copyResourcesToClasses")
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.test.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.test.get().resources.srcDirs.joinToString(File.pathSeparator)}")
 }
 
 tasks.withType<Jar> {

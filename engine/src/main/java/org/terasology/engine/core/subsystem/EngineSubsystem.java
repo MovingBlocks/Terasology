@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
+@IndexInherited
 public interface EngineSubsystem {
 
     /**

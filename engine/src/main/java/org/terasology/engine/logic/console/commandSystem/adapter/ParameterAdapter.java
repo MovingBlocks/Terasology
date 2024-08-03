@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.console.commandSystem.adapter;
 
 import org.terasology.engine.logic.console.commandSystem.AbstractCommand;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link AbstractCommand}

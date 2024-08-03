@@ -9,4 +9,4 @@
 @API
 package org.terasology.persistence.typeHandling;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

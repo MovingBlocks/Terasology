@@ -19,7 +19,8 @@ public abstract class Mesh extends Asset<MeshData> {
     }
 
     protected Mesh(ResourceUrn urn, AssetType<?, MeshData> assetType, DisposableResource resource) {
-        super(urn, assetType, resource);
+        super(urn, assetType);
+        setDisposableResource(resource);
     }
 
     public abstract AABBfc getAABB();

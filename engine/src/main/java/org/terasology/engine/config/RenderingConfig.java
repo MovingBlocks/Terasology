@@ -4,7 +4,7 @@
 package org.terasology.engine.config;
 
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;

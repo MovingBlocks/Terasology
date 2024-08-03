@@ -17,7 +17,7 @@ import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;

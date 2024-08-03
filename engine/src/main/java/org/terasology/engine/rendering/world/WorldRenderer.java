@@ -8,7 +8,7 @@ import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.rendering.dag.RenderGraph;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,

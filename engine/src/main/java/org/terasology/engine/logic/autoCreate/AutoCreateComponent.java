@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.autoCreate;
 
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * This component is used to mark prefabs that should automatically created when a game begins or is loaded, if one does not already exist.
