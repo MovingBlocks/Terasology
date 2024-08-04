@@ -6,5 +6,5 @@
         displayName = "${engine:menu#category-behavior}"
         ) package org.terasology.engine.logic.behavior.nui;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.input.InputCategory;

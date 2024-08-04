@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
+import org.terasology.context.annotation.Index;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,6 +17,7 @@ import java.lang.annotation.Target;
 @API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Index
 public @interface TelemetryCategory {
     /**
      * @return The id of the category.

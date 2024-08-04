@@ -4,6 +4,7 @@ package org.terasology.engine.rendering.dag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
@@ -17,6 +18,7 @@ import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.Range;
 
 @RegisterSystem
+@IndexInherited
 public abstract class ModuleRendering {
     protected static final Logger logger = LoggerFactory.getLogger(ModuleRendering.class);
 

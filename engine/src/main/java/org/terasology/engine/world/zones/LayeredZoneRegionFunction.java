@@ -6,7 +6,7 @@ import org.joml.Vector2i;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.generation.Region;
 import org.terasology.engine.world.generation.facets.ElevationFacet;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.Comparator;
 import java.util.List;

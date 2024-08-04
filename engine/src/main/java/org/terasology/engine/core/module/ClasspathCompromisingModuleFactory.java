@@ -50,7 +50,7 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
         Module module = super.createDirectoryModule(metadata, directory);
         return new Module(
                 module.getMetadata(), module.getResources(),
-                module.getClasspaths(), module.getModuleManifest(),
+                module.getClasspaths(), module.getClassIndex(),
                 new ClassesInModule(module));
     }
 
@@ -59,7 +59,7 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
         Module module = super.createArchiveModule(metadata, archive);
         return new Module(
                 module.getMetadata(), module.getResources(),
-                module.getClasspaths(), module.getModuleManifest(),
+                module.getClasspaths(), module.getClassIndex(),
                 new ClassesInModule(module));
     }
 
@@ -158,7 +158,6 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
     static class ClassesInModule implements Predicate<Class<?>> {
 
         private final Set<URL> classpaths;
-        private final ClassLoader[] classLoaders;
         private final String name;
 
         ClassesInModule(Module module) {
@@ -174,13 +173,12 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
                     throw new RuntimeException(e);
                 }
             }).collect(ImmutableSet.toImmutableSet());
-            classLoaders = module.getModuleManifest().getConfiguration().getClassLoaders();
             name = module.getId().toString();
         }
 
         @Override
         public boolean test(Class<?> aClass) {
-            URL classUrl = ClasspathHelper.forClass(aClass, classLoaders);
+            URL classUrl = ClasspathHelper.forClass(aClass);
             return classpaths.contains(classUrl);
         }
 

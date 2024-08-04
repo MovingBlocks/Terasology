@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.logic.console.commandSystem.annotations;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

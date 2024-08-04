@@ -23,7 +23,7 @@ import org.terasology.engine.utilities.gson.ResolutionHandler;
 import org.terasology.engine.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 import org.terasology.gestalt.naming.gson.NameTypeAdapter;

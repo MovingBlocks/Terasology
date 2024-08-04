@@ -21,7 +21,7 @@ public class EventLibrary extends ModuleClassLibrary<Event> {
     private static final Logger logger = LoggerFactory.getLogger(EventLibrary.class);
 
     public EventLibrary(ModuleEnvironment environment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
-        super(environment, reflectFactory, copyStrategyLibrary);
+        super(() -> environment, reflectFactory, copyStrategyLibrary);
     }
 
     @Override

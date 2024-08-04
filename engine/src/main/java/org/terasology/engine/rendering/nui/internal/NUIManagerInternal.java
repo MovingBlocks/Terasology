@@ -189,13 +189,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(),
+        widgetsLibrary = new WidgetLibrary(() -> context.get(ModuleManager.class).getEnvironment(),
                 context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
             Name module = verifyNotNull(environment.getModuleProviding(type), "No module provides %s", type);
             widgetsLibrary.register(new ResourceUrn(module.toString(), type.getSimpleName()), type);
         }
+        // Interfaces are not instantiatable and so are not usually stored in the widget library.
+        // We make a special exception in this case since all Terasology UI screens inherit from this base interface to use common styles.
+        widgetsLibrary.register(new ResourceUrn("engine", UIScreenLayer.class.getSimpleName()), UIScreenLayer.class);
     }
 
     @Override

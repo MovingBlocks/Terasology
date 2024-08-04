@@ -7,7 +7,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegionc;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.protobuf.EntityData;
 
 /**

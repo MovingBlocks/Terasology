@@ -3,7 +3,7 @@
 
 package org.terasology.engine.world.chunks.blockdata;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
