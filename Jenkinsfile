@@ -139,9 +139,10 @@ pipeline {
                         ])
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
-                        tools: [
-                            spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true)
-                        ])
+                        tool: spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true))
+
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: pmd(pattern: '**/build/reports/pmd/*.xml', useRankAsPriority: true))
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
