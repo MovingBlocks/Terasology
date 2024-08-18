@@ -18,8 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorldTimeImpl.class);
-
     private static final float WORLD_TIME_MULTIPLIER = 48f;
 
     private AtomicLong worldTime = new AtomicLong(0);
