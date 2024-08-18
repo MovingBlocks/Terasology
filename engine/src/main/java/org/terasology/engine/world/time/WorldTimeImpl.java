@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.time;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -10,9 +13,12 @@ import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldComponent;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorldTimeImpl.class);
 
     private static final float WORLD_TIME_MULTIPLIER = 48f;
 
@@ -68,17 +74,14 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
             if (startTick != endTick) {
                 long tick = endTime - endTime % TICK_EVENT_RATE;
-                getWorldEntity().send(new WorldTimeEvent(tick));
+                for (EntityRef e : entityManager.getEntitiesWith(WorldComponent.class)) {
+                    // this may not be called if there's no entity with World Component (yet)
+                    // TODO: consider catching / logging this case (someplace better than here)
+                    e.send(new WorldTimeEvent(tick));
+                }
             }
 
             // TODO: consider sending a DailyTick (independent from solar events such as midnight)
         }
-    }
-
-    private EntityRef getWorldEntity() {
-        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
-            return entity;
-        }
-        return EntityRef.NULL;
     }
 }
