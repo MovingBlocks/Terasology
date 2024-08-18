@@ -4,6 +4,8 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -42,6 +44,7 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.engine.world.time.WorldTimeImpl;
 import org.terasology.engine.world.zones.Zone;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -94,6 +97,8 @@ import java.util.stream.Collectors;
  * for a particular game template.
  */
 public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener, PropertyChangeListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UniverseSetupScreen.class);
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
 
     @In
@@ -354,10 +359,10 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
         } catch (UnresolvedWorldGeneratorException e) {
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Selected world generator cannot be resolved!",
                 "Please report this issue on Discord/GitHub and select a different world generator!");
-            e.printStackTrace();
+            LOGGER.error("Selected world generator cannot be resolved: ", e);
         } catch (UnresolvedDependencyException e) {
             //TODO: this will likely fail at game creation time later-on due to lack of world generator - don't just ignore this
-            e.printStackTrace();
+            LOGGER.error("Selected world generator cannot be resolved: ", e);
         }
 
         configureProperties();

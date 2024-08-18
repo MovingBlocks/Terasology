@@ -263,7 +263,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             }
             return "";
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            logger.error("Couldn't set player eye height: e");
             return "";
         }
     }

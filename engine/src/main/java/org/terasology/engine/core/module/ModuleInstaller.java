@@ -65,7 +65,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
             try {
                 uri = RemoteModuleExtension.getDownloadUrl(metadata).toURI();
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                logger.error("Couldn't get download URL: ", e);
             }
             String fileName = String.format("%s-%s.jar", id, version);
             Path folder = PathManager.getInstance().getHomeModPath().normalize();

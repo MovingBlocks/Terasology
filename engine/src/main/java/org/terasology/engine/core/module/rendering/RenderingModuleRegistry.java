@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module.rendering;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseSetupScreen;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 
 @API
 public class RenderingModuleRegistry {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenderingModuleRegistry.class);
 
     private List<ModuleRendering> orderedModuleRenderingInstances = new ArrayList<>();
 
@@ -126,7 +130,7 @@ public class RenderingModuleRegistry {
                     Constructor<?> constructor = renderingClass.getConstructor(Context.class);
                     moduleRenderingInstance = (ModuleRendering) constructor.newInstance(context);
                 } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Couldn't get constructor: ", e);
                 }
             }
             if (moduleRenderingInstance != null) {
