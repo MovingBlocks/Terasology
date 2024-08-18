@@ -99,11 +99,11 @@ public final class PathManager {
             }
         }
 
-        System.err.printf(
-                "Native library installation directory not found. %n" +
-                "Things will almost certainly crash as a result, %n" +
-                "unless something else installed everything to java.library.path. %n" +
-                "Searched: %s%n", installationSearchPaths
+        LOGGER.error(
+                "Native library installation directory not found. /n" +
+                "Things will almost certainly crash as a result, /n" +
+                "unless something else installed everything to java.library.path. /n" +
+                "Searched: {}/n", installationSearchPaths
         );
         return currentDirectory;
     }

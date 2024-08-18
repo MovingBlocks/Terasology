@@ -318,6 +318,7 @@ public final class Terasology implements Callable<Integer> {
         builder.add(new HibernationSubsystem());
     }
 
+    @SuppressWarnings("PMD.SystemPrintln")
     private void reportException(Throwable throwable) {
         Path logPath = LoggingContext.getLoggingPath();
 

@@ -25,6 +25,7 @@ import java.util.Date;
 /**
  * Configures the underlying logback logging framework.
  */
+@SuppressWarnings("PMD.SystemPrintln")
 public final class LoggingContext {
 
     /**
