@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import static org.terasology.gestalt.assets.module.ModuleAssetScanner.OVERRIDE_FOLDER;
 
@@ -79,34 +80,34 @@ public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
         // Convert AWT image to proper internal format
         if (image.getType() == BufferedImage.TYPE_3BYTE_BGR) {
-            for (int i = 0; i < data.length; i += stride) {
+            IntStream.iterate(0, i -> i < data.length, i -> i + stride).forEach(i -> {
                 buf.put(data, i + 2, 1); // R
                 buf.put(data, i + 1, 1); // G
                 buf.put(data, i + 0, 1); // B
                 buf.put((byte) 255); // A
-            }
+            });
         } else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
-            for (int i = 0; i < data.length; i += stride) {
+            IntStream.iterate(0, i -> i < data.length, i -> i + stride).forEach(i -> {
                 buf.put(data, i + 3, 1); // R
                 buf.put(data, i + 2, 1); // G
                 buf.put(data, i + 1, 1); // B
                 buf.put(data, i + 0, 1); // A
-            }
+            });
         } else if (image.getType() == BufferedImage.TYPE_INT_ARGB) {
-            for (int i = 0; i < data.length; i += stride) {
+            IntStream.iterate(0, i -> i < data.length, i -> i + stride).forEach(i -> {
                 buf.put(data, i + 1, 1); // R
                 buf.put(data, i + 2, 1); // G
                 buf.put(data, i + 3, 1); // B
                 buf.put(data, i + 0, 1); // A
-            }
+            });
         } else if (image.getType() == BufferedImage.TYPE_BYTE_INDEXED) {
             final ColorModel cm = image.getColorModel();
-            for (int i = 0; i < data.length; i += stride) {
+            IntStream.iterate(0, i -> i < data.length, i -> i + stride).forEach(i -> {
                 buf.put((byte) cm.getRed(data[i])); // R
                 buf.put((byte) cm.getGreen(data[i])); // G
                 buf.put((byte) cm.getBlue(data[i])); // B
                 buf.put((byte) cm.getAlpha(data[i])); // A
-            }
+            });
         } else {
             throw new IOException("Unsupported AWT format: " + image.getType());
         }
