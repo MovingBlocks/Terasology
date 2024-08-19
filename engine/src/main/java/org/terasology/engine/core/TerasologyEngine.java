@@ -327,8 +327,8 @@ public class TerasologyEngine implements GameEngine {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
         TypeRegistry.ALLOWLISTED_CLASSES =
-                ExternalApiallowlist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
-        TypeRegistry.ALLOWLISTED_PACKAGES = ExternalApiallowlist.PACKAGES;
+                ExternalApiAllowlist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.ALLOWLISTED_PACKAGES = ExternalApiAllowlist.PACKAGES;
 
         ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class),
                 classesOnClasspathsToAddToEngine);
