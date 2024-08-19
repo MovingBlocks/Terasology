@@ -14,7 +14,7 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.GameState;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
@@ -326,9 +326,9 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        TypeRegistry.WHITELISTED_CLASSES =
-                ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
-        TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
+        TypeRegistry.ALLOWLISTED_CLASSES =
+                ExternalApiallowlist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.ALLOWLISTED_PACKAGES = ExternalApiallowlist.PACKAGES;
 
         ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class),
                 classesOnClasspathsToAddToEngine);

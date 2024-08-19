@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
-public final class ExternalApiWhitelist {
+public final class ExternalApiAllowlist {
     private static final Set<String> NUI_PACKAGES = new ImmutableSet.Builder<String>()
             .add("org.terasology.input")
             .add("org.terasology.input.device")
@@ -188,6 +188,6 @@ public final class ExternalApiWhitelist {
             .add(org.terasology.reflection.metadata.FieldMetadata.class)
             .build();
 
-    private ExternalApiWhitelist() {
+    private ExternalApiAllowlist() {
     }
 }

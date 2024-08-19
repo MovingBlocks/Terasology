@@ -19,7 +19,7 @@ import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
@@ -264,7 +264,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws RuntimeException {
-        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.ALLOWLISTED_CLASSES = ExternalApiAllowlist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
 
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());

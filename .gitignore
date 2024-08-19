@@ -94,9 +94,9 @@ config/metrics/
 API_file.txt
 New_API_file.txt
 
-# Ignore Whitelist and Blacklist files
-whitelist.json
-blacklist.json
+# Ignore Allowlist and Denylist files
+allowlist.json
+denylist.json
 
 # Profiling related
 terasology.jfr

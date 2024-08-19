@@ -256,8 +256,8 @@ public class ModuleManager {
 
     private void setupSandbox() {
         PermissionSet permissionSet = permissionProviderFactory.getBasePermissionSet();
-        ExternalApiWhitelist.CLASSES.forEach(permissionSet::addAPIClass);
-        ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
+        ExternalApiAllowlist.CLASSES.forEach(permissionSet::addAPIClass);
+        ExternalApiAllowlist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
         for (Module module : registry) {
