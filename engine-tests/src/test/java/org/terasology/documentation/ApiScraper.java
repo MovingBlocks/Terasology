@@ -6,7 +6,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -99,9 +99,9 @@ public final class ApiScraper {
                     LOGGER.info("Unknown protocol for: {}, came from {}", apiClass, location);
             }
         }
-        sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()
+        sortedApi.putAll("external", ExternalApiAllowlist.CLASSES.stream()
                 .map(clazz -> clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
-        sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
+        sortedApi.putAll("external", ExternalApiAllowlist.PACKAGES.stream()
                 .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
         System.out.println("# Modding API:\n");

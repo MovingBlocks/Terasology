@@ -44,7 +44,7 @@ The game creates new objects and executes methods on them in response to network
 
 Terasology relies on [Gestalt Module Sandboxing](https://github.com/MovingBlocks/gestalt/wiki/Module%20Sandboxing) to protect from these risks of running untrusted JVM code. However, it's up to the application to make sure the sandbox is configured and applied correctly.
 
-* [o.t.engine.core.module.ExternalApiWhitelist](https://github.com/MovingBlocks/Terasology/blob/develop/engine/src/main/java/org/terasology/engine/core/module/ExternalApiWhitelist.java) defines a hardcoded list of allowable packages and classes.
+* [o.t.engine.core.module.ExternalApiAllowlist](https://github.com/MovingBlocks/Terasology/blob/develop/engine/src/main/java/org/terasology/engine/core/module/ExternalApiAllowlist.java) defines a hardcoded list of allowable packages and classes.
 
 ## ClassLoaders
 
