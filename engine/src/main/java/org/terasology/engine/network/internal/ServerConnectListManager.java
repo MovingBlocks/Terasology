@@ -34,8 +34,20 @@ public class ServerConnectListManager {
     private final Path allowlistPath;
 
     public ServerConnectListManager(Context context) {
-        denylistPath = PathManager.getInstance().getHomePath().resolve("denylist.json");
-        allowlistPath = PathManager.getInstance().getHomePath().resolve("allowlist.json");
+        // although this seems redundant, compiler wouldn't accept assigning then checking
+        if (Files.exists(PathManager.getInstance().getHomePath().resolve("denylist.json"))) {
+            denylistPath = PathManager.getInstance().getHomePath().resolve("denylist.json");
+        }
+        else {
+            denylistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+        }
+        // although this seems redundant, compiler wouldn't accept assigning then checking
+        if (Files.exists(PathManager.getInstance().getHomePath().resolve("allowlist.json"))) {
+            allowlistPath = PathManager.getInstance().getHomePath().resolve("allowlist.json");
+        }
+        else {
+            allowlistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+        }
         this.context = context;
         loadLists();
     }

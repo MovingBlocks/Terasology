@@ -1,7 +1,7 @@
 Modding API
 =================
 
-Terasology's engine uses allowlisting approach to expose an API for modules using two primary methods and a rarely needed third one:
+Terasology's engine uses an allowlisting approach to expose an API for modules using two primary methods and a rarely needed third one:
 
 * Classes or packages marked with the `@API` annotation
 * Classes or packages in the basic allowlist defined in `ExternalApiAllowlist.java`

@@ -152,6 +152,13 @@ public class SelectGameScreen extends SelectionScreen {
             Path denylistPath = PathManager.getInstance().getHomePath().resolve("denylist.json");
             Path allowlistPath = PathManager.getInstance().getHomePath().resolve("allowlist.json");
             if (!Files.exists(denylistPath)) {
+                denylistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+            }
+            
+            if (!Files.exists(allowlistPath)) {
+                allowlistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+            }
+            if (!Files.exists(denylistPath)) {
                 try {
                     Files.createFile(denylistPath);
                 } catch (IOException e) {
