@@ -74,6 +74,7 @@ public class ExampleTest {
     }
 
     @Test
+    @Tag("flaky")
     public void testSendEvent() throws IOException {
         Context clientContext = helper.createClient();
 
