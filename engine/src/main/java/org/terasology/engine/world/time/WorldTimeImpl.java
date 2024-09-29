@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.time;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -13,8 +10,6 @@ import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldComponent;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
