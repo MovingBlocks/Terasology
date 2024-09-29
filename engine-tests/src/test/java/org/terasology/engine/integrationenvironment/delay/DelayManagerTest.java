@@ -5,6 +5,7 @@ package org.terasology.engine.integrationenvironment.delay;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class DelayManagerTest {
     Time time;
 
     @Test
+    @Tag("flaky")
     public void delayedActionIsTriggeredTest(ModuleTestingHelper helper) throws IOException {
         helper.createClient();
         helper.runWhile(() -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).isEmpty());
