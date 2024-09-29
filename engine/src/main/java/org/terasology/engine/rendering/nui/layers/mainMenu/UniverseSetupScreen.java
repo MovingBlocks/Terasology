@@ -96,9 +96,9 @@ import java.util.stream.Collectors;
  * for a particular game template.
  */
 public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener, PropertyChangeListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UniverseSetupScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UniverseSetupScreen.class);
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
