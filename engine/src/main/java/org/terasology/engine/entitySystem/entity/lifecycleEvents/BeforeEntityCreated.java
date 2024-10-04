@@ -80,17 +80,15 @@ public class BeforeEntityCreated implements Event {
                 if (componentsToAdd.containsKey(result.getClass())) {
                     throw new IllegalStateException("Requested to add component that was already defined for this entity");
                 }
-                if (componentsToRemove.contains(result.getClass())) {
-                    continue;
+                if (!componentsToRemove.contains(result.getClass())) {
+                    return result;
                 }
-                return result;
             }
             while (addedIterator.hasNext()) {
                 final Component result = addedIterator.next();
-                if (componentsToRemove.contains(result.getClass())) {
-                    continue;
+                if (!componentsToRemove.contains(result.getClass())) {
+                    return result;
                 }
-                return result;
             }
             return null;
         }

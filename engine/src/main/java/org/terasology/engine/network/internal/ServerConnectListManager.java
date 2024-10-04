@@ -69,7 +69,7 @@ public class ServerConnectListManager {
                 whitelistWriter.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Couldn't save lists: ", e);
         }
     }
 

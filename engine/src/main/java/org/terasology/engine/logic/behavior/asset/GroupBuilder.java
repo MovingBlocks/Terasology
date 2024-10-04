@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
  * @see Group
  */
 @API
+@SuppressWarnings("PMD.AvoidPrintStackTrace")
 public class GroupBuilder {
 
     private GroupData groupData;

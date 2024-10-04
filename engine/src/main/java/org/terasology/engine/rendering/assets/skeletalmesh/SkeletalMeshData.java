@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class SkeletalMeshData implements AssetData {
@@ -172,10 +174,8 @@ public class SkeletalMeshData implements AssetData {
     private void calculateNormals() {
         // TODO: Better algorithm (take into account triangle size and angles
         List<Vector3f> vertices = getBindPoseVertexPositions();
-        List<Vector3f> normals = Lists.newArrayListWithCapacity(vertices.size());
-        for (int i = 0; i < vertices.size(); ++i) {
-            normals.add(new Vector3f());
-        }
+        List<Vector3f> normals = IntStream.range(0, vertices.size()).mapToObj(i -> new Vector3f()).collect(Collectors.toCollection(() ->
+                Lists.newArrayListWithCapacity(vertices.size())));
         Vector3f v1 = new Vector3f();
         Vector3f v2 = new Vector3f();
         Vector3f norm = new Vector3f();

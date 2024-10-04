@@ -25,6 +25,7 @@ import java.util.Date;
 /**
  * Configures the underlying logback logging framework.
  */
+@SuppressWarnings("PMD.SystemPrintln")
 public final class LoggingContext {
 
     /**
@@ -74,7 +75,7 @@ public final class LoggingContext {
         try {
             deleteLogFiles(logFileFolder, Duration.ofDays(5).getSeconds());
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //NOPMD
         }
 
         // Unfortunately, setting context-based variables works only after initialization
