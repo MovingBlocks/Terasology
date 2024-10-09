@@ -486,52 +486,57 @@ public class TerasologyEngine implements GameEngine {
             return false;
         }
 
-        if (assetTypeManager instanceof AutoReloadAssetTypeManager) {
-            try {
-                ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
-            } catch (IllegalStateException ignore) {
-                // ignore: This can happen if a module environment switch is happening in a different thread.
-                return true;
+        try {
+            if (assetTypeManager instanceof AutoReloadAssetTypeManager) {
+                try {
+                    ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
+                } catch (IllegalStateException ignore) {
+                    // ignore: This can happen if a module environment switch is happening in a different thread.
+                    return true;
+                }
             }
-        }
 
-        processPendingState();
+            processPendingState();
 
-        if (currentState == null) {
-            shutdown();
-            return false;
-        }
-
-        Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-        CoreRegistry.setContext(currentState.getContext());
-        rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
-
-        for (EngineSubsystem subsystem : allSubsystems) {
-            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
-                subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            if (currentState == null) {
+                shutdown();
+                return false;
             }
-        }
 
-        while (updateCycles.hasNext()) {
-            float updateDelta = updateCycles.next(); // gameTime gets updated here!
-            try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
-                currentState.update(updateDelta);
+            Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+            CoreRegistry.setContext(currentState.getContext());
+            rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
+
+            for (EngineSubsystem subsystem : allSubsystems) {
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
+                    subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+                }
             }
-        }
 
-        // Waiting processes are set by modules via GameThread.a/synch() methods.
-        GameThread.processWaitingProcesses();
-
-        for (EngineSubsystem subsystem : getSubsystems()) {
-            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
-                subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            while (updateCycles.hasNext()) {
+                float updateDelta = updateCycles.next(); // gameTime gets updated here!
+                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                    currentState.update(updateDelta);
+                }
             }
-        }
-        assetTypeManager.disposedUnusedAssets();
 
-        PerformanceMonitor.rollCycle();
-        PerformanceMonitor.startActivity("Other");
-        return true;
+            // Waiting processes are set by modules via GameThread.a/synch() methods.
+            GameThread.processWaitingProcesses();
+
+            for (EngineSubsystem subsystem : getSubsystems()) {
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
+                    subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+                }
+            }
+            assetTypeManager.disposedUnusedAssets();
+
+            PerformanceMonitor.rollCycle();
+            PerformanceMonitor.startActivity("Other");
+            return true;
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+            return true;
+        }
     }
 
     public void cleanup() {
