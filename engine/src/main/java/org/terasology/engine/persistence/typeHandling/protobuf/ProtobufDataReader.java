@@ -9,6 +9,7 @@ import org.terasology.protobuf.EntityData;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class ProtobufDataReader implements PersistedDataReader<ProtobufPersistedData> {
     @Override
@@ -19,6 +20,12 @@ public class ProtobufDataReader implements PersistedDataReader<ProtobufPersisted
 
     @Override
     public ProtobufPersistedData read(byte[] byteBuffer) throws InvalidProtocolBufferException {
+        EntityData.Value value = EntityData.Value.parseFrom(byteBuffer);
+        return new ProtobufPersistedData(value);
+    }
+
+    @Override
+    public ProtobufPersistedData read(ByteBuffer byteBuffer) throws InvalidProtocolBufferException {
         EntityData.Value value = EntityData.Value.parseFrom(byteBuffer);
         return new ProtobufPersistedData(value);
     }

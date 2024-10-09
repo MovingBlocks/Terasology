@@ -7,6 +7,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 /**
  * Read {@link PersistedData} from files, stream, buffer, etc.
@@ -15,4 +16,6 @@ public interface PersistedDataReader<T extends PersistedData> {
     T read(InputStream inputStream) throws IOException;
 
     T read(byte[] byteBuffer) throws IOException;
+
+    T read(ByteBuffer byteBuffer) throws IOException;
 }

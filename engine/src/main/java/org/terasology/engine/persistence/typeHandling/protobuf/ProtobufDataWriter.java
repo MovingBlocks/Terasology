@@ -8,6 +8,7 @@ import org.terasology.persistence.serializers.PersistedDataWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 public class ProtobufDataWriter implements PersistedDataWriter<ProtobufPersistedData> {
     @Override
@@ -18,5 +19,10 @@ public class ProtobufDataWriter implements PersistedDataWriter<ProtobufPersisted
     @Override
     public void writeTo(ProtobufPersistedData data, OutputStream outputStream) throws IOException {
         data.getValue().writeTo(CodedOutputStream.newInstance(outputStream));
+    }
+
+    @Override
+    public void writeTo(ProtobufPersistedData data, ByteBuffer byteBuffer) throws IOException {
+        byteBuffer.put(data.getValue().toByteArray());
     }
 }

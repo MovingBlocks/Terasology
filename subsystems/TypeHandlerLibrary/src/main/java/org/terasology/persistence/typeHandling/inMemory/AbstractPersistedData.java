@@ -7,9 +7,10 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public abstract class AbstractPersistedData implements PersistedData {
+public abstract class AbstractPersistedData implements PersistedData, Serializable {
 
     @Override
     public String getAsString() {
