@@ -4,8 +4,7 @@
 package org.terasology.engine.core;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.jna.platform.win32.KnownFolders;
-import com.sun.jna.platform.win32.Shell32Util;
+import dev.dirs.ProjectDirectories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
@@ -33,15 +32,14 @@ import java.util.stream.Collectors;
  */
 public final class PathManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(PathManager.class);
-    private static final String TERASOLOGY_FOLDER_NAME = "Terasology";
-    private static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
-
+    private static final ProjectDirectories PROJECT_DIRS = ProjectDirectories.from("org", "terasology", "terasology");
+    private static final Path PROJECT_PATH = Paths.get(PROJECT_DIRS.dataDir);
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String RECORDINGS_LIBRARY_DIR = "recordings";
-    private static final String LOG_DIR = "logs";
-    private static final String SHADER_LOG_DIR = "shaders";
+    private static final String LOG_DIR = PROJECT_DIRS.dataLocalDir + "/logs";
+    private static final String SHADER_LOG_DIR = PROJECT_DIRS.dataLocalDir + "/shaders";
     private static final String MODULE_DIR = "modules";
-    private static final String MODULE_CACHE_DIR = "cachedModules";
+    private static final String MODULE_CACHE_DIR = PROJECT_DIRS.cacheDir + "/cachedModules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
@@ -67,7 +65,7 @@ public final class PathManager {
 
     private PathManager() {
         installPath = findInstallPath();
-        homePath = installPath;
+        homePath = PROJECT_PATH;
     }
 
     private static Path findInstallPath() {
@@ -159,7 +157,11 @@ public final class PathManager {
     }
 
     /**
-     * Uses the given path as the home instead of the default home path.
+     * Uses the given path as the home instead of the default home path. Especially interesting for unit tests, as java>17 does not
+     * make it easy to set environment variables. see: https://www.baeldung.com/java-unit-testing-environment-variables .
+     *
+     * Currently LOG_DIR and LOG_SHADER_DIR are not affected here, as not based on homePath.
+     *
      * @param rootPath Path to use as the home path.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
@@ -173,33 +175,8 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useDefaultHomePath() throws IOException {
-        switch (OS.get()) {
-            case LINUX:
-                homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
-                break;
-            case MACOSX:
-                homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
-                break;
-            case WINDOWS:
-                String savedGamesPath = Shell32Util
-                    .getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
-                if (savedGamesPath == null) {
-                    savedGamesPath = Shell32Util
-                        .getKnownFolderPath(KnownFolders.FOLDERID_Documents);
-                }
-                Path rawPath;
-                if (savedGamesPath != null) {
-                    rawPath = Paths.get(savedGamesPath);
-                } else {
-                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
-                        .toPath();
-                }
-                homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
-                break;
-            default:
-                homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
-                break;
-        }
+        // use datadir, .local/share for linux e.g.
+        homePath = PROJECT_PATH;
         updateDirs();
     }
 
@@ -316,8 +293,8 @@ public final class PathManager {
     private void updateDirs() throws IOException {
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         recordingsPath = homePath.resolve(RECORDINGS_LIBRARY_DIR);
-        logPath = homePath.resolve(LOG_DIR);
-        shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
+        logPath = Paths.get(LOG_DIR);
+        shaderLogPath = Paths.get(SHADER_LOG_DIR);
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         nativesPath = installPath.resolve(NATIVES_DIR);
         configsPath = homePath.resolve(CONFIGS_DIR);
