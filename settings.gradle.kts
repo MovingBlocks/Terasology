@@ -3,6 +3,8 @@ rootProject.name = "Terasology"
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
+            // currently not yet for build-logic, see https://github.com/gradle/gradle/issues/15383 , change verisons
+            // here and there please.
             val gestalt = version("gestalt", "8.0.0-SNAPSHOT")
             library("gestalt-core", "org.terasology.gestalt", "gestalt-asset-core" ).versionRef(gestalt)
             library("gestalt-entitysystem", "org.terasology.gestalt", "gestalt-entity-system" ).versionRef(gestalt)
