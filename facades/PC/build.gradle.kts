@@ -58,7 +58,7 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 dependencies {
-    implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.6.0")
+    implementation(libs.jna.platform)
     implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
 
@@ -82,9 +82,9 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation(libs.junit.api)
+    testImplementation(libs.junit.params)
+    testRuntimeOnly(libs.junit.engine)
 
     testImplementation("com.google.truth:truth:1.1.2")
     testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")

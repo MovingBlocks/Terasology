@@ -15,6 +15,7 @@ dependencyResolutionManagement {
             library("gestalt-util", "org.terasology.gestalt", "gestalt-util" ).versionRef(gestalt)
             library("gson", "com.google.code.gson:gson:2.8.6")
             library("guava", "com.google.guava:guava:31.1-jre")
+            library("jna-platform", "net.java.dev.jna:jna-platform:5.6.0")
             val junit5 = version("junit5", "5.10.1")
             library("junit-api", "org.junit.jupiter", "junit-jupiter-api").versionRef(junit5)
             library("junit-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(junit5)

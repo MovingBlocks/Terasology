@@ -73,7 +73,7 @@ dependencies {
     api("org.codehaus.plexus:plexus-utils:3.0.16")
 
     // Java magic
-    implementation("net.java.dev.jna:jna-platform:5.6.0")
+    implementation(libs.jna.platform)
     implementation("org.terasology:reflections:0.9.12-MB")
     implementation("com.esotericsoftware:reflectasm:1.11.9")
 
