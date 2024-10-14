@@ -1,13 +1,13 @@
 Modding API
 =================
 
-Terasology's engine uses a whitelisting approach to expose an API for modules using two primary methods and a rarely needed third one:
+Terasology's engine uses an allowlisting approach to expose an API for modules using two primary methods and a rarely needed third one:
 
 * Classes or packages marked with the `@API` annotation
-* Classes or packages in the basic whitelist defined in `ExternalApiWhitelist.java`
+* Classes or packages in the basic allowlist defined in `ExternalApiAllowlist.java`
 * Rarely blocks of code in the engine may be hit in a way requiring use of `AccessController.doPrivileged(...)` - usually module authors do not need to worry about this but once in a while it could explain something quirky.
 
-This is to both protect the user's system from malicious code (for instance you cannot use `java.io.File` directly) and to better document what is available. If you attempt to use a class not on the whitelist you'll get log message like:
+This is to both protect the user's system from malicious code (for instance you cannot use `java.io.File` directly) and to better document what is available. If you attempt to use a class not on the allowlist you'll get log message like:
 
 `Denied access to class (not allowed with this module's permissions): some.package.and.class`
 

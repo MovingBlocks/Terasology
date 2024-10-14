@@ -6,7 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -100,9 +100,9 @@ final class CompleteApiScraper {
                     logger.error("Unknown protocol for: {} , came from {}", apiClass, location);
             }
         }
-        api.putAll(EXTERNAL, ExternalApiWhitelist.CLASSES.stream()
+        api.putAll(EXTERNAL, ExternalApiAllowlist.CLASSES.stream()
                 .map(clazz -> clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
-        api.putAll(EXTERNAL, ExternalApiWhitelist.PACKAGES.stream()
+        api.putAll(EXTERNAL, ExternalApiAllowlist.PACKAGES.stream()
                 .map(packagee -> packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
         //Puts the information in the StringBuffer

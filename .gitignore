@@ -94,7 +94,9 @@ config/metrics/
 API_file.txt
 New_API_file.txt
 
-# Ignore Whitelist and Blacklist files
+# Ignore Allowlist and Denylist files (Whitelist and Blacklist are old filenames)
+allowlist.json
+denylist.json
 whitelist.json
 blacklist.json
 
