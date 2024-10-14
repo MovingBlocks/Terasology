@@ -53,7 +53,7 @@ dependencies {
     // Dependency not provided for modules, but required for module-tests
     implementation(libs.gson)
     implementation("org.codehaus.plexus:plexus-utils:3.0.16")
-    implementation("com.google.protobuf:protobuf-java:3.16.1")
+    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get().toString()}")
     implementation("org.terasology:reflections:0.9.12-MB")
 
     implementation("com.github.zafarkhaja:java-semver:0.10.2")

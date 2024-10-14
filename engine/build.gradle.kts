@@ -62,7 +62,7 @@ dependencies {
     api(libs.gson)
     api("net.sf.trove4j:trove4j:3.0.3")
     implementation("io.netty:netty-all:4.1.77.Final")
-    implementation("com.google.protobuf:protobuf-java:3.22.0")
+    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get().toString()}")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     // Javax for protobuf due to @Generated - needed on Java 9 or newer Javas
@@ -73,7 +73,7 @@ dependencies {
     api("org.codehaus.plexus:plexus-utils:3.0.16")
 
     // Java magic
-    implementation("net.java.dev.jna:jna-platform:5.6.0")
+    implementation(libs.jna.platform)
     implementation("org.terasology:reflections:0.9.12-MB")
     implementation("com.esotericsoftware:reflectasm:1.11.9")
 
@@ -152,7 +152,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.22.0"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get().toString()}"
     }
     plugins {
     }

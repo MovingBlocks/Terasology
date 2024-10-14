@@ -3,6 +3,8 @@ rootProject.name = "Terasology"
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
+            // currently not yet for build-logic, see https://github.com/gradle/gradle/issues/15383 , change verisons
+            // here and there please.
             val gestalt = version("gestalt", "8.0.0-SNAPSHOT")
             library("gestalt-core", "org.terasology.gestalt", "gestalt-asset-core" ).versionRef(gestalt)
             library("gestalt-entitysystem", "org.terasology.gestalt", "gestalt-entity-system" ).versionRef(gestalt)
@@ -13,6 +15,7 @@ dependencyResolutionManagement {
             library("gestalt-util", "org.terasology.gestalt", "gestalt-util" ).versionRef(gestalt)
             library("gson", "com.google.code.gson:gson:2.8.6")
             library("guava", "com.google.guava:guava:31.1-jre")
+            library("jna-platform", "net.java.dev.jna:jna-platform:5.6.0")
             val junit5 = version("junit5", "5.10.1")
             library("junit-api", "org.junit.jupiter", "junit-jupiter-api").versionRef(junit5)
             library("junit-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(junit5)
@@ -22,6 +25,8 @@ dependencyResolutionManagement {
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockito)
             library("mockito-inline", "org.mockito:mockito-inline:3.12.4")
             library("mockito-junit", "org.mockito", "mockito-junit-jupiter").versionRef(mockito)
+            // protobuf does not work as the others, see https://github.com/google/protobuf-gradle-plugin/issues/563
+            val protobuf = version("protobuf", "3.22.5")
             val slf4j = version("slf4j", "2.0.11")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4j)
             library("slf4j-jul", "org.slf4j", "jul-to-slf4j").versionRef(slf4j)
