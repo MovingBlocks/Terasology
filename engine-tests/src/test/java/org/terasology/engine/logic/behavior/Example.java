@@ -1,9 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.logic.behavior.actions.Print;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BaseAction;
@@ -19,7 +20,7 @@ public final class Example {
     }
 
     public static void main(String[] args) {
-        BehaviorTreeBuilder treeBuilder = new BehaviorTreeBuilder();
+        BehaviorTreeBuilder treeBuilder = new BehaviorTreeBuilder(new ContextImpl());
 
         BehaviorNode node = treeBuilder.fromJson("{ sequence:[ success, success, failure ] }");
         logger.info("{}", new DefaultBehaviorTreeRunner(node, null).step());
