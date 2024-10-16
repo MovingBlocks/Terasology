@@ -270,6 +270,7 @@ public class TerasologyEngine implements GameEngine {
         logger.info("{}", TerasologyVersion.getInstance());
         logger.info("Home path: {}", PathManager.getInstance().getHomePath());
         logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
+        logger.info("Log path: {}", PathManager.getInstance().getLogPath());
         logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
         logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm" +
                 ".version"));

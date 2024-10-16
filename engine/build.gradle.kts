@@ -61,6 +61,7 @@ dependencies {
     api(libs.guava)
     api(libs.gson)
     api("net.sf.trove4j:trove4j:3.0.3")
+    implementation("dev.dirs:directories:26")
     implementation("io.netty:netty-all:4.1.77.Final")
     implementation("com.google.protobuf:protobuf-java:3.22.0")
     implementation("org.lz4:lz4-java:1.8.0")
