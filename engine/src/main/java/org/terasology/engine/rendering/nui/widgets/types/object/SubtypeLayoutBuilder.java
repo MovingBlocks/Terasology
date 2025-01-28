@@ -1,5 +1,3 @@
-// Copyright 2021 The Terasology Foundation
-// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.widgets.types.object;
 
 import com.google.common.collect.ImmutableSet;
@@ -65,7 +63,7 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         List<Class<? extends T>> allowedSubclasses =
                 typeRegistry.getSubtypesOf(baseType.getRawType())
                         .stream()
-                        // Type must come from an allowed module or be in the whitelist
+                        // Type must come from an allowed module or be in the allowlist
                         .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz))
                                 || permissionProvider.isPermitted(clazz))
                         // Filter public, instantiable types

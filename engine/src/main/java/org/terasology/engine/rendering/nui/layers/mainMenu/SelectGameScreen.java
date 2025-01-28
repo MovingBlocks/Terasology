@@ -1,5 +1,3 @@
-// Copyright 2021 The Terasology Foundation
-// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
@@ -149,20 +147,20 @@ public class SelectGameScreen extends SelectionScreen {
 
     private void loadGame(GameInfo item) {
         if (isLoadingAsServer()) {
-            Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-            Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
-            if (!Files.exists(blacklistPath)) {
+            Path denylistPath = PathManager.getInstance().getHomePath().resolve("denylist.json");
+            Path allowlistPath = PathManager.getInstance().getHomePath().resolve("allowlist.json");
+            if (!Files.exists(denylistPath)) {
                 try {
-                    Files.createFile(blacklistPath);
+                    Files.createFile(denylistPath);
                 } catch (IOException e) {
-                    logger.error("IO Exception on blacklist generation", e);
+                    logger.error("IO Exception on denylist generation", e);
                 }
             }
-            if (!Files.exists(whitelistPath)) {
+            if (!Files.exists(allowlistPath)) {
                 try {
-                    Files.createFile(whitelistPath);
+                    Files.createFile(allowlistPath);
                 } catch (IOException e) {
-                    logger.error("IO Exception on whitelist generation", e);
+                    logger.error("IO Exception on allowlist generation", e);
                 }
             }
         }
