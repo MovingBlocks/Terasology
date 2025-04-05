@@ -52,18 +52,8 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "id": "singleplayer",
-                        "text": "${engine:menu#start-singleplayer-game}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "multiplayer",
-                        "text": "${engine:menu#host-multiplayer-game}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "join",
-                        "text": "${engine:menu#join-game-online}"
+                        "id": "startgame",
+                        "text": "Start Game"
                     },
                     {
                         "type": "UIButton",

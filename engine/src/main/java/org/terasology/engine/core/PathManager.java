@@ -164,9 +164,15 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useOverrideHomePath(Path rootPath) throws IOException {
-        this.homePath = rootPath.toRealPath();
-        updateDirs();
-    }
+    // ✅ Create the directory if it doesn't exist
+    	if (!Files.exists(rootPath)) {
+        	Files.createDirectories(rootPath);
+    	}
+
+    	this.homePath = rootPath.toRealPath(); // now this won't crash
+    	updateDirs();
+}
+
 
     /**
      * Uses a platform-specific default home path for this execution.

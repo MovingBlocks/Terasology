@@ -16,6 +16,7 @@ import org.terasology.nui.widgets.UILabel;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.version.TerasologyVersion;
+import org.terasology.engine.network.NetworkMode;
 
 public class MainMenuScreen extends CoreScreenLayer {
 
@@ -43,26 +44,14 @@ public class MainMenuScreen extends CoreScreenLayer {
 
         UniverseWrapper universeWrapper = new UniverseWrapper();
 
-        WidgetUtil.trySubscribe(this, "singleplayer", button -> {
+        WidgetUtil.trySubscribe(this, "start", button -> {
             universeWrapper.setLoadingAsServer(false);
             selectScreen.setUniverseWrapper(universeWrapper);
+            universeWrapper.setServerAddress("localhost");  // Set the server address to local
+            universeWrapper.setNetworkMode(NetworkMode.CLIENT);  // Set the mode to client
             triggerForwardAnimation(selectScreen);
         });
-        WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            universeWrapper.setLoadingAsServer(true);
-            selectScreen.setUniverseWrapper(universeWrapper);
-            triggerForwardAnimation(selectScreen);
-        });
-        WidgetUtil.trySubscribe(this, "join", button -> {
-            if (storageService.getStatus() == StorageServiceWorkerStatus.WORKING) {
-                ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-                confirmPopup.setMessage(translationSystem.translate("${engine:menu#warning}"),
-                        translationSystem.translate("${engine:menu#storage-service-working}"));
-                confirmPopup.setOkHandler(() -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
-            } else {
-                triggerForwardAnimation(JoinGameScreen.ASSET_URI);
-            }
-        });
+
         WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "extras", button -> triggerForwardAnimation(ExtrasMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
