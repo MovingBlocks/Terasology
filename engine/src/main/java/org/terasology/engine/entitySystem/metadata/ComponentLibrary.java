@@ -5,6 +5,7 @@ package org.terasology.engine.entitySystem.metadata;
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
@@ -16,12 +17,19 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.ModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
+
 /**
  * The library for metadata about components (and their fields).
  */
 public class ComponentLibrary extends ModuleClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
+
+    @Inject
+    public ComponentLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        super(moduleManager::getEnvironment, reflectFactory, copyStrategyLibrary);
+    }
 
     public ComponentLibrary(ModuleEnvironment environment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         super(() -> environment, reflectFactory, copyStrategyLibrary);

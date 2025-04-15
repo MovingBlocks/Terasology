@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.IdentityStorageServiceConfig;
 import org.terasology.engine.config.SecurityConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.ClientIdentity;
 import org.terasology.engine.identity.PublicIdentityCertificate;
@@ -44,11 +43,11 @@ public final class StorageServiceWorker {
     private final Deque<ConsoleNotification> notificationBuffer;
     private Map<PublicIdentityCertificate, ClientIdentity> conflictSolutionsToUpload;
 
-    public StorageServiceWorker(Context context) {
-        this.config = context.get(Config.class);
+    public StorageServiceWorker(Config config, TranslationSystem translationSystem) {
+        this.config = config;
         this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
-        this.translationSystem = context.get(TranslationSystem.class);
+        this.translationSystem = translationSystem;
         this.notificationBuffer = new LinkedBlockingDeque<>();
         this.conflictingRemoteIdentities = new ArrayDeque<>();
     }

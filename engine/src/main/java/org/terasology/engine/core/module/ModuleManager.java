@@ -12,10 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.utilities.Jvm;
-import org.terasology.gestalt.di.DefaultBeanContext;
 import org.terasology.gestalt.di.index.CompoundClassIndex;
 import org.terasology.gestalt.di.index.UrlClassIndex;
 import org.terasology.gestalt.module.Module;
@@ -357,7 +358,15 @@ public class ModuleManager {
         resolveAndLoadEnvironment(Arrays.asList(modules));
     }
 
+    public void resolveAndLoadEnvironment(Context context, Name... modules) {
+        resolveAndLoadEnvironment(context, Arrays.asList(modules));
+    }
+
     public void resolveAndLoadEnvironment(Iterable<Name> modules) {
+        resolveAndLoadEnvironment(new ContextImpl(), modules);
+    }
+
+    public void resolveAndLoadEnvironment(Context context, Iterable<Name> modules) {
         DependencyResolver resolver = new DependencyResolver(registry);
         ResolutionResult result = resolver.resolve(modules);
 
@@ -366,18 +375,22 @@ public class ModuleManager {
             throw new RuntimeException("Failed to resolve dependencies for " + modules);
         }
 
-        loadEnvironment(result.getModules(), true);
+        loadEnvironment(context, result.getModules(), true);
     }
 
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
+        return loadEnvironment(new ContextImpl(), modules, asPrimary);
+    }
+
+    public ModuleEnvironment loadEnvironment(Context context, Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.add(engineModule);
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(new DefaultBeanContext(), finalModules, wrappingPermissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(((ContextImpl) context).getBeanContext(), finalModules, wrappingPermissionProviderFactory);
         } else {
-            newEnvironment = new ModuleEnvironment(new DefaultBeanContext(), finalModules, permissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(((ContextImpl) context).getBeanContext(), finalModules, permissionProviderFactory);
         }
         if (asPrimary) {
             environment = newEnvironment;

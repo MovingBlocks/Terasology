@@ -10,6 +10,9 @@ import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.network.NetworkMode;
 
 public class RegisterSystems extends SingleStepLoadProcess {
@@ -37,6 +40,8 @@ public class RegisterSystems extends SingleStepLoadProcess {
             subsystem.registerSystems(componentSystemManager);
         }
         componentSystemManager.loadSystems(moduleManager.getEnvironment(), netMode);
+
+        ((PojoEntityManager) context.get(EntityManager.class)).setPrefabManager(context.get(PrefabManager.class));
 
         return true;
     }

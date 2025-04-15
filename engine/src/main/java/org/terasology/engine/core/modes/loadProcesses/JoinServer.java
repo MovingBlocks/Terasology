@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.StateMainMenu;
@@ -19,7 +20,10 @@ import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.Server;
 import org.terasology.engine.network.ServerInfoMessage;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.di.BeanContext;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.NameVersion;
@@ -111,12 +115,18 @@ public class JoinServer extends VariableStepLoadProcess {
             }
 
             oldEnvironment = moduleManager.getEnvironment();
-            moduleManager.loadEnvironment(moduleSet, true);
+            moduleManager.loadEnvironment(context, moduleSet, true);
 
             context.get(Game.class).load(gameManifest);
 
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            applyModuleThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
+            ContextImpl modulesContext = new ContextImpl(context, moduleManager.getEnvironment().getBeans(BeanContext.class).stream().findFirst().get());
+            ServiceRegistry gameContextRegistry = new ServiceRegistry();
+            applyModuleThread = new Thread(() -> {
+                environmentSwitchHandler.handleSwitchToGameEnvironment(modulesContext, gameContextRegistry);
+                Context gameContext = new ContextImpl(modulesContext, gameContextRegistry);
+                CoreRegistry.setContext(gameContext);
+            });
             applyModuleThread.start();
 
             return false;

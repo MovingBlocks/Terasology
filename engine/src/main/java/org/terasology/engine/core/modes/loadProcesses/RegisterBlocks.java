@@ -3,11 +3,10 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.BlockTypeHandler;
@@ -19,16 +18,16 @@ import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
 import org.terasology.engine.world.block.tiles.WorldAtlasImpl;
 import org.terasology.gestalt.assets.management.AssetManager;
-import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 public class RegisterBlocks extends SingleStepLoadProcess {
     private final Context context;
-    private final GameManifest gameManifest;
+    private final ServiceRegistry serviceRegistry;
 
-    public RegisterBlocks(Context context, GameManifest gameManifest) {
+    public RegisterBlocks(Context context, ServiceRegistry serviceRegistry) {
         this.context = context;
-        this.gameManifest = gameManifest;
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -40,11 +39,9 @@ public class RegisterBlocks extends SingleStepLoadProcess {
     public boolean step() {
         NetworkSystem networkSystem = context.get(NetworkSystem.class);
         WorldAtlas atlas = new WorldAtlasImpl(context.get(Config.class).getRendering().getMaxTextureAtlasResolution());
-        context.put(WorldAtlas.class, atlas);
+        serviceRegistry.with(WorldAtlas.class).lifetime(Lifetime.Singleton).use(() -> atlas);
 
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
-
+        serviceRegistry.with(BlockFamilyLibrary.class).lifetime(Lifetime.Singleton).use(BlockFamilyLibrary.class);
 
         BlockManagerImpl blockManager;
         if (networkSystem.getMode().isAuthority()) {
@@ -53,12 +50,9 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         } else {
             blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
         }
-        context.put(BlockManager.class, blockManager);
+        serviceRegistry.with(BlockManager.class).lifetime(Lifetime.Singleton).use(() -> blockManager);
         context.get(TypeHandlerLibrary.class).addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
         context.get(TypeHandlerLibrary.class).addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
-
-        blockManager.initialise(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap());
-
         return true;
     }
 

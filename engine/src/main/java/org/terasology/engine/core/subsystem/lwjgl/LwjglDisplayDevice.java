@@ -6,9 +6,7 @@ import com.google.common.base.Suppliers;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryUtil;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.Resolution;
@@ -40,8 +38,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private int windowHeight = 0;
     private boolean isWindowDirty = true;
 
-    public LwjglDisplayDevice(Context context) {
-        this.config = context.get(Config.class).getRendering();
+    public LwjglDisplayDevice(RenderingConfig config) {
+        this.config = config;
     }
 
     @Override

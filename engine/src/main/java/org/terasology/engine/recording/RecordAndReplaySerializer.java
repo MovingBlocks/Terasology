@@ -16,6 +16,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.reflection.TypeRegistry;
 
+import javax.inject.Inject;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
@@ -41,6 +42,7 @@ public final class RecordAndReplaySerializer {
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
     private RecordedEventSerializer recordedEventSerializer;
 
+    @Inject
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
                                      RecordAndReplayUtils recordAndReplayUtils,
                                      CharacterStateEventPositionMap characterStateEventPositionMap,

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless;
 
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
+import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
@@ -29,11 +30,19 @@ import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.nui.canvas.CanvasRenderer;
 
+import javax.inject.Inject;
+
 public class HeadlessGraphics implements EngineSubsystem {
+    @Inject
+    public HeadlessGraphics() {
+
+    }
 
     @Override
     public String getName() {
@@ -62,18 +71,22 @@ public class HeadlessGraphics implements EngineSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
-        context.put(RenderingSubsystemFactory.class, new HeadlessRenderingSubsystemFactory());
+    public void initialise(GameEngine gameEngine, ServiceRegistry serviceRegistry) {
+        HeadlessRenderingSubsystemFactory headlessRenderingSubsystemFactory = new HeadlessRenderingSubsystemFactory();
+        serviceRegistry.with(RenderingSubsystemFactory.class).lifetime(Lifetime.Singleton).use(() -> headlessRenderingSubsystemFactory);
 
         HeadlessDisplayDevice headlessDisplay = new HeadlessDisplayDevice();
-        context.put(DisplayDevice.class, headlessDisplay);
-        initHeadless(context);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> headlessDisplay);
+        initHeadless(serviceRegistry);
 
-        context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
+        HeadlessCanvasRenderer headlessCanvasRenderer = new HeadlessCanvasRenderer();
+        serviceRegistry.with(CanvasRenderer.class).lifetime(Lifetime.Singleton).use(() -> headlessCanvasRenderer);
+        serviceRegistry.with(TerasologyCanvasRenderer.class).lifetime(Lifetime.Singleton).use(() -> headlessCanvasRenderer);
     }
 
-    private void initHeadless(Context context) {
-        context.put(ShaderManager.class, new ShaderManagerHeadless());
+    private void initHeadless(ServiceRegistry serviceRegistry) {
+        ShaderManagerHeadless shaderManagerHeadless = new ShaderManagerHeadless();
+        serviceRegistry.with(ShaderManager.class).lifetime(Lifetime.Singleton).use(() -> shaderManagerHeadless);
     }
 
 

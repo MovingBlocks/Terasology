@@ -53,6 +53,8 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import reactor.core.publisher.Mono;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -108,26 +110,50 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
      * that will use the privateEntityManager.
      */
     private final ComponentLibrary entityRefReplacingComponentLibrary;
+    private Provider<ChunkProvider> chunkProvider;
+    private final Provider<NetworkSystem> networkSystem;
+    private final Time time;
+    private final Game game;
+    private final BlockManager blockManager;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
                                    ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
-                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus)
-            throws IOException {
+                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
-            true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+            true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus,
+                () -> CoreRegistry.get(ChunkProvider.class), () -> CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(Time.class),
+                CoreRegistry.get(Game.class));
+    }
+
+    @Inject
+    public ReadWriteStorageManager(Game game, ModuleManager moduleManager, EngineEntityManager entityManager, BlockManager blockManager,
+                                   ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+                                   RecordAndReplayUtils recordAndReplayUtils,
+                                   RecordAndReplayCurrentStatus recordAndReplayCurrentStatus, Provider<ChunkProvider> chunkProvider,
+                                   Provider<NetworkSystem> networkSystem, Time time) {
+        this(recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY
+                        ? PathManager.getInstance().getRecordingPath(game.getName())
+                        : PathManager.getInstance().getSavePath(game.getName()),
+                moduleManager.getEnvironment(), entityManager, blockManager, extraDataManager, true, recordAndReplaySerializer,
+                recordAndReplayUtils, recordAndReplayCurrentStatus, chunkProvider, networkSystem, time, game);
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
-                                   RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
-                            RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
+                            BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
+                            RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
+                            RecordAndReplayCurrentStatus recordAndReplayCurrentStatus, Provider<ChunkProvider> chunkProvider,
+                            Provider<NetworkSystem> networkSystem, Time time, Game game) {
         super(savePath, environment, entityManager, blockManager, extraDataManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
         entityManager.subscribeForChanges(this);
         // TODO Ensure that the component library and the type serializer library are thread save (e.g. immutable)
         this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
-        Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
+        try {
+            Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.config = CoreRegistry.get(Config.class);
         this.systemConfig = CoreRegistry.get((SystemConfig.class));
@@ -137,7 +163,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
-
+        this.chunkProvider = chunkProvider;
+        this.networkSystem = networkSystem;
+        this.time = time;
+        this.game = game;
+        this.blockManager = blockManager;
     }
 
     private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
@@ -240,12 +270,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
                 recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
-
-        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-
-        addChunksToSaveTransaction(saveTransactionBuilder, chunkProvider);
-        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystem);
+        addChunksToSaveTransaction(saveTransactionBuilder, chunkProvider.get());
+        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystem.get());
         addGlobalStoreBuilderToSaveTransaction(saveTransactionBuilder);
         addGameManifestToSaveTransaction(saveTransactionBuilder);
 
@@ -332,10 +358,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         UniverseConfig universeConfig = config.getUniverseConfig();
-        Time time = CoreRegistry.get(Time.class);
-        Game game = CoreRegistry.get(Game.class);
 
         GameManifest gameManifest = new GameManifest(game.getName(), game.getSeed(), time.getGameTimeInMs());
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
@@ -380,8 +403,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private boolean isRunModeAllowSaving() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        return networkSystem.getMode().isAuthority();
+        NetworkSystem networkSystemInstance = networkSystem.get();
+        return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority() && chunkProvider.get() != null
+                && blockManager != null;
     }
 
     private void startSaving() {
@@ -442,9 +466,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private boolean isSavingNecessary() {
-        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         int unloadedChunkCount = unloadedAndUnsavedChunkMap.size();
-        int loadedChunkCount = chunkProvider.getAllChunks().size();
+        int loadedChunkCount = chunkProvider.get().getAllChunks().size();
         double totalChunkCount = unloadedChunkCount + loadedChunkCount;
         double percentageUnloaded = 100.0 * unloadedChunkCount / totalChunkCount;
         if (percentageUnloaded >= systemConfig.maxUnloadedChunksPercentageTillSave.get()) {
@@ -466,7 +489,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
 
     private void saveGamePreviewImage() {
         final ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
-        final Game game = CoreRegistry.get(Game.class);
         if (screenGrabber != null && game != null) {
             screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(game.getName()));
         }
@@ -533,5 +555,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
         DelayedEntityRef delayedEntityRef = new DelayedEntityRef(id);
         entitySetDeltaRecorder.registerDelayedEntityRef(delayedEntityRef);
         return delayedEntityRef;
+    }
+
+    /**
+     * TODO: This should not be public. It is only used for unit tests.
+     */
+    public void testSetChunkProvider(ChunkProvider chunkProvider) {
+        this.chunkProvider = () -> chunkProvider;
     }
 }

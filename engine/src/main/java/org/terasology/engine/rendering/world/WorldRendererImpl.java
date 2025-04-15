@@ -6,9 +6,11 @@ import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
@@ -45,9 +47,12 @@ import org.terasology.engine.world.chunks.LodChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.math.TeraMath;
 
+import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -92,7 +97,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
-    private final Console console;
+    private Console console;
 
     private RenderTaskListGenerator renderTaskListGenerator;
     private boolean requestedTaskListRefresh;
@@ -115,68 +120,57 @@ public final class WorldRendererImpl implements WorldRenderer {
      *
      * @param context a context object, to obtain instances of classes such as the rendering config.
      */
+    @Inject
     public WorldRendererImpl(Context context) {
-        this.context = context;
-        renderGraph = new RenderGraph(context);
-
+        this.shaderManager = context.get(ShaderManager.class);
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        this.shaderManager = context.get(ShaderManager.class);
-        playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
+        playerCamera = context.get(Camera.class);
         currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        context.put(ChunkTessellator.class, new ChunkTessellator());
-
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-        ChunkTessellator chunkTessellator = context.get(ChunkTessellator.class);
-        BlockManager blockManager = context.get(BlockManager.class);
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
-        Config config = context.get(Config.class);
-
-
-        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-        LodChunkProvider lodChunkProvider = null;
-        if (worldGenerator instanceof ScalableWorldGenerator) {
-            lodChunkProvider = new LodChunkProvider(chunkProvider, blockManager, extraDataManager,
-                    (ScalableWorldGenerator) worldGenerator, chunkTessellator);
-        }
-        this.renderableWorld = new RenderableWorldImpl(this, lodChunkProvider, chunkProvider, chunkTessellator, worldProvider, config, playerCamera);
+        this.renderableWorld = context.get(RenderableWorld.class);
         renderQueues = renderableWorld.getRenderQueues();
 
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        registerRenderingSupport(serviceRegistry);
+        registerRenderGraph(serviceRegistry);
+        this.context = new ContextImpl(context, serviceRegistry);
+
+        renderGraph = this.context.get(RenderGraph.class);
+    }
+
+    @Override
+    public void init() {
         initRenderingSupport();
-
-        initRenderGraph();
-
         initRenderingModules();
 
         console = context.get(Console.class);
         MethodCommand.registerAvailable(this, console, context);
     }
 
-    private void initRenderingSupport() {
-        ScreenGrabber screenGrabber = new ScreenGrabber(context);
-        context.put(ScreenGrabber.class, screenGrabber);
-
-        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(
-                context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
-        context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
+    private void registerRenderingSupport(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(ScreenGrabber.class).lifetime(Lifetime.Singleton).use(ScreenGrabber.class);
+        serviceRegistry.with(DisplayResolutionDependentFbo.class).lifetime(Lifetime.Singleton).use(DisplayResolutionDependentFbo.class);
 
         shaderManager.initShaders();
 
-        context.put(WorldRenderer.class, this);
-        context.put(RenderQueuesHelper.class, renderQueues);
-        context.put(RenderableWorld.class, renderableWorld);
+        serviceRegistry.with(RenderQueuesHelper.class).lifetime(Lifetime.Singleton).use(() -> renderQueues);
+        serviceRegistry.with(RenderableWorld.class).lifetime(Lifetime.Singleton).use(() -> renderableWorld);
     }
 
-    private void initRenderGraph() {
-        context.put(RenderGraph.class, renderGraph);
+    private void initRenderingSupport() {
+        displayResolutionDependentFbo = context.get(DisplayResolutionDependentFbo.class);
+    }
+
+    private void registerRenderGraph(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(RenderGraph.class).lifetime(Lifetime.Singleton).use(RenderGraph.class);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
-        context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
+        serviceRegistry.with(RenderTaskListGenerator.class).lifetime(Lifetime.Singleton).use(() -> renderTaskListGenerator);
     }
 
     private void initRenderingModules() {

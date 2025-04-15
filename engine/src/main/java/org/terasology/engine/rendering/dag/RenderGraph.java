@@ -17,6 +17,7 @@ import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConne
 import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
 import org.terasology.gestalt.naming.Name;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class RenderGraph {
     private Context context;
     private ShaderManager shaderManager;
 
+    @Inject
     public RenderGraph(Context context) {
         nodeMap = Maps.newHashMap();
         akaNodeMap = Maps.newHashMap();

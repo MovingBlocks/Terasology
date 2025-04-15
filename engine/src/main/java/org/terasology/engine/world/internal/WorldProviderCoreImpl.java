@@ -9,13 +9,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.WorldChangeListener;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
@@ -36,6 +36,7 @@ import org.terasology.engine.world.propagation.light.SunlightWorldView;
 import org.terasology.engine.world.time.WorldTime;
 import org.terasology.engine.world.time.WorldTimeImpl;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,14 +64,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
-                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+                                 ChunkProvider chunkProvider, Block unloadedBlock, EntityManager entityManager) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         this.unloadedBlock = unloadedBlock;
-        this.entityManager = context.get(EntityManager.class);
-        context.put(ChunkProvider.class, chunkProvider);
+        this.entityManager = entityManager;
 
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -85,11 +85,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, Block unloadedBlock,
-                                 Context context) {
+    @Inject
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager, EntityManager entityManager) {
         this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(),
                 chunkProvider,
-                unloadedBlock, context);
+                blockManager.getBlock(BlockManager.UNLOADED_ID), entityManager);
     }
 
     @Override

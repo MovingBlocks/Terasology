@@ -15,11 +15,12 @@ import io.micrometer.jmx.JmxConfig;
 import io.micrometer.jmx.JmxMeterRegistry;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.monitoring.gui.AdvancedMonitor;
+import org.terasology.gestalt.di.ServiceRegistry;
 
+import javax.inject.Inject;
 import java.time.Duration;
 
 public class MonitoringSubsystem implements EngineSubsystem {
@@ -28,17 +29,26 @@ public class MonitoringSubsystem implements EngineSubsystem {
 
     private AdvancedMonitor advancedMonitor;
 
+    @Inject
+    protected SystemConfig systemConfig;
+    @Inject
+    protected Time time;
+
+    @Inject
+    public MonitoringSubsystem() {
+    }
+
     @Override
     public String getName() {
         return "Monitoring";
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        if (rootContext.get(SystemConfig.class).monitoringEnabled.get()) {
+    public void postInitialise(Context context) {
+        if (systemConfig.monitoringEnabled.get()) {
             advancedMonitor = new AdvancedMonitor();
             advancedMonitor.setVisible(true);
-            initMicrometerMetrics(rootContext.get(Time.class));
+            initMicrometerMetrics(time);
         }
     }
 

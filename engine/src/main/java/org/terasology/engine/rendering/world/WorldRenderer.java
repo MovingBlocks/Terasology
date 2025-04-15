@@ -28,6 +28,11 @@ public interface WorldRenderer {
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
     /**
+     * Initialises the renderer.
+     */
+    void init();
+
+    /**
      * @return the number of seconds since last frame, as a float number.
      */
     float getSecondsSinceLastFrame();

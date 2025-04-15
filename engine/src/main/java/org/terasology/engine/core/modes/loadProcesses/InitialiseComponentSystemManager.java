@@ -3,16 +3,17 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 public class InitialiseComponentSystemManager extends SingleStepLoadProcess {
 
-    private final Context context;
+    private final ServiceRegistry serviceRegistry;
 
-    public InitialiseComponentSystemManager(Context context) {
-        this.context = context;
+    public InitialiseComponentSystemManager(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -22,7 +23,7 @@ public class InitialiseComponentSystemManager extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        context.put(ComponentSystemManager.class, new ComponentSystemManager(context));
+        serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
         return true;
     }
 

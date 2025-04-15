@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
@@ -16,15 +15,28 @@ import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.testUtil.WithUnittestModule;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.module.ModuleRegistry;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 
 final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationEnvironmentSubsystem.class);
+
+    @Inject
+    protected ModuleManager moduleManager;
+    @Inject
+    protected Config config;
+    @Inject
+    protected SystemConfig systemConfig;
+
+    @Inject
+    public IntegrationEnvironmentSubsystem() {
+    }
 
     @Override
     public String getName() {
@@ -32,11 +44,10 @@ final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        ModuleManager moduleManager = rootContext.getValue(ModuleManager.class);
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
         WithUnittestModule.registerUnittestModule(moduleManager);
         registerCurrentDirectoryIfModule(moduleManager);
-        configure(rootContext);
+        configure(serviceRegistry);
     }
 
     /**
@@ -45,12 +56,9 @@ final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
      * You can override this by defining your own EngineSubsystem and passing it to
      * {@link IntegrationEnvironment#subsystem()}; it will run after this does.
      */
-    static void configure(Context context) {
-        Config config = context.getValue(Config.class);
+    private void configure(ServiceRegistry serviceRegistry) {
         config.getRendering().setViewDistance(ViewDistance.LEGALLY_BLIND);
-
-        SystemConfig sys = context.getValue(SystemConfig.class);
-        sys.writeSaveGamesEnabled.set(false);
+        systemConfig.writeSaveGamesEnabled.set(false);
     }
 
     /**

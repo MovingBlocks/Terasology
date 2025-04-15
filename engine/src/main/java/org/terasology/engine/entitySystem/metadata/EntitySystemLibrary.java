@@ -5,10 +5,11 @@ package org.terasology.engine.entitySystem.metadata;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
+
+import javax.inject.Inject;
 
 /**
  * The set of metadata libraries used by the entity system
@@ -20,19 +21,21 @@ public class EntitySystemLibrary {
     private final ComponentLibrary componentLibrary;
     private final EventLibrary eventLibrary;
 
-    public EntitySystemLibrary(Context context, TypeHandlerLibrary typeHandlerLibrary) {
-        // NOTE: Work-around to fix tests
-        ModuleManager manager = context.get(ModuleManager.class);
-        ModuleEnvironment environment = null;
-        if (manager != null) {
-            environment = manager.getEnvironment();
-        }
-        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
-
+    @Inject
+    public EntitySystemLibrary(TypeHandlerLibrary typeHandlerLibrary, ComponentLibrary componentLibrary, EventLibrary eventLibrary) {
         this.typeHandlerLibrary = typeHandlerLibrary;
-        this.componentLibrary = new ComponentLibrary(environment, reflectFactory, copyStrategyLibrary);
-        this.eventLibrary = new EventLibrary(environment, reflectFactory, copyStrategyLibrary);
+        this.componentLibrary = componentLibrary;
+        this.eventLibrary = eventLibrary;
+    }
+
+    public EntitySystemLibrary(Context context, TypeHandlerLibrary typeHandlerLibrary) {
+        this(typeHandlerLibrary,
+                new ComponentLibrary(context.get(ModuleManager.class) != null ? context.get(ModuleManager.class).getEnvironment() : null,
+                        context.get(ReflectFactory.class),
+                        context.get(CopyStrategyLibrary.class)),
+                new EventLibrary(context.get(ModuleManager.class) != null ? context.get(ModuleManager.class).getEnvironment() : null,
+                        context.get(ReflectFactory.class),
+                        context.get(CopyStrategyLibrary.class)));
     }
 
     /**

@@ -45,6 +45,7 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.reflection.metadata.FieldMetadata;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +74,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
         super(base);
         entityManager = (EngineEntityManager) context.get(EntityManager.class);
         context.get(ComponentSystemManager.class).register(getTime());
+    }
+
+    @Inject
+    public EntityAwareWorldProvider(WorldProviderCore base, EntityManager entityManager, ComponentSystemManager componentSystemManager) {
+        super(base);
+        this.entityManager = (EngineEntityManager) entityManager;
+        componentSystemManager.register(getTime());
     }
 
     @Override

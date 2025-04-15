@@ -3,40 +3,45 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.config.Config;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
 import org.terasology.engine.rendering.backdrop.Skysphere;
-import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.internal.EntityAwareWorldProvider;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.internal.WorldProviderCore;
 import org.terasology.engine.world.internal.WorldProviderCoreImpl;
 import org.terasology.engine.world.internal.WorldProviderWrapper;
 import org.terasology.engine.world.sun.BasicCelestialModel;
+import org.terasology.engine.world.sun.CelestialModel;
 import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
+import org.terasology.gestalt.di.ServiceRegistry;
+
+import javax.inject.Inject;
 
 public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     private final Context context;
+    private final ServiceRegistry serviceRegistry;
     private final GameManifest gameManifest;
 
-
-    public InitialiseRemoteWorld(Context context, GameManifest gameManifest) {
+    public InitialiseRemoteWorld(Context context, ServiceRegistry serviceRegistry, GameManifest gameManifest) {
         this.context = context;
+        this.serviceRegistry = serviceRegistry;
         this.gameManifest = gameManifest;
     }
 
@@ -47,39 +52,28 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
         localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
-        context.put(LocalPlayer.class, localPlayer);
-        BlockManager blockManager = context.get(BlockManager.class);
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer, context.get(Config.class));
+        serviceRegistry.with(LocalPlayer.class).lifetime(Lifetime.Singleton).use(() -> localPlayer);
+        serviceRegistry.with(ChunkProvider.class).lifetime(Lifetime.Singleton).use(RemoteChunkProvider.class);
 
-        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
-                blockManager.getBlock(BlockManager.UNLOADED_ID), context);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
-        WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider, extraDataManager);
-        context.put(WorldProvider.class, worldProvider);
-        context.put(BlockEntityRegistry.class, entityWorldProvider);
-        context.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        serviceRegistry.with(WorldInfo.class).lifetime(Lifetime.Singleton).use(() -> worldInfo);
 
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
-        context.put(CelestialSystem.class, celestialSystem);
-        context.get(ComponentSystemManager.class).register(celestialSystem);
+        // Provides both WorldProviderCore and BlockEntityRegistry
+        serviceRegistry.with(WorldProviderCoreWorkAround.class).lifetime(Lifetime.Singleton);
+        serviceRegistry.with(WorldProvider.class).lifetime(Lifetime.Singleton).use(WorldProviderWrapper.class);
+
+        serviceRegistry.with(CelestialModel.class).lifetime(Lifetime.Singleton).use(BasicCelestialModel.class);
+        serviceRegistry.with(CelestialSystem.class).lifetime(Lifetime.Singleton).use(DefaultCelestialSystem.class);
 
         // Init. a new world
-        context.put(BackdropProvider.class, new Skysphere(context));
+        serviceRegistry.with(BackdropProvider.class).lifetime(Lifetime.Singleton).use(Skysphere.class);
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
-        float reflectionHeight = context.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
-        worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
-        context.put(WorldRenderer.class, worldRenderer);
-        // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(Camera.class, worldRenderer.getActiveCamera());
-        context.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
+        engineSubsystemFactory.registerWorldRenderer(context, serviceRegistry);
 
         return true;
     }
@@ -89,4 +83,16 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         return 1;
     }
 
+    /**
+     * This work-around exists because you cannot easily have two instances of {@link WorldProviderCore} in the context at a given time.
+     * One of these instances exists purely to wrap the other, so we instantiate both at the same time here to leave only one instance.
+     */
+    public static final class WorldProviderCoreWorkAround extends EntityAwareWorldProvider
+            implements WorldProviderCore, BlockEntityRegistry {
+        @Inject
+        public WorldProviderCoreWorkAround(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager,
+                                           EntityManager entityManager, ComponentSystemManager componentSystemManager) {
+            super(new WorldProviderCoreImpl(info, chunkProvider, blockManager, entityManager), entityManager, componentSystemManager);
+        }
+    }
 }

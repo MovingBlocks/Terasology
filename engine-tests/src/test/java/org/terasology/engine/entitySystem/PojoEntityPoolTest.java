@@ -5,14 +5,17 @@ package org.terasology.engine.entitySystem;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityPool;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.network.NetworkMode;
@@ -23,6 +26,10 @@ import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
+import org.terasology.gestalt.di.ServiceRegistry;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.ModuleTypeRegistry;
+import org.terasology.reflection.TypeRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,15 +44,18 @@ public class PojoEntityPoolTest {
 
     @BeforeAll
     public static void setupClass() throws Exception {
-        context = new ContextImpl();
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        context.put(ModuleManager.class, moduleManager);
+        serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
+        TypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
+        serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
         assetTypeManager.createAssetType(Prefab.class,
                 PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
-        context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
+        serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
+        serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> new RecordAndReplayCurrentStatus());
+        context = new ContextImpl(serviceRegistry);
         CoreRegistry.setContext(context);
     }
 
@@ -53,9 +63,14 @@ public class PojoEntityPoolTest {
     public void setup() {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
+        context = new ContextImpl(context, serviceRegistry);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
+                context.get(EntitySystemLibrary.class), context.get(ModuleManager.class).getEnvironment(),
+                context.get(EngineEntityManager.class));
         entityManager = (PojoEntityManager) context.get(EntityManager.class);
 
         pool = new PojoEntityPool(entityManager);

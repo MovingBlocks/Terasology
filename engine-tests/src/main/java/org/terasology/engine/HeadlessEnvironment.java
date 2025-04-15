@@ -4,6 +4,7 @@ package org.terasology.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
@@ -13,6 +14,7 @@ import org.terasology.engine.audio.nullAudio.NullStreamingSound;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.PathManager;
@@ -26,9 +28,10 @@ import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessShader;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessSkeletalMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessTexture;
-import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.network.NetworkSystem;
@@ -40,7 +43,9 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.BlockTypeHa
 import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
-import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorder;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
@@ -75,6 +80,7 @@ import org.terasology.engine.world.block.tiles.WorldAtlas;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.sun.BasicCelestialModel;
+import org.terasology.engine.world.sun.CelestialModel;
 import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
 import org.terasology.engine.world.time.WorldTime;
@@ -83,7 +89,7 @@ import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
-import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
@@ -121,71 +127,80 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupStorageManager() throws IOException {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
-        BlockManager blockManager = context.get(BlockManager.class);
-        RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
-        Path savePath = PathManager.getInstance().getSavePath("world1");
+    protected void setupStorageManager(ServiceRegistry serviceRegistry) throws IOException {
+        Game game = new Game();
+        game.load(new GameManifest("world1", "world1", 0));
+        serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(() -> game);
+
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
-        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
+        serviceRegistry.with(RecordAndReplayUtils.class).lifetime(Lifetime.Singleton).use(() -> recordAndReplayUtils);
+        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
+        serviceRegistry.with(CharacterStateEventPositionMap.class).lifetime(Lifetime.Singleton).use(() -> characterStateEventPositionMap);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
+        serviceRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
+        serviceRegistry.with(RecordAndReplaySerializer.class).lifetime(Lifetime.Singleton);
 
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
-
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
-
-        context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+        serviceRegistry.with(BlockFamilyLibrary.class).lifetime(Lifetime.Singleton).use(BlockFamilyLibrary.class);
+        serviceRegistry.with(StorageManager.class).lifetime(Lifetime.Singleton).use(ReadWriteStorageManager.class);
     }
 
     @Override
-    protected void setupNetwork() {
+    protected void setupNetwork(ServiceRegistry serviceRegistry) {
         EngineTime mockTime = mock(EngineTime.class);
-        context.put(Time.class, mockTime);
-        NetworkSystem networkSystem = new NetworkSystemImpl(mockTime, getContext());
-        context.put(NetworkSystem.class, networkSystem);
+        serviceRegistry.with(Time.class).lifetime(Lifetime.Singleton).use(() -> mockTime);
+        serviceRegistry.with(EngineTime.class).lifetime(Lifetime.Singleton).use(() -> mockTime);
+        serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(NetworkSystemImpl.class);
     }
 
     @Override
-    protected void setupEntitySystem() {
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+    protected void setupEntitySystem(ServiceRegistry serviceRegistry) {
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
     }
 
     @Override
-    protected void setupCollisionManager() {
+    protected void setupCollisionManager(ServiceRegistry serviceRegistry) {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
-        context.put(CollisionGroupManager.class, collisionGroupManager);
+        serviceRegistry.with(CollisionGroupManager.class).lifetime(Lifetime.Singleton).use(() -> collisionGroupManager);
+    }
+
+    @Override
+    protected void registerCollisionTypeHandlers(Context context) {
+        CollisionGroupManager collisionGroupManager = context.get(CollisionGroupManager.class);
         context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
-    protected void setupBlockManager(AssetManager assetManager) {
+    protected void setupBlockManager(ServiceRegistry serviceRegistry, AssetManager assetManager) {
         WorldAtlas worldAtlas = new NullWorldAtlas();
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
-        context.put(BlockManager.class, blockManager);
+        serviceRegistry.with(BlockManager.class).lifetime(Lifetime.Singleton).use(() -> blockManager);
+    }
+
+    @Override
+    protected void registerBlockTypeHandlers(Context context) {
+        BlockManager blockManager = context.get(BlockManager.class);
         TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
         typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
         typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
 
     @Override
-    protected void setupExtraDataManager(Context context) {
-        context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
+    protected void setupExtraDataManager(ServiceRegistry serviceRegistry, Context context) {
+        serviceRegistry.with(ExtraBlockDataManager.class).lifetime(Lifetime.Singleton).use(ExtraBlockDataManager.class);
     }
 
     @Override
-    protected AssetManager setupEmptyAssetManager() {
+    protected AssetManager setupEmptyAssetManager(ModuleManager moduleManager, ServiceRegistry serviceRegistry) {
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
-        assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
-        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
+        serviceRegistry.with(ModuleAwareAssetTypeManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager);
+        serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
         return assetTypeManager.getAssetManager();
     }
 
     @Override
-    protected AssetManager setupAssetManager() {
+    protected AssetManager setupAssetManager(ModuleManager moduleManager, ServiceRegistry serviceRegistry) {
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
@@ -240,43 +255,47 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.createAssetType(Subtexture.class,
                 Subtexture::new);
 
-        assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
-        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
+        serviceRegistry.with(ModuleAwareAssetTypeManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager);
+        serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
         return assetTypeManager.getAssetManager();
     }
 
     @Override
-    protected void setupAudio() {
+    protected void setupAudio(ServiceRegistry serviceRegistry) {
         NullAudioManager audioManager = new NullAudioManager();
-        context.put(AudioManager.class, audioManager);
+        serviceRegistry.with(AudioManager.class).lifetime(Lifetime.Singleton).use(() -> audioManager);
     }
 
     @Override
-    protected void setupConfig() {
-        Config config = new Config(context);
+    protected void setupConfig(ServiceRegistry serviceRegistry) {
+        Config config = new Config();
         config.loadDefaults();
-        context.put(Config.class, config);
-        context.put(StorageServiceWorker.class, mock(StorageServiceWorker.class));
-        context.put(PlayerConfig.class, mock(PlayerConfig.class));
+        serviceRegistry.with(Config.class).lifetime(Lifetime.Singleton).use(() -> config);
+        StorageServiceWorker storageServiceWorker = mock(StorageServiceWorker.class);
+        serviceRegistry.with(StorageServiceWorker.class).lifetime(Lifetime.Singleton).use(() -> storageServiceWorker);
+        PlayerConfig playerConfig = mock(PlayerConfig.class);
+        serviceRegistry.with(PlayerConfig.class).lifetime(Lifetime.Singleton).use(() -> playerConfig);
     }
 
     @Override
-    protected void setupModuleManager(Set<Name> moduleNames) throws RuntimeException {
+    protected ModuleManager setupModuleManager(ServiceRegistry serviceRegistry, Set<Name> moduleNames) throws RuntimeException {
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
 
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
-        context.put(TypeRegistry.class, typeRegistry);
-        context.put(ModuleTypeRegistry.class, typeRegistry);
+        serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        serviceRegistry.with(ModuleTypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
 
-        moduleManager.resolveAndLoadEnvironment(moduleNames);
+        moduleManager.resolveAndLoadEnvironment(context, moduleNames);
 
-        context.put(ModuleManager.class, moduleManager);
+        serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+
+        return moduleManager;
     }
 
     @Override
@@ -287,29 +306,31 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupComponentManager() {
-        ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
-        componentSystemManager.initialise();
-        context.put(ComponentSystemManager.class, componentSystemManager);
+    protected void setupComponentManager(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
     }
 
     @Override
-    protected void setupWorldProvider() {
+    protected void initComponentManager(Context context) {
+        context.get(ComponentSystemManager.class).initialise();
+    }
+
+    @Override
+    protected void setupWorldProvider(ServiceRegistry serviceRegistry) {
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         when(worldProvider.getTime()).thenReturn(WORLD_TIME);
-        context.put(WorldProvider.class, worldProvider);
+        serviceRegistry.with(WorldProvider.class).lifetime(Lifetime.Singleton).use(() -> worldProvider);
     }
 
     @Override
-    protected void setupCelestialSystem() {
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
-        context.put(CelestialSystem.class, celestialSystem);
+    protected void setupCelestialSystem(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(CelestialModel.class).lifetime(Lifetime.Singleton).use(BasicCelestialModel.class);
+        serviceRegistry.with(CelestialSystem.class).lifetime(Lifetime.Singleton).use(DefaultCelestialSystem.class);
     }
 
     @Override
     protected void loadPrefabs() {
-
         LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
 
         boolean complete = false;
@@ -322,6 +343,7 @@ public class HeadlessEnvironment extends Environment {
     @Override
     public void close() throws RuntimeException {
         // it would be nice, if elements in the context implemented (Auto)Closeable
+        // TODO: It appears that Gestalt-8 DI does close AutoClosable objects in the context on exit?
 
         // The StorageManager creates a thread pool (through TaskMaster)
         // which isn't closed automatically
@@ -329,7 +351,6 @@ public class HeadlessEnvironment extends Environment {
         if (storageManager != null) {
             storageManager.finishSavingAndShutdown();
         }
-
 
         super.close();
     }

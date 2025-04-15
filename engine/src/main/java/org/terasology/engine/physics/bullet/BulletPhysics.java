@@ -51,6 +51,7 @@ import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.components.RigidBodyComponent;
 import org.terasology.engine.physics.components.TriggerComponent;
@@ -64,11 +65,11 @@ import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.joml.geom.AABBf;
 
+import javax.inject.Inject;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +84,7 @@ import java.util.Set;
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
 @RegisterSystem
-public class BulletPhysics implements PhysicsEngine {
+public class BulletPhysics implements PhysicsEngine, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
     public static final float SIMD_EPSILON = 1.1920929E-7F;
@@ -117,8 +118,8 @@ public class BulletPhysics implements PhysicsEngine {
      */
     private ArrayList<btConvexShape> shapes = Lists.newArrayList();
 
-    public BulletPhysics() {
-
+    @Inject
+    public BulletPhysics(BlockEntityRegistry blockEntityRegistry) {
         ghostPairCallback = new btGhostPairCallback();
 
         broadphase = new btDbvtBroadphase();
@@ -129,10 +130,9 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld =
                 new btDiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
         discreteDynamicsWorld.setGravity(new Vector3f(0f, -PhysicsEngine.GRAVITY, 0f));
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        this.blockEntityRegistry = blockEntityRegistry;
 
         discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(ghostPairCallback);
-
     }
 
     public btDiscreteDynamicsWorld getWorld() {

@@ -24,6 +24,7 @@ import org.terasology.nui.FontColor;
 import org.terasology.nui.FontUnderline;
 import org.terasology.engine.utilities.collection.CircularBuffer;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -48,6 +49,7 @@ public class ConsoleImpl implements Console {
     private final NetworkSystem networkSystem;
     private final Context context;
 
+    @Inject
     public ConsoleImpl(Context context) {
         this.networkSystem = context.get(NetworkSystem.class);
         this.context = context;

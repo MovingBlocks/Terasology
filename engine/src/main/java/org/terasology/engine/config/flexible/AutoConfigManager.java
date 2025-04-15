@@ -5,12 +5,13 @@ package org.terasology.engine.config.flexible;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.reflection.TypeInfo;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -41,19 +43,40 @@ public class AutoConfigManager {
         this.serializer = serializer;
     }
 
-    public void loadConfigsIn(Context context) {
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-
+    @SuppressWarnings("unchecked")
+    public void loadConfigsIn(ModuleEnvironment environment, ServiceRegistry serviceRegistry) {
         for (Class<? extends AutoConfig> configClass : environment.getSubtypesOf(AutoConfig.class)) {
-            if (context.get(configClass) != null) {
-                // We've already initialized this config before
-                continue;
-            }
-
             SimpleUri configId = verifyNotNull(ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment),
                     "Could not find ID for %s", configClass.getSimpleName()
             );
-            loadConfig(configClass, configId, context);
+            serviceRegistry.with((Class) configClass).lifetime(Lifetime.Singleton).use(() -> {
+                try {
+                    AutoConfig config = configClass.getDeclaredConstructor().newInstance();
+                    config.setId(configId);
+                    loadedConfigs.add(config);
+                    Path configPath = getConfigPath(config.getId());
+                    if (!Files.exists(configPath)) {
+                        return config;
+                    }
+                    try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
+                        AutoConfig loadedConfig = serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
+                        Set<Field> fields = AutoConfig.getSettingFieldsIn(configClass);
+                        for (Field field : fields) {
+                            try {
+                                Object value = ((Setting) field.get(loadedConfig)).get();
+                                ((Setting) field.get(config)).set(value);
+                            } catch (IllegalAccessException e) {
+                                // ignore `AutoConfig.getSettingFieldIn` returns PUBLIC fields
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error while loading config {} from disk", config.getId(), e); //NOPMD
+                    }
+                    return configClass.cast(config);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignore) {
+                    return null;
+                }
+            });
         }
     }
 

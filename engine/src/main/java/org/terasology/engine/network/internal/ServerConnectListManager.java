@@ -9,6 +9,7 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -33,6 +34,7 @@ public class ServerConnectListManager {
     private final Path blacklistPath;
     private final Path whitelistPath;
 
+    @Inject
     public ServerConnectListManager(Context context) {
         blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
         whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");

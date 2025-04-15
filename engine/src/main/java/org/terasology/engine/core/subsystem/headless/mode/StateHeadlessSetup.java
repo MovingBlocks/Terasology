@@ -16,10 +16,12 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.naming.Name;
 
@@ -47,9 +49,16 @@ public class StateHeadlessSetup extends AbstractState {
 
     @Override
     public void init(GameEngine gameEngine) {
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+
         context = gameEngine.createChildContext();
-        initEntityAndComponentManagers(true);
-        createLocalPlayer(context);
+        registerEntityAndComponentManagers(true, serviceRegistry);
+        registerLocalPlayer(serviceRegistry);
+
+        context = gameEngine.createChildContext(serviceRegistry);
+        initEntityAndComponentManagers();
+        CoreRegistry.setContext(context);
+        createLocalPlayer();
 
         GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();

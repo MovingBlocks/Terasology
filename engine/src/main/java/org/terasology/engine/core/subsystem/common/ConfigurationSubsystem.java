@@ -3,32 +3,28 @@
 package org.terasology.engine.core.subsystem.common;
 
 import com.google.common.collect.Iterables;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.facade.BindsConfiguration;
 import org.terasology.engine.config.facade.BindsConfigurationImpl;
 import org.terasology.engine.config.facade.InputDeviceConfiguration;
 import org.terasology.engine.config.facade.InputDeviceConfigurationImpl;
 import org.terasology.engine.config.flexible.AutoConfigManager;
-import org.terasology.engine.config.flexible.AutoConfigTypeHandlerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.CertificateGenerator;
 import org.terasology.engine.identity.CertificatePair;
 import org.terasology.engine.identity.PrivateIdentityCertificate;
 import org.terasology.engine.identity.PublicIdentityCertificate;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedData;
-import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
-import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
-import org.terasology.persistence.serializers.Serializer;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+
+import javax.inject.Inject;
 
 /**
  * The configuration subsystem manages Terasology's configuration
@@ -37,8 +33,18 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSubsystem.class);
 
+    @Inject
+    protected TypeHandlerLibrary typeHandlerLibrary;
+    @Inject
+    protected TranslationSystem translationSystem;
+    @Inject
+    protected AutoConfigManager autoConfigManager;
+
     private Config config;
-    private AutoConfigManager autoConfigManager;
+
+    @Inject
+    public ConfigurationSubsystem() {
+    }
 
     @Override
     public String getName() {
@@ -46,8 +52,8 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void preInitialise(Context rootContext) {
-        config = new Config(rootContext);
+    public void preInitialise(ServiceRegistry serviceRegistry) {
+        config = new Config();
         config.load();
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
@@ -68,36 +74,17 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         // TODO: Move to display subsystem
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering())); //NOPMD
 
-        rootContext.put(Config.class, config);
+        serviceRegistry.with(Config.class).lifetime(Lifetime.Singleton).use(() -> config);
         //add facades
-        rootContext.put(InputDeviceConfiguration.class, new InputDeviceConfigurationImpl(config));
-        rootContext.put(BindsConfiguration.class, new BindsConfigurationImpl(config));
+        serviceRegistry.with(InputDeviceConfiguration.class).lifetime(Lifetime.Singleton).use(() -> new InputDeviceConfigurationImpl(config));
+        serviceRegistry.with(BindsConfiguration.class).lifetime(Lifetime.Singleton).use(() -> new BindsConfigurationImpl(config));
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        // TODO: Put here because of TypeHandlerLibrary dependency,
-        //  might need to move to preInitialise or elsewhere
-        TypeHandlerLibrary typeHandlerLibrary = rootContext.get(TypeHandlerLibrary.class);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Serializer<GsonPersistedData> serializer = new Serializer<>(
-                typeHandlerLibrary,
-                new GsonPersistedDataSerializer(),
-                new GsonPersistedDataWriter(gson),
-                new GsonPersistedDataReader(gson)
-        );
-        autoConfigManager = new AutoConfigManager(serializer);
-        typeHandlerLibrary.addTypeHandlerFactory(new AutoConfigTypeHandlerFactory(typeHandlerLibrary));
-        rootContext.put(AutoConfigManager.class, autoConfigManager);
-
-        autoConfigManager.loadConfigsIn(rootContext);
-    }
-
-    @Override
-    public void postInitialise(Context rootContext) {
-        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(rootContext);
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
+        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(config, translationSystem);
         storageServiceWorker.initializeFromConfig();
-        rootContext.put(StorageServiceWorker.class, storageServiceWorker);
+        serviceRegistry.with(StorageServiceWorker.class).lifetime(Lifetime.Singleton).use(() -> storageServiceWorker);
     }
 
     private void checkServerIdentity() {
@@ -132,4 +119,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         autoConfigManager.saveConfigsToDisk();
     }
 
+    public Config getConfig() {
+        return config;
+    }
 }

@@ -72,7 +72,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
-        this.blockBuilder = new BlockBuilder(atlas);
+        this.blockBuilder = new BlockBuilder(assetManager, atlas);
     }
 
     public void initialise(List<String> registeredBlockFamilies,
