@@ -11,5 +11,5 @@ This can be achieved with different approaches.
    - Take a look at: https://hub.docker.com/r/qwick/terasology/
    - And please report any issues, **relating to the docker image**, at https://github.com/qwc/docker-terasology
 3. Start a headless server from source
-   - `gradlew server`
+   - `./gradlew server`
    - or via Intellij run configuration `TerasologyPC (Headless)`
