@@ -7,6 +7,7 @@ import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
@@ -56,6 +57,8 @@ public abstract class AbstractState implements GameState {
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+
+        EntitySystemSetupUtil.registerEvents(eventSystem, context.get(ModuleManager.class).getEnvironment());
     }
 
     protected void registerLocalPlayer(ServiceRegistry serviceRegistry) {
