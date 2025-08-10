@@ -83,7 +83,6 @@ import java.util.Set;
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
-@RegisterSystem
 public class BulletPhysics implements PhysicsEngine, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
