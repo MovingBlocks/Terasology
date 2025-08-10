@@ -56,6 +56,8 @@ public final class ExternalApiWhitelist {
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
             .addAll(NUI_PACKAGES)
             .addAll(GESTALT_ECS_PACKAGES)
+            // Allow persistence internals needed during client join (EntityRestorer, etc.)
+            .add("org.terasology.engine.persistence.internal")
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
