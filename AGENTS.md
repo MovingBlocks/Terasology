@@ -23,6 +23,7 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
     - **Path**: You can verify java is accessible with `& "$env:JAVA_HOME\bin\java" -version`.
 
 ## Gradle & Build System
+
 - **Verbosity**: Gradle output can be overwhelming.
     - Avoid `--info` or `--debug` unless necessary.
     - If output is truncated, check XML reports: `build/test-results/test/TEST-*.xml`.
@@ -36,12 +37,14 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
     - **Clean Builds**: When in doubt (class not found, weird linkage errors), run `./gradlew clean`.
 
 ## Context Management
+
 - **Logs**: Do not dump full log files into the chat context.
     - Use `grep` (or `Select-String` in PS) to find relevant lines.
     - Read specific blocks of XML reports.
 - **File Viewing**: Use `view_file` with line ranges to inspect relevant code sections.
 
 ## Testing Strategy: "Meta-Test Suite"
+
 We are building a validation suite from the ground up to verify the test infrastructure itself.
 1.  **Build & Classpath**: Verify resources can be loaded.
 2.  **Module Loading**: Verify `ModuleManager` works.
@@ -50,5 +53,10 @@ We are building a validation suite from the ground up to verify the test infrast
 5.  **MTE/Multiplayer**: Verify full game environment.
 
 ## Common Issues
+
 - **Context Pollution**: `CoreRegistry` is a deprecated static singleton meant to be removed. Tests running in the same JVM must be careful about cleaning it up or isolating contexts.
 - **Module Permissions**: The `SecurityManager` (via `ModuleSecurityManager`) can block access to classes. Ensure modules have correct dependencies and permissions.
+
+## Conventions
+
+* Max line length in code files is 150 characters

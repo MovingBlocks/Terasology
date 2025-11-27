@@ -10,6 +10,7 @@ import org.terasology.engine.testUtil.ModuleManagerFactory;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ModuleLoadingTest {
@@ -33,8 +34,7 @@ public class ModuleLoadingTest {
                         .collect(Collectors.joining(", ")));
 
         // 3. Load an environment with just the engine using the recommended API
-        // This handles dependency resolution and loading in one step, avoiding
-        // deprecated getRegistry()
+        // Handles dependency resolution and loading in one step, avoiding the deprecated getRegistry()
         moduleManager.resolveAndLoadEnvironment(new Name("engine"));
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
@@ -48,9 +48,36 @@ public class ModuleLoadingTest {
         // 4. Verify we can find a class from the engine module via the environment
         Class<?> expectedClass = org.terasology.engine.core.TerasologyEngine.class;
         Name providingModule = environment.getModuleProviding(expectedClass);
-        assertEquals(new Name("engine"), providingModule,
-                "Should be able to resolve TerasologyEngine class from the environment");
+        assertEquals(new Name("engine"), providingModule, "Should be able to resolve TerasologyEngine class from the environment");
 
         System.out.println("ModuleLoadingTest passed!");
+    }
+
+    @Test
+    public void testEngineResourceLoading() {
+        ModuleManager moduleManager = ModuleManagerFactory.create();
+        Module engineModule = moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"));
+        assertNotNull(engineModule, "Engine module should be present");
+
+        System.out.println("Engine module classpaths: " + engineModule.getClasspaths());
+        System.out.println("Engine module resource roots: " + engineModule.getResources().getRootPaths());
+
+        // Check if module.txt is accessible via ClassLoader directly (sanity check)
+        System.out.println("ClassLoader resource (no slash): " +
+                ClassLoader.getSystemResource("org/terasology/engine/module.txt"));
+        System.out.println("ClassLoader resource (with slash): " +
+                ClassLoader.getSystemResource("org/terasology/engine/module.txt/"));
+
+        // The engine module is a Package Module rooted at "org/terasology/engine".
+        // So we should ask for "module.txt" relative to that root.
+        var moduleTxt = engineModule.getResources().getFile("module.txt");
+
+        if (moduleTxt.isEmpty()) {
+            System.out.println("Failed to find module.txt via getFile(\"module.txt\")");
+        } else {
+            System.out.println("Found module.txt via getFile: " + moduleTxt.get());
+        }
+
+        assertTrue(moduleTxt.isPresent(), "module.txt should be present in engine module resources");
     }
 }
