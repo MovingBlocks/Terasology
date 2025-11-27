@@ -73,4 +73,106 @@ public class RegistryTest {
         Context retrievedContext = CoreRegistry.get(Context.class);
         assertSame(context, retrievedContext, "CoreRegistry.get(Context.class) should return the current context");
     }
+
+    @Test
+    public void testContextHierarchy() {
+        // 1. Create Root Context (e.g., Engine level)
+        Context rootContext = new ContextImpl();
+        rootContext.put(String.class, "Root Value");
+
+        // 2. Create Child Context (e.g., Game State level)
+        Context childContext = new ContextImpl(rootContext);
+        CoreRegistry.setContext(childContext);
+
+        // 3. Verify Child can access Root values
+        assertEquals("Root Value", CoreRegistry.get(String.class), "Child context should inherit values from parent");
+
+        // 4. Verify Child can override Root values locally (if supported, or at least put new ones)
+        // Note: ContextImpl usually looks in itself first, then parent.
+        childContext.put(Integer.class, 123);
+        assertEquals(123, CoreRegistry.get(Integer.class));
+
+        // 5. Verify Root does NOT have Child values
+        assertNull(rootContext.get(Integer.class), "Parent context should not see child values");
+    }
+
+    @Test
+    public void testGameStateSimulation() {
+        System.out.println("Starting testGameStateSimulation...");
+
+        // 1. Engine Init (Root Context)
+        Context engineContext = new ContextImpl();
+        engineContext.put(String.class, "Engine Service");
+        CoreRegistry.setContext(engineContext);
+
+        String engineValue = CoreRegistry.get(String.class);
+        System.out.println("Engine Context Value: " + engineValue);
+        assertEquals("Engine Service", engineValue);
+
+        // 2. Switch to Main Menu (Child of Engine)
+        Context mainMenuContext = new ContextImpl(engineContext);
+        mainMenuContext.put(String.class, "Menu Service");
+        CoreRegistry.setContext(mainMenuContext);
+
+        String menuValue = CoreRegistry.get(String.class);
+        System.out.println("Main Menu Context Value: " + menuValue);
+
+        // Explicit assertion with clear message
+        assertEquals("Menu Service", menuValue, "Menu context should override Engine service with its own");
+
+        // Let's use distinct types to be clear for this test
+        mainMenuContext.put(Integer.class, 100);
+        assertEquals(100, CoreRegistry.get(Integer.class));
+
+        // 3. Switch to InGame (Sibling of Main Menu, Child of Engine)
+        Context gameContext = new ContextImpl(engineContext);
+        gameContext.put(Double.class, 99.9);
+        CoreRegistry.setContext(gameContext);
+
+        // Verify InGame sees Engine
+        String gameValue = CoreRegistry.get(String.class);
+        System.out.println("Game Context Value (inherited): " + gameValue);
+        assertEquals("Engine Service", gameValue);
+
+        // Verify InGame sees its own
+        assertEquals(99.9, CoreRegistry.get(Double.class));
+
+        // Verify InGame does NOT see Main Menu
+        assertNull(CoreRegistry.get(Integer.class), "Game context should not see Main Menu values");
+
+        System.out.println("testGameStateSimulation passed!");
+    }
+
+    @Test
+    public void testInjectionHelper() {
+        // This test demonstrates the "Modern" pattern replacing CoreRegistry.
+        // Instead of static CoreRegistry.get(), we use Context and InjectionHelper.
+
+        Context context = new ContextImpl();
+        context.put(String.class, "Injected Value");
+
+        // 1. Field Injection
+        TestBean bean = new TestBean();
+        org.terasology.engine.registry.InjectionHelper.inject(bean, context);
+
+        assertEquals("Injected Value", bean.value, "Field should be injected from Context");
+
+        // 2. Constructor Injection (Preferred)
+        ConstructorBean cBean = org.terasology.engine.registry.InjectionHelper
+                .createWithConstructorInjection(ConstructorBean.class, context);
+        assertEquals("Injected Value", cBean.value, "Constructor argument should be injected from Context");
+    }
+
+    public static class TestBean {
+        @org.terasology.engine.registry.In
+        public String value;
+    }
+
+    public static class ConstructorBean {
+        public final String value;
+
+        public ConstructorBean(String value) {
+            this.value = value;
+        }
+    }
 }
