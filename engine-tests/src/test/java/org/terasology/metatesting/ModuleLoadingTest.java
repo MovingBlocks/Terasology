@@ -5,7 +5,9 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
+import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.gestalt.module.ModuleRegistry;
 
 import java.util.stream.Collectors;
 
@@ -25,7 +27,7 @@ public class ModuleLoadingTest {
 
         // 2. Verify modules are present in the registry
         // TODO: Deprecated getRegistry() for verification/logging is the only way to inspect state? Introduce new way?
-        org.terasology.gestalt.module.ModuleRegistry registry = moduleManager.getRegistry();
+        ModuleRegistry registry = moduleManager.getRegistry();
 
         System.out.println("Modules in registry: " +
                 registry.stream()
@@ -46,7 +48,7 @@ public class ModuleLoadingTest {
                         .collect(Collectors.joining(", ")));
 
         // 4. Verify we can find a class from the engine module via the environment
-        Class<?> expectedClass = org.terasology.engine.core.TerasologyEngine.class;
+        Class<?> expectedClass = TerasologyEngine.class;
         Name providingModule = environment.getModuleProviding(expectedClass);
         assertEquals(new Name("engine"), providingModule, "Should be able to resolve TerasologyEngine class from the environment");
 

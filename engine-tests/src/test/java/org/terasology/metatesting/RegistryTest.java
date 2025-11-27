@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.registry.In;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -153,20 +156,19 @@ public class RegistryTest {
 
         // 1. Field Injection
         TestBean bean = new TestBean();
-        org.terasology.engine.registry.InjectionHelper.inject(bean, context);
+        InjectionHelper.inject(bean, context);
 
         assertEquals("Injected Value", bean.value, "Field should be injected from Context");
 
         // 2. Constructor Injection (Preferred)
-        ConstructorBean cBean = org.terasology.engine.registry.InjectionHelper
-                .createWithConstructorInjection(ConstructorBean.class, context);
+        ConstructorBean cBean = InjectionHelper.createWithConstructorInjection(ConstructorBean.class, context);
         assertEquals("Injected Value", cBean.value, "Constructor argument should be injected from Context");
     }
 
     @Test
     public void testServiceRegistry() {
         // Verify that we can define services via ServiceRegistry (the "modern" way) and retrieve them via Context.
-        org.terasology.gestalt.di.ServiceRegistry registry = new org.terasology.gestalt.di.ServiceRegistry();
+        ServiceRegistry registry = new ServiceRegistry();
 
         // Use a custom class to avoid potential issues with system classes/classloaders in this specific test setup
         // Note that using a String in this case leads to a NullPointerException - an edge case we can likely ignore
@@ -190,7 +192,7 @@ public class RegistryTest {
 
     // This test bean uses @In to fetch an object from the registry. We use "String" for simplicity, normally it would be a custom object
     public static class TestBean {
-        @org.terasology.engine.registry.In
+        @In
         public String value;
     }
 

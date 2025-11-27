@@ -4,25 +4,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.event.internal.EventSystemImpl;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
 import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class EntitySystemTest {
 
@@ -33,6 +44,8 @@ public class EntitySystemTest {
     @BeforeEach
     public void setUp() {
         context = new ContextImpl();
+        CoreRegistry.setContext(context);
+
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);
@@ -50,20 +63,17 @@ public class EntitySystemTest {
 
     @Test
     public void testEntityLifecycle() {
-        
         // 1. Create Entity
         EntityRef entity = entityManager.create();
         System.out.println("Starting testEntityLifecycle with entity: " + entity);
         assertNotNull(entity);
         assertTrue(entity.exists());
         long id = entity.getId();
-        System.out.println("Entity created with ID: " + id);
 
         // 2. Destroy Entity
         entity.destroy();
         assertFalse(entity.exists());
         assertFalse(entityManager.contains(id));
-        System.out.println("Entity destroyed.");
     }
 
     @Test
@@ -75,7 +85,6 @@ public class EntitySystemTest {
         TestComponent comp = new TestComponent();
         comp.name = "Test Name";
         entity.addComponent(comp);
-        System.out.println("Component added: " + comp.name);
 
         assertTrue(entity.hasComponent(TestComponent.class));
         assertEquals("Test Name", entity.getComponent(TestComponent.class).name);
@@ -84,20 +93,18 @@ public class EntitySystemTest {
         TestComponent comp2 = entity.getComponent(TestComponent.class);
         comp2.name = "Updated Name";
         entity.saveComponent(comp2);
-        System.out.println("Component updated: " + comp2.name);
 
         assertEquals("Updated Name", entity.getComponent(TestComponent.class).name);
 
         // 3. Remove Component
         entity.removeComponent(TestComponent.class);
         assertFalse(entity.hasComponent(TestComponent.class));
-        System.out.println("Component removed.");
     }
 
     @Test
     public void testSystemLifecycle() {
-        org.terasology.engine.core.ComponentSystemManager systemManager = new org.terasology.engine.core.ComponentSystemManager(context);
-        org.terasology.engine.entitySystem.systems.ComponentSystem mockSystem = mock(org.terasology.engine.entitySystem.systems.ComponentSystem.class);
+        ComponentSystemManager systemManager = new ComponentSystemManager(context);
+        ComponentSystem mockSystem = mock(ComponentSystem.class);
 
         systemManager.register(mockSystem);
         System.out.println("System registered to systemManager: " + systemManager + " with mockSystem: " + mockSystem);
@@ -106,11 +113,9 @@ public class EntitySystemTest {
         verify(mockSystem, never()).initialise();
 
         systemManager.initialise();
-        System.out.println("System manager initialised.");
         verify(mockSystem).initialise();
 
         systemManager.shutdown();
-        System.out.println("System manager shutdown.");
         verify(mockSystem).shutdown();
     }
 
@@ -122,7 +127,7 @@ public class EntitySystemTest {
         System.out.println("Starting testEventProcessing with entity: " + entity + " and event: " + event);
 
         // 2. Register Handlers via ComponentSystemManager (simulating real engine flow)
-        org.terasology.engine.core.ComponentSystemManager systemManager = new org.terasology.engine.core.ComponentSystemManager(context);
+        ComponentSystemManager systemManager = new ComponentSystemManager(context);
 
         TestEventHandler handlerNormal = new TestEventHandler();
         TestEventHandlerHighPriority handlerHigh = new TestEventHandlerHighPriority();
@@ -150,7 +155,7 @@ public class EntitySystemTest {
         TestConsumableEvent event = new TestConsumableEvent();
         System.out.println("Starting testEventConsumption with entity: " + entity + " and event: " + event);
 
-        org.terasology.engine.core.ComponentSystemManager systemManager = new org.terasology.engine.core.ComponentSystemManager(context);
+        ComponentSystemManager systemManager = new ComponentSystemManager(context);
 
         ConsumingHandler consumingHandler = new ConsumingHandler();
         TestEventHandler normalHandler = new TestEventHandler();
@@ -168,6 +173,72 @@ public class EntitySystemTest {
         System.out.println("Event should have been consumed");
     }
 
+    @Test
+    public void testLiveEntitySystem() {
+        // 1. Setup Managers
+        ComponentSystemManager systemManager = new ComponentSystemManager(context);
+        System.out.println("Starting testLiveEntitySystem with systemManager: " + systemManager);
+
+        // 2. Register Test System
+        TestUpdateSubscriber testSystem = new TestUpdateSubscriber();
+        systemManager.register(testSystem);
+
+        // 3. Initialise (triggers injection)
+        systemManager.initialise();
+        System.out.println("System manager initialised with test UpdateSubscriberSystem: " + testSystem);
+
+        // Verify Injection
+        assertNotNull(testSystem.entityManager, "EntityManager should be injected");
+        assertNotNull(testSystem.eventSystem, "EventSystem should be injected");
+
+        // 4. Simulate Game Loop (3 ticks)
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Tick " + (i + 1));
+            float delta = 0.1f;
+
+            // Process Events
+            eventSystem.process();
+
+            // Update Systems
+            for (UpdateSubscriberSystem system : systemManager.iterateUpdateSubscribers()) {
+                system.update(delta);
+            }
+        }
+
+        // 5. Verify Execution
+        System.out.println("Number of updates: " + testSystem.updateCount + " and event received: " + testSystem.eventReceived);
+        assertEquals(3, testSystem.updateCount, "System should have updated 3 times");
+        assertTrue(testSystem.eventReceived, "System should have received event fired during update");
+    }
+
+    public static class TestUpdateSubscriber extends BaseComponentSystem
+            implements UpdateSubscriberSystem {
+
+        @In
+        public EngineEntityManager entityManager;
+
+        @In
+        public EventSystem eventSystem;
+
+        public int updateCount = 0;
+        public boolean eventReceived = false;
+
+        @Override
+        public void update(float delta) {
+            updateCount++;
+            // Fire an event on the first tick to test interaction
+            if (updateCount == 1) {
+                EntityRef entity = entityManager.create();
+                entity.send(new TestEvent());
+            }
+        }
+
+        @ReceiveEvent
+        public void onEvent(TestEvent event, EntityRef entity) {
+            eventReceived = true;
+        }
+    }
+
     public static class TestComponent implements Component<TestComponent> {
         public String name;
 
@@ -177,42 +248,42 @@ public class EntitySystemTest {
         }
     }
 
-    public static class TestEvent implements org.terasology.gestalt.entitysystem.event.Event {
+    public static class TestEvent implements Event {
     }
 
-    public static class TestConsumableEvent extends org.terasology.engine.entitySystem.event.AbstractConsumableEvent {
+    public static class TestConsumableEvent extends AbstractConsumableEvent {
     }
 
-    public static class TestEventHandler extends org.terasology.engine.entitySystem.systems.BaseComponentSystem {
+    public static class TestEventHandler extends BaseComponentSystem {
         public boolean received = false;
 
-        @org.terasology.gestalt.entitysystem.event.ReceiveEvent
+        @ReceiveEvent
         public void onEvent(TestEvent event, EntityRef entity) {
             received = true;
         }
 
-        @org.terasology.gestalt.entitysystem.event.ReceiveEvent
+        @ReceiveEvent
         public void onConsumable(TestConsumableEvent event, EntityRef entity) {
             received = true;
         }
     }
 
     public static class TestEventHandlerHighPriority
-            extends org.terasology.engine.entitySystem.systems.BaseComponentSystem {
+            extends BaseComponentSystem {
         public boolean received = false;
 
-        @org.terasology.engine.entitySystem.event.Priority(org.terasology.engine.entitySystem.event.EventPriority.PRIORITY_HIGH)
-        @org.terasology.gestalt.entitysystem.event.ReceiveEvent
+        @Priority(EventPriority.PRIORITY_HIGH)
+        @ReceiveEvent
         public void onEvent(TestEvent event, EntityRef entity) {
             received = true;
         }
     }
 
-    public static class ConsumingHandler extends org.terasology.engine.entitySystem.systems.BaseComponentSystem {
+    public static class ConsumingHandler extends BaseComponentSystem {
         public boolean received = false;
 
-        @org.terasology.engine.entitySystem.event.Priority(org.terasology.engine.entitySystem.event.EventPriority.PRIORITY_HIGH)
-        @org.terasology.gestalt.entitysystem.event.ReceiveEvent
+        @Priority(EventPriority.PRIORITY_HIGH)
+        @ReceiveEvent
         public void onEvent(TestConsumableEvent event, EntityRef entity) {
             received = true;
             event.consume();
