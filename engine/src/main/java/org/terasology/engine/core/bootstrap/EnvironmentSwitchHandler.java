@@ -193,8 +193,11 @@ public final class EnvironmentSwitchHandler {
                     && !componentType.isInterface()
                     && !Modifier.isAbstract(componentType.getModifiers())) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType),
-                        "Could not find module for %s %s", componentName, componentType);
+                Name componentModuleName = environment.getModuleProviding(componentType);
+                if (componentModuleName == null) {
+                    logger.warn("Could not find module for {} {}", componentName, componentType);
+                    continue;
+                }
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }

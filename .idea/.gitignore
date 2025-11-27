@@ -55,3 +55,6 @@ workspace.xml
 # Grep Console https://plugins.jetbrains.com/plugin/7125-grep-console
 # Settings appear to be workspace-specific.
 /GrepConsole.xml
+
+# Ignore some AI stuff
+copilot*

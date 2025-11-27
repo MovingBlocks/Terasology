@@ -151,12 +151,97 @@ public final class Config {
     }
 
     public JsonObject loadDefaultToJson() {
-        try (Reader baseReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/default.cfg")))) {
+        // Diagnostic logging to see what's on the classpath
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader == null) {
+            classLoader = Config.class.getClassLoader();
+        }
+
+        // Log diagnostic information
+        logger.info("=== Classpath Diagnostic for default.cfg ===");
+        logger.info("Config class loaded from: {}", Config.class.getProtectionDomain().getCodeSource().getLocation());
+        logger.info("ClassLoader: {}", classLoader.getClass().getName());
+
+        // Try multiple approaches to find the resource
+        java.io.InputStream resourceStream = null;
+        String foundLocation = null;
+
+        // Approach 1: Context ClassLoader without leading slash
+        resourceStream = classLoader.getResourceAsStream("default.cfg");
+        if (resourceStream != null) {
+            foundLocation = "Context ClassLoader (default.cfg)";
+        }
+
+        // Approach 2: Context ClassLoader with leading slash
+        if (resourceStream == null) {
+            resourceStream = classLoader.getResourceAsStream("/default.cfg");
+            if (resourceStream != null) {
+                foundLocation = "Context ClassLoader (/default.cfg)";
+            }
+        }
+
+        // Approach 3: Class.getResourceAsStream with leading slash
+        if (resourceStream == null) {
+            resourceStream = getClass().getResourceAsStream("/default.cfg");
+            if (resourceStream != null) {
+                foundLocation = "Class.getResourceAsStream (/default.cfg)";
+            }
+        }
+
+        // Approach 4: Class.getResourceAsStream without leading slash
+        if (resourceStream == null) {
+            resourceStream = getClass().getResourceAsStream("default.cfg");
+            if (resourceStream != null) {
+                foundLocation = "Class.getResourceAsStream (default.cfg)";
+            }
+        }
+
+        // Approach 5: Try Config.class.getClassLoader()
+        if (resourceStream == null) {
+            ClassLoader configClassLoader = Config.class.getClassLoader();
+            resourceStream = configClassLoader.getResourceAsStream("default.cfg");
+            if (resourceStream != null) {
+                foundLocation = "Config ClassLoader (default.cfg)";
+            }
+        }
+
+        if (resourceStream != null) {
+            logger.info("Found default.cfg using: {}", foundLocation);
+        } else {
+            // Resource not found - let's see what IS available
+            logger.error("default.cfg not found. Listing available resources:");
+            try {
+                java.util.Enumeration<java.net.URL> resources = classLoader.getResources("");
+                while (resources.hasMoreElements()) {
+                    logger.error("  Classpath entry: {}", resources.nextElement());
+                }
+            } catch (IOException e) {
+                logger.error("Failed to enumerate classpath", e);
+            }
+
+            // Also try to find any .cfg files
+            try {
+                java.util.Enumeration<java.net.URL> cfgFiles = classLoader.getResources("*.cfg");
+                logger.error("Looking for *.cfg files:");
+                while (cfgFiles.hasMoreElements()) {
+                    logger.error("  Found: {}", cfgFiles.nextElement());
+                }
+            } catch (IOException e) {
+                logger.error("Failed to search for .cfg files", e);
+            }
+
+            throw new RuntimeException("Missing default configuration file: default.cfg resource not found in classpath. " +
+                    "Config class loaded from: " + Config.class.getProtectionDomain().getCodeSource().getLocation() +
+                    ". ClassLoader: " + classLoader.getClass().getName());
+        }
+
+        try (Reader baseReader = new BufferedReader(new InputStreamReader(resourceStream))) {
             return new JsonParser().parse(baseReader).getAsJsonObject();
         } catch (IOException e) {
-            throw new RuntimeException("Missing default configuration file");
+            throw new RuntimeException("Failed to read default configuration file", e);
         }
     }
+
 
     public Optional<JsonObject> loadFileToJson(Path configPath) {
         if (Files.isRegularFile(configPath)) {
