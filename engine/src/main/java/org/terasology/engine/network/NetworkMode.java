@@ -20,6 +20,7 @@ public enum NetworkMode {
     
     /**
      * The game is hosting a server with local player
+     * TODO: This seems confusing, generally dedicated servers don't have local players - switch?
      */
     DEDICATED_SERVER(true, true, true),
     
