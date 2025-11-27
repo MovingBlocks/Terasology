@@ -10,6 +10,13 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
 - **Command Syntax**: PowerShell handles quotes and environment variables differently than Bash.
     - *Env Vars*: `$env:VAR="value"; command`
     - *Chaining*: Use `;` instead of `&&` if you want unconditional execution, or `if ($?) { command }` for conditional.
+- **Environment Setup**:
+    - **JAVA_HOME**: PowerShell terminals in the IDE may not inherit system variables correctly. Set it explicitly for the session plus update the PATH:
+      ```powershell
+      $env:JAVA_HOME = "D:\Dev\Java\TemurinJDK17"
+      $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+      ```
+    - **Path**: You can verify java is accessible with `& "$env:JAVA_HOME\bin\java" -version`.
 
 ## Gradle & Build System
 - **Verbosity**: Gradle output can be overwhelming.
@@ -18,7 +25,11 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
 - **Running Tests**:
     - Use specific filters: `./gradlew :project:test --tests "package.ClassName"`
     - Example: `./gradlew :engine-tests:test --tests "org.terasology.engine.BuildValidationTest"`
-- **Clean Builds**: When in doubt (class not found, weird linkage errors), run `./gradlew clean`.
+- **Task Execution**:
+    - **Force Run**: To force a test to run without rebuilding the whole project, use `cleanTest` before the test task:
+      `./gradlew :project:cleanTest :project:test --tests "..."`
+    - **Nuclear Option**: `--rerun-tasks` will rerun EVERYTHING. Use sparingly.
+    - **Clean Builds**: When in doubt (class not found, weird linkage errors), run `./gradlew clean`.
 
 ## Context Management
 - **Logs**: Do not dump full log files into the chat context.

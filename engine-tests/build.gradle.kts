@@ -116,6 +116,10 @@ tasks.named<Test>("test") {
     description = "Runs all tests (slow)"
     useJUnitPlatform ()
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
 }
 
 tasks.register<Test>("unitTest") {
