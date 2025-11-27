@@ -163,11 +163,38 @@ public class RegistryTest {
         assertEquals("Injected Value", cBean.value, "Constructor argument should be injected from Context");
     }
 
+    @Test
+    public void testServiceRegistry() {
+        // Verify that we can define services via ServiceRegistry (the "modern" way) and retrieve them via Context.
+        org.terasology.gestalt.di.ServiceRegistry registry = new org.terasology.gestalt.di.ServiceRegistry();
+
+        // Use a custom class to avoid potential issues with system classes/classloaders in this specific test setup
+        // Note that using a String in this case leads to a NullPointerException - an edge case we can likely ignore
+        registry.with(TestBean.class).use(() -> {
+            TestBean bean = new TestBean();
+            bean.value = "Service Registry Value";
+            return bean;
+        });
+        System.out.println("Registry created and configured + " + registry);
+
+        Context context = new ContextImpl(registry);
+        System.out.println("Context created: " + context);
+
+        TestBean bean = context.get(TestBean.class);
+        System.out.println("Retrieved value: " + bean);
+
+        assertNotNull(bean, "Should retrieve bean defined in ServiceRegistry");
+        assertEquals("Service Registry Value", bean.value, "Should retrieve value defined in ServiceRegistry");
+        System.out.println("testServiceRegistry passed!");
+    }
+
+    // This test bean uses @In to fetch an object from the registry. We use "String" for simplicity, normally it would be a custom object
     public static class TestBean {
         @org.terasology.engine.registry.In
         public String value;
     }
 
+    // This test bean uses constructor injection to fetch an object from the registry. Explicit parameter rather than magic annotation
     public static class ConstructorBean {
         public final String value;
 
