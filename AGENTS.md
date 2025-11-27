@@ -10,6 +10,10 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
 - **Command Syntax**: PowerShell handles quotes and environment variables differently than Bash.
     - *Env Vars*: `$env:VAR="value"; command`
     - *Chaining*: Use `;` instead of `&&` if you want unconditional execution, or `if ($?) { command }` for conditional.
+    - **File Search**: To find files recursively:
+      ```powershell
+      Get-ChildItem -Path . -Filter filename.txt -Recurse
+      ```
 - **Environment Setup**:
     - **JAVA_HOME**: PowerShell terminals in the IDE may not inherit system variables correctly. Set it explicitly for the session plus update the PATH:
       ```powershell
