@@ -42,6 +42,7 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
     - Use `grep` (or `Select-String` in PS) to find relevant lines.
     - Read specific blocks of XML reports.
 - **File Viewing**: Use `view_file` with line ranges to inspect relevant code sections.
+- **Debugging**: When tests fail or timeout, use `System.out.println` *before* assertions or inside `runUntil` loops to dump relevant state (e.g., object counts, flags, current states). This is often faster than attaching a debugger.
 
 ## Testing Strategy: "Meta-Test Suite"
 
@@ -56,7 +57,10 @@ We are building a validation suite from the ground up to verify the test infrast
 
 - **Context Pollution**: `CoreRegistry` is a deprecated static singleton meant to be removed. Tests running in the same JVM must be careful about cleaning it up or isolating contexts.
 - **Module Permissions**: The `SecurityManager` (via `ModuleSecurityManager`) can block access to classes. Ensure modules have correct dependencies and permissions.
+- **Service vs System**: Distinguish between `Context`/`CoreRegistry` services (global, available via `@In`) and ECS Systems (event-driven, registered with `ComponentSystemManager`). Some functionality (like Chat) relies on ECS systems processing events, not just the service being present.
 
 ## Conventions
 
 * Max line length in code files is 150 characters
+* Do not make linting or whitespace-only changes to files unless explicitly requested
+* If edits repeatedly result in corrupted files (large deleted chunks) start solely rewriting the file from scratch

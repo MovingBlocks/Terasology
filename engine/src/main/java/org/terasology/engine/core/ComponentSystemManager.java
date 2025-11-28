@@ -77,6 +77,9 @@ public class ComponentSystemManager {
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode.isAuthority(), isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
                 systemsByModule.put(moduleId, type);
+            } else {
+                logger.info("Skipping system {} due to mismatch. NetMode Authority: {}, Headless: {}, RegisterMode: {}",
+                        type.getSimpleName(), netMode.isAuthority(), isHeadless, registerInfo.value());
             }
         }
 
@@ -105,7 +108,7 @@ public class ComponentSystemManager {
             newSystem = (ComponentSystem) system.newInstance();
             InjectionHelper.share(newSystem);
             register(newSystem, id);
-            logger.debug("Loaded system {}", id);
+            logger.info("Loaded system {}", id);
 
         } catch (RuntimeException | InstantiationException | IllegalAccessException e) {
             logger.error("Failed to load system {}", id, e);

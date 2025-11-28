@@ -18,6 +18,8 @@ import org.terasology.engine.network.OwnerEvent;
  */
 @OwnerEvent
 public class ChatMessageEvent implements MessageEvent {
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ChatMessageEvent.class);
+
     private String message;
     private EntityRef from;
 
@@ -38,6 +40,7 @@ public class ChatMessageEvent implements MessageEvent {
     public ChatMessageEvent(String message, EntityRef from) {
         this.message = message;
         this.from = from;
+        logger.info("ChatMessageEvent created: '{}' from {}", message, from);
     }
 
     public String getMessage() {
@@ -50,7 +53,6 @@ public class ChatMessageEvent implements MessageEvent {
 
         return new Message(String.format("%s: %s", playerName, message), CoreMessageType.CHAT);
     }
-
 
     @Override
     public String toString() {

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.console;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
@@ -10,6 +12,7 @@ import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.input.binds.general.ConsoleButton;
+import org.terasology.engine.logic.chat.ChatSystem;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.engine.logic.console.ui.NotificationOverlay;
 import org.terasology.engine.network.ClientComponent;
@@ -20,7 +23,8 @@ import org.terasology.input.ButtonState;
 
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
-
+    private static final Logger logger = LoggerFactory.getLogger(ConsoleSystem.class);
+    
     @In
     private Console console;
 
@@ -37,8 +41,8 @@ public class ConsoleSystem extends BaseComponentSystem {
                 // make sure the message isn't already shown in the chat overlay
                 if (!nuiManager.isOpen("engine:console")
                         && (message.getType() != CoreMessageType.CHAT
-                        && message.getType() != CoreMessageType.NOTIFICATION
-                        || !nuiManager.isOpen("engine:chat"))) {
+                                && message.getType() != CoreMessageType.NOTIFICATION
+                                || !nuiManager.isOpen("engine:chat"))) {
                     overlay.setVisible(true);
                 }
             });
@@ -58,6 +62,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
+        logger.info("ConsoleSystem.onMessage: Received message '{}'. Client local? {}", event.getFormattedMessage().getMessage(), client.local);
         if (client.local) {
             console.addMessage(event.getFormattedMessage());
         }
@@ -69,7 +74,7 @@ public class ConsoleSystem extends BaseComponentSystem {
         ConsoleCommand cmd = console.getCommand(event.getCommandName());
 
         if (cmd.getCommandParameters().size() >= cmd.getRequiredParameterCount() && cmd.isRunOnServer()) {
-        console.execute(cmd.getName(), event.getParameters(), entity);
+            console.execute(cmd.getName(), event.getParameters(), entity);
         }
     }
 }

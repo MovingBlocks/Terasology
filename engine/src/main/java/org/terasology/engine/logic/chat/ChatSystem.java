@@ -66,6 +66,7 @@ public class ChatSystem extends BaseComponentSystem {
             return;
         }
         ClientComponent client = entity.getComponent(ClientComponent.class);
+        logger.info("ChatSystem.onMessage: Received message '{}'. Client local? {}", event.getFormattedMessage().getMessage(), client.local);
         if (client.local) {
             Message message = event.getFormattedMessage();
             // show overlay only if chat and console are hidden
@@ -78,18 +79,16 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
 
-    @Command(runOnServer = true,
-            requiredPermission = PermissionManager.CHAT_PERMISSION,
-            shortDescription = "Sends a message to all other players")
+    @Command(runOnServer = true, requiredPermission = PermissionManager.CHAT_PERMISSION, shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
-            @CommandParam("message") String[] message
-    ) {
+            @CommandParam("message") String[] message) {
         String messageToString = joinWithWhitespace(message);
 
-        logger.debug("Received chat message from {} : '{}'", sender, messageToString);
+        logger.info("ChatSystem.say: Received chat message from {} : '{}'", sender, messageToString);
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            logger.info("ChatSystem.say: Sending ChatMessageEvent to client {}", client);
             client.send(new ChatMessageEvent(messageToString, sender.getComponent(ClientComponent.class).clientInfo));
         }
 
@@ -100,14 +99,11 @@ public class ChatSystem extends BaseComponentSystem {
         return String.join(" ", words);
     }
 
-    @Command(runOnServer = true,
-            requiredPermission = PermissionManager.CHAT_PERMISSION,
-            shortDescription = "Sends a private message to a specified user")
+    @Command(runOnServer = true, requiredPermission = PermissionManager.CHAT_PERMISSION, shortDescription = "Sends a private message to a specified user")
     public String whisper(
             @Sender EntityRef sender,
             @CommandParam(value = "user", suggester = OnlineUsernameSuggester.class) String username,
-            @CommandParam("message") String[] message
-    ) {
+            @CommandParam("message") String[] message) {
         String messageToString = joinWithWhitespace(message);
 
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
