@@ -22,6 +22,10 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
       ```
     - **Path**: You can verify java is accessible with `& "$env:JAVA_HOME\bin\java" -version`.
 
+## Search and Navigation
+*   **Use Search Tools**: When looking for specific method calls, variable usages, or class definitions across the codebase, try to use `grep_search` or `codebase_search` instead of manually traversing files one by one. This is faster and more exhaustive.
+*   **Scoped Search**: Narrow down search scope using `TargetDirectories` or `SearchPath` to reduce noise.
+
 ## Gradle & Build System
 
 - **Verbosity**: Gradle output can be overwhelming.
@@ -32,7 +36,7 @@ General coding on Linux and Mac are well-understood by AI, while Java on Windows
     - Example: `./gradlew :engine-tests:test --tests "org.terasology.engine.BuildValidationTest"`
 - **Task Execution**:
     - **Force Run**: To force a test to run without rebuilding the whole project, use `cleanTest` before the test task:
-      `./gradlew :project:cleanTest :project:test --tests "..."`
+      ` ./gradlew :engine-tests:cleanTest :engine-tests:test --tests "org.terasology.metatesting.MTETwoClientChatTest"`
     - **Nuclear Option**: `--rerun-tasks` will rerun EVERYTHING. Use sparingly.
     - **Clean Builds**: When in doubt (class not found, weird linkage errors), run `./gradlew clean`.
 

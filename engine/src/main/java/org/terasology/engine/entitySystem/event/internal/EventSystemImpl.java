@@ -64,7 +64,7 @@ public class EventSystemImpl implements EventSystem {
 
     private Thread mainThread;
     private BlockingQueue<PendingEvent> pendingEvents = Queues.newLinkedBlockingQueue();
-
+    
 
     @Inject
     public EventSystemImpl(NetworkSystem networkSystem) {
@@ -164,13 +164,13 @@ public class EventSystemImpl implements EventSystem {
         componentSpecificHandlers.values().stream()
                 .map(eventHandlers -> eventHandlers.values().iterator())
                 .forEach(eventHandlerIterator -> {
-            while (eventHandlerIterator.hasNext()) {
-                EventHandlerInfo eventHandler = eventHandlerIterator.next();
-                if (eventHandler.getHandler().equals(handler)) {
-                    eventHandlerIterator.remove();
-                }
-            }
-        });
+                    while (eventHandlerIterator.hasNext()) {
+                        EventHandlerInfo eventHandler = eventHandlerIterator.next();
+                        if (eventHandler.getHandler().equals(handler)) {
+                            eventHandlerIterator.remove();
+                        }
+                    }
+                });
 
         Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
         while (eventHandlerIterator.hasNext()) {
@@ -216,7 +216,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass,
-                                                        int priority, Class<? extends Component>... componentTypes) {
+            int priority, Class<? extends Component>... componentTypes) {
         EventHandlerInfo info = new ReceiverEventHandlerInfo<>(eventReceiver, priority, componentTypes);
         addEventHandler(eventClass, info, Arrays.asList(componentTypes));
     }
@@ -265,6 +265,15 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
+        if (event.getClass().getSimpleName().equals("ChatMessageEvent")) {
+            logger.debug("EventSystemImpl.sendStandardEvent: Dispatching {} (Loader: {}) to {} handlers for entity {}",
+                    event.getClass().getName(), event.getClass().getClassLoader(), selectedHandlers.size(), entity);
+            for (EventHandlerInfo handler : selectedHandlers) {
+                logger.debug(" - Handler: {} (Loader: {}) (Priority: {})",
+                        handler.getHandler().getClass().getName(), handler.getHandler().getClass().getClassLoader(),
+                        handler.getPriority());
+            }
+        }
         for (EventHandlerInfo handler : selectedHandlers) {
             // Check isValid at each stage in case components were removed.
             if (handler.isValidFor(entity)) {
@@ -313,11 +322,31 @@ public class EventSystemImpl implements EventSystem {
             return result;
         }
 
-        for (Class<? extends Component> compClass : handlers.keySet()) {
-            if (entity.hasComponent(compClass)) {
-                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
-                    if (eventHandler.isValidFor(entity)) {
-                        result.add(eventHandler);
+        if (eventType.getSimpleName().equals("ChatMessageEvent")) {
+            logger.debug("selectEventHandlers for ChatMessageEvent on entity {}", entity);
+            for (Class<? extends Component> compClass : handlers.keySet()) {
+                boolean hasComponent = entity.hasComponent(compClass);
+                logger.debug(" - Checking component {}: hasComponent={}", compClass.getSimpleName(), hasComponent);
+                if (hasComponent) {
+                    for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                        boolean valid = eventHandler.isValidFor(entity);
+                        logger.debug("   - Handler: {} (Loader: {}), isValidFor={}",
+                                eventHandler.getHandler().getClass().getName(),
+                                eventHandler.getHandler().getClass().getClassLoader(),
+                                valid);
+                        if (valid) {
+                            result.add(eventHandler);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (Class<? extends Component> compClass : handlers.keySet()) {
+                if (entity.hasComponent(compClass)) {
+                    for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                        if (eventHandler.isValidFor(entity)) {
+                            result.add(eventHandler);
+                        }
                     }
                 }
             }
@@ -358,11 +387,11 @@ public class EventSystemImpl implements EventSystem {
         private int priority;
 
         ByteCodeEventHandlerInfo(ComponentSystem handler,
-                                 Method method,
-                                 int priority,
-                                 @Nullable String activity,
-                                 Collection<Class<? extends Component>> filterComponents,
-                                 Collection<Class<? extends Component>> componentParams) {
+                Method method,
+                int priority,
+                @Nullable String activity,
+                Collection<Class<? extends Component>> filterComponents,
+                Collection<Class<? extends Component>> componentParams) {
 
 
             this.handler = handler;
