@@ -20,8 +20,8 @@ import org.terasology.engine.network.OwnerEvent;
 public class ChatMessageEvent implements MessageEvent {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ChatMessageEvent.class);
 
-    private String message;
-    private EntityRef from;
+    public String message;
+    public EntityRef from;
 
     protected ChatMessageEvent() {
     }

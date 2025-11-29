@@ -93,8 +93,8 @@ public final class EntitySystemSetupUtil {
     }
 
     public static void configureEntityManagementRelatedClasses(TypeHandlerLibrary typeHandlerLibrary,
-                                                               EntitySystemLibrary entitySystemLibrary,
-                                                               ModuleEnvironment environment, EngineEntityManager entityManager) {
+            EntitySystemLibrary entitySystemLibrary,
+            ModuleEnvironment environment, EngineEntityManager entityManager) {
         // Standard serialization library
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler(entityManager));
         registerComponents(entitySystemLibrary.getComponentLibrary(), environment);
@@ -129,7 +129,7 @@ public final class EntitySystemSetupUtil {
         RecordingClasses recordingClasses = new RecordingClasses(createSelectedClassesToRecordList());
         serviceRegistry.with(RecordingClasses.class).lifetime(Lifetime.Singleton).use(() -> recordingClasses);
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
-            serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(EventSystemImpl.class);
+            serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(NetworkEventSystem.class);
         } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(EventSystemReplayImpl.class);
         } else {
@@ -171,12 +171,19 @@ public final class EntitySystemSetupUtil {
         return selectedClassesToRecord;
     }
 
+    public static final class NetworkEventSystem extends NetworkEventSystemDecorator {
+        @Inject
+        public NetworkEventSystem(NetworkSystem networkSystem, EntitySystemLibrary entitySystemLibrary) {
+            super(new EventSystemImpl(networkSystem), networkSystem, entitySystemLibrary.getEventLibrary());
+        }
+    }
+
     public static final class RecordingEventSystemWrapped extends RecordingEventSystemDecorator {
         @Inject
         public RecordingEventSystemWrapped(RecordingClasses recordingClasses, NetworkSystem networkSystem,
-                                           EntitySystemLibrary entitySystemLibrary,
-                                           RecordedEventStore recordedEventStore,
-                                           RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+                EntitySystemLibrary entitySystemLibrary,
+                RecordedEventStore recordedEventStore,
+                RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
             super(new NetworkEventSystemDecorator(new EventSystemImpl(networkSystem.getMode().isAuthority()),
                     networkSystem, entitySystemLibrary.getEventLibrary()), new EventCatcher(recordingClasses, recordedEventStore),
                     recordAndReplayCurrentStatus);

@@ -8,7 +8,10 @@ import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.world.BlockEntityRegistry;
 
@@ -31,6 +34,8 @@ public class InitialiseSystems extends SingleStepLoadProcess {
         EventLibrary eventLibrary = context.get(EventLibrary.class);
         BlockEntityRegistry blockEntityRegistry = context.get(BlockEntityRegistry.class);
 
+        EntitySystemSetupUtil.registerEvents(context.get(EventSystem.class),
+                context.get(ModuleManager.class).getEnvironment());
         context.get(NetworkSystem.class).connectToEntitySystem(entityManager, eventLibrary, blockEntityRegistry);
         ComponentSystemManager csm = context.get(ComponentSystemManager.class);
         csm.initialise();

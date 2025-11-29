@@ -12,6 +12,7 @@ import org.terasology.engine.logic.console.Message;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.logic.console.ConsoleSystem;
@@ -90,34 +91,57 @@ public class MTETwoClientChatTest {
         ClientComponent clientComp2 = localPlayer2.getClientEntity().getComponent(ClientComponent.class);
         System.out.println("Client 2 local flag: " + (clientComp2 != null ? clientComp2.local : "null"));
 
+        Console console2 = client2Ctx.get(Console.class);
+        System.out.println("Client 2 console: " + console2);
+
         // Register ProbeSystem on Client 2 to listen for ChatMessageEvent directly
         ProbeSystem probe = new ProbeSystem();
         client2Ctx.get(ComponentSystemManager.class).register(probe);
-        System.out.println("Registered ProbeSystem on Client 2");
+
+        // IMPORTANT: Manually register with EventSystem because ComponentSystemManager
+        // might not do it for post-init registration
+        EventSystem eventSystem = client2Ctx.get(EventSystem.class);
+        eventSystem.registerEventHandler(probe);
+        System.out.println("Registered ProbeSystem on Client 2 (and with EventSystem)");
+
+        // TEST PROBE LOCALLY
+        System.out.println("Testing ProbeSystem locally on Client 2...");
+        localPlayer2.getClientEntity()
+                .send(new org.terasology.engine.logic.chat.ChatMessageEvent("Local Probe Test", EntityRef.NULL));
+
+        if (probe.received) {
+            System.out.println("ProbeSystem successfully received LOCAL event.");
+            probe.received = false; // Reset for network test
+        } else {
+            System.out.println("ProbeSystem FAILED to receive LOCAL event.");
+        }
 
         // Manually send a ChatMessageEvent from the host to verify event propagation
         // This bypasses the Command system to isolate the issue
         helper.runUntil(() -> hostNetwork.getPlayers().iterator().hasNext()); // Ensure players are there
         Client senderClient = hostNetwork.getPlayers().iterator().next();
         EntityRef senderOnHost = senderClient.getEntity();
+        EntityRef senderClientInfo = senderOnHost.getComponent(ClientComponent.class).clientInfo;
         String manualMessage = "Manual message from host";
 
         System.out.println("Sending manual message from host using sender: " + senderOnHost);
+        System.out.println("Sender ClientInfo: " + senderClientInfo);
+
         for (Client client : hostNetwork.getPlayers()) {
-            // Try sending with the actual sender
-            client.getEntity().send(new org.terasology.engine.logic.chat.ChatMessageEvent(manualMessage, senderOnHost));
+            EntityRef clientEntity = client.getEntity();
+            boolean hasNetComp = clientEntity.hasComponent(org.terasology.engine.network.NetworkComponent.class);
+            System.out.println("Target Client Entity: " + clientEntity + " Has NetworkComponent? " + hasNetComp);
+
+            // Try sending with the actual sender (ClientInfo, like ChatSystem does)
+            clientEntity.send(new org.terasology.engine.logic.chat.ChatMessageEvent(manualMessage, senderClientInfo));
 
             // Try sending with EntityRef.NULL to rule out replication issues
-            client.getEntity().send(
+            clientEntity.send(
                     new org.terasology.engine.logic.chat.ChatMessageEvent("Message with NULL sender", EntityRef.NULL));
         }
 
         // Set a safety timeout to prevent hangs
         helper.setSafetyTimeoutMs(10000);
-
-        // Run the loop until client 2 receives the message (or we time out)
-        Console console2 = client2Ctx.get(Console.class);
-        System.out.println("Client 2 console: " + console2);
 
         try {
             helper.runUntil(() -> {
@@ -126,7 +150,8 @@ public class MTETwoClientChatTest {
                     return true;
                 }
                 for (Message message : console2.getMessages()) {
-                    System.out.println("Client 2 message: " + message.getMessage());
+                    // System.out.println("Client 2 message: " + message.getMessage()); // REMOVED
+                    // SPAM
                     if (message.getMessage().contains("hello from client1")
                             || message.getMessage().contains("Manual message")
                             || message.getMessage().contains("NULL sender")) {
