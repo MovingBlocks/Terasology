@@ -164,3 +164,19 @@ idea {
         isDownloadSources = true
     }
 }
+
+tasks.named<org.gradle.testing.jacoco.tasks.JacocoReport>("jacocoTestReport") {
+    // Cross-module support: The tests in this module (:engine-tests) exercise code located in the :engine module.
+    // By default, JaCoCo only looks at sources in the current project. We must explicitly add the :engine
+    // main source set and output classes so that the coverage report includes the actual engine code.
+    val engineProject = project(":engine")
+    val sourceSets = engineProject.extensions.getByType(SourceSetContainer::class)
+    val mainSourceSet = sourceSets.getByName("main")
+
+    additionalSourceDirs.from(mainSourceSet.allSource)
+    additionalClassDirs.from(mainSourceSet.output)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}

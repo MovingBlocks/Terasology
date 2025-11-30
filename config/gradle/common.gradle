@@ -43,3 +43,21 @@ tasks.javadoc {
     // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
     failOnError = false
 }
+
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
