@@ -11,6 +11,7 @@ import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironme
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
@@ -33,21 +34,21 @@ public class MTEClientSystemTest {
         // Inspect ComponentSystemManager
         ComponentSystemManager csm = clientContext.get(ComponentSystemManager.class);
         System.out.println("Client CSM: " + csm);
+        assertNotNull(csm);
+
         System.out.println("Client CSM Active? " + (csm != null ? csm.isActive() : "null"));
+        assertTrue(csm.isActive());
 
         // Register a test system on the client
         TestSystem testSystem = new TestSystem();
-        if (csm != null) {
-            csm.register(testSystem);
-            System.out.println("Registered TestSystem on Client.");
-        }
+        csm.register(testSystem);
+        System.out.println("Registered TestSystem on Client.");
 
         // Try to get Engine to check state
         GameEngine engine = clientContext.get(GameEngine.class);
         System.out.println("Client Engine: " + engine);
-        if (engine != null) {
-            System.out.println("Client Engine State: " + engine.getState());
-        }
+        assertNotNull(engine);
+        System.out.println("Client Engine State: " + engine.getState());
 
         // Run the engine for a few ticks (wait for the system to be updated multiple times)
         int targetUpdates = 10;
