@@ -49,6 +49,10 @@ public class AutoConfigManager {
             SimpleUri configId = verifyNotNull(ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment),
                     "Could not find ID for %s", configClass.getSimpleName()
             );
+            if (!environment.getBeans(configClass).isEmpty()) {
+                // Do not create AutoConfig instances in this context if they already exist in a parent context.
+                continue;
+            }
             serviceRegistry.with((Class) configClass).lifetime(Lifetime.Singleton).use(() -> {
                 try {
                     AutoConfig config = configClass.getDeclaredConstructor().newInstance();

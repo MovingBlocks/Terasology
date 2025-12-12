@@ -8,7 +8,6 @@ import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.TerasologyEngine;
-import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
@@ -21,7 +20,6 @@ import static org.terasology.engine.testUtil.Correspondences.instanceOfExpected;
 public class CustomSubsystemTest {
 
     static final String PLAYER_NAME = "Customized Name Just For This";
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CustomSubsystemTest.class);
 
     @Test
     void testSubsystemExists(GameEngine engine) {
@@ -32,7 +30,6 @@ public class CustomSubsystemTest {
 
     @Test
     void testConfigurationBySubsystemInitialisation(PlayerConfig config) {
-        logger.warn("Test method checking config: " + System.identityHashCode(config) + " name=" + config.playerName.get());
         assertThat(config.playerName.get()).isEqualTo(PLAYER_NAME);
     }
 
@@ -44,20 +41,16 @@ public class CustomSubsystemTest {
      * to an annotation.
      */
     public static class MySubsystem extends NonPlayerVisibleSubsystem {
+        @Inject
+        protected PlayerConfig playerConfig;
 
         @Inject
         public MySubsystem() {
         }
 
         @Override
-        public void preUpdate(GameState currentState, float delta) {
-            Context context = currentState.getContext();
-            if (context != null) {
-                PlayerConfig config = context.get(PlayerConfig.class);
-                if (config != null) {
-                    config.playerName.set(PLAYER_NAME);
-                }
-            }
+        public void postInitialise(Context context) {
+            playerConfig.playerName.set(PLAYER_NAME);
         }
     }
 }
