@@ -140,8 +140,8 @@ public final class Terasology implements Callable<Integer> {
 
     @Override
     public Integer call() throws IOException {
-        handleLaunchArguments();
         setupLogging();
+        handleLaunchArguments();
 
         SplashScreen splashScreen;
         if (splashEnabled) {
@@ -258,11 +258,7 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private static void setupLogging() {
-        Path path = PathManager.getInstance().getLogPath();
-        if (path == null) {
-            path = Paths.get("logs");
-        }
-
+        Path path = Paths.get("logs");
         LoggingContext.initialize(path);
     }
 
