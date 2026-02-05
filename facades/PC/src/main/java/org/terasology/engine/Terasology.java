@@ -140,7 +140,17 @@ public final class Terasology implements Callable<Integer> {
 
     @Override
     public Integer call() throws IOException {
-        setupLogging();
+        // IMPORTANT: Logging must be initialized BEFORE any class with a static Logger field
+        // is loaded. Classes like PathManager have static loggers that trigger Logback
+        // initialization when the class is loaded. If Logback initializes before
+        // LoggingContext.initialize() sets the logFileFolder system property,
+        // it creates a "logFileFolder_IS_UNDEFINED" directory.
+        //
+        // Therefore: compute log path directly from homeDir, then call setupLogging(),
+        // THEN call handleLaunchArguments() which loads PathManager.
+        Path logPath = (homeDir != null ? homeDir : Paths.get(".")).resolve("logs");
+        setupLogging(logPath);
+
         handleLaunchArguments();
 
         SplashScreen splashScreen;
@@ -257,9 +267,8 @@ public final class Terasology implements Callable<Integer> {
         return (newTitle + " " + fileNumber);
     }
 
-    private static void setupLogging() {
-        Path path = Paths.get("logs");
-        LoggingContext.initialize(path);
+    private static void setupLogging(Path logPath) {
+        LoggingContext.initialize(logPath);
     }
 
     private void handleLaunchArguments() throws IOException {
@@ -271,7 +280,8 @@ public final class Terasology implements Callable<Integer> {
         }
 
         if (homeDir != null) {
-            // This is called before logging is initialized, so we use stdout.
+            // Use stdout here since this is pre-initialization diagnostic output.
+            // Logger is available but using println keeps the initialization sequence clear.
             System.out.println("homeDir is " + homeDir);
             PathManager.getInstance().useOverrideHomePath(homeDir);
             // TODO: what is this?
