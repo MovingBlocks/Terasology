@@ -275,7 +275,8 @@ public final class Terasology implements Callable<Integer> {
         }
 
         if (homeDir != null) {
-            logger.info("homeDir is {}", homeDir);
+            // This is called before logging is initialized, so we use stdout.
+            System.out.println("homeDir is " + homeDir);
             PathManager.getInstance().useOverrideHomePath(homeDir);
             // TODO: what is this?
             //   PathManager.getInstance().chooseHomePathManually();
