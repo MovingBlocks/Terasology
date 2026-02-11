@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="CheckStyle-IDEA">
-    <option name="configuration">
-      <map>
-        <entry key="active-configuration-0" value="PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology;All" />
-        <entry key="checkstyle-version" value="10.2" />
-        <entry key="copy-libs" value="false" />
-        <entry key="location-0" value="BUNDLED:(bundled):Sun Checks;All" />
-        <entry key="location-1" value="BUNDLED:(bundled):Google Checks;All" />
-        <entry key="location-2" value="PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology;All" />
-        <entry key="property-2.samedir" value="$PROJECT_DIR$/config/metrics/checkstyle" />
-        <entry key="scan-before-checkin" value="true" />
-        <entry key="scanscope" value="AllSourcesWithTests" />
-        <entry key="suppress-errors" value="false" />
-      </map>
+  <component name="CheckStyle-IDEA" serialisationVersion="2">
+    <checkstyleVersion>10.2</checkstyleVersion>
+    <scanScope>AllSourcesWithTests</scanScope>
+    <scanBeforeCheckin>true</scanBeforeCheckin>
+    <option name="thirdPartyClasspath" />
+    <option name="activeLocationIds">
+      <option value="46e78959-6b0b-4bfa-8dd9-e3e1f1952fe8" />
+    </option>
+    <option name="locations">
+      <list>
+        <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
+        <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
+        <ConfigurationLocation id="46e78959-6b0b-4bfa-8dd9-e3e1f1952fe8" type="PROJECT_RELATIVE" scope="All" description="Terasology">
+          $PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml
+          <option name="properties">
+            <map>
+              <entry key="config_loc" value="" />
+            </map>
+          </option>
+        </ConfigurationLocation>
+      </list>
     </option>
   </component>
 </project>
