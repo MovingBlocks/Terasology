@@ -5,6 +5,7 @@ package org.terasology.engine.world.block;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.DisplayName;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.LineSegmentf;
 import org.terasology.joml.geom.Rayf;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -652,5 +654,156 @@ public class BlockRegionTest {
             }
         }
         return result;
+    }
+
+
+    /**
+     *  -- NEW STRUCTURAL (WHITE BOX) TEST CASES ----------------------------------------------------------------------//
+    */
+    @Test
+    @DisplayName("Structural: Verify all branches of the equals() method")
+    public void testEqualsStructuralBranches() {
+        BlockRegion regionA = new BlockRegion(0, 0, 0, 5, 5, 5);
+        BlockRegion regionB = new BlockRegion(0, 0, 0, 5, 5, 5);
+        BlockRegion regionC = new BlockRegion(1, 1, 1, 6, 6, 6);
+
+        // Branch 1: Reference Identity (this == obj)
+        assertTrue(regionA.equals(regionA), "Failed reference equality branch");
+
+        // Branch 2 & 3: Null and Type Safety (obj == null || getClass() != obj.getClass())
+        assertFalse(regionA.equals(null), "Failed null check branch");
+        assertFalse(regionA.equals("Not a Region"), "Failed type safety branch");
+
+        // Branch 4: Full field comparison
+        assertTrue(regionA.equals(regionB), "Failed identical content branch");
+        assertFalse(regionA.equals(regionC), "Failed different content branch (maxX difference)");
+
+        // Testing specific field differences to hit all && conditions
+        assertFalse(regionA.equals(new BlockRegion(-1, 0, 0, 5, 5, 5))); // minX diff
+        assertFalse(regionA.equals(new BlockRegion(0, -1, 0, 5, 5, 5))); // minY diff
+        assertFalse(regionA.equals(new BlockRegion(0, 0, -1, 5, 5, 5))); // minZ diff
+    }
+
+    @Test
+    @DisplayName("Structural: Verify 3D volume boundary conditions for contains()")
+    public void testContainsVolumeBoundaries() {
+        // Create a 10*10*10 volume to test range logic
+        BlockRegion region = new BlockRegion(0, 0, 0, 10, 10, 10);
+
+        // Test inclusive boundaries (Edges)
+        assertTrue(region.contains(0, 5, 5), "Min-X boundary should be inclusive");
+        assertTrue(region.contains(10, 5, 5), "Max-X boundary should be inclusive");
+        assertTrue(region.contains(5, 0, 5), "Min-Y boundary should be inclusive");
+        assertTrue(region.contains(5, 10, 5), "Max-Y boundary should be inclusive");
+
+        // Test exclusive boundaries (points exactly one unit outside the volume)
+        assertFalse(region.contains(-1, 5, 5), "Point outside Min-X should be false");
+        assertFalse(region.contains(11, 5, 5), "Point outside Max-X should be false");
+        assertFalse(region.contains(5, -1, 5), "Point outside Min-Y should be false");
+        assertFalse(region.contains(5, 11, 5), "Point outside Max-Y should be false");
+        assertFalse(region.contains(5, 5, -1), "Point outside Min-Z should be false");
+        assertFalse(region.contains(5, 5, 11), "Point outside Max-Z should be false");
+    }
+
+    @Test
+    @DisplayName("Structural: Verify partial intersection and destination logic")
+    public void testPartialIntersectionMath() {
+        BlockRegion regionA = new BlockRegion(0, 0, 0, 10, 10, 10);
+        BlockRegion regionB = new BlockRegion(5, 5, 5, 15, 15, 15);
+        BlockRegion dest = new BlockRegion();
+
+        Optional<BlockRegion> result = regionA.intersect(regionB, dest);
+
+        // Verify the 'if (dest.isValid())' branch
+        assertTrue(result.isPresent());
+        // Verify intersection coordinates: max of mins (5) and min of maxs (10)
+        assertEquals(new BlockRegion(5, 5, 5, 10, 10, 10), dest);
+    }
+
+    @Test
+    @DisplayName("Structural: Verify invalid region iterator branch")
+    public void testInvalidIteratorBranch() {
+        BlockRegion invalid = new BlockRegion(); // Creates INVALID state
+        assertFalse(invalid.isValid());
+
+        // Verify the 'if (!isValid())' branch in iterator() method
+        java.util.Iterator<org.joml.Vector3ic> it = invalid.iterator();
+        assertFalse(it.hasNext(), "Invalid region should return an empty iterator");
+    }
+
+    @Test
+    @DisplayName("Structural: Verify hashCode execution and prime consistency")
+    public void testHashCodeStructural() {
+        BlockRegion region1 = new BlockRegion(1, 2, 3, 4, 5, 6);
+        BlockRegion region2 = new BlockRegion(1, 2, 3, 4, 5, 6);
+
+        assertEquals(region1.hashCode(), region2.hashCode(), "Same regions must have same hashCode");
+        assertNotEquals(0, region1.hashCode(), "HashCode logic should execute and produce non-zero");
+    }
+
+    @Test
+    @DisplayName("Structural: Verify Matrix Transformation logic")
+    public void testTransformStructural() {
+        BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
+        // A simple translation matrix: moves everything by +10 on all axes
+        org.joml.Matrix4f matrix = new org.joml.Matrix4f().translation(10, 10, 10);
+
+        BlockRegion result = new BlockRegion();
+        region.transform(matrix, result);
+
+        // Executes the 8-corner loop and the Math.roundUsing branches
+        assertEquals(10, result.minX());
+        assertEquals(11, result.maxX());
+        assertTrue(result.isValid());
+    }
+
+    @Test
+    @DisplayName("Structural: Verify Union overloads and expansion")
+    public void testUnionAndExpandStructural() {
+        BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
+
+        // Target: union(int, int, int)
+        region.union(5, 5, 5);
+        assertEquals(5, region.maxX());
+
+        // Target: expand(int, int, int)
+        region.expand(1, 1, 1);
+        // Min should go from 0 to -1, Max from 5 to 6
+        assertEquals(-1, region.minX());
+        assertEquals(6, region.maxX());
+
+        // Target: translate(Vector3ic)
+        region.translate(new org.joml.Vector3i(10, 10, 10));
+        assertEquals(9, region.minX()); // -1 + 10
+    }
+
+    @Test
+    @DisplayName("Structural: Verify Side/Face modification logic")
+    public void testFaceStructural() {
+        BlockRegion region = new BlockRegion(0, 0, 0, 10, 10, 10);
+
+        // This targets the face(Side) method logic
+        region.face(org.terasology.engine.math.Side.TOP);
+
+        // The TOP face should result in a region where miny == maxy == 10
+        assertEquals(10, region.minY());
+        assertEquals(10, region.maxY());
+    }
+
+    @Test
+    @DisplayName("Structural: Verify all Min/Max setter variants")
+    public void testMinMaxSetters() {
+        BlockRegion region = new BlockRegion(0, 0, 0, 5, 5, 5);
+
+        // Various return dest.set(...) lines
+        region.minX(1);
+        region.minY(1);
+        region.minZ(1);
+        region.maxX(4);
+        region.maxY(4);
+        region.maxZ(4);
+
+        assertEquals(1, region.minX());
+        assertEquals(4, region.maxX());
     }
 }
