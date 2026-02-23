@@ -1,0 +1,57 @@
+# File: .github/workflows/ci.yml
+# Purpose: Run CI on every push / pull request to ensure the project can build and tests can run.
+
+name: CI
+
+# Trigger this workflow when code is pushed or when a Pull Request is opened/updated.
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    # Run on a fresh Ubuntu VM hosted by GitHub (cloud-based CI runner).
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code so the runner can access our project files.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install the required Java version for building/running Gradle tasks.
+      # Also enable Gradle dependency caching to speed up future CI runs.
+      - name: Set up Java (Temurin) + Gradle cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      # Step 3: Ensure the Gradle wrapper script is executable on Linux runners.
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      # Step 4: Prepare required native/config assets (Terasology often needs this in clean environments).
+      # This helps avoid missing-file errors during tests.
+      - name: Extract natives and config
+        run: ./gradlew extractNatives extractConfig --no-daemon --stacktrace
+
+      # Step 5: BUILD step (compile/package without running tests).
+      # Using 'assemble' here makes "build" explicit and separate from "test" for our assignment report.
+      - name: Build (assemble)
+        run: ./gradlew assemble --no-daemon --stacktrace
+
+      # Step 6: TEST step (run unit tests).
+      - name: Run tests
+        run: ./gradlew test --no-daemon --stacktrace
+
+      # Step 7: Always upload test reports, even if tests fail,
+      # so we can download and screenshot the HTML report for our documentation.
+      - name: Upload test reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/test
+            **/build/test-results/test
