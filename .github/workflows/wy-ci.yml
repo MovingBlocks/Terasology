@@ -26,14 +26,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Extract Natives and Config
-        # Terasology requires this step before building
         run: ./gradlew extractNatives extractConfig --no-daemon
 
       - name: Build Project (Assemble)
         run: ./gradlew assemble --no-daemon
 
       - name: Execute Test Suite
-        # This will run the structural tests you wrote in Part 3
         run: ./gradlew test --no-daemon
 
       - name: Archive Test Results (wy)
