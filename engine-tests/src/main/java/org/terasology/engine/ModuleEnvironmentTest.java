@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.io.TempDir;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.reflection.ModuleTypeRegistry;
@@ -26,8 +26,8 @@ public abstract class ModuleEnvironmentTest {
         PathManager.getInstance().useOverrideHomePath(tempHome);
 
         moduleManager = ModuleManagerFactory.create();
-        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
-        TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
+        TypeRegistry.WHITELISTED_CLASSES = ExternalApiAllowlist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_PACKAGES = ExternalApiAllowlist.PACKAGES;
         typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
         setup();

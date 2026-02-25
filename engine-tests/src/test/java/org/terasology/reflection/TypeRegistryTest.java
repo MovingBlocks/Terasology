@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.engine.ModuleEnvironmentTest;
-import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ExternalApiAllowlist;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.naming.Name;
 
@@ -49,10 +49,10 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
     // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
     @Disabled("Seems to intermittently stall, at least on Win10")
     @Test
-    public void testWhitelistedTypes() {
+    public void testAllowlistedTypes() {
         Set<Class<?>> allTypes = typeRegistry.getSubtypesOf(Object.class);
-        for (Class<?> whitelisted : ExternalApiWhitelist.CLASSES) {
-            assumeTrue(allTypes.contains(whitelisted), () -> allTypes.toString() + " should contain " + whitelisted.getName());
+        for (Class<?> allowlisted : ExternalApiAllowlist.CLASSES) {
+            assumeTrue(allTypes.contains(allowlisted), () -> allTypes.toString() + " should contain " + allowlisted.getName());
         }
     }
 }
