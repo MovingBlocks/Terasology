@@ -1,0 +1,43 @@
+name: wy CI Pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  wy-build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17 for Terasology
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Extract Natives and Config
+        run: ./gradlew extractNatives extractConfig --no-daemon
+
+      - name: Build Project (Assemble)
+        run: ./gradlew assemble --no-daemon
+
+      - name: Execute Test Suite
+        run: ./gradlew test --no-daemon
+
+      - name: Archive Test Results (wy)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wy-test-reports
+          path: |
+            **/build/reports/tests/test/
+            **/build/test-results/test/
