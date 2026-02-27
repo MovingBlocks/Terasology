@@ -85,6 +85,10 @@ dependencies {
     }
 
     // See terasology-metrics for other test-only internal dependencies
+
+    // part 5
+    testImplementation("org.mockito:mockito-core:5.10.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
 }
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
