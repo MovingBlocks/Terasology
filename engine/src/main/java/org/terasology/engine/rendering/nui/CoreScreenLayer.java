@@ -58,14 +58,24 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private boolean activateBindEvent;
 
-    private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
+    // part 5
+    // private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
+    private MenuAnimationSystem animationSystem;
 
     public CoreScreenLayer() {
     }
 
     public CoreScreenLayer(String id) {
         super(id);
+        this.animationSystem = new MenuAnimationSystemStub(); // part 5
     }
+
+    // part 5
+    public CoreScreenLayer(String id, MenuAnimationSystem animationSystem) {
+        super(id);
+        this.animationSystem = animationSystem;
+    }
+
 
     public int getDepth() {
         return depth;
