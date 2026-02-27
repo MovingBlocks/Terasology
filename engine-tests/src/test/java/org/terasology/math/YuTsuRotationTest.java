@@ -4,6 +4,8 @@
 package org.terasology.math;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.terasology.engine.math.Pitch;
 import org.terasology.engine.math.Roll;
 import org.terasology.engine.math.Rotation;
@@ -15,7 +17,9 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class YuTsuRotationTest {
 
     @Test
@@ -150,4 +154,35 @@ public class YuTsuRotationTest {
         assertTrue(seen.size() <= 24);
         assertEquals(24, seen.size(), "All transformations should still collapse to 24 unique mappings");
     }
+
+    interface RotationLike {
+        Side rotate(Side side);
+    }
+
+    static class StubRotation implements RotationLike {
+        @Override
+        public Side rotate(Side side) {
+            return Side.TOP;
+        }
+    }
+
+    @Test
+    public void testStubRotationAlwaysTop() {
+        RotationLike stub = new StubRotation();
+        assertEquals(Side.TOP, stub.rotate(Side.FRONT));
+        assertEquals(Side.TOP, stub.rotate(Side.LEFT));
+    }
+
+    @Test
+    public void testMockRotationInteraction() {
+        Rotation mockRotation = mock(Rotation.class);
+
+        when(mockRotation.rotate(Side.FRONT)).thenReturn(Side.TOP);
+
+        Side result = mockRotation.rotate(Side.FRONT);
+        assertEquals(Side.TOP, result);
+
+        verify(mockRotation, times(1)).rotate(Side.FRONT);
+    }
 }
+
