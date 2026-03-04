@@ -115,6 +115,38 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }
 
+    /**
+     * Draws a texture with rotation support.
+     * This method draws a texture using the billboard mesh with the given rotation.
+     *
+     * @param texture the texture region to draw
+     * @param region the region to draw in (in UI coordinates)
+     * @param rotation the rotation to apply (as quaternion)
+     * @param offset the offset from the center of the region
+     * @param scale the scale factor
+     * @param alpha the alpha value (0-1)
+     */
+    public void drawTexture(UITextureRegion texture, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
+        Rectanglei drawRegion = relativeToAbsolute(region);
+        if (!state.cropRegion.intersectsRectangle(drawRegion)) {
+            return;
+        }
+
+        // Use the billboard mesh from the renderer
+        Mesh billboard = ((TerasologyCanvasRenderer) renderer).getBillboardMesh();
+        meshMat.setTexture("tex", ((TextureRegion) texture).getTexture());
+
+        // Store and restore alpha
+        float previousAlpha = state.getAlpha();
+        state.setAlpha(state.getAlpha() * alpha);
+
+        ((TerasologyCanvasRenderer) renderer).drawMesh(
+                billboard, meshMat, drawRegion, drawRegion.intersection(state.cropRegion),
+                rotation, offset, scale, state.getAlpha());
+
+        state.setAlpha(previousAlpha);
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {

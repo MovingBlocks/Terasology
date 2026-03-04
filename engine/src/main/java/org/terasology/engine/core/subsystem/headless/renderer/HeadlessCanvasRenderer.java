@@ -86,4 +86,10 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     public void setUiScale(float uiScale) {
         // Do nothing
     }
+
+    @Override
+    public Mesh getBillboardMesh() {
+        // Headless renderer - return null
+        return null;
+    }
 }

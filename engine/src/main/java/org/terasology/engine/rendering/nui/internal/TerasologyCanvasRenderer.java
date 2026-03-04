@@ -19,4 +19,10 @@ public interface TerasologyCanvasRenderer extends CanvasRenderer {
                   Quaternionfc rotation, Vector3fc offset, float scale, float alpha);
 
     void drawMaterialAt(Material material, Rectanglei drawRegion);
+
+    /**
+     * Returns the billboard mesh used for texture rendering.
+     * @return the billboard mesh
+     */
+    Mesh getBillboardMesh();
 }

@@ -653,4 +653,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             return Objects.hash(textureSize, areaSize, border, tiled);
         }
     }
+
+    @Override
+    public Mesh getBillboardMesh() {
+        return billboard;
+    }
 }
