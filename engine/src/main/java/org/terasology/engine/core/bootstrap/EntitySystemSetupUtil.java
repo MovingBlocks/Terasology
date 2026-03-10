@@ -129,7 +129,7 @@ public final class EntitySystemSetupUtil {
         RecordingClasses recordingClasses = new RecordingClasses(createSelectedClassesToRecordList());
         serviceRegistry.with(RecordingClasses.class).lifetime(Lifetime.Singleton).use(() -> recordingClasses);
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
-            serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(EventSystemImpl.class);
+            serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(NetworkEventSystemWrapped.class);
         } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             serviceRegistry.with(EventSystem.class).lifetime(Lifetime.Singleton).use(EventSystemReplayImpl.class);
         } else {
@@ -169,6 +169,14 @@ public final class EntitySystemSetupUtil {
         //selectedClassesToRecord.add(AttackEvent.class);
         //selectedClassesToRecord.add(GetMaxSpeedEvent.class);
         return selectedClassesToRecord;
+    }
+
+    public static final class NetworkEventSystemWrapped extends NetworkEventSystemDecorator {
+        @Inject
+        public NetworkEventSystemWrapped(NetworkSystem networkSystem, EntitySystemLibrary entitySystemLibrary) {
+            super(new EventSystemImpl(networkSystem.getMode().isAuthority()),
+                            networkSystem, entitySystemLibrary.getEventLibrary());
+        }
     }
 
     public static final class RecordingEventSystemWrapped extends RecordingEventSystemDecorator {

@@ -219,6 +219,8 @@ public class TerasologyEngine implements GameEngine {
         addToClassesOnClasspathsToAddToEngine(UIWidget.class);
         // register gestalt asset classes with engine module
         addToClassesOnClasspathsToAddToEngine(ResourceUrn.class);
+        // register gestalt entity-system classes with engine module
+        addToClassesOnClasspathsToAddToEngine(org.terasology.gestalt.entitysystem.prefab.GeneratedFromRecipeComponent.class);
     }
 
     /**

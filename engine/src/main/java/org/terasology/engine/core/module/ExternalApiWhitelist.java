@@ -51,6 +51,7 @@ public final class ExternalApiWhitelist {
     private static final Set<String> GESTALT_ECS_PACKAGES = new ImmutableSet.Builder<String>()
             .add("org.terasology.gestalt.entitysystem.component")
             .add("org.terasology.gestalt.entitysystem.event")
+            .add("org.terasology.gestalt.entitysystem.prefab")
             .build();
 
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
