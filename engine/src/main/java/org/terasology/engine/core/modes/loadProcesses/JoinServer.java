@@ -120,7 +120,8 @@ public class JoinServer extends VariableStepLoadProcess {
             context.get(Game.class).load(gameManifest);
 
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            ContextImpl modulesContext = new ContextImpl(context, moduleManager.getEnvironment().getBeans(BeanContext.class).stream().findFirst().get());
+            ContextImpl modulesContext = new ContextImpl(context,
+                    moduleManager.getEnvironment().getBeans(BeanContext.class).stream().findFirst().get());
             ServiceRegistry gameContextRegistry = new ServiceRegistry();
             applyModuleThread = new Thread(() -> {
                 environmentSwitchHandler.handleSwitchToGameEnvironment(modulesContext, gameContextRegistry);

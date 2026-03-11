@@ -51,7 +51,9 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
         context = new ContextImpl(context, serviceRegistry);
-        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class), context.get(EntitySystemLibrary.class), moduleManager.getEnvironment(), (EngineEntityManager) context.get(EntityManager.class));
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(
+                context.get(TypeHandlerLibrary.class), context.get(EntitySystemLibrary.class),
+                moduleManager.getEnvironment(), (EngineEntityManager) context.get(EntityManager.class));
 
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime, context);

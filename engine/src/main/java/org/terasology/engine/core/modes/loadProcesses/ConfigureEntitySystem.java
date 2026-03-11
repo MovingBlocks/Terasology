@@ -1,4 +1,4 @@
-// Copyright The Terasology Foundation
+// Copyright 2026 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;

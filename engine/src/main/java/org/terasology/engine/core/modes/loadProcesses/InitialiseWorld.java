@@ -76,19 +76,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         return "Initializing world...";
     }
 
-    /**
-     * This work-around exists because you cannot easily have two instances of {@link WorldProviderCore} in the context at a given time.
-     * One of these instances exists purely to wrap the other, so we instantiate both at the same time here to leave only one instance.
-     */
-    public static final class WorldProviderCoreWorkAround extends EntityAwareWorldProvider
-            implements WorldProviderCore, BlockEntityRegistry {
-        @Inject
-        public WorldProviderCoreWorkAround(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager,
-                                           EntityManager entityManager, ComponentSystemManager componentSystemManager) {
-            super(new WorldProviderCoreImpl(info, chunkProvider, blockManager, entityManager), entityManager, componentSystemManager);
-        }
-    }
-
     @Override
     public boolean step() {
         serviceRegistry.with(WorldGeneratorPluginLibrary.class).lifetime(Lifetime.Singleton).use(DefaultWorldGeneratorPluginLibrary.class);
@@ -163,5 +150,18 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public int getExpectedCost() {
         return 5;
+    }
+
+    /**
+     * This work-around exists because you cannot easily have two instances of {@link WorldProviderCore} in the context at a given time.
+     * One of these instances exists purely to wrap the other, so we instantiate both at the same time here to leave only one instance.
+     */
+    public static final class WorldProviderCoreWorkAround extends EntityAwareWorldProvider
+            implements WorldProviderCore, BlockEntityRegistry {
+        @Inject
+        public WorldProviderCoreWorkAround(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager,
+                                           EntityManager entityManager, ComponentSystemManager componentSystemManager) {
+            super(new WorldProviderCoreImpl(info, chunkProvider, blockManager, entityManager), entityManager, componentSystemManager);
+        }
     }
 }
