@@ -341,7 +341,7 @@ public class StorageManagerTest {
         assertTrue(character.isActive());
     }
 
-    static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
+    public static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
         @Inject
         public EnableWritingSaveGames() {
         }

@@ -19,7 +19,6 @@ import org.terasology.engine.core.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.core.modes.loadProcesses.ConfigureEntitySystem;
 import org.terasology.engine.core.modes.loadProcesses.CreateRemoteWorldEntity;
 import org.terasology.engine.core.modes.loadProcesses.CreateWorldEntity;
-import org.terasology.engine.core.modes.loadProcesses.EnsureSaveGameConsistency;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseBlockTypeEntities;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseBlocks;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseCommandSystem;

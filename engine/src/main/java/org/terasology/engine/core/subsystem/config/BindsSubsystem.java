@@ -52,13 +52,13 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
     @Inject
     protected BindsConfiguration bindsConfiguration;
-    private BindsConfiguration defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
-    private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
-    private List<BindableButton> buttonBinds = Lists.newArrayList();
     @Inject
     protected Optional<ModuleManager> moduleManager;
     @Inject
     protected Optional<Config> config;
+    private BindsConfiguration defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
+    private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
+    private List<BindableButton> buttonBinds = Lists.newArrayList();
     private Map<String, BindableRealAxis> axisLookup = Maps.newHashMap();
     private List<AbstractBindableAxis> axisBinds = Lists.newArrayList();
 

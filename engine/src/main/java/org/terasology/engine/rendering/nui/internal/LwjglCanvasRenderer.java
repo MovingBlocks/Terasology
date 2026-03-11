@@ -18,7 +18,6 @@ import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
 import org.terasology.engine.rendering.assets.material.Material;

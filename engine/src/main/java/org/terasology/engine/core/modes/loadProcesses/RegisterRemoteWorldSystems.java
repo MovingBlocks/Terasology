@@ -9,11 +9,9 @@ import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
-import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.sun.CelestialSystem;
 
 public class RegisterRemoteWorldSystems extends SingleStepLoadProcess {

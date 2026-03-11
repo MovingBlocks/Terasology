@@ -14,7 +14,6 @@ import org.terasology.engine.audio.nullAudio.NullStreamingSound;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.PathManager;
@@ -44,7 +43,6 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGr
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.recording.CharacterStateEventPositionMap;
-import org.terasology.engine.recording.DirectionAndOriginPosRecorder;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;

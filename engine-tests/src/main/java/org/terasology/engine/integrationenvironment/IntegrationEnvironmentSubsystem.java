@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 
-final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
+public final class IntegrationEnvironmentSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationEnvironmentSubsystem.class);
 
     @Inject

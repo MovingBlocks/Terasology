@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.physics.Physics;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.PhysicsEngineManager;
 import org.terasology.gestalt.di.ServiceRegistry;
 

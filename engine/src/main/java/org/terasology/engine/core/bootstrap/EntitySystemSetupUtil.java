@@ -119,6 +119,7 @@ public final class EntitySystemSetupUtil {
      * <li>{@link PrefabManager}</li>
      * <li>{@link EventSystem}</li>
      * </ul>
+     * @deprecated Retained only for compatibility - use {@link #addEntityManagementRelatedClasses(ServiceRegistry)} instead.
      */
     @Deprecated
     public static void addEntityManagementRelatedClasses(Context context, ServiceRegistry serviceRegistry) {

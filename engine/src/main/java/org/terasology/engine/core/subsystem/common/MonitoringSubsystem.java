@@ -18,7 +18,6 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.monitoring.gui.AdvancedMonitor;
-import org.terasology.gestalt.di.ServiceRegistry;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -27,12 +26,12 @@ public class MonitoringSubsystem implements EngineSubsystem {
 
     public static final Duration JMX_INTERVAL = Duration.ofSeconds(5);
 
-    private AdvancedMonitor advancedMonitor;
-
     @Inject
     protected SystemConfig systemConfig;
     @Inject
     protected Time time;
+
+    private AdvancedMonitor advancedMonitor;
 
     @Inject
     public MonitoringSubsystem() {
