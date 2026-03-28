@@ -19,6 +19,13 @@ plugins {
     id("facade")
 }
 
+repositories {
+    maven {
+        name = "JitPack"
+        url = uri("https://jitpack.io")
+    }
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply(from = "$rootDir/config/gradle/publish.gradle")
 
@@ -64,6 +71,7 @@ dependencies {
 
     implementation(project(":engine"))
     implementation(project(":subsystems:DiscordRPC"))
+    implementation(project(":subsystems:Nakama"))
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu

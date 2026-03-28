@@ -314,6 +314,7 @@ public final class Terasology implements Callable<Integer> {
                     .add(new LwjglInput())
                     .add(new BindsSubsystem());
             builder.add(new DiscordRPCSubSystem());
+            builder.add(new org.terasology.subsystem.nakama.NakamaSubSystem());
         }
         builder.add(new HibernationSubsystem());
     }
