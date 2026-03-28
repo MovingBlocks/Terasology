@@ -28,3 +28,18 @@ dependencies {
 
     api("com.github.heroiclabs.nakama-java:nakama-java:2.5.3")
 }
+
+tasks.named<Test>("test") {
+    // Exclude integration tests by default — they need a running Nakama server
+    useJUnitPlatform {
+        if (!project.hasProperty("includeTags")) {
+            excludeTags("integration")
+        } else {
+            includeTags(project.property("includeTags") as String)
+        }
+    }
+    // Pass nakama.test.* system properties through to the test JVM
+    System.getProperties().entries
+        .filter { (it.key as String).startsWith("nakama.test.") }
+        .forEach { systemProperty(it.key as String, it.value) }
+}

@@ -10,7 +10,8 @@ package org.terasology.subsystem.nakama;
 public class NakamaConfig {
     private boolean enabled = false;
     private String host = "localhost";
-    private int port = 7349;
+    private int grpcPort = 7349;
+    private int wsPort = 7350;
     private String channel = "bifrost.lobby";
     private String playerName = "";
 
@@ -20,8 +21,20 @@ public class NakamaConfig {
     public String getHost() { return host; }
     public void setHost(String host) { this.host = host; }
 
-    public int getPort() { return port; }
-    public void setPort(int port) { this.port = port; }
+    /** gRPC port for API calls (auth, account). Default: 7349. */
+    public int getGrpcPort() { return grpcPort; }
+    public void setGrpcPort(int grpcPort) { this.grpcPort = grpcPort; }
+
+    /** @deprecated Use {@link #getGrpcPort()}. Kept for backwards compatibility. */
+    @Deprecated
+    public int getPort() { return grpcPort; }
+    /** @deprecated Use {@link #setGrpcPort(int)}. */
+    @Deprecated
+    public void setPort(int port) { this.grpcPort = port; }
+
+    /** WebSocket port for realtime (chat, presence). Default: 7350. */
+    public int getWsPort() { return wsPort; }
+    public void setWsPort(int wsPort) { this.wsPort = wsPort; }
 
     public String getChannel() { return channel; }
     public void setChannel(String channel) { this.channel = channel; }
@@ -37,7 +50,8 @@ public class NakamaConfig {
         NakamaConfig config = new NakamaConfig();
         config.setEnabled(Boolean.parseBoolean(System.getProperty("nakama.enabled", "false")));
         config.setHost(System.getProperty("nakama.host", "localhost"));
-        config.setPort(Integer.parseInt(System.getProperty("nakama.port", "7349")));
+        config.setGrpcPort(Integer.parseInt(System.getProperty("nakama.grpcPort", "7349")));
+        config.setWsPort(Integer.parseInt(System.getProperty("nakama.wsPort", "7350")));
         config.setChannel(System.getProperty("nakama.channel", "bifrost.lobby"));
         config.setPlayerName(System.getProperty("nakama.playerName", ""));
         return config;

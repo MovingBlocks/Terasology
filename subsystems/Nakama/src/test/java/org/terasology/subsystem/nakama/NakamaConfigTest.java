@@ -12,6 +12,7 @@ class NakamaConfigTest {
         NakamaConfig config = new NakamaConfig();
         assertFalse(config.isEnabled());
         assertEquals("bifrost.lobby", config.getChannel());
-        assertEquals(7349, config.getPort());
+        assertEquals(7349, config.getGrpcPort());
+        assertEquals(7350, config.getWsPort());
     }
 }

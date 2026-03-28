@@ -71,12 +71,13 @@ public class NakamaSubSystem implements EngineSubsystem {
     private void connect() {
         try {
             String deviceId = getOrCreateDeviceId();
-            // DefaultClient(serverKey, host, port, ssl) — port is HTTP/WebSocket port
-            client = new DefaultClient("defaultkey", config.getHost(), config.getPort(), false);
+            // DefaultClient uses gRPC for API calls (auth, etc.)
+            client = new DefaultClient("defaultkey", config.getHost(), config.getGrpcPort(), false);
             session = client.authenticateDevice(deviceId).get();
             logger.info("Nakama: authenticated as {}", session.getUserId());
 
-            socket = client.createSocket();
+            // createSocket uses WebSocket for realtime — may be a different port via NodePort
+            socket = client.createSocket(config.getHost(), config.getWsPort(), false);
             socket.connect(session, new AbstractSocketListener() {
                 @Override
                 public void onChannelMessage(ChannelMessage message) {
