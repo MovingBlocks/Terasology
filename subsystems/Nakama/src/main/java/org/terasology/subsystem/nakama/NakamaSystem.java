@@ -7,6 +7,7 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.chat.ChatMessageEvent;
+import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
@@ -25,7 +26,12 @@ public class NakamaSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onChatMessage(ChatMessageEvent event, EntityRef entity) {
         if (nakamaSubSystem != null && nakamaSubSystem.isConnected()) {
-            String playerName = event.getFrom().toString();
+            EntityRef from = event.getFrom();
+            String playerName = "Unknown";
+            DisplayNameComponent displayName = from.getComponent(DisplayNameComponent.class);
+            if (displayName != null) {
+                playerName = displayName.name;
+            }
             nakamaSubSystem.sendChatMessage(playerName, event.getMessage());
         }
     }

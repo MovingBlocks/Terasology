@@ -18,7 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.CoreMessageType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 /**
@@ -47,6 +51,10 @@ public class NakamaSubSystem implements EngineSubsystem {
     private SocketClient socket;
     private Channel channel;
 
+    // Thread-safe queue for incoming messages — drained on the game thread in preUpdate
+    private final ConcurrentLinkedQueue<String> incomingMessages = new ConcurrentLinkedQueue<>();
+    private Console console;
+
     // Callback for incoming messages — set by the engine/module that handles chat display
     private Consumer<String> incomingMessageHandler;
 
@@ -61,8 +69,12 @@ public class NakamaSubSystem implements EngineSubsystem {
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         autoConfig = rootContext.get(NakamaAutoConfig.class);
-        if (autoConfig == null || !autoConfig.enabled.get()) {
-            logger.info("Nakama subsystem disabled (enable in Nakama config file)");
+        if (autoConfig == null) {
+            logger.warn("Nakama subsystem: NakamaAutoConfig not found in context — AutoConfig discovery may have failed");
+            return;
+        }
+        if (!autoConfig.enabled.get()) {
+            logger.info("Nakama subsystem disabled (set enabled=true in config file)");
             return;
         }
         connect();
@@ -106,6 +118,9 @@ public class NakamaSubSystem implements EngineSubsystem {
             String prefix = "[" + GAME_PREFIXES.getOrDefault(game,
                     game.toUpperCase().substring(0, Math.min(game.length(), 2))) + "]";
             String formatted = prefix + " " + player + ": " + text;
+
+            logger.info("Nakama chat: {}", formatted);
+            incomingMessages.add(formatted);
 
             if (incomingMessageHandler != null) {
                 suppressOutbound = true;
@@ -164,12 +179,23 @@ public class NakamaSubSystem implements EngineSubsystem {
         if (autoConfig == null || !autoConfig.enabled.get() || !isConnected()) {
             return;
         }
-        // Inbound: inject Nakama messages into the local chat system
-        setIncomingMessageHandler(formatted -> {
-            // For POC, log to the game log. Full chat injection requires
-            // accessing the NUI ChatBox or sending a synthetic ChatMessageEvent.
-            logger.info("Nakama chat: {}", formatted);
-        });
+        console = context.get(Console.class);
+    }
+
+    @Override
+    public void preUpdate(GameState currentState, float delta) {
+        String msg;
+        while ((msg = incomingMessages.poll()) != null) {
+            // Lazily resolve console — it's only available once a game world is loaded
+            if (console == null) {
+                console = currentState.getContext().get(Console.class);
+            }
+            if (console != null) {
+                console.addMessage(msg, CoreMessageType.CHAT);
+            } else {
+                logger.info("Nakama chat (no console yet): {}", msg);
+            }
+        }
     }
 
     public boolean isConnected() {
