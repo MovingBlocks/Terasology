@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.PathManagerProvider;
@@ -107,7 +108,9 @@ public class Engines {
         }
         ScreenGrabber grabber = Mockito.mock(ScreenGrabber.class);
         hostContext.put(ScreenGrabber.class, grabber);
-        CoreRegistry.put(GameEngine.class, host);
+        Context coreContextOverride = new ContextImpl(CoreRegistry.get(Context.class));
+        coreContextOverride.put(GameEngine.class, host);
+        CoreRegistry.setContext(coreContextOverride);
     }
 
     /**
@@ -295,16 +298,18 @@ public class Engines {
      * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
      */
     boolean connectToHost(TerasologyEngine client, MainLoop mainLoop) {
-        CoreRegistry.put(Config.class, client.getFromEngineContext(Config.class));
+        Context coreContextOverride = client.createChildContext();
+        CoreRegistry.setContext(coreContextOverride);
+        coreContextOverride.put(Config.class, client.getFromEngineContext(Config.class));
         JoinStatus joinStatus = null;
         try {
-            joinStatus = client.getFromEngineContext(NetworkSystem.class).join("localhost", 25777);
+            joinStatus = coreContextOverride.get(NetworkSystem.class).join("localhost", 25777);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while joining: ", e);
         }
 
         client.changeState(new StateLoading(joinStatus));
-        CoreRegistry.put(GameEngine.class, client);
+        coreContextOverride.put(GameEngine.class, client);
 
         // TODO: subscribe to state change and return an asynchronous result
         //     so that we don't need to pass mainLoop to here.

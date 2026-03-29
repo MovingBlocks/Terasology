@@ -17,6 +17,7 @@ import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
@@ -52,7 +53,13 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
             try {
                 if (Modifier.isPrivate(field.getModifiers())) {
-                    val = ReflectionUtil.findGetter(field).invoke(value);
+                    Method getter = ReflectionUtil.findGetter(field);
+                    if (getter != null) {
+                        val = getter.invoke(value);
+                    } else {
+                        logger.error("Field {} is inaccessible - private and has no getter.", field);
+                        continue;
+                    }
                 } else {
                     val = field.get(value);
                 }

@@ -7,11 +7,16 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.config.Config;
+import org.terasology.context.Lifetime;
+import org.terasology.engine.config.flexible.AutoConfigManager;
+import org.terasology.engine.config.flexible.AutoConfigTypeHandlerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.context.internal.ImmutableContextImpl;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
@@ -37,11 +42,16 @@ import org.terasology.engine.monitoring.Activity;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedData;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.engine.recording.CharacterStateEventPositionMap;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.rendering.gltf.ByteBufferAsset;
 import org.terasology.engine.version.TerasologyVersion;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
@@ -56,9 +66,11 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.ModuleTypeRegistry;
@@ -127,14 +139,22 @@ public class TerasologyEngine implements GameEngine {
     private volatile boolean running;
 
     private TimeSubsystem timeSubsystem;
+    private ConfigurationSubsystem configurationSubsystem;
     private Deque<EngineSubsystem> allSubsystems;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private boolean initialisedAlready;
 
     /**
-     * Contains objects that live for the duration of this engine.
+     * Contains objects that live for the duration of this application.
      */
-    private Context rootContext;
+    private ImmutableContextImpl rootContext;
+    /**
+     * Contains objects that live for the duration of this game instance.
+     */
+    private ContextImpl gameContext;
+
+    private ServiceRegistry rootContextRegistry;
+    private ServiceRegistry gameContextRegistry;
 
     /**
      * This constructor initializes the engine by initializing its systems, subsystems and managers. It also verifies
@@ -148,19 +168,20 @@ public class TerasologyEngine implements GameEngine {
         PathManager.getInstance();
         Bullet.init(true, false);
 
-        this.rootContext = new ContextImpl();
-        rootContext.put(GameEngine.class, this);
+        this.rootContextRegistry = new ServiceRegistry();
+        rootContextRegistry.with(GameEngine.class).lifetime(Lifetime.Singleton).use(() -> this);
+        this.gameContextRegistry = new ServiceRegistry();
         this.timeSubsystem = timeSubsystem;
 
         //Record and Replay classes
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
-        rootContext.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
+        rootContextRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> recordAndReplayCurrentStatus);
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
-        rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
+        rootContextRegistry.with(RecordAndReplayUtils.class).lifetime(Lifetime.Singleton).use(() -> recordAndReplayUtils);
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
-        rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
+        rootContextRegistry.with(CharacterStateEventPositionMap.class).lifetime(Lifetime.Singleton).use(() -> characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
+        rootContextRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -170,7 +191,9 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.setContext(rootContext);
 
         this.allSubsystems = Queues.newArrayDeque();
-        this.allSubsystems.add(new ConfigurationSubsystem());
+        configurationSubsystem = new ConfigurationSubsystem();
+        this.allSubsystems.add(new I18nSubsystem());
+        this.allSubsystems.add(configurationSubsystem);
         this.allSubsystems.add(timeSubsystem);
         this.allSubsystems.addAll(subsystems);
         this.allSubsystems.add(new MonitoringSubsystem());
@@ -179,7 +202,6 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new NetworkSubsystem());
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
-        this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
 
         for (EngineSubsystem subsystem : allSubsystems) {
@@ -197,6 +219,8 @@ public class TerasologyEngine implements GameEngine {
         addToClassesOnClasspathsToAddToEngine(UIWidget.class);
         // register gestalt asset classes with engine module
         addToClassesOnClasspathsToAddToEngine(ResourceUrn.class);
+        // register gestalt entity-system classes with engine module
+        addToClassesOnClasspathsToAddToEngine(org.terasology.gestalt.entitysystem.prefab.GeneratedFromRecipeComponent.class);
     }
 
     /**
@@ -217,6 +241,9 @@ public class TerasologyEngine implements GameEngine {
                 logger.info("Initializing Terasology...");
                 logEnvironmentInfo();
 
+                EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
+                rootContextRegistry.with(EnvironmentSwitchHandler.class).lifetime(Lifetime.Singleton).use(() -> environmentSwitcher);
+
                 // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as
                 //  possible.
                 GameThread.setToCurrentThread();
@@ -225,15 +252,32 @@ public class TerasologyEngine implements GameEngine {
 
                 initManagers();
 
+                // Register the context with the context before creating the context.
+                // If this seems confusing, it is. We are taking advantage of the fact that context registrations use a callback that
+                // is invoked when a class is first requested,
+                // so that the requested instance does not need to exist at the time of registration.
+                rootContextRegistry.with(Context.class).use(() -> rootContext);
+                rootContextRegistry.with(ContextImpl.class).use(() -> rootContext);
+                rootContextRegistry.with(GameEngine.class).lifetime(Lifetime.Singleton).use(() -> this);
+                rootContext = new ImmutableContextImpl(rootContextRegistry);
+                // TODO: Remove CoreRegistry altogether.
+                CoreRegistry.setContext(rootContext);
+
                 initSubsystems();
 
                 changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
                 initAssets();
 
-                EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
-                rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
-
-                environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
+                environmentSwitcher.handleSwitchToGameEnvironment(rootContext, gameContextRegistry);
+                // Register the context with the context before creating the context.
+                // If this seems confusing, it is. We are taking advantage of the fact that context registrations use a callback that
+                // is invoked when a class is first requested,
+                // so that the requested instance does not need to exist at the time of registration.
+                gameContextRegistry.with(Context.class).use(() -> gameContext);
+                gameContextRegistry.with(ContextImpl.class).use(() -> gameContext);
+                gameContext = new ContextImpl(rootContext, gameContextRegistry);
+                // TODO: Remove CoreRegistry altogether.
+                CoreRegistry.setContext(gameContext);
 
                 postInitSubsystems();
 
@@ -289,7 +333,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(TerasologyEngineStatus.PREPARING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Pre-initialising " + subsystem.getName() + " subsystem");
-            subsystem.preInitialise(rootContext);
+            subsystem.preInitialise(rootContextRegistry);
         }
     }
 
@@ -297,7 +341,8 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
-            subsystem.initialise(this, rootContext);
+            rootContext.inject(subsystem);
+            subsystem.initialise(this, gameContextRegistry);
         }
     }
 
@@ -307,7 +352,8 @@ public class TerasologyEngine implements GameEngine {
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Post-Initialising " + subsystem.getName() + " subsystem");
-            subsystem.postInitialise(rootContext);
+            gameContext.inject(subsystem);
+            subsystem.postInitialise(gameContext);
         }
     }
 
@@ -318,7 +364,7 @@ public class TerasologyEngine implements GameEngine {
      * @throws IllegalStateException Details the required system that has not been registered.
      */
     private void verifyRequiredSystemIsRegistered(Class<?> clazz) {
-        if (rootContext.get(clazz) == null) {
+        if (gameContext.get(clazz) == null) {
             throw new IllegalStateException(clazz.getSimpleName() + " not registered as a core system.");
         }
     }
@@ -330,28 +376,40 @@ public class TerasologyEngine implements GameEngine {
                 ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
 
-        ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class),
-                classesOnClasspathsToAddToEngine);
+        ModuleManager moduleManager = new ModuleManager(configurationSubsystem.getConfig(), classesOnClasspathsToAddToEngine);
         ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
-        rootContext.put(ModuleTypeRegistry.class, typeRegistry);
-        rootContext.put(TypeRegistry.class, typeRegistry);
-        rootContext.put(ModuleManager.class, moduleManager);
+        rootContextRegistry.with(ModuleTypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        rootContextRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        rootContextRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        rootContext.put(ReflectFactory.class, reflectFactory);
+        rootContextRegistry.with(ReflectFactory.class).lifetime(Lifetime.Singleton).use(() -> reflectFactory);
 
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
+        rootContextRegistry.with(CopyStrategyLibrary.class).lifetime(Lifetime.Singleton).use(() -> copyStrategyLibrary);
 
-        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager,
-                typeRegistry));
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
+        rootContextRegistry.with(TypeHandlerLibrary.class).lifetime(Lifetime.Singleton).use(() -> typeHandlerLibrary);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Serializer<GsonPersistedData> serializer = new Serializer<>(
+                typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
+                new GsonPersistedDataWriter(gson),
+                new GsonPersistedDataReader(gson)
+        );
+        AutoConfigManager autoConfigManager = new AutoConfigManager(serializer);
+        typeHandlerLibrary.addTypeHandlerFactory(new AutoConfigTypeHandlerFactory(typeHandlerLibrary));
+        rootContextRegistry.with(AutoConfigManager.class).lifetime(Lifetime.Singleton).use(() -> autoConfigManager);
+
+        autoConfigManager.loadConfigsIn(moduleManager.getEnvironment(), rootContextRegistry);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new AutoReloadAssetTypeManager();
-        rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
-        rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
+        rootContextRegistry.with(ModuleAwareAssetTypeManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager);
+        rootContextRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
     }
 
     private void initAssets() {
@@ -423,7 +481,6 @@ public class TerasologyEngine implements GameEngine {
         initialize();
 
         try {
-            rootContext.put(GameEngine.class, this);
             changeState(initialState);
         } catch (Throwable e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);
@@ -504,7 +561,7 @@ public class TerasologyEngine implements GameEngine {
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
         CoreRegistry.setContext(currentState.getContext());
-        rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
+        gameContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
             try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
@@ -600,12 +657,22 @@ public class TerasologyEngine implements GameEngine {
         if (currentState != null) {
             currentState.dispose();
         }
-        CoreRegistry.setContext(newState.getContext());
+
         currentState = newState;
         LoggingContext.setGameState(newState);
         newState.init(this);
+
+        Context stateContext = newState.getContext();
+        CoreRegistry.setContext(newState.getContext());
+        for (EngineSubsystem subsystem : getSubsystems()) {
+            if (stateContext != null) {
+                ((ContextImpl) stateContext).inject(subsystem);
+                InjectionHelper.inject(subsystem, stateContext);
+            }
+        }
+
         stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
-        InputSystem inputSystem = rootContext.get(InputSystem.class);
+        InputSystem inputSystem = gameContext.get(InputSystem.class);
         if (inputSystem != null) {
             inputSystem.drainQueues();
         }
@@ -642,7 +709,17 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public Context createChildContext() {
-        return new ContextImpl(rootContext);
+        return new ContextImpl(gameContext);
+    }
+
+    @Override
+    public Context createChildContext(ServiceRegistry serviceRegistry) {
+        return new ContextImpl(gameContext, serviceRegistry);
+    }
+
+    @Override
+    public Context createImmutableChildContext(ServiceRegistry serviceRegistry) {
+        return new ImmutableContextImpl(gameContext, serviceRegistry);
     }
 
     /**

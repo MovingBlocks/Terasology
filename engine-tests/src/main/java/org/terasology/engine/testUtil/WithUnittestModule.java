@@ -3,11 +3,17 @@
 
 package org.terasology.engine.testUtil;
 
+import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
+
+import javax.inject.Inject;
 
 /**
  * This subsystem registers the {@code unittest} module containing stub component classes with the {@link ModuleManager} before the engine
@@ -21,20 +27,32 @@ import org.terasology.gestalt.module.Module;
  * in the environment — and then things might break with an unclear error again.
  */
 public class WithUnittestModule implements EngineSubsystem {
+    @Inject
+    protected ModuleManager moduleManager;
+
+    @Inject
+    public WithUnittestModule() {
+    }
+
     @Override
     public String getName() {
         return "Unittest";
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        EngineSubsystem.super.initialise(engine, rootContext);
-        ModuleManager manager = rootContext.get(ModuleManager.class);
-        registerUnittestModule(manager);
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
+        EngineSubsystem.super.initialise(engine, serviceRegistry);
+        registerUnittestModule(moduleManager);
     }
 
     public static void registerUnittestModule(ModuleManager manager) {
         Module unittestModule = manager.registerPackageModule("org.terasology.unittest");
-        manager.resolveAndLoadEnvironment(unittestModule.getId());
+        manager.resolveAndLoadEnvironment(new ContextImpl(), unittestModule.getId());
+    }
+
+    @Override
+    public void postInitialise(Context context) {
+        EngineSubsystem.super.postInitialise(context);
+        context.get(Config.class).getDefaultModSelection().addModule(new Name("unittest"));
     }
 }

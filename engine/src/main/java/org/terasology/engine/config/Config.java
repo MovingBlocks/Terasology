@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
@@ -54,10 +53,7 @@ public final class Config {
 
     private RootConfig config;
 
-    private Context context;
-
-    public Config(Context context) {
-        this.context = context;
+    public Config() {
     }
 
     public PermissionConfig getPermission() {

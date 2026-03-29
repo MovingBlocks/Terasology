@@ -6,7 +6,9 @@ package org.terasology.engine.network.internal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
@@ -16,12 +18,14 @@ import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
 import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.world.BlockEntityRegistry;
-
+import org.terasology.gestalt.di.ServiceRegistry;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -41,14 +45,21 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     public void setup() throws Exception {
         super.setup();
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        context.put(ModuleManager.class, moduleManager);
+
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        serviceRegistry.with(ServerConnectListManager.class).lifetime(Lifetime.Singleton).use(ServerConnectListManager.class);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
+        context = new ContextImpl(context, serviceRegistry);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(
+                context.get(TypeHandlerLibrary.class), context.get(EntitySystemLibrary.class),
+                moduleManager.getEnvironment(), (EngineEntityManager) context.get(EntityManager.class));
+
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime, context);
         networkSystem.setContext(context);
         context.put(NetworkSystem.class, networkSystem);
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = (PojoEntityManager) context.get(EntityManager.class);
         context.put(ComponentSystemManager.class, new ComponentSystemManager(context));
         entityManager.clear();
@@ -61,7 +72,6 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         networkSystem.mockHost();
         networkSystem.connectToEntitySystem(entityManager, context.get(EventLibrary.class), mock(BlockEntityRegistry.class));
         networkSystem.registerNetworkEntity(clientEntity);
-        context.put(ServerConnectListManager.class, new ServerConnectListManager(context));
     }
 
     private void connectClient() {

@@ -12,6 +12,7 @@ import org.joml.Vector4f;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.flexible.AutoConfigManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
@@ -25,13 +26,13 @@ import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandlerFactory;
-import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
@@ -74,45 +75,40 @@ public final class EnvironmentSwitchHandler {
     public EnvironmentSwitchHandler() {
     }
 
-    public void handleSwitchToGameEnvironment(Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
+    public void handleSwitchToGameEnvironment(Context engineContext, ServiceRegistry gameContextRegistry) {
+        ModuleManager moduleManager = engineContext.get(ModuleManager.class);
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
-        ModuleTypeRegistry typeRegistry = context.get(ModuleTypeRegistry.class);
+        ModuleTypeRegistry typeRegistry = engineContext.get(ModuleTypeRegistry.class);
         typeRegistry.reload(environment);
 
-        CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
+        CopyStrategyLibrary copyStrategyLibrary = engineContext.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
 
         for (CopyStrategyEntry<?> entry : typesWithCopyConstructors) {
             entry.registerWith(copyStrategyLibrary);
         }
 
-        //TODO: find a permanent fix over just creating a new typehandler
-        // https://github.com/Terasology/JoshariasSurvival/issues/31
-        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
-        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
-
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
-        typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
-        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = engineContext.get(TypeHandlerLibrary.class);
+        typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(engineContext.get(CollisionGroupManager.class)));
 
         // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
-        context.put(EntitySystemLibrary.class, library);
+        EntitySystemLibrary library = new EntitySystemLibrary(engineContext, typeHandlerLibrary);
+        gameContextRegistry.with(EntitySystemLibrary.class).lifetime(Lifetime.Singleton).use(() -> library);
         ComponentLibrary componentLibrary = library.getComponentLibrary();
-        context.put(ComponentLibrary.class, componentLibrary);
-        context.put(EventLibrary.class, library.getEventLibrary());
-        context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
+        gameContextRegistry.with(ComponentLibrary.class).lifetime(Lifetime.Singleton).use(() -> componentLibrary);
+        gameContextRegistry.with(EventLibrary.class).lifetime(Lifetime.Singleton).use(library::getEventLibrary);
+        ClassMetaLibraryImpl classMetaLibrary = new ClassMetaLibraryImpl(moduleManager);
+        gameContextRegistry.with(ClassMetaLibrary.class).lifetime(Lifetime.Singleton).use(() -> classMetaLibrary);
 
         registerComponents(componentLibrary, environment);
-        registerTypeHandlers(context, typeHandlerLibrary, environment);
+        registerTypeHandlers(engineContext, typeHandlerLibrary, environment);
 
         // Load configs for the new environment
-        AutoConfigManager autoConfigManager = context.get(AutoConfigManager.class);
-        autoConfigManager.loadConfigsIn(context);
+        AutoConfigManager autoConfigManager = engineContext.get(AutoConfigManager.class);
+        autoConfigManager.loadConfigsIn(environment, gameContextRegistry);
 
-        ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        ModuleAwareAssetTypeManager assetTypeManager = engineContext.get(ModuleAwareAssetTypeManager.class);
         /*
          * The registering of the prefab formats is done in this method, because it needs to be done before
          * the environment of the asset manager gets changed.

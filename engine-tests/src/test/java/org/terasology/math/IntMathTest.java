@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.internal.ContextImpl;
-import org.terasology.engine.context.internal.MockContext;
 import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class IntMathTest {
 
     @BeforeAll
     public static void setUpClass() throws Exception {
-        Config config = new Config(new MockContext());
+        Config config = new Config();
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }

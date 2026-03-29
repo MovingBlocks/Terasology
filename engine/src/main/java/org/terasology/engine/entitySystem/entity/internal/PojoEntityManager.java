@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -25,6 +26,7 @@ import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponen
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
@@ -33,6 +35,7 @@ import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,7 +47,7 @@ import java.util.Set;
 
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.SECTOR;
 
-public class PojoEntityManager implements EngineEntityManager {
+public class PojoEntityManager implements EntityManager, EngineEntityManager {
     public static final long NULL_ID = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
@@ -69,6 +72,20 @@ public class PojoEntityManager implements EngineEntityManager {
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
     private TypeHandlerLibrary typeSerializerLibrary;
+
+    public PojoEntityManager() {
+    }
+
+    @Inject
+    public PojoEntityManager(Optional<PrefabManager> prefabManager, Optional<EventSystem> eventSystem,
+                             Optional<EntitySystemLibrary> entitySystemLibrary, Optional<TypeHandlerLibrary> typeSerializerLibrary) {
+        this.prefabManager = prefabManager.orElse(null);
+        this.eventSystem = eventSystem.orElse(null);
+        if (entitySystemLibrary.isPresent()) {
+            this.componentLibrary = entitySystemLibrary.get().getComponentLibrary();
+        }
+        this.typeSerializerLibrary = typeSerializerLibrary.orElse(null);
+    }
 
     @Override
     public RefStrategy getEntityRefStrategy() {

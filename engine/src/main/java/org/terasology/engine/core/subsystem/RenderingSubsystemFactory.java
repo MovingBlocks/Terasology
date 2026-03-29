@@ -3,11 +3,9 @@
 package org.terasology.engine.core.subsystem;
 
 import org.terasology.engine.context.Context;
-import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 @FunctionalInterface
 public interface RenderingSubsystemFactory {
-
-    WorldRenderer createWorldRenderer(Context context);
-
+    void registerWorldRenderer(Context context, ServiceRegistry serviceRegistry);
 }

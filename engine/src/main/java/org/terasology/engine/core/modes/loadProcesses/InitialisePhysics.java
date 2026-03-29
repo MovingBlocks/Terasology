@@ -4,15 +4,16 @@ package org.terasology.engine.core.modes.loadProcesses;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
-import org.terasology.engine.physics.Physics;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.PhysicsEngineManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 public class InitialisePhysics extends SingleStepLoadProcess {
     private final Context context;
+    private final ServiceRegistry serviceRegistry;
 
-    public InitialisePhysics(Context context) {
+    public InitialisePhysics(Context context, ServiceRegistry serviceRegistry) {
         this.context = context;
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -22,9 +23,7 @@ public class InitialisePhysics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        PhysicsEngine physicsEngine = PhysicsEngineManager.getNewPhysicsEngine(context);
-        context.put(Physics.class, physicsEngine);
-        context.put(PhysicsEngine.class, physicsEngine);
+        PhysicsEngineManager.registerPhysicsEngine(serviceRegistry);
         return true;
     }
 

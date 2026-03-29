@@ -3,17 +3,18 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleImpl;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 public class InitialiseCommandSystem extends SingleStepLoadProcess {
 
-    private Context context;
+    private ServiceRegistry serviceRegistry;
 
-    public InitialiseCommandSystem(Context context) {
-        this.context = context;
+    public InitialiseCommandSystem(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -23,7 +24,7 @@ public class InitialiseCommandSystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        context.put(Console.class, new ConsoleImpl(context));
+        serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
         return true;
     }
 

@@ -11,6 +11,8 @@ import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
+import javax.inject.Inject;
+
 import static com.google.common.truth.Truth.assertThat;
 import static org.terasology.engine.testUtil.Correspondences.instanceOfExpected;
 
@@ -38,11 +40,17 @@ public class CustomSubsystemTest {
      * it's a convenient way to keep it close to the test code and still be something we can give
      * to an annotation.
      */
-    static class MySubsystem extends NonPlayerVisibleSubsystem {
+    public static class MySubsystem extends NonPlayerVisibleSubsystem {
+        @Inject
+        protected PlayerConfig playerConfig;
+
+        @Inject
+        public MySubsystem() {
+        }
+
         @Override
-        public void initialise(GameEngine engine, Context rootContext) {
-            var config = rootContext.getValue(PlayerConfig.class);
-            config.playerName.set(PLAYER_NAME);
+        public void postInitialise(Context context) {
+            playerConfig.playerName.set(PLAYER_NAME);
         }
     }
 }

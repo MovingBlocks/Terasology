@@ -6,13 +6,13 @@ package org.terasology.engine.i18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.SystemConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.i18n.assets.Translation;
 import org.terasology.engine.persistence.TemplateEngine;
 import org.terasology.engine.persistence.TemplateEngineImpl;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,12 +37,13 @@ public class TranslationSystemImpl implements TranslationSystem {
     private AssetManager assetManager;
 
     /**
-     * @param context the context to use
+     * @param systemConfig the system config to use.
+     * @param assetManager the asset manager to use.
      */
-    public TranslationSystemImpl(Context context) {
-
-        systemConfig = context.get(SystemConfig.class);
-        assetManager = context.get(AssetManager.class);
+    @Inject
+    public TranslationSystemImpl(SystemConfig systemConfig, AssetManager assetManager) {
+        this.systemConfig = systemConfig;
+        this.assetManager = assetManager;
         refresh();
     }
 

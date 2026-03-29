@@ -12,6 +12,7 @@ import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.game.GameManifest;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
@@ -28,12 +29,14 @@ public class RegisterMods extends SingleStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterMods.class);
 
     private final Context context;
+    private final ServiceRegistry serviceRegistry;
     private final GameManifest gameManifest;
     private Thread applyModulesThread;
     private ModuleEnvironment oldEnvironment;
 
-    public RegisterMods(Context context, GameManifest gameManifest) {
+    public RegisterMods(Context context, ServiceRegistry serviceRegistry, GameManifest gameManifest) {
         this.context = context;
+        this.serviceRegistry = serviceRegistry;
         this.gameManifest = gameManifest;
     }
 
@@ -65,14 +68,14 @@ public class RegisterMods extends SingleStepLoadProcess {
             ResolutionResult result = resolver.resolve(moduleIds);
             if (result.isSuccess()) {
                 oldEnvironment = moduleManager.getEnvironment();
-                ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
+                ModuleEnvironment env = moduleManager.loadEnvironment(context, result.getModules(), true);
 
                 for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
                     logger.atInfo().log("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
                 }
 
                 EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                applyModulesThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
+                applyModulesThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context, serviceRegistry));
                 applyModulesThread.start();
                 return false;
             } else {

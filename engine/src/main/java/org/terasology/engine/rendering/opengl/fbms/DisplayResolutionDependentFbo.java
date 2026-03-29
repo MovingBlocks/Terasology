@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl.fbms;
 
+import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.subsystem.DisplayDevice;
@@ -12,6 +13,7 @@ import org.terasology.engine.rendering.opengl.FboConfig;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.opengl.SwappableFBO;
 
+import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -68,6 +70,25 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
         updateFullScale();
         generateDefaultFBOs();
+    }
+
+    /**
+     * The constructor: returns an instance of this class, subscribes it and generates the default FBOs.
+     * <p>
+     * The returned instance is subscribed to the RenderingConfig.FBO_SCALE and DisplayDevice.DISPLAY_RESOLUTION_CHANGE
+     * settings, so that changes to either properties trigger the regeneration of the FBOs handled by this manager,
+     * if necessary.
+     * <p>
+     * This constructor also initializes the SwappableFBOs of the GBuffer and the buffer identified by the
+     * SimpleUri stored in DisplayResolutionDependentFbo.FINAL_BUFFER.
+     *
+     * @param config the config containing a RenderingConfig instance.
+     * @param screenGrabber   the ScreenGrabber instance.
+     * @param displayDevice   the DisplayDevice instance
+     */
+    @Inject
+    public DisplayResolutionDependentFbo(Config config, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
+        this(config.getRendering(), screenGrabber, displayDevice);
     }
 
     private void generateDefaultFBOs() {

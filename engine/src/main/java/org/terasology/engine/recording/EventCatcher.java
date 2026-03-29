@@ -5,6 +5,7 @@ package org.terasology.engine.recording;
 import org.terasology.engine.entitySystem.event.PendingEvent;
 import org.terasology.gestalt.entitysystem.event.Event;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -27,6 +28,19 @@ public class EventCatcher {
      */
     public EventCatcher(List<Class<?>> selectedClassesToRecord, RecordedEventStore recordedEventStore) {
         this.selectedClassesToRecord = selectedClassesToRecord;
+        this.eventCopier = new EventCopier();
+        this.recordedEventStore = recordedEventStore;
+    }
+
+    /**
+     * EventCatcher constructor that receives a list of event classes it is supposed to record, and the RecordedEventStore that
+     * will store said event classes.
+     * @param selectedClassesToRecord A list of classes that should be recorded and sent to the RecordedEventStore.
+     * @param recordedEventStore The Store that will save the events selected to be recorded.
+     */
+    @Inject
+    public EventCatcher(RecordingClasses selectedClassesToRecord, RecordedEventStore recordedEventStore) {
+        this.selectedClassesToRecord = selectedClassesToRecord.getClassesToRecord();
         this.eventCopier = new EventCopier();
         this.recordedEventStore = recordedEventStore;
     }

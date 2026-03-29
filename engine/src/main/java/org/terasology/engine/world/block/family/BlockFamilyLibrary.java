@@ -5,6 +5,7 @@ package org.terasology.engine.world.block.family;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
@@ -19,6 +20,7 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 /**
@@ -47,6 +49,11 @@ public class BlockFamilyLibrary {
                     (Class<? extends BlockFamily>) entry);
 
         }
+    }
+
+    @Inject
+    public BlockFamilyLibrary(ModuleManager moduleManager, Context context) {
+        this(moduleManager.getEnvironment(), context);
     }
 
     /**

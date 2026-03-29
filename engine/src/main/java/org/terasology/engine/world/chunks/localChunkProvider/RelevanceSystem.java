@@ -25,6 +25,7 @@ import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.engine.world.chunks.pipeline.PositionFuture;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
     private final LocalChunkProvider chunkProvider;
 
+    @Inject
     public RelevanceSystem(LocalChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
     }

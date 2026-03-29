@@ -26,7 +26,6 @@ import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.network.NetworkMode;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
@@ -107,6 +106,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
     private SelectModulesConfig selectModulesConfig;
+    private UniverseWrapper universeWrapper;
 
     @Override
     public void onOpened() {
@@ -125,7 +125,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         super.onScreenOpened();
 
         final UIText seed = find("seed", UIText.class);
-        UniverseWrapper universeWrapper = CoreRegistry.get(UniverseWrapper.class);
         if (universeWrapper != null && !universeWrapper.getSeed().isEmpty()) {
             seed.setText(universeWrapper.getSeed());
         }
@@ -508,11 +507,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
-            context.get(UniverseWrapper.class).setSeed(seed.getText());
+            universeWrapper.setSeed(seed.getText());
             final UniverseSetupScreen universeSetupScreen = getManager()
                     .createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             saveConfiguration();
-            universeSetupScreen.setEnvironment();
+            universeSetupScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(universeSetupScreen);
         });
 
@@ -521,7 +520,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).
                         setMessage("Error", "Game seed cannot be empty!");
             } else {
-                UniverseWrapper universeWrapper = context.get(UniverseWrapper.class);
                 universeWrapper.setSeed(seed.getText());
                 saveConfiguration();
                 final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
@@ -796,13 +794,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     public void setEnvironment(UniverseWrapper wrapper) {
-        // Theoretically, the idea was to do the following:
-        // context.put(UniverseWrapper.class, wrapper);
-        // CoreRegistry.setContext(context);
-        // However, this does not work and leads to an NPE in UniverseSetupScreen.java:182
-        // when attempting to access UniverseWrapper from a context that it's not in.
-        // At this moment, it's unclear, why this does not work.
-        // TODO: Investigate the inconsistencies between context and core registry usage
-        CoreRegistry.put(UniverseWrapper.class, wrapper);
+        universeWrapper = wrapper;
     }
 }

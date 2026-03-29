@@ -3,7 +3,9 @@
 package org.terasology.engine.testUtil;
 
 import com.google.common.collect.ImmutableList;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.entitysystem.prefab.Prefab;
 import org.terasology.gestalt.module.Module;
 import org.terasology.nui.UIWidget;
 
@@ -13,10 +15,10 @@ public final class ModuleManagerFactory {
     }
 
     public static ModuleManager create() {
-        // Loading screens, among other things, break when NUI classes are not added to engine.
-        ModuleManager moduleManager = new ModuleManager("", ImmutableList.of(UIWidget.class));
+        // Loading screens, among other things, break when NUI and Gestalt classes are not added to engine.
+        ModuleManager moduleManager = new ModuleManager("", ImmutableList.of(UIWidget.class, Prefab.class));
         Module unittestModule = moduleManager.registerPackageModule("org.terasology.unittest");
-        moduleManager.resolveAndLoadEnvironment(unittestModule.getId());
+        moduleManager.resolveAndLoadEnvironment(new ContextImpl(), unittestModule.getId());
         return moduleManager;
     }
 }

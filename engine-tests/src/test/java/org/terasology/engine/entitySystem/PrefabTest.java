@@ -4,7 +4,10 @@ package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
@@ -17,6 +20,9 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
+import org.terasology.gestalt.di.ServiceRegistry;
+import org.terasology.reflection.ModuleTypeRegistry;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.ListOfEnumsComponent;
 import org.terasology.unittest.stubs.ListOfObjectComponent;
 import org.terasology.unittest.stubs.MappedContainerComponent;
@@ -47,13 +53,19 @@ public class PrefabTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        ContextImpl context = new ContextImpl();
-        context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
-        CoreRegistry.setContext(context);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(RecordAndReplayCurrentStatus::new);
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        context.put(ModuleManager.class, moduleManager);
+        serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        TypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
+        serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+
+        ContextImpl context = new ContextImpl(serviceRegistry);
+        CoreRegistry.setContext(context);
+
+        serviceRegistry = new ServiceRegistry();
 
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
         AssetType<Prefab, PrefabData> prefabDataAssetType = assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
@@ -62,12 +74,18 @@ public class PrefabTest {
         PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.getAssetFileDataProducer(prefabDataAssetType).addAssetFormat(prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
+        serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
+
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        context = new ContextImpl(context, serviceRegistry);
+        CoreRegistry.setContext(context);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(typeHandlerLibrary,
+                context.get(EntitySystemLibrary.class), moduleManager.getEnvironment(),
+                context.get(EngineEntityManager.class));
 
         prefabManager = new PojoPrefabManager(context);
     }

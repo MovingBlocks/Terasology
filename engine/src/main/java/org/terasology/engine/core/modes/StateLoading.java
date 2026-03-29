@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
@@ -15,10 +16,11 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.modes.loadProcesses.AwaitCharacterSpawn;
+import org.terasology.engine.core.modes.loadProcesses.ConfigureEntitySystem;
 import org.terasology.engine.core.modes.loadProcesses.CreateRemoteWorldEntity;
 import org.terasology.engine.core.modes.loadProcesses.CreateWorldEntity;
-import org.terasology.engine.core.modes.loadProcesses.EnsureSaveGameConsistency;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseBlockTypeEntities;
+import org.terasology.engine.core.modes.loadProcesses.InitialiseBlocks;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseCommandSystem;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseComponentSystemManager;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseEntitySystem;
@@ -42,7 +44,9 @@ import org.terasology.engine.core.modes.loadProcesses.RegisterBlockFamilies;
 import org.terasology.engine.core.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.core.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.engine.core.modes.loadProcesses.RegisterMods;
+import org.terasology.engine.core.modes.loadProcesses.RegisterRemoteWorldSystems;
 import org.terasology.engine.core.modes.loadProcesses.RegisterSystems;
+import org.terasology.engine.core.modes.loadProcesses.RegisterWorldSystems;
 import org.terasology.engine.core.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.engine.core.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.core.modes.loadProcesses.StartServer;
@@ -59,6 +63,7 @@ import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.nui.canvas.CanvasRenderer;
 
 import java.util.Queue;
@@ -70,6 +75,7 @@ public class StateLoading implements GameState {
     private final NetworkMode netMode;
     private final Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private Context context;
+    private ServiceRegistry serviceRegistry;
     private LoadProcess current;
     private JoinStatus joinStatus;
 
@@ -108,6 +114,8 @@ public class StateLoading implements GameState {
     @Override
     public void init(GameEngine engine) {
         this.context = engine.createChildContext();
+        this.serviceRegistry = new ServiceRegistry();
+
         headless = context.get(DisplayDevice.class).isHeadless();
         
         CoreRegistry.setContext(context);
@@ -115,8 +123,11 @@ public class StateLoading implements GameState {
         systemConfig = context.get(SystemConfig.class);
 
         if (!headless) {
+            // Assign a temporary NUIManager instance for showing the loading screen.
             this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-            context.put(NUIManager.class, nuiManager);
+            context.put(NUIManager.class, this.nuiManager);
+            // This temporary instance will be replaced by the one in the context when it is created.
+            serviceRegistry.with(NUIManager.class).lifetime(Lifetime.Singleton).use(NUIManagerInternal.class);
         }
 
         EngineTime time = (EngineTime) context.get(Time.class);
@@ -126,10 +137,10 @@ public class StateLoading implements GameState {
         context.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:
-                initClient();
+                initClient(engine, serviceRegistry);
                 break;
             default:
-                initHost();
+                initHost(engine, serviceRegistry);
                 break;
         }
 
@@ -147,84 +158,55 @@ public class StateLoading implements GameState {
         chunkGenerationStarted = false;
     }
 
-    private void initClient() {
+    private void initClient(GameEngine engine, ServiceRegistry serviceRegistry) {
         loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
         if (!headless) {
-            loadProcesses.add(new InitialiseRendering(context));
+            loadProcesses.add(new InitialiseRendering(serviceRegistry));
         }
-        loadProcesses.add(new InitialiseEntitySystem(context));
-        loadProcesses.add(new RegisterBlocks(context, gameManifest));
+        loadProcesses.add(new InitialiseEntitySystem(context, serviceRegistry));
+        loadProcesses.add(new RegisterBlocks(context, serviceRegistry));
         if (!headless) {
             loadProcesses.add(new InitialiseGraphics(context));
         }
-        loadProcesses.add(new LoadPrefabs(context));
-        loadProcesses.add(new ProcessBlockPrefabs(context));
-        loadProcesses.add(new LoadExtraBlockData(context));
-        loadProcesses.add(new InitialiseComponentSystemManager(context));
-        if (!headless) {
-            loadProcesses.add(new RegisterInputSystem(context));
-        }
-        loadProcesses.add(new RegisterSystems(context, netMode));
-        loadProcesses.add(new InitialiseCommandSystem(context));
-        loadProcesses.add(new InitialiseRemoteWorld(context, gameManifest));
-        loadProcesses.add(new InitialisePhysics(context));
-        loadProcesses.add(new InitialiseSystems(context));
-        loadProcesses.add(new PreBeginSystems(context));
-        loadProcesses.add(new CreateRemoteWorldEntity(context));
-        loadProcesses.add(new PostBeginSystems(context));
-        loadProcesses.add(new SetupRemotePlayer(context));
-        loadProcesses.add(new AwaitCharacterSpawn(context));
-        loadProcesses.add(new RegisterBlockFamilies(context));
-        loadProcesses.add(new PrepareWorld(context));
+//        loadProcesses.add(new LoadPrefabs(context));
+//        loadProcesses.add(new ProcessBlockPrefabs(context));
+        loadProcesses.add(new LoadExtraBlockData(serviceRegistry));
+        loadProcesses.add(new InitialiseComponentSystemManager(serviceRegistry));
+//        loadProcesses.add(new RegisterSystems(context, netMode));
+//        loadProcesses.add(new RegisterWorldSystems(gameManifest, context));
+        loadProcesses.add(new InitialiseCommandSystem(serviceRegistry));
+        loadProcesses.add(new InitialiseRemoteWorld(context, serviceRegistry, gameManifest));
+        loadProcesses.add(new InitialisePhysics(context, serviceRegistry));
+//        loadProcesses.add(new InitialiseSystems(context));
+//        loadProcesses.add(new PreBeginSystems(context));
+//        loadProcesses.add(new CreateRemoteWorldEntity(context));
+//        loadProcesses.add(new PostBeginSystems(context));
+//        loadProcesses.add(new SetupRemotePlayer(context));
+//        loadProcesses.add(new AwaitCharacterSpawn(context));
+//        loadProcesses.add(new RegisterBlockFamilies(context));
+//        loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(new SwitchToContextStep(engine));
+        loadProcesses.add(new AddClientPostLoadProcessesStep());
     }
 
-    private void initHost() {
-        loadProcesses.add(new RegisterMods(context, gameManifest));
+    private void initHost(GameEngine engine, ServiceRegistry serviceRegistry) {
+        loadProcesses.add(new RegisterMods(context, serviceRegistry, gameManifest));
         if (!headless) {
-            loadProcesses.add(new InitialiseRendering(context));
+            loadProcesses.add(new InitialiseRendering(serviceRegistry));
         }
-        loadProcesses.add(new InitialiseEntitySystem(context));
-        loadProcesses.add(new RegisterBlocks(context, gameManifest));
+        loadProcesses.add(new InitialiseEntitySystem(context, serviceRegistry));
+        loadProcesses.add(new RegisterBlocks(context, serviceRegistry));
         if (!headless) {
             loadProcesses.add(new InitialiseGraphics(context));
         }
-        loadProcesses.add(new LoadPrefabs(context));
-        loadProcesses.add(new ProcessBlockPrefabs(context));
-        loadProcesses.add(new InitialiseComponentSystemManager(context));
-        if (!headless) {
-            loadProcesses.add(new RegisterInputSystem(context));
-        }
-        loadProcesses.add(new RegisterSystems(context, netMode));
-        loadProcesses.add(new InitialiseCommandSystem(context));
-        loadProcesses.add(new LoadExtraBlockData(context));
-        loadProcesses.add(new InitialiseWorld(gameManifest, context));
-        loadProcesses.add(new RegisterBlockFamilies(context));
-        loadProcesses.add(new EnsureSaveGameConsistency(context));
-        loadProcesses.add(new InitialisePhysics(context));
-        loadProcesses.add(new InitialiseSystems(context));
-        loadProcesses.add(new PreBeginSystems(context));
-        loadProcesses.add(new LoadEntities(context));
-        loadProcesses.add(new InitialiseBlockTypeEntities(context));
-        loadProcesses.add(new CreateWorldEntity(context, gameManifest));
-        loadProcesses.add(new InitialiseWorldGenerator(context));
-        loadProcesses.add(new InitialiseRecordAndReplay(context));
-        if (netMode.isServer()) {
-            boolean dedicated;
-            if (netMode == NetworkMode.DEDICATED_SERVER) {
-                dedicated = true;
-            } else if (netMode == NetworkMode.LISTEN_SERVER) {
-                dedicated = false;
-            } else {
-                throw new IllegalStateException("Invalid server mode: " + netMode);
-            }
-            loadProcesses.add(new StartServer(context, dedicated));
-        }
-        loadProcesses.add(new PostBeginSystems(context));
-        if (netMode.hasLocalClient()) {
-            loadProcesses.add(new SetupLocalPlayer(context));
-            loadProcesses.add(new AwaitCharacterSpawn(context));
-        }
-        loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(new InitialiseComponentSystemManager(serviceRegistry));
+        loadProcesses.add(new InitialiseCommandSystem(serviceRegistry));
+        loadProcesses.add(new LoadExtraBlockData(serviceRegistry));
+        loadProcesses.add(new InitialiseWorld(gameManifest, context, serviceRegistry));
+        loadProcesses.add(new InitialisePhysics(context, serviceRegistry));
+        loadProcesses.add(new SwitchToContextStep(engine));
+        // Post-Init processes
+        loadProcesses.add(new AddHostPostLoadProcessesStep());
     }
 
     private void popStep() {
@@ -324,5 +306,156 @@ public class StateLoading implements GameState {
     public void onChunkLoaded(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         EngineTime time = (EngineTime) context.get(Time.class);
         timeLastChunkGenerated = time.getRealTimeInMs();
+    }
+
+    private class SwitchToContextStep implements LoadProcess {
+        private final GameEngine engine;
+
+        SwitchToContextStep(GameEngine engine) {
+            this.engine = engine;
+        }
+
+        @Override
+        public String getMessage() {
+            return "Entering new game context...";
+        }
+
+        @Override
+        public boolean step() {
+            context = engine.createChildContext(serviceRegistry);
+            CoreRegistry.setContext(context);
+            nuiManager = context.get(NUIManager.class);
+            return true;
+        }
+
+        @Override
+        public void begin() {
+        }
+
+        @Override
+        public float getProgress() {
+            return 0;
+        }
+
+        @Override
+        public int getExpectedCost() {
+            return 0;
+        }
+    }
+
+    private class AddHostPostLoadProcessesStep implements LoadProcess {
+        @Override
+        public String getMessage() {
+            return "";
+        }
+
+        @Override
+        public boolean step() {
+            loadProcesses.add(new ConfigureEntitySystem(context));
+            loadProcesses.add(new InitialiseBlocks(gameManifest, context));
+            loadProcesses.add(new LoadPrefabs(context));
+            loadProcesses.add(new RegisterSystems(context, netMode));
+            if (!headless) {
+                loadProcesses.add(new RegisterInputSystem(context));
+            }
+            loadProcesses.add(new RegisterWorldSystems(gameManifest, context));
+            loadProcesses.add(new RegisterBlockFamilies(context));
+            loadProcesses.add(new ProcessBlockPrefabs(context));
+            loadProcesses.add(new InitialiseSystems(context));
+            loadProcesses.add(new PreBeginSystems(context));
+            loadProcesses.add(new LoadEntities(context));
+            loadProcesses.add(new InitialiseBlockTypeEntities(context));
+            loadProcesses.add(new CreateWorldEntity(context, gameManifest));
+            loadProcesses.add(new InitialiseWorldGenerator(context));
+            loadProcesses.add(new InitialiseRecordAndReplay(context));
+            if (netMode.isServer()) {
+                boolean dedicated;
+                if (netMode == NetworkMode.DEDICATED_SERVER) {
+                    dedicated = true;
+                } else if (netMode == NetworkMode.LISTEN_SERVER) {
+                    dedicated = false;
+                } else {
+                    throw new IllegalStateException("Invalid server mode: " + netMode);
+                }
+                loadProcesses.add(new StartServer(context, dedicated));
+            }
+            loadProcesses.add(new PostBeginSystems(context));
+            if (netMode.hasLocalClient()) {
+                loadProcesses.add(new SetupLocalPlayer(context));
+                loadProcesses.add(new AwaitCharacterSpawn(context));
+            }
+            loadProcesses.add(new PrepareWorld(context));
+            return true;
+        }
+
+        @Override
+        public void begin() {
+        }
+
+        @Override
+        public float getProgress() {
+            return 0;
+        }
+
+        @Override
+        public int getExpectedCost() {
+            return 0;
+        }
+    }
+
+    private class AddClientPostLoadProcessesStep implements LoadProcess {
+        @Override
+        public String getMessage() {
+            return "";
+        }
+
+        @Override
+        public boolean step() {
+            loadProcesses.add(new ConfigureEntitySystem(context));
+            loadProcesses.add(new InitialiseBlocks(gameManifest, context));
+            loadProcesses.add(new LoadPrefabs(context));
+            loadProcesses.add(new RegisterSystems(context, netMode));
+            if (!headless) {
+                loadProcesses.add(new RegisterInputSystem(context));
+            }
+            loadProcesses.add(new RegisterRemoteWorldSystems(gameManifest, context));
+            loadProcesses.add(new RegisterBlockFamilies(context));
+            loadProcesses.add(new ProcessBlockPrefabs(context));
+            loadProcesses.add(new InitialiseSystems(context));
+            loadProcesses.add(new PreBeginSystems(context));
+            loadProcesses.add(new CreateRemoteWorldEntity(context));
+            loadProcesses.add(new InitialiseBlockTypeEntities(context));
+            loadProcesses.add(new InitialiseRecordAndReplay(context));
+            if (netMode.isServer()) {
+                boolean dedicated;
+                if (netMode == NetworkMode.DEDICATED_SERVER) {
+                    dedicated = true;
+                } else if (netMode == NetworkMode.LISTEN_SERVER) {
+                    dedicated = false;
+                } else {
+                    throw new IllegalStateException("Invalid server mode: " + netMode);
+                }
+                loadProcesses.add(new StartServer(context, dedicated));
+            }
+            loadProcesses.add(new PostBeginSystems(context));
+            loadProcesses.add(new SetupRemotePlayer(context));
+            loadProcesses.add(new AwaitCharacterSpawn(context));
+            loadProcesses.add(new PrepareWorld(context));
+            return true;
+        }
+
+        @Override
+        public void begin() {
+        }
+
+        @Override
+        public float getProgress() {
+            return 0;
+        }
+
+        @Override
+        public int getExpectedCost() {
+            return 0;
+        }
     }
 }

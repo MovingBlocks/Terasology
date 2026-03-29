@@ -28,6 +28,7 @@ import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -57,6 +58,7 @@ public class RemoteChunkProvider implements ChunkProvider {
     private EntityRef worldEntity = EntityRef.NULL;
     private ChunkReadyListener listener;
 
+    @Inject
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer, Config config) {
         this.blockManager = blockManager;
         loadingPipeline = new ChunkProcessingPipeline(config.getRendering().getChunkThreads(), this::getChunk,

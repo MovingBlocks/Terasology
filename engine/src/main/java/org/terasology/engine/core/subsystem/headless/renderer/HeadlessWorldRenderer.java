@@ -21,6 +21,7 @@ import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.RenderableChunk;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -43,10 +44,19 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     private Config config;
 
+    @Inject
+    public HeadlessWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, Config config) {
+        this.worldProvider = worldProvider;
+        this.chunkProvider = chunkProvider;
+        this.config = config;
+    }
+
     public HeadlessWorldRenderer(Context context) {
-        this.worldProvider = context.get(WorldProvider.class);
-        this.chunkProvider = context.get(ChunkProvider.class);
-        config = context.get(Config.class);
+        this(context.get(WorldProvider.class), context.get(ChunkProvider.class), context.get(Config.class));
+    }
+
+    @Override
+    public void init() {
     }
 
     @Override

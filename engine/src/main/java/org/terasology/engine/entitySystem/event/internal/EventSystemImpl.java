@@ -27,12 +27,14 @@ import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -50,7 +52,7 @@ import java.util.concurrent.BlockingQueue;
 public class EventSystemImpl implements EventSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(EventSystemImpl.class);
-    private final boolean isAutority;
+    private final boolean isAuthority;
 
     private Map<Class<? extends Event>, SetMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
     private SetMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = HashMultimap.create();
@@ -64,8 +66,13 @@ public class EventSystemImpl implements EventSystem {
     private BlockingQueue<PendingEvent> pendingEvents = Queues.newLinkedBlockingQueue();
 
 
-    public EventSystemImpl(boolean isAutority) {
-        this.isAutority = isAutority;
+    @Inject
+    public EventSystemImpl(NetworkSystem networkSystem) {
+        this(networkSystem.getMode().isAuthority());
+    }
+
+    public EventSystemImpl(boolean isAuthority) {
+        this.isAuthority = isAuthority;
         this.mainThread = Thread.currentThread();
     }
 
@@ -105,7 +112,7 @@ public class EventSystemImpl implements EventSystem {
             if (receiveEventAnnotation != null) {
 
                 NetFilterEvent netFilterAnnotation =  method.getAnnotation(NetFilterEvent.class);
-                if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(isAutority, false)) {
+                if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(isAuthority, false)) {
                     continue;
                 }
 

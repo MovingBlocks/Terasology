@@ -48,6 +48,7 @@ import org.terasology.gestalt.entitysystem.event.Event;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -107,6 +108,14 @@ public class EventSystemReplayImpl implements EventSystem {
     /** The position of the last recorded event processed */
     private long lastRecordedEventIndex;
 
+    @Inject
+    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
+                                 RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
+                                 RecordAndReplayUtils recordAndReplayUtils, RecordingClasses recordingClasses,
+                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+        this(eventLibrary, networkSystem, entityManager, recordedEventStore, recordAndReplaySerializer, recordAndReplayUtils,
+                recordingClasses.getClassesToRecord(), recordAndReplayCurrentStatus);
+    }
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,

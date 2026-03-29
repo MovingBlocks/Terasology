@@ -3,6 +3,7 @@
 package org.terasology.engine.world.generator.plugin;
 
 import com.google.common.collect.Lists;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -12,6 +13,7 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
@@ -19,13 +21,23 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
     private final ClassLibrary<WorldGeneratorPlugin> library;
 
     public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        this(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+    }
+
+    public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory,
+                                              CopyStrategyLibrary copyStrategyLibrary) {
+        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, reflectFactory, copyStrategyLibrary);
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
                 ResourceUrn resourceUrn = new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName());
                 library.register(resourceUrn.toString(), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
+    }
+
+    @Inject
+    public DefaultWorldGeneratorPluginLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        this(moduleManager.getEnvironment(), reflectFactory, copyStrategyLibrary);
     }
 
     @Override

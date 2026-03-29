@@ -27,7 +27,7 @@ class WorldGeneratorManagerTest {
 
     @Test
     void hasUnittestWorldGenerator() {
-        manager = new WorldGeneratorManager(context);
+        manager = new WorldGeneratorManager(context.get(ModuleManager.class));
         assertThat(manager.getWorldGenerators())
                 .comparingElementsUsing(
                         Correspondence.transforming(WorldGeneratorInfo::getUri, "info"))

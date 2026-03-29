@@ -3,9 +3,11 @@
 
 package org.terasology.engine.core.modes;
 
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.event.internal.EventSystem;
@@ -20,8 +22,7 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
-import org.terasology.nui.canvas.CanvasRenderer;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
@@ -31,36 +32,45 @@ public abstract class AbstractState implements GameState {
     protected EventSystem eventSystem;
     protected ComponentSystemManager componentSystemManager;
 
-    protected void initEntityAndComponentManagers(boolean isHeadless) {
+    protected void registerEntityAndComponentManagers(boolean isHeadless, ServiceRegistry serviceRegistry) {
         verifyNotNull(context);
         CoreRegistry.setContext(context);
 
         // let's get the entity event system running
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        entityManager = context.get(EngineEntityManager.class);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
 
-        eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl(context));
+        serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
         if (!isHeadless) {
-            NUIManager nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-            context.put(NUIManager.class, nuiManager);
+            serviceRegistry.with(NUIManager.class).lifetime(Lifetime.Singleton).use(NUIManagerInternal.class);
         }
 
-        componentSystemManager = new ComponentSystemManager(context);
-        context.put(ComponentSystemManager.class, componentSystemManager);
+        serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
+    }
+
+    protected void initEntityAndComponentManagers() {
+        verifyNotNull(context);
+        CoreRegistry.setContext(context);
+
+        entityManager = context.get(EngineEntityManager.class);
+        eventSystem = context.get(EventSystem.class);
+        componentSystemManager = context.get(ComponentSystemManager.class);
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+
+        EntitySystemSetupUtil.registerEvents(eventSystem, context.get(ModuleManager.class).getEnvironment());
     }
 
-    protected static void createLocalPlayer(Context context) {
-        EngineEntityManager entityManager = context.get(EngineEntityManager.class);
-        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
+    protected void registerLocalPlayer(ServiceRegistry serviceRegistry) {
         LocalPlayer localPlayer = new LocalPlayer();
         localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class),
                 context.get(RecordAndReplayCurrentStatus.class));
-        context.put(LocalPlayer.class, localPlayer);
-        localPlayer.setClientEntity(localPlayerEntity);
+        serviceRegistry.with(LocalPlayer.class).lifetime(Lifetime.Singleton).use(() -> localPlayer);
+    }
+
+    protected void createLocalPlayer() {
+        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
+        context.get(LocalPlayer.class).setClientEntity(localPlayerEntity);
     }
 
     @Override

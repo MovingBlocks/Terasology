@@ -6,13 +6,16 @@ package org.terasology.engine.core.modes.loadProcesses;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 public class InitialiseEntitySystem extends SingleStepLoadProcess {
 
     private final Context context;
+    private final ServiceRegistry serviceRegistry;
 
-    public InitialiseEntitySystem(Context context) {
+    public InitialiseEntitySystem(Context context, ServiceRegistry serviceRegistry) {
         this.context = context;
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -22,7 +25,7 @@ public class InitialiseEntitySystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
         return true;
     }
 
@@ -30,5 +33,4 @@ public class InitialiseEntitySystem extends SingleStepLoadProcess {
     public int getExpectedCost() {
         return 1;
     }
-
 }

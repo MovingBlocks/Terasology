@@ -4,10 +4,14 @@ package org.terasology.engine.core.subsystem.common.hibernation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.gestalt.di.ServiceRegistry;
+
+import javax.inject.Inject;
 
 
 public class HibernationSubsystem implements EngineSubsystem {
@@ -15,15 +19,19 @@ public class HibernationSubsystem implements EngineSubsystem {
     private HibernationManager hibernationManager;
     private DisplayDevice displayDevice;
 
+    @Inject
+    public HibernationSubsystem() {
+    }
+
     @Override
     public String getName() {
         return "Hibernation";
     }
 
     @Override
-    public void preInitialise(Context rootContext) {
+    public void preInitialise(ServiceRegistry serviceRegistry) {
         hibernationManager = new HibernationManager();
-        rootContext.put(HibernationManager.class, hibernationManager);
+        serviceRegistry.with(HibernationManager.class).lifetime(Lifetime.Singleton).use(() -> hibernationManager);
     }
 
     @Override

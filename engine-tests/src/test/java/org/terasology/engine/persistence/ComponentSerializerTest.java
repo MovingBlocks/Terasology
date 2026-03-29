@@ -9,12 +9,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.ComponentSerializer;
@@ -25,9 +27,13 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.ModuleTypeRegistry;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.GetterSetterComponent;
 import org.terasology.unittest.stubs.IntegerComponent;
 import org.terasology.unittest.stubs.StringComponent;
@@ -50,10 +56,9 @@ public class ComponentSerializerTest {
 
     @BeforeEach
     public void setup() {
-        context = new ContextImpl();
-        context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
-        context.put(ModuleManager.class, moduleManager);
-        CoreRegistry.setContext(context);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> new RecordAndReplayCurrentStatus());
+        serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibraryImpl(reflections);
@@ -63,9 +68,18 @@ public class ComponentSerializerTest {
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        AssetManager assetManager = mock(AssetManager.class);
+        serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
+        serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetManager);
+        TypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
+        serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        context = new ContextImpl(context, serviceRegistry);
+        CoreRegistry.setContext(context);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
+                context.get(EntitySystemLibrary.class), context.get(ModuleManager.class).getEnvironment(),
+                context.get(EngineEntityManager.class));
         EngineEntityManager entityManager = context.get(EngineEntityManager.class);
         entityManager.getComponentLibrary().register(new ResourceUrn("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new ResourceUrn("test", "string"), StringComponent.class);

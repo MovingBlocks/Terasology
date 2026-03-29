@@ -12,6 +12,7 @@ import org.terasology.context.annotation.API;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 
+import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -67,7 +68,12 @@ public class ExtraBlockDataManager {
      * Set extra-data fields based on the modules available through the context.
      */
     public ExtraBlockDataManager(Context context) {
-        Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(context);
+        this(context.get(ModuleManager.class), context.get(BlockManager.class));
+    }
+
+    @Inject
+    public ExtraBlockDataManager(ModuleManager moduleManager, BlockManager blockManager) {
+        Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(moduleManager.getEnvironment(), blockManager);
 
         // Work out which fields don't overlap and can be aliased together.
         slots = new HashMap<>();
@@ -94,9 +100,8 @@ public class ExtraBlockDataManager {
     }
 
     // Find requests for extensions and which blocks they apply to.
-    private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(Context context) {
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
+    private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(ModuleEnvironment environment, BlockManager blockManager) {
+        Collection<Block> blocks = blockManager.listRegisteredBlocks();
 
         Map<Integer, Map<String, Set<Block>>> fieldss = new HashMap<>();
         TERA_ARRAY_FACTORIES.forEach((size, fac) -> fieldss.put(size, new HashMap<>()));

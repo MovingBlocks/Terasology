@@ -4,6 +4,7 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
@@ -51,6 +52,7 @@ import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.gestalt.entitysystem.component.Component;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -115,6 +117,12 @@ public class LocalChunkProvider implements ChunkProvider {
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkCache = chunkCache;
         ChunkMonitor.fireChunkProviderInitialized(this);
+    }
+
+    @Inject
+    public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
+                              BlockManager blockManager, ExtraBlockDataManager extraDataManager, Config config) {
+        this(storageManager, entityManager, generator, blockManager, extraDataManager, config, Maps.newConcurrentMap());
     }
 
 

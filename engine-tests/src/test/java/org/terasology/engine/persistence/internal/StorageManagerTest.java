@@ -18,13 +18,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.PathManager;
+import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.NonPlayerVisibleSubsystem;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.game.Game;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.location.LocationComponent;
@@ -37,7 +40,6 @@ import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -45,11 +47,14 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.joml.geom.AABBfc;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.unittest.stubs.EntityRefComponent;
 import org.terasology.unittest.stubs.StringComponent;
 
+import javax.inject.Inject;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -175,12 +180,17 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        Context newContext = new ContextImpl(context, serviceRegistry);
+        EngineEntityManager newEntityManager = newContext.get(EngineEntityManager.class);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(newContext.get(TypeHandlerLibrary.class),
+                newContext.get(EntitySystemLibrary.class), moduleEnvironment, newEntityManager);
 
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus,
+                null, null, null, null);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -198,11 +208,17 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        Context newContext = new ContextImpl(context, serviceRegistry);
+        EngineEntityManager newEntityManager = newContext.get(EngineEntityManager.class);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(newContext.get(TypeHandlerLibrary.class),
+                newContext.get(EntitySystemLibrary.class), moduleEnvironment, newEntityManager);
+
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus,
+                null, null, null, null);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(playerId);
@@ -217,13 +233,13 @@ public class StorageManagerTest {
 
     @Test
     public void testStoreAndRestoreChunkStore(
-            StorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+            ReadWriteStorageManager esm, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
-        CoreRegistry.put(ChunkProvider.class, chunkProvider);
+        esm.testSetChunkProvider(chunkProvider);
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
@@ -245,17 +261,23 @@ public class StorageManagerTest {
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
-        CoreRegistry.put(ChunkProvider.class, chunkProvider);
+        esm.testSetChunkProvider(chunkProvider);
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        Context newContext = new ContextImpl(context, serviceRegistry);
+        EngineEntityManager newEntityManager = newContext.get(EngineEntityManager.class);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(newContext.get(TypeHandlerLibrary.class),
+                newContext.get(EntitySystemLibrary.class), moduleEnvironment, newEntityManager);
+
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
                 extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils,
-                recordAndReplayCurrentStatus);
+                recordAndReplayCurrentStatus, () -> chunkProvider, () -> newContext.get(NetworkSystem.class), newContext.get(Time.class),
+                newContext.get(Game.class));
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -275,7 +297,7 @@ public class StorageManagerTest {
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(List.of(chunk));
-        CoreRegistry.put(ChunkProvider.class, chunkProvider);
+        esm.testSetChunkProvider(chunkProvider);
         EntityRef entity = entityManager.create();
         long id = entity.getId();
         LocationComponent locationComponent = new LocationComponent();
@@ -289,11 +311,18 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
+        Context newContext = new ContextImpl(context, serviceRegistry);
+        EngineEntityManager newEntityManager = newContext.get(EngineEntityManager.class);
+        EntitySystemSetupUtil.configureEntityManagementRelatedClasses(newContext.get(TypeHandlerLibrary.class),
+                newContext.get(EntitySystemLibrary.class), moduleEnvironment, newEntityManager);
+
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, esm.isStoreChunksInZips(), recordAndReplaySerializer, recordAndReplayUtils,
+                recordAndReplayCurrentStatus, () -> chunkProvider, () -> newContext.get(NetworkSystem.class), newContext.get(Time.class),
+                newContext.get(Game.class));
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -312,10 +341,14 @@ public class StorageManagerTest {
         assertTrue(character.isActive());
     }
 
-    static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
+    public static class EnableWritingSaveGames extends NonPlayerVisibleSubsystem {
+        @Inject
+        public EnableWritingSaveGames() {
+        }
+
         @Override
-        public void initialise(GameEngine engine, Context rootContext) {
-            rootContext.getValue(SystemConfig.class).writeSaveGamesEnabled.set(true);
+        public void postInitialise(Context context) {
+            context.getValue(SystemConfig.class).writeSaveGamesEnabled.set(true);
         }
     }
 }

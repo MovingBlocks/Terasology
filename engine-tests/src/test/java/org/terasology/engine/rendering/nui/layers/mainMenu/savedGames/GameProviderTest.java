@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,7 +65,8 @@ public class GameProviderTest {
         Files.createDirectories(TMP_SAVES_FOLDER_PATH);
         Files.createDirectories(TMP_RECORDS_FOLDER_PATH);
 
-        final File file = new File(GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile());
+        final File file = new File(URLDecoder.decode(
+                GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile(), Charset.defaultCharset()));
         try {
             manifestExample = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
         } catch (IOException e) {

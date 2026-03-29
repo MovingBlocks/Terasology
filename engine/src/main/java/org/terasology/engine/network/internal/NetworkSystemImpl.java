@@ -83,6 +83,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.FutureMono;
 
+import javax.inject.Inject;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -147,6 +148,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ServerImpl server;
     private EventLoopGroup clientGroup;
 
+    @Inject
     public NetworkSystemImpl(EngineTime time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();

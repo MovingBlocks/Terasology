@@ -29,17 +29,17 @@ import static com.google.common.base.Verify.verifyNotNull;
 public class WorldGeneratorManager {
     private static final Logger logger = LoggerFactory.getLogger(WorldGeneratorManager.class);
 
-    private final Context context;
+    private final ModuleManager moduleManager;
 
     private ImmutableList<WorldGeneratorInfo> generatorInfo;
 
-    public WorldGeneratorManager(Context context) {
-        this.context = context;
+    public WorldGeneratorManager(ModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
         refresh();
     }
 
     public void refresh() {
-        ModuleManager moduleManager = verifyNotNull(context.get(ModuleManager.class), "no ModuleManager");
+        ModuleManager moduleManager = verifyNotNull(this.moduleManager, "no ModuleManager");
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);

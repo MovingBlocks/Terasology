@@ -24,6 +24,7 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class ComponentSystemManager {
 
     private boolean initialised;
 
+    @Inject
     public ComponentSystemManager(Context context) {
         this.context = context;
     }

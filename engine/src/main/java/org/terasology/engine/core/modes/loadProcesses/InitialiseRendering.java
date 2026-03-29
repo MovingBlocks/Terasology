@@ -3,24 +3,25 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 /**
- * Add {@link RenderingModuleRegistry} to the game {@link Context}.
+ * Add {@link RenderingModuleRegistry} to the game {@link ServiceRegistry}.
  * 
  * The rendering system is required whenever a client starts or joins a game. As rendering may fail to re-initialise
- * correctly when it has previously been constructed, this loading process will populate the {@link Context} with a
+ * correctly when it has previously been constructed, this loading process will populate the {@link ServiceRegistry} with a
  * freshly created rendering system.
  * 
  * When switching the game state, the rendering system can just be disposed with the old state.
  */
 public class InitialiseRendering extends SingleStepLoadProcess {
-    private final Context context;
+    private final ServiceRegistry serviceRegistry;
 
-    public InitialiseRendering(Context context) {
-        this.context = context;
+    public InitialiseRendering(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
     }
 
 
@@ -31,7 +32,8 @@ public class InitialiseRendering extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        context.put(RenderingModuleRegistry.class, new RenderingModuleRegistry());
+        RenderingModuleRegistry renderingModuleRegistry = new RenderingModuleRegistry();
+        serviceRegistry.with(RenderingModuleRegistry.class).lifetime(Lifetime.Singleton).use(() -> renderingModuleRegistry);
         return true;
     }
 

@@ -5,10 +5,13 @@ package org.terasology.unittest.stubs;
 
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 
+import javax.inject.Inject;
+
 public class StubSubsystem implements EngineSubsystem {
     final String name;
 
-    StubSubsystem(String name) {
+    @Inject
+    public StubSubsystem(String name) {
         this.name = name;
     }
 

@@ -4,6 +4,7 @@ package org.terasology.engine.rendering.world.viewDistance;
 
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -18,6 +19,7 @@ import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import java.beans.PropertyChangeListener;
@@ -62,7 +64,7 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
         };
         config.getRendering().subscribe(chunkLodsListener);
 
-        translationSystem = new TranslationSystemImpl(context);
+        translationSystem = new TranslationSystemImpl(context.get(SystemConfig.class), context.get(AssetManager.class));
     }
 
     public void onChangeViewDistanceChange() {

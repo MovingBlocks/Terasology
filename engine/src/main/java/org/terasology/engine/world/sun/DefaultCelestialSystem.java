@@ -13,6 +13,7 @@ import org.terasology.engine.world.time.WorldTime;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.WorldProvider;
 
+import javax.inject.Inject;
 import java.math.RoundingMode;
 
 /**
@@ -35,6 +36,14 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     public DefaultCelestialSystem(CelestialModel model, Context context) {
         WorldProvider worldProvider = context.get(WorldProvider.class);
         entityManager = context.get(EntityManager.class);
+        worldTime = worldProvider.getTime();
+        lastUpdate = worldTime.getMilliseconds();
+        this.model = model;
+    }
+
+    @Inject
+    public DefaultCelestialSystem(CelestialModel model, WorldProvider worldProvider, EntityManager entityManager) {
+        this.entityManager = entityManager;
         worldTime = worldProvider.getTime();
         lastUpdate = worldTime.getMilliseconds();
         this.model = model;

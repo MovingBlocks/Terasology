@@ -33,6 +33,8 @@ import org.terasology.engine.input.events.MouseAxisEvent;
 import org.terasology.engine.input.events.MouseButtonEvent;
 import org.terasology.engine.input.events.MouseWheelEvent;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.monitoring.Activity;
+import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.rendering.assets.texture.Texture;
@@ -75,6 +77,7 @@ import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -111,6 +114,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private TypeWidgetLibrary typeWidgetLibrary;
 
 
+    @Inject
     public NUIManagerInternal(TerasologyCanvasRenderer renderer, Context context) {
         this.context = context;
         this.hudScreenLayer = new HUDScreenLayer();
@@ -162,7 +166,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
 
         typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistryImpl(context);
-        context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
         registerTypeWidgetFactories();
     }
 
@@ -504,8 +507,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
         TypeWidgetLibrary moduleLibrary =
-                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, this.context);
-        context.put(TypeWidgetLibrary.class, moduleLibrary);
+                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, timedContextForModulesWidgets);
+        timedContextForModulesWidgets.put(TypeWidgetLibrary.class, moduleLibrary);
 
         InjectionHelper.inject(overlay, timedContextForModulesWidgets);
 
@@ -573,10 +576,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         for (UIScreenLayer screen : screensToRender) {
-            canvas.drawWidget(screen, canvas.getRegion());
+            try (Activity activity = PerformanceMonitor.startActivity("Canvas::drawWidget (Screen " + screen.getClass().getSimpleName() + ")")) {
+                canvas.drawWidget(screen, canvas.getRegion());
+            }
         }
         for (ControlWidget overlay : overlays.values()) {
-            canvas.drawWidget(overlay);
+            try (Activity activity = PerformanceMonitor.startActivity("Canvas::drawWidget (Overlay " + overlay.getClass().getSimpleName() + ")")) {
+                canvas.drawWidget(overlay);
+            }
         }
         canvas.postRender();
     }

@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
@@ -32,6 +32,7 @@ import org.terasology.engine.rendering.opengl.OpenGLTexture;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.module.ModuleAssetScanner;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -98,8 +99,9 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);
     }
 
-    public void registerRenderingSubsystem(Context context) {
-        context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
+    public void registerRenderingSubsystem(ServiceRegistry serviceRegistry) {
+        LwjglRenderingSubsystemFactory renderingSubsystemFactory = new LwjglRenderingSubsystemFactory();
+        serviceRegistry.with(RenderingSubsystemFactory.class).lifetime(Lifetime.Singleton).use(() -> renderingSubsystemFactory);
     }
 
     public void processActions() {
