@@ -383,6 +383,7 @@ public class UniverseSetupScreen extends CoreScreenLayer implements UISliderOnCh
      * needed for successful game creation.
      */
     public void setEnvironment(UniverseWrapper universeWrapper) {
+        this.universeWrapper = universeWrapper;
         prepareContext();
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
