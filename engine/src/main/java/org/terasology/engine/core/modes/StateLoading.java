@@ -325,6 +325,12 @@ public class StateLoading implements GameState {
             context = engine.createChildContext(serviceRegistry);
             CoreRegistry.setContext(context);
             nuiManager = context.get(NUIManager.class);
+            // Re-push the loading screen onto the new NUI manager so it stays
+            // visible after the context swap. The old manager that created it
+            // is no longer being rendered.
+            if (nuiManager != null && loadingScreen != null) {
+                loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
+            }
             return true;
         }
 
@@ -385,6 +391,9 @@ public class StateLoading implements GameState {
                 loadProcesses.add(new AwaitCharacterSpawn(context));
             }
             loadProcesses.add(new PrepareWorld(context));
+            for (LoadProcess process : loadProcesses) {
+                maxProgress += process.getExpectedCost();
+            }
             return true;
         }
 
@@ -441,6 +450,9 @@ public class StateLoading implements GameState {
             loadProcesses.add(new SetupRemotePlayer(context));
             loadProcesses.add(new AwaitCharacterSpawn(context));
             loadProcesses.add(new PrepareWorld(context));
+            for (LoadProcess process : loadProcesses) {
+                maxProgress += process.getExpectedCost();
+            }
             return true;
         }
 
