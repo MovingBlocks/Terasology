@@ -9,7 +9,9 @@ on:
 jobs:
   add_opened_to_inbox_board:
     name: Add New Issue/PR to Terasology Inbox Board
-    if: github.event.action == 'opened'
+    if: >-
+      github.event.action == 'opened' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
       - name: Add to inbox board
@@ -19,9 +21,10 @@ jobs:
           github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_bug_labeled_to_bug_board:
     name: Assign bug report issues and pull requests to bug board backlog
-    if: |
-      contains(github.event.issue.labels.*.name, 'Type: Bug') ||
-      contains(github.event.pull_request.labels.*.name, 'Type: Bug')
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      (contains(github.event.issue.labels.*.name, 'Type: Bug') ||
+      contains(github.event.pull_request.labels.*.name, 'Type: Bug'))
     runs-on: ubuntu-latest
     steps:
       - name: Add to bug board
@@ -31,14 +34,15 @@ jobs:
           github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_maintenance_to_stabilization_board:
     name: Assign stabilization / refactoring / chore issues and pull requests to stabilization board backlog
-    if: |
-      github.event.action != 'opened' && 
-      ( contains(github.event.issue.labels.*.name, 'Type: Refactoring') ||
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      github.event.action != 'opened' &&
+      (contains(github.event.issue.labels.*.name, 'Type: Refactoring') ||
       contains(github.event.pull_request.labels.*.name, 'Type: Refactoring') ||
       contains(github.event.issue.labels.*.name, 'Type: Chore') ||
       contains(github.event.pull_request.labels.*.name, 'Type: Chore') ||
       contains(github.event.issue.labels.*.name, 'Topic: Stabilization') && !contains(github.event.issue.labels.*.name, 'Type: Bug') ||
-      contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization') && !contains(github.event.pull_request.labels.*.name, 'Type: Bug') )
+      contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization') && !contains(github.event.pull_request.labels.*.name, 'Type: Bug'))
     runs-on: ubuntu-latest
     steps:
       - name: Add to stabilization board
@@ -48,10 +52,11 @@ jobs:
           github-token: ${{ secrets.PROJECT_GITHUB_TOKEN }}
   add_features_to_feature_board:
     name: Assign improvement issues and pull requests to feature board backlog
-    if: |
-      github.event.action != 'opened' && 
-      contains(github.event.issue.labels.*.name, 'Type: Improvement') && !contains(github.event.issue.labels.*.name, 'Topic: Stabilization') ||
-      contains(github.event.pull_request.labels.*.name, 'Type: Improvement') && !contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization')
+    if: >-
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      github.event.action != 'opened' &&
+      (contains(github.event.issue.labels.*.name, 'Type: Improvement') && !contains(github.event.issue.labels.*.name, 'Topic: Stabilization') ||
+      contains(github.event.pull_request.labels.*.name, 'Type: Improvement') && !contains(github.event.pull_request.labels.*.name, 'Topic: Stabilization'))
     runs-on: ubuntu-latest
     steps:
       - name: Add to feature board
