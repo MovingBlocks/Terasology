@@ -32,7 +32,7 @@ import java.util.function.Consumer;
  * Optional engine subsystem that bridges Terasology chat to a Nakama
  * chat channel, enabling cross-game messaging for the Bifrost protocol.
  *
- * Enable via system property: -Dnakama.enabled=true -Dnakama.host=192.168.x.x
+ * Enable via the Nakama config file at ~/.terasology/configs/nakama/NakamaAutoConfig.cfg
  */
 public class NakamaSubSystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(NakamaSubSystem.class);
@@ -41,7 +41,7 @@ public class NakamaSubSystem implements EngineSubsystem {
             "terasology", "TS", "destinationsol", "DS", "minecraft", "MC"
     );
 
-    private NakamaConfig config;
+    private NakamaAutoConfig autoConfig;
     private Client client;
     private Session session;
     private SocketClient socket;
@@ -60,9 +60,9 @@ public class NakamaSubSystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        config = NakamaConfig.fromSystemProperties();
-        if (!config.isEnabled()) {
-            logger.info("Nakama subsystem disabled (set -Dnakama.enabled=true to enable)");
+        autoConfig = rootContext.get(NakamaAutoConfig.class);
+        if (autoConfig == null || !autoConfig.enabled.get()) {
+            logger.info("Nakama subsystem disabled (enable in Nakama config file)");
             return;
         }
         connect();
@@ -71,13 +71,11 @@ public class NakamaSubSystem implements EngineSubsystem {
     private void connect() {
         try {
             String deviceId = getOrCreateDeviceId();
-            // DefaultClient uses gRPC for API calls (auth, etc.)
-            client = new DefaultClient("defaultkey", config.getHost(), config.getGrpcPort(), false);
+            client = new DefaultClient("defaultkey", autoConfig.host.get(), autoConfig.grpcPort.get(), false);
             session = client.authenticateDevice(deviceId).get();
             logger.info("Nakama: authenticated as {}", session.getUserId());
 
-            // createSocket uses WebSocket for realtime — may be a different port via NodePort
-            socket = client.createSocket(config.getHost(), config.getWsPort(), false);
+            socket = client.createSocket(autoConfig.host.get(), autoConfig.wsPort.get(), false);
             socket.connect(session, new AbstractSocketListener() {
                 @Override
                 public void onChannelMessage(ChannelMessage message) {
@@ -86,8 +84,8 @@ public class NakamaSubSystem implements EngineSubsystem {
             }).get();
 
             // Join the shared chat channel
-            channel = socket.joinChat(config.getChannel(), ChannelType.ROOM).get();
-            logger.info("Nakama: joined channel '{}'", config.getChannel());
+            channel = socket.joinChat(autoConfig.channel.get(), ChannelType.ROOM).get();
+            logger.info("Nakama: joined channel '{}'", autoConfig.channel.get());
 
         } catch (Exception e) {
             logger.warn("Nakama: connection failed, continuing without cross-game chat", e);
@@ -154,7 +152,7 @@ public class NakamaSubSystem implements EngineSubsystem {
 
     @Override
     public void registerSystems(ComponentSystemManager componentSystemManager) {
-        if (config != null && config.isEnabled()) {
+        if (autoConfig != null && autoConfig.enabled.get()) {
             NakamaSystem nakamaSystem = new NakamaSystem();
             nakamaSystem.setNakamaSubSystem(this);
             componentSystemManager.register(nakamaSystem);
@@ -163,7 +161,7 @@ public class NakamaSubSystem implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        if (config == null || !config.isEnabled() || !isConnected()) {
+        if (autoConfig == null || !autoConfig.enabled.get() || !isConnected()) {
             return;
         }
         // Inbound: inject Nakama messages into the local chat system

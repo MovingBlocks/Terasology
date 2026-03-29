@@ -26,7 +26,7 @@ dependencyResolutionManagement {
             library("mockito-inline", "org.mockito:mockito-inline:3.12.4")
             library("mockito-junit", "org.mockito", "mockito-junit-jupiter").versionRef(mockito)
             // protobuf does not work as the others, see https://github.com/google/protobuf-gradle-plugin/issues/563
-            val protobuf = version("protobuf", "3.22.5")
+            val protobuf = version("protobuf", "4.28.2")
             val slf4j = version("slf4j", "2.0.11")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4j)
             library("slf4j-jul", "org.slf4j", "jul-to-slf4j").versionRef(slf4j)

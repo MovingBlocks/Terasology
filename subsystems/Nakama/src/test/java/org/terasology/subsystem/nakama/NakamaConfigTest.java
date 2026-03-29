@@ -8,11 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NakamaConfigTest {
     @Test
-    void defaultsAreDisabled() {
-        NakamaConfig config = new NakamaConfig();
-        assertFalse(config.isEnabled());
-        assertEquals("bifrost.lobby", config.getChannel());
-        assertEquals(7349, config.getGrpcPort());
-        assertEquals(7350, config.getWsPort());
+    void autoConfigDefaultsAreDisabled() {
+        NakamaAutoConfig config = new NakamaAutoConfig();
+        assertFalse(config.enabled.get());
+        assertEquals("bifrost.lobby", config.channel.get());
+        assertEquals(7349, config.grpcPort.get());
+        assertEquals(7350, config.wsPort.get());
+        assertEquals("localhost", config.host.get());
+        assertEquals("", config.playerName.get());
     }
 }
