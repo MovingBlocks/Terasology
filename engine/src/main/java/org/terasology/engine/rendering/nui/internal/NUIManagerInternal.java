@@ -503,14 +503,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private <T extends ControlWidget> void initialiseControlWidget(T overlay, ResourceUrn screenUri) {
-        ContextImpl timedContextForModulesWidgets = new ContextImpl(this.context);
+        ContextImpl widgetContext = new ContextImpl(this.context);
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
         TypeWidgetLibrary moduleLibrary =
-                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, timedContextForModulesWidgets);
-        timedContextForModulesWidgets.put(TypeWidgetLibrary.class, moduleLibrary);
+                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, widgetContext);
+        widgetContext.put(TypeWidgetLibrary.class, moduleLibrary);
 
-        InjectionHelper.inject(overlay, timedContextForModulesWidgets);
+        InjectionHelper.inject(overlay, widgetContext);
 
         overlay.initialise();
     }
