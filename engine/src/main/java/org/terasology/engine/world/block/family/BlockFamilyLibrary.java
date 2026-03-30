@@ -4,7 +4,6 @@ package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.world.block.BlockBuilderHelper;
@@ -34,8 +33,8 @@ public class BlockFamilyLibrary {
 
     private ClassLibrary<BlockFamily> library;
 
-    public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+    public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, reflectFactory, copyStrategyLibrary);
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
 
             if (!BlockFamily.class.isAssignableFrom(entry)) {
@@ -52,8 +51,8 @@ public class BlockFamilyLibrary {
     }
 
     @Inject
-    public BlockFamilyLibrary(ModuleManager moduleManager, Context context) {
-        this(moduleManager.getEnvironment(), context);
+    public BlockFamilyLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        this(moduleManager.getEnvironment(), reflectFactory, copyStrategyLibrary);
     }
 
     /**
