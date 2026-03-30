@@ -50,8 +50,8 @@ public class ConsoleImpl implements Console {
     private final Context context;
 
     @Inject
-    public ConsoleImpl(Context context) {
-        this.networkSystem = context.get(NetworkSystem.class);
+    public ConsoleImpl(NetworkSystem networkSystem, Context context) {
+        this.networkSystem = networkSystem;
         this.context = context;
     }
 
