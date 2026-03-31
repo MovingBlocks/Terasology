@@ -9,9 +9,12 @@ import org.terasology.gestalt.di.ServiceRegistry;
 
 import javax.inject.Inject;
 
+import org.terasology.gestalt.di.exceptions.DependencyResolutionException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link ContextImpl}, focusing on parent-child bean resolution.
@@ -67,6 +70,43 @@ public class ContextImplTest {
         TestService viaGet = child.get(TestService.class);
         assertNotNull(viaGet);
         assertEquals("from-child", viaGet.name);
+    }
+
+    /**
+     * When the parent is not a ContextImpl, the child cannot inherit the parent's
+     * BeanContext (instanceof check). context.get() should still resolve via the
+     * parent fallback, but @Inject resolution should not see parent beans.
+     */
+    @Test
+    public void childContextWithNonContextImplParentFallsBackToGetOnly() {
+        Context plainParent = new Context() {
+            private final TestService service = new TestService("from-plain-parent");
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> T get(Class<T> type) {
+                if (type == TestService.class) {
+                    return (T) service;
+                }
+                return null;
+            }
+
+            @Override
+            public <T, U extends T> void put(Class<T> type, U object) {
+            }
+        };
+
+        ContextImpl child = new ContextImpl(plainParent);
+
+        // get() works via parent fallback
+        TestService viaGet = child.get(TestService.class);
+        assertNotNull(viaGet, "child.get() should resolve from non-ContextImpl parent via fallback");
+        assertEquals("from-plain-parent", viaGet.name);
+
+        // @Inject fails because there is no parent BeanContext to search
+        TestConsumer consumer = new TestConsumer();
+        assertThrows(DependencyResolutionException.class, () -> child.inject(consumer),
+                "inject() should fail for non-ContextImpl parent with no BeanContext hierarchy");
     }
 
     @Test
