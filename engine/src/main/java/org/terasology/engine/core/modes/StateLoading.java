@@ -209,6 +209,11 @@ public class StateLoading implements GameState {
         loadProcesses.add(new AddHostPostLoadProcessesStep());
     }
 
+    private void addAndTrack(LoadProcess process) {
+        loadProcesses.add(process);
+        maxProgress += process.getExpectedCost();
+    }
+
     private void popStep() {
         if (current != null) {
             progress += current.getExpectedCost();
@@ -357,23 +362,23 @@ public class StateLoading implements GameState {
 
         @Override
         public boolean step() {
-            loadProcesses.add(new ConfigureEntitySystem(context));
-            loadProcesses.add(new InitialiseBlocks(gameManifest, context));
-            loadProcesses.add(new LoadPrefabs(context));
-            loadProcesses.add(new RegisterSystems(context, netMode));
+            addAndTrack(new ConfigureEntitySystem(context));
+            addAndTrack(new InitialiseBlocks(gameManifest, context));
+            addAndTrack(new LoadPrefabs(context));
+            addAndTrack(new RegisterSystems(context, netMode));
             if (!headless) {
-                loadProcesses.add(new RegisterInputSystem(context));
+                addAndTrack(new RegisterInputSystem(context));
             }
-            loadProcesses.add(new RegisterWorldSystems(gameManifest, context));
-            loadProcesses.add(new RegisterBlockFamilies(context));
-            loadProcesses.add(new ProcessBlockPrefabs(context));
-            loadProcesses.add(new InitialiseSystems(context));
-            loadProcesses.add(new PreBeginSystems(context));
-            loadProcesses.add(new LoadEntities(context));
-            loadProcesses.add(new InitialiseBlockTypeEntities(context));
-            loadProcesses.add(new CreateWorldEntity(context, gameManifest));
-            loadProcesses.add(new InitialiseWorldGenerator(context));
-            loadProcesses.add(new InitialiseRecordAndReplay(context));
+            addAndTrack(new RegisterWorldSystems(gameManifest, context));
+            addAndTrack(new RegisterBlockFamilies(context));
+            addAndTrack(new ProcessBlockPrefabs(context));
+            addAndTrack(new InitialiseSystems(context));
+            addAndTrack(new PreBeginSystems(context));
+            addAndTrack(new LoadEntities(context));
+            addAndTrack(new InitialiseBlockTypeEntities(context));
+            addAndTrack(new CreateWorldEntity(context, gameManifest));
+            addAndTrack(new InitialiseWorldGenerator(context));
+            addAndTrack(new InitialiseRecordAndReplay(context));
             if (netMode.isServer()) {
                 boolean dedicated;
                 if (netMode == NetworkMode.DEDICATED_SERVER) {
@@ -383,17 +388,14 @@ public class StateLoading implements GameState {
                 } else {
                     throw new IllegalStateException("Invalid server mode: " + netMode);
                 }
-                loadProcesses.add(new StartServer(context, dedicated));
+                addAndTrack(new StartServer(context, dedicated));
             }
-            loadProcesses.add(new PostBeginSystems(context));
+            addAndTrack(new PostBeginSystems(context));
             if (netMode.hasLocalClient()) {
-                loadProcesses.add(new SetupLocalPlayer(context));
-                loadProcesses.add(new AwaitCharacterSpawn(context));
+                addAndTrack(new SetupLocalPlayer(context));
+                addAndTrack(new AwaitCharacterSpawn(context));
             }
-            loadProcesses.add(new PrepareWorld(context));
-            for (LoadProcess process : loadProcesses) {
-                maxProgress += process.getExpectedCost();
-            }
+            addAndTrack(new PrepareWorld(context));
             return true;
         }
 
@@ -420,21 +422,21 @@ public class StateLoading implements GameState {
 
         @Override
         public boolean step() {
-            loadProcesses.add(new ConfigureEntitySystem(context));
-            loadProcesses.add(new InitialiseBlocks(gameManifest, context));
-            loadProcesses.add(new LoadPrefabs(context));
-            loadProcesses.add(new RegisterSystems(context, netMode));
+            addAndTrack(new ConfigureEntitySystem(context));
+            addAndTrack(new InitialiseBlocks(gameManifest, context));
+            addAndTrack(new LoadPrefabs(context));
+            addAndTrack(new RegisterSystems(context, netMode));
             if (!headless) {
-                loadProcesses.add(new RegisterInputSystem(context));
+                addAndTrack(new RegisterInputSystem(context));
             }
-            loadProcesses.add(new RegisterRemoteWorldSystems(context));
-            loadProcesses.add(new RegisterBlockFamilies(context));
-            loadProcesses.add(new ProcessBlockPrefabs(context));
-            loadProcesses.add(new InitialiseSystems(context));
-            loadProcesses.add(new PreBeginSystems(context));
-            loadProcesses.add(new CreateRemoteWorldEntity(context));
-            loadProcesses.add(new InitialiseBlockTypeEntities(context));
-            loadProcesses.add(new InitialiseRecordAndReplay(context));
+            addAndTrack(new RegisterRemoteWorldSystems(context));
+            addAndTrack(new RegisterBlockFamilies(context));
+            addAndTrack(new ProcessBlockPrefabs(context));
+            addAndTrack(new InitialiseSystems(context));
+            addAndTrack(new PreBeginSystems(context));
+            addAndTrack(new CreateRemoteWorldEntity(context));
+            addAndTrack(new InitialiseBlockTypeEntities(context));
+            addAndTrack(new InitialiseRecordAndReplay(context));
             if (netMode.isServer()) {
                 boolean dedicated;
                 if (netMode == NetworkMode.DEDICATED_SERVER) {
@@ -444,15 +446,12 @@ public class StateLoading implements GameState {
                 } else {
                     throw new IllegalStateException("Invalid server mode: " + netMode);
                 }
-                loadProcesses.add(new StartServer(context, dedicated));
+                addAndTrack(new StartServer(context, dedicated));
             }
-            loadProcesses.add(new PostBeginSystems(context));
-            loadProcesses.add(new SetupRemotePlayer(context));
-            loadProcesses.add(new AwaitCharacterSpawn(context));
-            loadProcesses.add(new PrepareWorld(context));
-            for (LoadProcess process : loadProcesses) {
-                maxProgress += process.getExpectedCost();
-            }
+            addAndTrack(new PostBeginSystems(context));
+            addAndTrack(new SetupRemotePlayer(context));
+            addAndTrack(new AwaitCharacterSpawn(context));
+            addAndTrack(new PrepareWorld(context));
             return true;
         }
 
