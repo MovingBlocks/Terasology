@@ -7,7 +7,6 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
-import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.BlockEntityRegistry;
@@ -17,7 +16,7 @@ import org.terasology.engine.world.sun.CelestialSystem;
 public class RegisterRemoteWorldSystems extends SingleStepLoadProcess {
     private final Context context;
 
-    public RegisterRemoteWorldSystems(GameManifest gameManifest, Context context) {
+    public RegisterRemoteWorldSystems(Context context) {
         this.context = context;
     }
 
