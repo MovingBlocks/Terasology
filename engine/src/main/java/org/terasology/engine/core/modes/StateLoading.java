@@ -418,7 +418,7 @@ public class StateLoading implements GameState {
             if (!headless) {
                 loadProcesses.add(new RegisterInputSystem(context));
             }
-            loadProcesses.add(new RegisterRemoteWorldSystems(gameManifest, context));
+            loadProcesses.add(new RegisterRemoteWorldSystems(context));
             loadProcesses.add(new RegisterBlockFamilies(context));
             loadProcesses.add(new ProcessBlockPrefabs(context));
             loadProcesses.add(new InitialiseSystems(context));
