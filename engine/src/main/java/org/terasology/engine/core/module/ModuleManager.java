@@ -395,7 +395,8 @@ public class ModuleManager {
      */
     public ModuleEnvironment loadEnvironment(Context context, Set<Module> modules, boolean asPrimary) {
         if (!(context instanceof ContextImpl contextImpl)) {
-            throw new IllegalStateException("loadEnvironment requires a ContextImpl but got " + context.getClass().getName());
+            throw new IllegalStateException("loadEnvironment requires a ContextImpl but got "
+                    + (context == null ? "null" : context.getClass().getName()));
         }
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.add(engineModule);

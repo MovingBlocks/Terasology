@@ -29,7 +29,8 @@ public class InitialiseBlocks extends SingleStepLoadProcess {
         if (blockManager instanceof BlockManagerImpl impl) {
             impl.initialise(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap());
         } else {
-            throw new IllegalStateException("Expected BlockManagerImpl but got " + blockManager.getClass().getName());
+            throw new IllegalStateException("Expected BlockManagerImpl but got "
+                    + (blockManager == null ? "null" : blockManager.getClass().getName()));
         }
         return true;
     }
