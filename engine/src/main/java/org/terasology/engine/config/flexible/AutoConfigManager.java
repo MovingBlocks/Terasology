@@ -78,8 +78,9 @@ public class AutoConfigManager {
                         logger.error("Error while loading config {} from disk", config.getId(), e); //NOPMD
                     }
                     return configClass.cast(config);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignore) {
-                    return null;
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    logger.error("Failed to instantiate AutoConfig {}", configClass.getSimpleName(), e);
+                    throw new RuntimeException("Failed to instantiate AutoConfig " + configClass.getSimpleName(), e);
                 }
             });
         }
