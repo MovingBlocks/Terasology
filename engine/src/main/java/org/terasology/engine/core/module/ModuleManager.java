@@ -382,15 +382,29 @@ public class ModuleManager {
         return loadEnvironment(new ContextImpl(), modules, asPrimary);
     }
 
+    /**
+     * Load a module environment backed by the given context's BeanContext.
+     *
+     * @param context must be a {@link ContextImpl} — the BeanContext is extracted for module
+     *                dependency injection. Use {@link #loadEnvironment(Set, boolean)} if no
+     *                specific context is needed.
+     * @param modules the modules to include in the environment
+     * @param asPrimary if true, sets this as the primary environment
+     * @return the loaded module environment
+     * @throws IllegalStateException if context is not a ContextImpl
+     */
     public ModuleEnvironment loadEnvironment(Context context, Set<Module> modules, boolean asPrimary) {
+        if (!(context instanceof ContextImpl contextImpl)) {
+            throw new IllegalStateException("loadEnvironment requires a ContextImpl but got " + context.getClass().getName());
+        }
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.add(engineModule);
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(((ContextImpl) context).getBeanContext(), finalModules, wrappingPermissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(contextImpl.getBeanContext(), finalModules, wrappingPermissionProviderFactory);
         } else {
-            newEnvironment = new ModuleEnvironment(((ContextImpl) context).getBeanContext(), finalModules, permissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(contextImpl.getBeanContext(), finalModules, permissionProviderFactory);
         }
         if (asPrimary) {
             environment = newEnvironment;
