@@ -119,10 +119,15 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
                 if (fieldValue.isPresent()) {
                     if (Modifier.isPrivate(field.getModifiers())) {
-                        try {
-                            ReflectionUtil.findSetter(field).invoke(result);
-                        } catch (InvocationTargetException e) {
-                            logger.error("Failed to invoke setter for field {}", field);
+                        Method setter = ReflectionUtil.findSetter(field);
+                        if (setter != null) {
+                            try {
+                                setter.invoke(result, fieldValue.get());
+                            } catch (InvocationTargetException e) {
+                                logger.error("Failed to invoke setter for field {}", field);
+                            }
+                        } else {
+                            logger.error("Field {} is inaccessible - private and has no setter.", field);
                         }
                     } else {
                         field.set(result, fieldValue.get());
