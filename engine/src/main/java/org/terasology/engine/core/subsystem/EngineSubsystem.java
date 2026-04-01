@@ -23,7 +23,7 @@ public interface EngineSubsystem {
      * This is an opportunity to register services that will be available from the root context
      * for the entire run of the engine, and may be used by other systems.
      *
-     * @param serviceRegistry the service registry used to build the root context for the entire run of the engine.
+     * @param serviceRegistry The service registry used to build the root context for the entire run of the engine
      */
     default void preInitialise(ServiceRegistry serviceRegistry) {
     }
@@ -32,7 +32,7 @@ public interface EngineSubsystem {
      * Called to initialise the system.
      *
      * @param engine          The game engine
-     * @param serviceRegistry The service registry used to build the context for the entire run of the engine.
+     * @param serviceRegistry The service registry used to build the context for the entire run of the engine
      */
     default void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
     }

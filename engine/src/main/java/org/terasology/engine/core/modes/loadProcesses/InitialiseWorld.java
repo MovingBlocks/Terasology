@@ -15,7 +15,6 @@ import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
-import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.players.LocalPlayer;
