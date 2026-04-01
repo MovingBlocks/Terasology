@@ -55,6 +55,9 @@ public class NakamaSubSystem implements EngineSubsystem {
     private final ConcurrentLinkedQueue<String> incomingMessages = new ConcurrentLinkedQueue<>();
     private Console console;
 
+    // Last received item link — consumed by /materialize
+    private volatile JsonObject lastItemLink;
+
     // Callback for incoming messages — set by the engine/module that handles chat display
     private Consumer<String> incomingMessageHandler;
 
@@ -114,12 +117,24 @@ public class NakamaSubSystem implements EngineSubsystem {
                 return;
             }
             String player = content.has("player") ? content.get("player").getAsString() : "???";
-            String text = content.has("text") ? content.get("text").getAsString() : "";
             String prefix = "[" + GAME_PREFIXES.getOrDefault(game,
                     game.toUpperCase().substring(0, Math.min(game.length(), 2))) + "]";
+
+            // Check for item link message
+            String type = content.has("type") ? content.get("type").getAsString() : "chat";
+            if ("item_link".equals(type)) {
+                lastItemLink = content;
+                String itemName = content.has("name") ? content.get("name").getAsString() : "???";
+                String formatted = prefix + " " + player + " beamed: [" + itemName + "]";
+                logger.info("Nakama RECV item_link (ws thread): {}", formatted);
+                incomingMessages.add(formatted);
+                return;
+            }
+
+            String text = content.has("text") ? content.get("text").getAsString() : "";
             String formatted = prefix + " " + player + ": " + text;
 
-            logger.info("Nakama chat: {}", formatted);
+            logger.info("Nakama RECV chat (ws thread): {}", formatted);
             incomingMessages.add(formatted);
 
             if (incomingMessageHandler != null) {
@@ -158,6 +173,44 @@ public class NakamaSubSystem implements EngineSubsystem {
     }
 
     /**
+     * Send an item link to the Nakama channel.
+     */
+    public boolean sendItemLink(String itemName, String description) {
+        if (socket == null || channel == null) {
+            return false;
+        }
+        try {
+            JsonObject content = new JsonObject();
+            content.addProperty("game", GAME_ID);
+            content.addProperty("player", autoConfig.playerName.get());
+            content.addProperty("type", "item_link");
+            content.addProperty("name", itemName);
+            content.addProperty("description", description);
+            socket.writeChatMessage(channel.getId(), content.toString()).get();
+            return true;
+        } catch (Exception e) {
+            logger.warn("Nakama: failed to send item link", e);
+            return false;
+        }
+    }
+
+    /**
+     * Consume the last received item link (returns null if none pending).
+     */
+    public JsonObject consumeItemLink() {
+        JsonObject link = lastItemLink;
+        lastItemLink = null;
+        return link;
+    }
+
+    /**
+     * Peek at the last received item link without consuming it.
+     */
+    public JsonObject getLastItemLink() {
+        return lastItemLink;
+    }
+
+    /**
      * Register a handler for incoming cross-game messages.
      * The handler receives a pre-formatted string like "[DS] Bob: Hello"
      */
@@ -191,9 +244,8 @@ public class NakamaSubSystem implements EngineSubsystem {
                 console = currentState.getContext().get(Console.class);
             }
             if (console != null) {
+                logger.info("Nakama DISPATCH to console (game thread): {}", msg);
                 console.addMessage(msg, CoreMessageType.CHAT);
-            } else {
-                logger.info("Nakama chat (no console yet): {}", msg);
             }
         }
     }
