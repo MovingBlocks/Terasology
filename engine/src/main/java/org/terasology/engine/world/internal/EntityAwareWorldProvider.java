@@ -77,9 +77,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
     }
 
     @Inject
-    public EntityAwareWorldProvider(WorldProviderCore base, EntityManager entityManager, ComponentSystemManager componentSystemManager) {
+    public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager, ComponentSystemManager componentSystemManager) {
         super(base);
-        this.entityManager = (EngineEntityManager) entityManager;
+        this.entityManager = entityManager;
         componentSystemManager.register(getTime());
     }
 

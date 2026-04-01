@@ -16,6 +16,7 @@ import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.persistence.StorageManager;
@@ -160,7 +161,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             implements WorldProviderCore, BlockEntityRegistry {
         @Inject
         public WorldProviderCoreWorkAround(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager,
-                                           EntityManager entityManager, ComponentSystemManager componentSystemManager) {
+                                           EngineEntityManager entityManager, ComponentSystemManager componentSystemManager) {
             super(new WorldProviderCoreImpl(info, chunkProvider, blockManager, entityManager), entityManager, componentSystemManager);
         }
     }
