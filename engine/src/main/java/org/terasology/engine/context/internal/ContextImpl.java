@@ -74,7 +74,8 @@ public class ContextImpl implements Context {
         ServiceRegistry thisServiceRegistry = new ServiceRegistry();
         thisServiceRegistry.with(Context.class).lifetime(Lifetime.Singleton).use(() -> this);
         thisServiceRegistry.with(ContextImpl.class).lifetime(Lifetime.Singleton).use(() -> this);
-        this.beanContext = new DefaultBeanContext(thisServiceRegistry);
+        this.beanContext = new DefaultBeanContext(
+                parent instanceof ContextImpl ? ((ContextImpl) parent).beanContext : null, thisServiceRegistry);
         this.parent = parent;
     }
 

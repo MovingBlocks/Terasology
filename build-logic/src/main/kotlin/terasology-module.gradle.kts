@@ -54,7 +54,7 @@ dependencies {
     implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
     testImplementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
-    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.0-SNAPSHOT")
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.1-SNAPSHOT")
 
     for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
