@@ -111,11 +111,8 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
     }
 
     public static TypeHandlerLibrary forModuleEnvironment(ModuleManager moduleManager, TypeRegistry typeRegistry) {
-        TypeHandlerLibrary library = new TypeHandlerLibraryImpl(moduleManager, typeRegistry);
-
-        populateWithDefaultHandlers(library);
-
-        return library;
+        // The @Inject constructor already calls populateWithDefaultHandlers
+        return new TypeHandlerLibraryImpl(moduleManager, typeRegistry);
     }
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
