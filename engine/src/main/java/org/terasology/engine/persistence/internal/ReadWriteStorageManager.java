@@ -269,8 +269,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private SaveTransaction createSaveTransaction() {
         ChunkProvider chunks = chunkProvider != null ? chunkProvider.get() : null;
         NetworkSystem network = networkSystem != null ? networkSystem.get() : null;
-        if (chunks == null || network == null) {
-            throw new IllegalStateException("Cannot save: ChunkProvider or NetworkSystem not available");
+        if (chunks == null) {
+            throw new IllegalStateException("Cannot save: ChunkProvider not available");
+        }
+        if (network == null) {
+            throw new IllegalStateException("Cannot save: NetworkSystem not available");
         }
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
