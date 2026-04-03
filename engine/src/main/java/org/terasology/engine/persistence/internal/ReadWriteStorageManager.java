@@ -267,19 +267,19 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private SaveTransaction createSaveTransaction() {
-        ChunkProvider chunks = chunkProvider != null ? chunkProvider.get() : null;
-        NetworkSystem network = networkSystem != null ? networkSystem.get() : null;
-        if (chunks == null) {
+        ChunkProvider chunkProviderInstance = chunkProvider != null ? chunkProvider.get() : null;
+        NetworkSystem networkSystemInstance = networkSystem != null ? networkSystem.get() : null;
+        if (chunkProviderInstance == null) {
             throw new IllegalStateException("Cannot save: ChunkProvider not available");
         }
-        if (network == null) {
+        if (networkSystemInstance == null) {
             throw new IllegalStateException("Cannot save: NetworkSystem not available");
         }
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
                 recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
-        addChunksToSaveTransaction(saveTransactionBuilder, chunks);
-        addPlayersToSaveTransaction(saveTransactionBuilder, network);
+        addChunksToSaveTransaction(saveTransactionBuilder, chunkProviderInstance);
+        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystemInstance);
         addGlobalStoreBuilderToSaveTransaction(saveTransactionBuilder);
         addGameManifestToSaveTransaction(saveTransactionBuilder);
 
@@ -415,8 +415,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
             return false;
         }
         NetworkSystem networkSystemInstance = networkSystem.get();
+        ChunkProvider chunkProviderInstance = chunkProvider.get();
         return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority()
-                && chunkProvider.get() != null && blockManager != null;
+                && chunkProviderInstance != null && blockManager != null;
     }
 
     private void startSaving() {
