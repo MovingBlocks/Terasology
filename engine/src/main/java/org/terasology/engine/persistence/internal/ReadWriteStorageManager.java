@@ -411,9 +411,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private boolean isRunModeAllowSaving() {
+        if (networkSystem == null || chunkProvider == null) {
+            return false;
+        }
         NetworkSystem networkSystemInstance = networkSystem.get();
-        return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority() && chunkProvider.get() != null
-                && blockManager != null;
+        return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority()
+                && chunkProvider.get() != null && blockManager != null;
     }
 
     private void startSaving() {

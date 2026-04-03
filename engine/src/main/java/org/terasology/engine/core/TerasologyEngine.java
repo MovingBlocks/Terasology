@@ -182,7 +182,8 @@ public class TerasologyEngine implements GameEngine {
         rootContextRegistry.with(CharacterStateEventPositionMap.class).lifetime(Lifetime.Singleton).use(() -> characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         rootContextRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
-        // CoreRegistry is set in initialize() after rootContext is created.
+        // Clear any stale context — rootContext is set in initialize().
+        CoreRegistry.setContext(null);
 
         this.allSubsystems = Queues.newArrayDeque();
         configurationSubsystem = new ConfigurationSubsystem();
