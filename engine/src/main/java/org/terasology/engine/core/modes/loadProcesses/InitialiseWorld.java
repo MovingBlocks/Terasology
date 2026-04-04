@@ -83,6 +83,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldInfo worldInfo = verifyNotNull(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD),
                 "Game manifest does not contain a MAIN_WORLD");
         verify(worldInfo.getWorldGenerator().isValid(), "Game manifest did not specify world type.");
+        // Seed is carried by the GameManifest from the UI (GameManifestProvider).
+        // Generate a random fallback if the manifest doesn't specify one.
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
             worldInfo.setSeed(random.nextString(16));
