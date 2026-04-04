@@ -31,6 +31,8 @@ import org.terasology.gestalt.naming.NameVersion;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 //TODO document this!
 public class JoinServer extends VariableStepLoadProcess {
@@ -41,7 +43,7 @@ public class JoinServer extends VariableStepLoadProcess {
     private GameManifest gameManifest;
     private JoinStatus joinStatus;
 
-    private Thread applyModuleThread;
+    private FutureTask<Context> applyModuleTask;
     private ModuleEnvironment oldEnvironment;
 
     public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
@@ -53,7 +55,7 @@ public class JoinServer extends VariableStepLoadProcess {
 
     @Override
     public String getMessage() {
-        if (applyModuleThread != null) {
+        if (applyModuleTask != null) {
             return "${engine:menu#scanning-for-assets}";
         } else {
             return joinStatus.getCurrentActivity();
@@ -62,8 +64,21 @@ public class JoinServer extends VariableStepLoadProcess {
 
     @Override
     public boolean step() {
-        if (applyModuleThread != null) {
-            if (!applyModuleThread.isAlive()) {
+        if (applyModuleTask != null) {
+            if (applyModuleTask.isDone()) {
+                try {
+                    Context gameContext = applyModuleTask.get();
+                    CoreRegistry.setContext(gameContext);
+                } catch (ExecutionException e) {
+                    logger.error("Failed to apply game environment", e.getCause());
+                    StateMainMenu mainMenu = new StateMainMenu("Failed to apply game environment: " + e.getCause().getMessage());
+                    context.get(GameEngine.class).changeState(mainMenu);
+                    networkSystem.shutdown();
+                    return false;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
                 if (oldEnvironment != null) {
                     oldEnvironment.close();
                 }
@@ -120,15 +135,17 @@ public class JoinServer extends VariableStepLoadProcess {
             context.get(Game.class).load(gameManifest);
 
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            ContextImpl modulesContext = new ContextImpl(context,
-                    moduleManager.getEnvironment().getBeans(BeanContext.class).stream().findFirst().get());
+            BeanContext moduleBeanContext = moduleManager.getEnvironment().getBeans(BeanContext.class).stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Loaded module environment did not expose a BeanContext"));
+            ContextImpl modulesContext = new ContextImpl(context, moduleBeanContext);
             ServiceRegistry gameContextRegistry = new ServiceRegistry();
-            applyModuleThread = new Thread(() -> {
+            applyModuleTask = new FutureTask<>(() -> {
                 environmentSwitchHandler.handleSwitchToGameEnvironment(modulesContext, gameContextRegistry);
-                Context gameContext = new ContextImpl(modulesContext, gameContextRegistry);
-                CoreRegistry.setContext(gameContext);
+                return new ContextImpl(modulesContext, gameContextRegistry);
             });
-            applyModuleThread.start();
+            new Thread(applyModuleTask, "apply-module-environment").start();
 
             return false;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
