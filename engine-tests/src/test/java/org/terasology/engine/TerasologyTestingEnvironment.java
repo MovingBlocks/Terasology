@@ -46,6 +46,7 @@ import static org.mockito.Mockito.mock;
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  */
 public abstract class TerasologyTestingEnvironment {
+    private static Context baseContext;
     protected static Context context;
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
@@ -68,7 +69,8 @@ public abstract class TerasologyTestingEnvironment {
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
         env = new HeadlessEnvironment(new Name("engine"), new Name("unittest"));
-        context = env.getContext();
+        baseContext = env.getContext();
+        context = baseContext;
         CoreRegistry.setContext(context);
         moduleManager = context.get(ModuleManager.class);
 
@@ -82,7 +84,9 @@ public abstract class TerasologyTestingEnvironment {
         mockTime = mock(EngineTime.class);
         serviceRegistry.with(Time.class).lifetime(Lifetime.Singleton).use(() -> mockTime);
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
-        serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(Game::new);
+        Game game = new Game();
+        game.load(new GameManifest("world1", "world1", 0));
+        serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(() -> game);
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
 
@@ -94,13 +98,12 @@ public abstract class TerasologyTestingEnvironment {
         serviceRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
 
-        Game game = new Game();
-        game.load(new GameManifest("world1", "world1", 0));
         serviceRegistry.with(StorageManager.class).lifetime(Lifetime.Singleton).use(ReadWriteStorageManager.class);
 
         serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
         serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
-        context = new ContextImpl(context, serviceRegistry);
+        context = new ContextImpl(baseContext, serviceRegistry);
+        CoreRegistry.setContext(context);
         engineEntityManager = context.get(EngineEntityManager.class);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
                 context.get(EntitySystemLibrary.class), moduleManager.getEnvironment(), engineEntityManager);

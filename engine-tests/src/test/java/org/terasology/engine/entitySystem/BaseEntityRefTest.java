@@ -46,6 +46,7 @@ import static org.terasology.engine.entitySystem.entity.internal.EntityScope.SEC
 
 public class BaseEntityRefTest {
 
+    private static Context baseContext;
     private static Context context;
     private PojoEntityManager entityManager;
     private EntityRef ref;
@@ -62,7 +63,8 @@ public class BaseEntityRefTest {
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetTypeManager.getAssetManager());
         serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> new RecordAndReplayCurrentStatus());
-        context = new ContextImpl(serviceRegistry);
+        baseContext = new ContextImpl(serviceRegistry);
+        context = baseContext;
         CoreRegistry.setContext(context);
     }
 
@@ -74,7 +76,8 @@ public class BaseEntityRefTest {
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
-        context = new ContextImpl(context, serviceRegistry);
+        context = new ContextImpl(baseContext, serviceRegistry);
+        CoreRegistry.setContext(context);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
                 context.get(EntitySystemLibrary.class), context.get(ModuleManager.class).getEnvironment(),
                 context.get(EngineEntityManager.class));
