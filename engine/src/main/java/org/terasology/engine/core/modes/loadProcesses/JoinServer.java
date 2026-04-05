@@ -74,7 +74,7 @@ public class JoinServer extends VariableStepLoadProcess {
                     StateMainMenu mainMenu = new StateMainMenu("Failed to apply game environment: " + e.getCause().getMessage());
                     context.get(GameEngine.class).changeState(mainMenu);
                     networkSystem.shutdown();
-                    return false;
+                    return true;
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return false;
