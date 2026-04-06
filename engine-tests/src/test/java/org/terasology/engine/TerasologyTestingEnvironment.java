@@ -46,14 +46,13 @@ import static org.mockito.Mockito.mock;
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  */
 public abstract class TerasologyTestingEnvironment {
-    private static Context baseContext;
-    protected static Context context;
-
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
+    private static Context baseContext;
     private static ModuleManager moduleManager;
-
     private static HeadlessEnvironment env;
+
+    protected static Context context;
 
     protected EngineTime mockTime;
 

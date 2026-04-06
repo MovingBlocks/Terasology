@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -76,5 +78,78 @@ public class PathManagerTest {
     public void savePathIsUnderSavesDirectory() {
         Path savePath = pathManager.getSavePath("MyWorld");
         assertEquals(pathManager.getSavesPath(), savePath.getParent());
+    }
+
+    @Test
+    public void getSavePathEmptyOrSpecialCharactersReturnsRoot() {
+        Path savePath = pathManager.getSavePath("!!!@@@");
+        // All invalid characters are removed, leaving an empty string.
+        // Resolving an empty string against savesPath returns savesPath itself.
+        assertEquals(pathManager.getSavesPath(), savePath);
+    }
+
+    @Test
+    public void getSavePathIgnoresPathTraversal() {
+        Path savePath = pathManager.getSavePath("../../Windows/System32");
+        // Dots and slashes are removed, combining the remaining valid characters.
+        assertEquals("WindowsSystem32", savePath.getFileName().toString());
+        assertEquals(pathManager.getSavesPath(), savePath.getParent());
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    public void useDefaultHomePathMac(@TempDir Path tempHome) throws IOException {
+        String originalHome = System.getProperty("user.home");
+        try {
+            System.setProperty("user.home", tempHome.toString());
+            pathManager.useDefaultHomePath();
+            
+            Path expectedMacPath = tempHome.resolve("Library/Application Support/Terasology");
+            assertEquals(expectedMacPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
+            assertTrue(Files.isDirectory(pathManager.getHomePath()));
+            assertTrue(Files.isDirectory(pathManager.getSavesPath()));
+        } finally {
+            if (originalHome != null) {
+                System.setProperty("user.home", originalHome);
+            } else {
+                System.clearProperty("user.home");
+            }
+        }
+    }
+
+    @Test
+    @EnabledOnOs(OS.LINUX)
+    public void useDefaultHomePathLinux(@TempDir Path tempHome) throws IOException {
+        String originalHome = System.getProperty("user.home");
+        try {
+            System.setProperty("user.home", tempHome.toString());
+            pathManager.useDefaultHomePath();
+            
+            Path expectedLinuxPath = tempHome.resolve(".local/share/terasology");
+            assertEquals(expectedLinuxPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
+            assertTrue(Files.isDirectory(pathManager.getHomePath()));
+            assertTrue(Files.isDirectory(pathManager.getSavesPath()));
+        } finally {
+            if (originalHome != null) {
+                System.setProperty("user.home", originalHome);
+            } else {
+                System.clearProperty("user.home");
+            }
+        }
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    public void useDefaultHomePathWindows() throws IOException {
+        // Windows relies on JNA (Shell32Util) which directly interrogates the Windows Registry/API.
+        // We cannot easily redirect this to a @TempDir. We only verify that the path resolves to a valid Windows dir.
+        // Note: This will create a 'Terasology' folder in the local user's AppData/Saved Games! 
+        pathManager.useDefaultHomePath();
+        assertNotNull(pathManager.getHomePath());
+        
+        // It should end with Terasology
+        assertTrue(pathManager.getHomePath().toString().endsWith("Terasology"));
+        assertTrue(Files.isDirectory(pathManager.getHomePath()));
+        assertTrue(Files.isDirectory(pathManager.getSavesPath()));
     }
 }
