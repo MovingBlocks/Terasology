@@ -83,7 +83,7 @@ public abstract class TerasologyTestingEnvironment {
 
         mockTime = mock(EngineTime.class);
         serviceRegistry.with(Time.class).lifetime(Lifetime.Singleton).use(() -> mockTime);
-        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
+        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, baseContext);
         Game game = new Game();
         game.load(new GameManifest("world1", "world1", 0));
         serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(() -> game);

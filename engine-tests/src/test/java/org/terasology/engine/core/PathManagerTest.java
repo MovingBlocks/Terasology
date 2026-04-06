@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,11 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PathManagerTest {
 
     private PathManager pathManager;
+    private PathManager originalInstance;
 
     @BeforeEach
     public void setup(@TempDir Path tempHome) throws IOException {
+        originalInstance = PathManager.getInstance();
         pathManager = PathManager.getInstance();
         pathManager.useOverrideHomePath(tempHome);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        PathManager.setInstance(originalInstance);
     }
 
     @Test
