@@ -77,6 +77,7 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
+        CoreRegistry.setContext(baseContext);
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 

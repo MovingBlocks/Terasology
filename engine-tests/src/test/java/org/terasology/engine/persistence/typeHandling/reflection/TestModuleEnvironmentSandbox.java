@@ -3,7 +3,6 @@
 
 package org.terasology.engine.persistence.typeHandling.reflection;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -27,11 +26,8 @@ public class TestModuleEnvironmentSandbox {
     private TypeRegistry typeRegistry;
     private ModuleManager moduleManager;
     private ModuleEnvironment environment;
-    private Path originalHomePath;
-
     @BeforeEach
     protected void provideSandbox(@TempDir Path tempHome) throws Exception {
-        originalHomePath = PathManager.getInstance().getHomePath();
         PathManager.getInstance().useOverrideHomePath(tempHome);
         moduleManager = ModuleManagerFactory.create();
         environment = moduleManager.getEnvironment();
@@ -42,13 +38,6 @@ public class TestModuleEnvironmentSandbox {
         sandbox = new ModuleEnvironmentSandbox(moduleManager, typeRegistry);
 
         // module = environment.get(new Name("unittest"));
-    }
-
-    @AfterEach
-    protected void restorePathManager() throws Exception {
-        if (originalHomePath != null) {
-            PathManager.getInstance().useOverrideHomePath(originalHomePath);
-        }
     }
 
     @Test
