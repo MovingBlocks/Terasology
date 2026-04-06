@@ -68,7 +68,7 @@ public class PojoEntityPoolTest {
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(baseContext, serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         context = new ContextImpl(baseContext, serviceRegistry);
         CoreRegistry.setContext(context);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),

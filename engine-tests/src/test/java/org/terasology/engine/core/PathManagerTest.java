@@ -23,18 +23,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PathManagerTest {
 
     private PathManager pathManager;
-    private PathManager originalInstance;
+    private Path originalHomePath;
 
     @BeforeEach
     public void setup(@TempDir Path tempHome) throws IOException {
-        originalInstance = PathManager.getInstance();
         pathManager = PathManager.getInstance();
+        originalHomePath = pathManager.getHomePath();
         pathManager.useOverrideHomePath(tempHome);
     }
 
     @AfterEach
-    public void tearDown() {
-        PathManager.setInstance(originalInstance);
+    public void tearDown() throws IOException {
+        if (originalHomePath != null) {
+            pathManager.useOverrideHomePath(originalHomePath);
+        }
     }
 
     @Test
