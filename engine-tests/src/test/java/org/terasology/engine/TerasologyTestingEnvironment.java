@@ -46,13 +46,13 @@ import static org.mockito.Mockito.mock;
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  */
 public abstract class TerasologyTestingEnvironment {
+    protected static Context context;
+
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
     private static Context baseContext;
     private static ModuleManager moduleManager;
     private static HeadlessEnvironment env;
-
-    protected static Context context;
 
     protected EngineTime mockTime;
 
@@ -70,14 +70,14 @@ public abstract class TerasologyTestingEnvironment {
         env = new HeadlessEnvironment(new Name("engine"), new Name("unittest"));
         baseContext = env.getContext();
         context = baseContext;
-        CoreRegistry.setContext(context);
+        CoreRegistry.setContext(context); // initial setup for @BeforeAll lookups
         moduleManager = context.get(ModuleManager.class);
 
     }
 
     @BeforeEach
     public void setup() throws Exception {
-        CoreRegistry.setContext(baseContext);
+        CoreRegistry.setContext(baseContext); // clear stale per-test context from previous run
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
@@ -103,7 +103,7 @@ public abstract class TerasologyTestingEnvironment {
         serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
         serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
         context = new ContextImpl(baseContext, serviceRegistry);
-        CoreRegistry.setContext(context);
+        CoreRegistry.setContext(context); // switch to per-test child context
         engineEntityManager = context.get(EngineEntityManager.class);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
                 context.get(EntitySystemLibrary.class), moduleManager.getEnvironment(), engineEntityManager);
@@ -116,7 +116,7 @@ public abstract class TerasologyTestingEnvironment {
             complete = prefabLoadStep.step();
         }
         context.get(ComponentSystemManager.class).initialise();
-        CoreRegistry.setContext(context);
+        CoreRegistry.setContext(context); // reassert after prefab loading and system init
     }
 
     @AfterAll
