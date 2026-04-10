@@ -20,7 +20,10 @@ import java.util.Set;
 
 /**
  * This class provides the methods needed to determine if a client is allowed to connect or not,
- * based on the blacklist and whitelist files.
+ * based on the denylist and allowlist files.
+ *
+ * To account for legacy blacklist and whitelist files on old servers,
+ * migrateLegacyFiles() will migrate these files to denylist and allowlist respectively.
  */
 
 public class ServerConnectListManager {
@@ -29,15 +32,15 @@ public class ServerConnectListManager {
     private static final Gson GSON = new Gson();
 
     private Context context;
-    private Set<String> blacklistedIDs;
-    private Set<String> whitelistedIDs;
-    private final Path blacklistPath;
-    private final Path whitelistPath;
+    private Set<String> denylistedIDs;
+    private Set<String> allowlistedIDs;
+    private final Path denylistPath;
+    private final Path allowlistPath;
 
     @Inject
     public ServerConnectListManager(Context context) {
-        blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-        whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+        denylistPath = PathManager.getInstance().getHomePath().resolve("denylist.json");
+        allowlistPath = PathManager.getInstance().getHomePath().resolve("allowlist.json");
         this.context = context;
         loadLists();
     }
@@ -45,30 +48,33 @@ public class ServerConnectListManager {
     @SuppressWarnings("unchecked")
     private void loadLists() {
         try {
+            migrateLegacyFiles();
             if (createFiles()) {
-                blacklistedIDs = GSON.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
-                whitelistedIDs = GSON.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
-                if (blacklistedIDs == null) {
-                    blacklistedIDs = new HashSet<>();
+                try (var denylistReader = Files.newBufferedReader(denylistPath);
+                     var allowlistReader = Files.newBufferedReader(allowlistPath)) {
+                    denylistedIDs = GSON.fromJson(denylistReader, Set.class);
+                    allowlistedIDs = GSON.fromJson(allowlistReader, Set.class);
                 }
-                if (whitelistedIDs == null) {
-                    whitelistedIDs = new HashSet<>();
+                if (denylistedIDs == null) {
+                    denylistedIDs = new HashSet<>();
+                }
+                if (allowlistedIDs == null) {
+                    allowlistedIDs = new HashSet<>();
                 }
             }
         } catch (IOException e) {
-            logger.error("Whitelist or blacklist files not found:", e);
+            logger.error("Allowlist or denylist files not found:", e);
         }
     }
 
     private void saveLists() {
         try {
             if (createFiles()) {
-                Writer blacklistWriter = Files.newBufferedWriter(blacklistPath);
-                Writer whitelistWriter = Files.newBufferedWriter(whitelistPath);
-                blacklistWriter.write(GSON.toJson(blacklistedIDs));
-                whitelistWriter.write(GSON.toJson(whitelistedIDs));
-                blacklistWriter.close();
-                whitelistWriter.close();
+                try (Writer denylistWriter = Files.newBufferedWriter(denylistPath);
+                     Writer allowlistWriter = Files.newBufferedWriter(allowlistPath)) {
+                    denylistWriter.write(GSON.toJson(denylistedIDs));
+                    allowlistWriter.write(GSON.toJson(allowlistedIDs));
+                }
             }
         } catch (IOException e) {
             logger.error("Couldn't save lists: ", e);
@@ -80,63 +86,87 @@ public class ServerConnectListManager {
         if (display == null || !display.isHeadless()) {
             return false;
         }
-        if (!Files.exists(blacklistPath)) {
-            Files.createFile(blacklistPath);
+        if (!Files.exists(denylistPath)) {
+            Files.createFile(denylistPath);
         }
-        if (!Files.exists(whitelistPath)) {
-            Files.createFile(whitelistPath);
+        if (!Files.exists(allowlistPath)) {
+            Files.createFile(allowlistPath);
         }
         return true;
     }
 
     public String getErrorMessage(String clientID) {
-        if (isClientBlacklisted(clientID)) {
-            return "client on blacklist";
+        if (isClientDenylisted(clientID)) {
+            return "client on denylist";
         }
-        if (!isClientWhitelisted(clientID)) {
-            return "client not on whitelist";
+        if (!isClientAllowlisted(clientID)) {
+            return "client not on allowlist";
         }
         return null;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isClientAllowedToConnect(String clientID) {
-        return !isClientBlacklisted(clientID) && isClientWhitelisted(clientID);
+        return !isClientDenylisted(clientID) && isClientAllowlisted(clientID);
     }
 
-    public void addToWhitelist(String clientID) {
-        whitelistedIDs.add(clientID);
+    public void addToAllowlist(String clientID) {
+        allowlistedIDs.add(clientID);
         saveLists();
     }
 
-    public void removeFromWhitelist(String clientID) {
-        whitelistedIDs.remove(clientID);
+    public void removeFromAllowlist(String clientID) {
+        allowlistedIDs.remove(clientID);
         saveLists();
     }
 
-    public Set getWhitelist() {
-        return Collections.unmodifiableSet(whitelistedIDs);
+    public Set getAllowlist() {
+        return Collections.unmodifiableSet(allowlistedIDs);
     }
 
-    public void addToBlacklist(String clientID) {
-        blacklistedIDs.add(clientID);
+    public void addToDenylist(String clientID) {
+        denylistedIDs.add(clientID);
         saveLists();
     }
 
-    public void removeFromBlacklist(String clientID) {
-        blacklistedIDs.remove(clientID);
+    public void removeFromDenylist(String clientID) {
+        denylistedIDs.remove(clientID);
         saveLists();
     }
 
-    public Set getBlacklist() {
-        return Collections.unmodifiableSet(blacklistedIDs);
+    public Set getDenylist() {
+        return Collections.unmodifiableSet(denylistedIDs);
     }
 
-    private boolean isClientBlacklisted(String clientID) {
-        return blacklistedIDs != null && blacklistedIDs.contains(clientID);
+    private boolean isClientDenylisted(String clientID) {
+        return denylistedIDs != null && denylistedIDs.contains(clientID);
     }
 
-    private boolean isClientWhitelisted(String clientID) {
-        return whitelistedIDs == null || whitelistedIDs.isEmpty() || whitelistedIDs.contains(clientID);
+    private boolean isClientAllowlisted(String clientID) {
+        return allowlistedIDs == null || allowlistedIDs.isEmpty() || allowlistedIDs.contains(clientID);
+    }
+
+    private void migrateLegacyFiles() {
+        Path homePath = PathManager.getInstance().getHomePath();
+
+        try {
+            Path legacyDenylist = homePath.resolve("blacklist.json");
+            if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)) {
+                Files.move(legacyDenylist, denylistPath);
+                logger.info("Migrated blacklist.json -> denylist.json");
+            }
+        } catch (IOException e) {
+            logger.error("Failed to migrate blacklist.json to denylist.json: ", e);
+        }
+
+        try {
+            Path legacyAllowlist = homePath.resolve("whitelist.json");
+            if (Files.exists(legacyAllowlist) && !Files.exists(allowlistPath)) {
+                Files.move(legacyAllowlist, allowlistPath);
+                logger.info("Migrated whitelist.json -> allowlist.json");
+            }
+        } catch (IOException e) {
+            logger.error("Failed to migrate whitelist.json to allowlist.json: ", e);
+        }
     }
 }
