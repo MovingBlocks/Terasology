@@ -152,19 +152,23 @@ public class SelectGameScreen extends SelectionScreen {
             Path homePath = PathManager.getInstance().getHomePath();
             Path denylistPath = homePath.resolve("denylist.json");
             Path allowlistPath = homePath.resolve("allowlist.json");
-            // Migrate legacy files before creating new empty ones, so existing
-            // banned/allowed client IDs are not silently discarded on upgrade.
+            // Migrate each legacy file independently before creating new empty ones,
+            // so existing banned/allowed client IDs are not silently discarded on upgrade.
             try {
                 Path legacyDenylist = homePath.resolve("blacklist.json");
                 if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)) {
                     Files.move(legacyDenylist, denylistPath);
                 }
+            } catch (IOException e) {
+                logger.error("Failed to migrate blacklist.json to denylist.json", e);
+            }
+            try {
                 Path legacyAllowlist = homePath.resolve("whitelist.json");
                 if (Files.exists(legacyAllowlist) && !Files.exists(allowlistPath)) {
                     Files.move(legacyAllowlist, allowlistPath);
                 }
             } catch (IOException e) {
-                logger.error("Failed to migrate legacy connect list files", e);
+                logger.error("Failed to migrate whitelist.json to allowlist.json", e);
             }
             if (!Files.exists(denylistPath)) {
                 try {

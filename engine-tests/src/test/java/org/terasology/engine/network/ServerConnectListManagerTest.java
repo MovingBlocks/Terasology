@@ -4,6 +4,7 @@
 package org.terasology.engine.network;
 
 import com.google.gson.Gson;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -29,9 +30,11 @@ class ServerConnectListManagerTest {
     Path tempDir;
 
     private Context context;
+    private Path originalHomePath;
 
     @BeforeEach
     void setUp() throws IOException {
+        originalHomePath = PathManager.getInstance().getHomePath();
         PathManager.getInstance().useOverrideHomePath(tempDir);
 
         DisplayDevice display = mock(DisplayDevice.class);
@@ -39,6 +42,11 @@ class ServerConnectListManagerTest {
 
         context = mock(Context.class);
         when(context.get(DisplayDevice.class)).thenReturn(display);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        PathManager.getInstance().useOverrideHomePath(originalHomePath);
     }
 
     @Test

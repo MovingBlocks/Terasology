@@ -22,7 +22,8 @@ import java.util.Set;
  * This class provides the methods needed to determine if a client is allowed to connect or not,
  * based on the denylist and allowlist files.
  *
- * To account for legacy blacklist and whitelist files on old servers, migrateLegacyFiles() will migrate these files to denylist and allowlist respectively.
+ * To account for legacy blacklist and whitelist files on old servers,
+ * migrateLegacyFiles() will migrate these files to denylist and allowlist respectively.
  */
 
 public class ServerConnectListManager {
@@ -143,22 +144,27 @@ public class ServerConnectListManager {
         return allowlistedIDs == null || allowlistedIDs.isEmpty() || allowlistedIDs.contains(clientID);
     }
 
-    private void migrateLegacyFiles(){
+    private void migrateLegacyFiles() {
         Path homePath = PathManager.getInstance().getHomePath();
-        Path legacyDenylist = homePath.resolve("blacklist.json");
-        Path legacyAllowlist = homePath.resolve("whitelist.json");
 
-        try{
-            if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)){
+        try {
+            Path legacyDenylist = homePath.resolve("blacklist.json");
+            if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)) {
                 Files.move(legacyDenylist, denylistPath);
                 logger.info("Migrated blacklist.json -> denylist.json");
             }
+        } catch (IOException e) {
+            logger.error("Failed to migrate blacklist.json to denylist.json: ", e);
+        }
+
+        try {
+            Path legacyAllowlist = homePath.resolve("whitelist.json");
             if (Files.exists(legacyAllowlist) && !Files.exists(allowlistPath)) {
                 Files.move(legacyAllowlist, allowlistPath);
                 logger.info("Migrated whitelist.json -> allowlist.json");
             }
-        } catch (IOException e){
-            logger.error("Failed to migrate legacy connect list files: ", e);
+        } catch (IOException e) {
+            logger.error("Failed to migrate whitelist.json to allowlist.json: ", e);
         }
     }
 }
