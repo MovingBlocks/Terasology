@@ -24,10 +24,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ServerConnectListManagerTest {
+/**
+ * Tests for {@link org.terasology.engine.network.internal.ServerConnectListManager}.
+ * Verifies that legacy {@code blacklist.json} and {@code whitelist.json} files are
+ * automatically migrated to {@code denylist.json} and {@code allowlist.json} on startup,
+ * and that existing new-format files are never overwritten by legacy ones.
+ */
+public class ServerConnectListManagerTest {
 
     @TempDir
-    Path tempDir;
+    private Path tempDir;
 
     private Context context;
     private Path originalHomePath;
