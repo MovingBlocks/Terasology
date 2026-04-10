@@ -21,6 +21,8 @@ import java.util.Set;
 /**
  * This class provides the methods needed to determine if a client is allowed to connect or not,
  * based on the denylist and allowlist files.
+ *
+ * To account for legacy blacklist and whitelist files on old servers, migrateLegacyFiles() will migrate these files to denylist and allowlist respectively.
  */
 
 public class ServerConnectListManager {
@@ -45,6 +47,7 @@ public class ServerConnectListManager {
     @SuppressWarnings("unchecked")
     private void loadLists() {
         try {
+            migrateLegacyFiles();
             if (createFiles()) {
                 denylistedIDs = GSON.fromJson(Files.newBufferedReader(denylistPath), Set.class);
                 allowlistedIDs = GSON.fromJson(Files.newBufferedReader(allowlistPath), Set.class);
@@ -138,5 +141,24 @@ public class ServerConnectListManager {
 
     private boolean isClientAllowlisted(String clientID) {
         return allowlistedIDs == null || allowlistedIDs.isEmpty() || allowlistedIDs.contains(clientID);
+    }
+
+    private void migrateLegacyFiles(){
+        Path homePath = PathManager.getInstance().getHomePath();
+        Path legacyDenylist = homePath.resolve("blacklist.json");
+        Path legacyAllowlist = homePath.resolve("whitelist.json");
+
+        try{
+            if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)){
+                Files.move(legacyDenylist, denylistPath);
+                logger.info("Migrated blacklist.json -> denylist.json");
+            }
+            if (Files.exists(legacyAllowlist) && !Files.exists(allowlistPath)) {
+                Files.move(legacyAllowlist, allowlistPath);
+                logger.info("Migrated whitelist.json -> allowlist.json");
+            }
+        } catch (IOException e){
+            logger.error("Failed to migrate legacy connect list files: ", e);
+        }
     }
 }
