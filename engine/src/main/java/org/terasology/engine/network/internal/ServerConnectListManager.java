@@ -50,8 +50,11 @@ public class ServerConnectListManager {
         try {
             migrateLegacyFiles();
             if (createFiles()) {
-                denylistedIDs = GSON.fromJson(Files.newBufferedReader(denylistPath), Set.class);
-                allowlistedIDs = GSON.fromJson(Files.newBufferedReader(allowlistPath), Set.class);
+                try (var denylistReader = Files.newBufferedReader(denylistPath);
+                     var allowlistReader = Files.newBufferedReader(allowlistPath)) {
+                    denylistedIDs = GSON.fromJson(denylistReader, Set.class);
+                    allowlistedIDs = GSON.fromJson(allowlistReader, Set.class);
+                }
                 if (denylistedIDs == null) {
                     denylistedIDs = new HashSet<>();
                 }
@@ -67,12 +70,11 @@ public class ServerConnectListManager {
     private void saveLists() {
         try {
             if (createFiles()) {
-                Writer denylistWriter = Files.newBufferedWriter(denylistPath);
-                Writer allowlistWriter = Files.newBufferedWriter(allowlistPath);
-                denylistWriter.write(GSON.toJson(denylistedIDs));
-                allowlistWriter.write(GSON.toJson(allowlistedIDs));
-                denylistWriter.close();
-                allowlistWriter.close();
+                try (Writer denylistWriter = Files.newBufferedWriter(denylistPath);
+                     Writer allowlistWriter = Files.newBufferedWriter(allowlistPath)) {
+                    denylistWriter.write(GSON.toJson(denylistedIDs));
+                    allowlistWriter.write(GSON.toJson(allowlistedIDs));
+                }
             }
         } catch (IOException e) {
             logger.error("Couldn't save lists: ", e);
