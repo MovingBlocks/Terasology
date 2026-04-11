@@ -12,7 +12,6 @@ import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
@@ -138,13 +137,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void init() {
         initRenderingSupport();
         initRenderingModules();
-
-        // Make ScreenGrabber visible from the shared game context so that
-        // ReadWriteStorageManager.saveGamePreviewImage() can resolve it via CoreRegistry.
-        ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
-        if (screenGrabber != null) {
-            CoreRegistry.put(ScreenGrabber.class, screenGrabber);
-        }
 
         console = context.get(Console.class);
         MethodCommand.registerAvailable(this, console, context);
