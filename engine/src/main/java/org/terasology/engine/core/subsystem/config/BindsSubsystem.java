@@ -420,11 +420,11 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
             }
         }
 
-        if (mouseWheelUpBind.getId().equals(bindId)) {
+        if (mouseWheelUpBind != null && mouseWheelUpBind.getId().equals(bindId)) {
             inputs.add(MouseInput.WHEEL_UP);
         }
 
-        if (mouseWheelDownBind.getId().equals(bindId)) {
+        if (mouseWheelDownBind != null && mouseWheelDownBind.getId().equals(bindId)) {
             inputs.add(MouseInput.WHEEL_DOWN);
         }
 

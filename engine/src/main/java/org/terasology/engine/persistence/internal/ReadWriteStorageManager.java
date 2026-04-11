@@ -267,11 +267,19 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private SaveTransaction createSaveTransaction() {
+        ChunkProvider chunkProviderInstance = chunkProvider != null ? chunkProvider.get() : null;
+        NetworkSystem networkSystemInstance = networkSystem != null ? networkSystem.get() : null;
+        if (chunkProviderInstance == null) {
+            throw new IllegalStateException("Cannot save: ChunkProvider not available");
+        }
+        if (networkSystemInstance == null) {
+            throw new IllegalStateException("Cannot save: NetworkSystem not available");
+        }
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
                 recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
-        addChunksToSaveTransaction(saveTransactionBuilder, chunkProvider.get());
-        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystem.get());
+        addChunksToSaveTransaction(saveTransactionBuilder, chunkProviderInstance);
+        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystemInstance);
         addGlobalStoreBuilderToSaveTransaction(saveTransactionBuilder);
         addGameManifestToSaveTransaction(saveTransactionBuilder);
 
@@ -403,9 +411,13 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     }
 
     private boolean isRunModeAllowSaving() {
+        if (networkSystem == null || chunkProvider == null) {
+            return false;
+        }
         NetworkSystem networkSystemInstance = networkSystem.get();
-        return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority() && chunkProvider.get() != null
-                && blockManager != null;
+        ChunkProvider chunkProviderInstance = chunkProvider.get();
+        return networkSystemInstance != null && networkSystemInstance.getMode().isAuthority()
+                && chunkProviderInstance != null && blockManager != null;
     }
 
     private void startSaving() {

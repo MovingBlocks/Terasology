@@ -20,8 +20,8 @@ graph TD;
     subgraph Loading
         subgraph LoadingUpdate[Update]
             LoadingLoadingScreenUpdate[LoadingScreen::updateStatus] --> LoadingNUIManagerUpdate[NUIManager]
-            LoadingNUIManagerUpdate--> LoadingStepUpdate[Step Update]
-            subgraph LoadingStepUpdate
+            LoadingNUIManagerUpdate--> LoadingStepUpdate
+            subgraph LoadingStepUpdate[Step Update]
                 direction TB
                 RegisterMods --> InitRenderingHeadlessCheck{!headless}
                 InitRenderingHeadlessCheck -->|true| InitialiseRendering --> InitialiseEntitySystem

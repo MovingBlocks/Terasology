@@ -182,13 +182,8 @@ public class TerasologyEngine implements GameEngine {
         rootContextRegistry.with(CharacterStateEventPositionMap.class).lifetime(Lifetime.Singleton).use(() -> characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         rootContextRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
-        /*
-         * We can't load the engine without core registry yet.
-         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
-         * And the engine loads assets while it gets created.
-         */
-        // TODO: Remove
-        CoreRegistry.setContext(rootContext);
+        // Clear any stale context — rootContext is set in initialize().
+        CoreRegistry.setContext(null);
 
         this.allSubsystems = Queues.newArrayDeque();
         configurationSubsystem = new ConfigurationSubsystem();
