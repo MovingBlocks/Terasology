@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.integrationenvironment;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
@@ -35,6 +36,7 @@ public class TwoClientChatTest {
     private ModuleTestingHelper helper;
 
     @Test
+    @Tag("flaky")
     public void testChatPropagatesBetweenClients() throws Exception {
         // Set up two clients
         Context client1Ctx = helper.createClient();

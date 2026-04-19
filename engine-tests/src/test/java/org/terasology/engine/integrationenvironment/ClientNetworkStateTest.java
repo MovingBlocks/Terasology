@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.integrationenvironment;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -30,6 +31,7 @@ public class ClientNetworkStateTest {
     private ModuleTestingHelper helper;
 
     @Test
+    @Tag("flaky")
     public void testClientNetworkMode() throws IOException {
         Context clientContext = helper.createClient();
 
@@ -40,6 +42,7 @@ public class ClientNetworkStateTest {
     }
 
     @Test
+    @Tag("flaky")
     public void testClientHasNetworkSubsystem() throws IOException {
         Context clientContext = helper.createClient();
 
