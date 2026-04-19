@@ -113,12 +113,57 @@ test files and expecting them to replicate over the network. They register
 locally but the `EventLibrary` doesn't pick up their network metadata,
 so `NetworkEventSystemDecorator.networkReplicate()` silently skips them.
 
-## Context and Registry Patterns
+## Singleton State in Tests
+
+Several engine classes are global singletons (`PathManager`, `CoreRegistry`)
+that tests must mutate. This is inherently fragile — any test that changes
+singleton state affects all subsequent tests in the same JVM.
+
+### The save/restore pattern
+
+Always save the original state in `@BeforeEach` and restore in `@AfterEach`:
+
+```java
+private Path originalHomePath;
+
+@BeforeEach
+void setUp(@TempDir Path tempHome) throws IOException {
+    originalHomePath = PathManager.getInstance().getHomePath();
+    PathManager.getInstance().useOverrideHomePath(tempHome);
+}
+
+@AfterEach
+void tearDown() throws IOException {
+    // Guard: @TempDir cleanup may have already deleted the original path
+    if (originalHomePath != null && Files.isDirectory(originalHomePath)) {
+        PathManager.getInstance().useOverrideHomePath(originalHomePath);
+    }
+}
+```
+
+The `Files.isDirectory` guard is important — `@TempDir` cleanup runs before
+`@AfterEach` in some JUnit configurations, so the path you saved in setup
+may already be deleted. Without the guard, the restore itself throws
+`NoSuchFileException`.
+
+### Why this matters
+
+If a test class mutates `PathManager` without restoring, the next test class
+in the same JVM sees a home path pointing at a deleted temp directory. This
+causes `NoSuchFileException` failures that are:
+- **Non-deterministic**: they depend on test execution order
+- **Environment-specific**: may pass locally but fail in CI (different JVM
+  reuse, cleanup timing, OS)
+- **Hard to diagnose**: the failing test is correct — the bug is in a
+  *different* test class that ran earlier
+
+Gradle's default is one JVM per test worker, so parallel test *classes*
+are usually isolated. Parallel *methods* within a class share state —
+avoid `@Execution(CONCURRENT)` on tests that mutate singletons.
 
 ### CoreRegistry Isolation
 
-`CoreRegistry` is a deprecated static singleton. Tests sharing a JVM must
-save and restore it:
+`CoreRegistry` is the same pattern — a deprecated static singleton:
 
 ```java
 @BeforeEach
