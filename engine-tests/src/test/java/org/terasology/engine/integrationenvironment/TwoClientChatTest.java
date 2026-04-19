@@ -11,7 +11,6 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.logic.chat.ChatMessageEvent;
 import org.terasology.engine.logic.permission.PermissionManager;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
