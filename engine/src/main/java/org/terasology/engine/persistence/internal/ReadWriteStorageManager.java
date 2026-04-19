@@ -116,6 +116,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager
     private final Game game;
     private final BlockManager blockManager;
 
+    /**
+     * @deprecated Use the @Inject constructor instead. This constructor relies on CoreRegistry
+     *             for implicit dependencies which conflicts with the DI migration.
+     */
+    @Deprecated
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
                                    ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
                                    RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
