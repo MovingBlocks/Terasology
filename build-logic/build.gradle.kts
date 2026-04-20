@@ -64,6 +64,9 @@ dependencies {
     // for inspecting modules
     implementation("org.terasology.gestalt:gestalt-module:8.0.1-SNAPSHOT")
 
+    // JSON parsing for build-time asset validation
+    implementation("org.json:json:20240303")
+
     // plugins we configure
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638")
