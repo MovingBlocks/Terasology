@@ -206,6 +206,7 @@ tasks.named<Copy>("processResources") {
     from("$rootDir/docs") {
         include("Credits.md")
     }
+    dependsOn("validateJsonAssets")
 }
 
 // Validate all engine JSON assets (prefabs, etc.) at build time
@@ -214,10 +215,6 @@ tasks.register<ValidateJsonAssets>("validateJsonAssets") {
     if (resourcesDir.exists()) {
         source(project.fileTree(resourcesDir) { include("**/*.prefab", "**/*.block", "**/*.ui", "**/*.json") })
     }
-}
-
-tasks.named("processResources") {
-    dependsOn("validateJsonAssets")
 }
 
 //TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)

@@ -72,6 +72,7 @@ dependencies {
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638")
 
     api(kotlin("test"))
+    testImplementation(gradleTestKit())
 }
 
 group = "org.terasology.gradology"
