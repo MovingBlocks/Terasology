@@ -14,7 +14,7 @@ Tests form a natural progression from fast/isolated to slow/integrated:
 | Unit (no engine) | Plain JUnit, mocks | Fast | `PojoEventSystemTests` |
 | Unit (engine libs) | `ModuleManagerFactory`, manual Context | Medium | `ContextImplTest` |
 | Integration (MTE, single player) | `@IntegrationEnvironment` | Slow | `ComponentSystemTest` |
-| Integration (MTE, multiplayer) | `@IntegrationEnvironment(networkMode = LISTEN_SERVER)` | Very slow | `ClientConnectionTest` |
+| Integration (MTE, multiplayer) | `@IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)` | Very slow | `ClientConnectionTest` |
 
 Prefer higher levels only when the thing you're testing genuinely requires
 the engine or network stack.
@@ -194,6 +194,40 @@ Distinguish between:
 
 Some functionality (like chat) requires an ECS system to be registered and
 processing events — just having the service in the context isn't enough.
+
+## Test Timing Diagnostics
+
+MTE integration tests — especially those creating clients — are prone to
+timeout-related flakiness in CI. Use JUnit 5's `TestReporter` to publish
+structured timing data that appears in JUnit XML reports:
+
+```java
+@Test
+@Tag("flaky")
+public void testWithClient(TestReporter reporter) throws IOException {
+    long start = System.currentTimeMillis();
+
+    Context clientContext = helper.createClient();
+    reporter.publishEntry("client_connect_ms",
+            String.valueOf(System.currentTimeMillis() - start));
+
+    // ... test logic ...
+
+    reporter.publishEntry("total_ms",
+            String.valueOf(System.currentTimeMillis() - start));
+}
+```
+
+The published entries appear in JUnit XML output and are accessible via
+the Jenkins test report API (`/testReport/api/json`), making them
+queryable by both humans and automation without console log scraping.
+
+**When to add timings:** Any test tagged `@Tag("flaky")`, and especially
+any test that calls `helper.createClient()` — the client connection
+handshake is the most common source of timeout failures.
+
+**Recommended entry names:** `client_connect_ms`, `client2_connect_ms`,
+`both_registered_ms`, `messages_sent_ms`, `total_ms`, `ticks_received`.
 
 ## Gradle Test Execution
 

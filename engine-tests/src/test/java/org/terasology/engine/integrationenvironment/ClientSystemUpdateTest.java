@@ -4,6 +4,7 @@ package org.terasology.engine.integrationenvironment;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -29,8 +30,10 @@ public class ClientSystemUpdateTest {
 
     @Test
     @Tag("flaky")
-    public void testClientSystemReceivesUpdates() throws IOException {
+    public void testClientSystemReceivesUpdates(TestReporter reporter) throws IOException {
+        long start = System.currentTimeMillis();
         Context clientContext = helper.createClient();
+        reporter.publishEntry("client_connect_ms", String.valueOf(System.currentTimeMillis() - start));
 
         ComponentSystemManager csm = clientContext.get(ComponentSystemManager.class);
         assertNotNull(csm, "Client should have a ComponentSystemManager");
@@ -41,6 +44,9 @@ public class ClientSystemUpdateTest {
 
         int targetTicks = 5;
         helper.runUntil(() -> tickCounter.updateCount >= targetTicks);
+
+        reporter.publishEntry("ticks_received", String.valueOf(tickCounter.updateCount));
+        reporter.publishEntry("total_ms", String.valueOf(System.currentTimeMillis() - start));
 
         assertTrue(tickCounter.updateCount >= targetTicks,
                 "Client system should have received at least " + targetTicks
