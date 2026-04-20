@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.internal.EventSystem;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.logic.chat.ChatMessageEvent;
@@ -26,8 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Verifies that a chat message sent from the host on behalf of one client
  * is received by another client via network event propagation.
  * <p>
- * This exercises the full ChatMessageEvent broadcast path through the
- * LISTEN_SERVER network stack with two connected clients.
+ * ChatMessageEvent is an @OwnerEvent — it replicates to the entity's owner.
+ * The test sends it to each connected client entity from the host side,
+ * exercising the LISTEN_SERVER network stack with two connected clients.
  */
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 public class TwoClientChatTest {
@@ -38,10 +38,9 @@ public class TwoClientChatTest {
     @Test
     @Tag("flaky")
     public void testChatPropagatesBetweenClients() throws Exception {
-        // Set up two clients
-        Context client1Ctx = helper.createClient();
+        // Set up two clients — we need client2's context for the probe
+        helper.createClient();
         Context client2Ctx = helper.createClient();
-        assertNotNull(client1Ctx, "Client 1 context should be created");
         assertNotNull(client2Ctx, "Client 2 context should be created");
 
         // Wait for both clients to register on the host
@@ -64,16 +63,13 @@ public class TwoClientChatTest {
 
         // Register a ChatMessageEvent probe on client 2
         ChatProbe probe = new ChatProbe();
-        ComponentSystemManager client2Csm = client2Ctx.get(ComponentSystemManager.class);
-        client2Csm.register(probe);
-        // Also register with EventSystem for post-init registration
-        client2Ctx.get(EventSystem.class).registerEventHandler(probe);
+        client2Ctx.get(ComponentSystemManager.class).register(probe);
 
-        // Send a ChatMessageEvent from the host targeting all connected clients
-        // (mimics what ChatSystem does when a player sends a message)
+        // Send a ChatMessageEvent from the host to each connected client entity
+        // (mimics what ChatSystem does — sends to each client's entity individually)
         Client senderClient = hostNetwork.getPlayers().iterator().next();
         EntityRef senderInfo = senderClient.getEntity().getComponent(ClientComponent.class).clientInfo;
-        String testMessage = "hello from client 1";
+        String testMessage = "hello from host";
 
         for (Client client : hostNetwork.getPlayers()) {
             client.getEntity().send(new ChatMessageEvent(testMessage, senderInfo));

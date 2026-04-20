@@ -77,11 +77,12 @@ the network.
 ### Working Patterns
 
 **Use existing engine events for network propagation tests.** Events like
-`ChatMessageEvent` (`@BroadcastEvent`) are already fully registered and
+`ChatMessageEvent` (`@OwnerEvent`) are already fully registered and
 will replicate correctly:
 
 ```java
 // This works — ChatMessageEvent is engine-registered with full metadata
+// It's an @OwnerEvent, so it replicates to the entity's owner
 clientEntity.send(new ChatMessageEvent("hello", senderInfo));
 ```
 
@@ -97,14 +98,16 @@ try (TestEventReceiver<MyEvent> receiver = new TestEventReceiver<>(context, MyEv
 
 **Register a probe system for multiplayer event verification.** When you
 need to verify an event arrived on a specific context (host or client),
-register a `BaseComponentSystem` as a probe and also register it with the
-`EventSystem` directly (needed for post-initialization registration):
+register a `BaseComponentSystem` as a probe via `ComponentSystemManager`:
 
 ```java
 MyProbe probe = new MyProbe();
 context.get(ComponentSystemManager.class).register(probe);
-context.get(EventSystem.class).registerEventHandler(probe);
 ```
+
+`ComponentSystemManager.register()` handles event handler registration
+internally — do not also call `EventSystem.registerEventHandler()` as
+this causes duplicate event delivery.
 
 ### What Does NOT Work
 
