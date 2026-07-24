@@ -43,6 +43,12 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core:5.6.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
+    constraints {
+        // Mockito 5.6.0 pins byte-buddy 1.14.8, which can't parse class files from newer JDKs
+        // (Mockito's inline mock maker fails with IllegalArgumentException on any mock creation).
+        testImplementation("net.bytebuddy:byte-buddy:1.18.11")
+        testImplementation("net.bytebuddy:byte-buddy-agent:1.18.11")
+    }
 
     testImplementation("com.google.truth:truth:1.1.3")
     testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.3")
@@ -51,6 +57,12 @@ dependencies {
 }
 
 tasks.withType<Test> {
+    // Custom-named Test tasks (unitTest, integrationTest, integrationTestFlaky) aren't auto-wired by the Java
+    // plugin the way the conventional "test" task is - without this they silently report NO-SOURCE and run
+    // nothing. See https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+
     useJUnitPlatform()
 
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
