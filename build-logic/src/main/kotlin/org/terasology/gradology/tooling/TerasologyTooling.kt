@@ -55,53 +55,59 @@ class TerasologyTooling(val itemType: ItemType, val rootDir: File) {
     }
 
     /**
-     * Retrieves a single item via git clone. Considers whether it exists locally first or has
-     * already been retrieved this execution.
+     * Retrieves a single item via git clone, or - if [recurse] - just checks an already-present
+     * item's dependencies without re-cloning it. Considers whether it exists locally first or has
+     * already been retrieved this execution (the latter check alone, regardless of on-disk
+     * presence, is what actually prevents redundant re-visits/infinite loops within one recursive
+     * walk - so a module already retrieved earlier in *this* walk is still skipped outright, same
+     * as before).
      */
     fun retrieveItem(itemName: String, recurse: Boolean) {
         val targetDir = File(targetDirectory, itemName)
         println("Request to retrieve ${itemType.itemType} $itemName would store it at $targetDir - exists? ${targetDir.exists()}")
-        when {
-            targetDir.exists() -> {
-                println("That ${itemType.itemType} already had an existing directory locally. If something is wrong with it please delete and try again")
-                itemsRetrieved += itemName
-            }
-            itemsRetrieved.contains(itemName) -> {
-                println("We already retrieved $itemName - skipping")
-            }
-            else -> {
-                itemsRetrieved += itemName
-                val targetUrl = "https://github.com/$githubTargetHome/$itemName"
-                try {
-                    println("Retrieving ${itemType.itemType} $itemName from $targetUrl")
-                    if (githubTargetHome != githubDefaultHome) {
-                        println("Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as '$defaultRemote'")
-                        GitOps.clone(targetDir, targetUrl, remoteName = githubTargetHome)
-                        println("Primary clone operation complete, about to add the '$defaultRemote' remote for the $githubDefaultHome org address")
-                        addRemote(itemName, defaultRemote, "https://github.com/$githubDefaultHome/$itemName")
-                    } else {
-                        GitOps.clone(targetDir, targetUrl)
-                    }
-                } catch (exception: GitAPIException) {
-                    println(Ansi.color("Unable to clone $itemName, Skipping: ${exception.message}", Ansi.RED))
-                    return
+
+        if (itemsRetrieved.contains(itemName)) {
+            println("We already retrieved $itemName - skipping")
+            return
+        }
+        itemsRetrieved += itemName
+
+        if (targetDir.exists()) {
+            println("That ${itemType.itemType} already had an existing directory locally. If something is wrong with it please delete and try again")
+        } else {
+            val targetUrl = "https://github.com/$githubTargetHome/$itemName"
+            try {
+                println("Retrieving ${itemType.itemType} $itemName from $targetUrl")
+                if (githubTargetHome != githubDefaultHome) {
+                    println("Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as '$defaultRemote'")
+                    GitOps.clone(targetDir, targetUrl, remoteName = githubTargetHome)
+                    println("Primary clone operation complete, about to add the '$defaultRemote' remote for the $githubDefaultHome org address")
+                    addRemote(itemName, defaultRemote, "https://github.com/$githubDefaultHome/$itemName")
+                } else {
+                    GitOps.clone(targetDir, targetUrl)
                 }
+            } catch (exception: GitAPIException) {
+                println(Ansi.color("Unable to clone $itemName, Skipping: ${exception.message}", Ansi.RED))
+                return
+            }
 
-                // This step allows the item type to check the newly cloned item and add in extra template stuff.
-                itemType.copyInTemplateFiles(rootDir, targetDir)
+            // This step allows the item type to check the newly cloned item and add in extra template stuff.
+            itemType.copyInTemplateFiles(rootDir, targetDir)
+        }
 
-                if (recurse) {
-                    val foundDependencies = itemType.findDependencies(targetDir)
-                    if (foundDependencies.isEmpty()) {
-                        println("The ${itemType.itemType} $itemName did not appear to have any dependencies we need to worry about")
-                    } else {
-                        println("The ${itemType.itemType} $itemName has the following ${itemType.itemType} dependencies we care about: $foundDependencies")
-                        val uniqueDependencies = foundDependencies - itemsRetrieved.toSet()
-                        println("After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies")
-                        if (uniqueDependencies.isNotEmpty()) {
-                            retrieve(uniqueDependencies, true)
-                        }
-                    }
+        // Chase dependencies whether this item was freshly cloned above or already present - a
+        // module fetched earlier without --command=recurse (e.g. a plain "get") shouldn't leave its
+        // own dependencies permanently unreachable just because it happens to already exist on disk.
+        if (recurse) {
+            val foundDependencies = itemType.findDependencies(targetDir)
+            if (foundDependencies.isEmpty()) {
+                println("The ${itemType.itemType} $itemName did not appear to have any dependencies we need to worry about")
+            } else {
+                println("The ${itemType.itemType} $itemName has the following ${itemType.itemType} dependencies we care about: $foundDependencies")
+                val uniqueDependencies = foundDependencies - itemsRetrieved.toSet()
+                println("After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies")
+                if (uniqueDependencies.isNotEmpty()) {
+                    retrieve(uniqueDependencies, true)
                 }
             }
         }
