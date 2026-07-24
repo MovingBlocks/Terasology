@@ -5,6 +5,7 @@ import org.jetbrains.gradle.ext.ActionDelegationConfig
 import org.jetbrains.gradle.ext.delegateActions
 import org.jetbrains.gradle.ext.settings
 import org.terasology.gradology.CopyButNeverOverwrite
+import org.terasology.gradology.tooling.TerasologyToolingTask
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
@@ -172,6 +173,11 @@ tasks.register<Copy>("extractConfig") {
     from(configurations["codeMetrics"].map { zipTree(it) })
     into("$rootDir/$dirConfigMetrics")
 }
+
+// `gradle terasology --type=... --command=... --params=...` - a Kotlin/Gradle-native port of
+// `groovyw <type> <sub-command> <params...>` for managing modules/metas/libs/facades. See
+// TerasologyToolingTask / the org.terasology.gradology.tooling package in build-logic.
+tasks.register<TerasologyToolingTask>("terasology")
 
 tasks.named("clean") {
     // gradle autocreates a clean task for tasks if outputs is specified, just link them to general clean.

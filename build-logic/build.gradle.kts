@@ -61,6 +61,10 @@ dependencies {
     // graph analysis
     implementation("org.jgrapht:jgrapht-core:1.5.0")
 
+    // for the "terasology" tooling task (Kotlin port of groovyw's module/meta/lib/facade management)
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
+    implementation("com.google.code.gson:gson:2.8.6")
+
     // for inspecting modules
     implementation("org.terasology.gestalt:gestalt-module:8.0.1-SNAPSHOT")
 
