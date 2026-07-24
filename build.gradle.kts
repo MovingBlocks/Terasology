@@ -20,7 +20,7 @@ buildscript {
                 // If the user supplies an alternative repo via gradle.properties then use that
                 name = "from alternativeResolutionRepo property"
                 // Fun Gradle/Kotlin-ism: a general import at the top of a class used in a buildscript block won't help
-                url =  java.net.URI(rootProject.properties["alternativeResolutionRepo"] as String)
+                url =  java.net.URI(rootProject.property("alternativeResolutionRepo") as String)
             } else if (repoViaEnv != null && repoViaEnv != "") {
                 name = "from \$RESOLUTION_REPO"
                 url = java.net.URI(repoViaEnv)
@@ -75,12 +75,15 @@ located at ${System.getProperty("java.home")}
 }
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
-val dirNatives by extra("natives")
-val dirConfigMetrics by extra("config/metrics")
-val templatesDir by extra(file("templates"))
+val dirNatives = "natives"
+val dirConfigMetrics = "config/metrics"
+val templatesDir = file("templates")
 // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
-val subDirLibs by extra("libs")
-val LwjglVersion by extra("3.3.3")
+val subDirLibs = "libs"
+val LwjglVersion = "3.3.3"
+// Published to extra: read via rootProject.extra[...] from other projects' build scripts
+extra["dirNatives"] = dirNatives
+extra["LwjglVersion"] = LwjglVersion
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Natives - Handles pulling in and extracting native libraries for LWJGL                                            //
@@ -104,13 +107,13 @@ dependencies {
 
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics(group = "org.terasology.config", name = "codemetrics", version = "2.2.0", ext = "zip")
+    codeMetrics("org.terasology.config:codemetrics:2.2.0@zip")
 
     // Natives for JNLua (Kallisti, KComputers)
-    natives(group = "org.terasology.jnlua", name = "jnlua_natives", version = "0.1.0-SNAPSHOT", ext = "zip")
+    natives("org.terasology.jnlua:jnlua_natives:0.1.0-SNAPSHOT@zip")
 
     // Natives for JNBullet
-    natives(group = "org.terasology.jnbullet", name = "JNBullet", version = "1.0.4", ext = "zip")
+    natives("org.terasology.jnbullet:JNBullet:1.0.4@zip")
 
 }
 

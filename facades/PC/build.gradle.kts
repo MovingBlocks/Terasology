@@ -23,16 +23,15 @@ plugins {
 apply(from = "$rootDir/config/gradle/publish.gradle")
 
 // Default path to store server data if running headless via Gradle
-val localServerDataPath by extra("terasology-server")
+val localServerDataPath = "terasology-server"
 
 // General props
-val mainClassName by extra("org.terasology.engine.Terasology")
+val mainClassName = "org.terasology.engine.Terasology"
 val templatesDir = File(rootDir, "templates")
 val rootDirDist = File(rootDir, "build/distributions")
 
 // Inherited props
-val dirNatives: String by rootProject.extra
-val distsDirectory: DirectoryProperty by project
+val dirNatives = rootProject.extra["dirNatives"] as String
 
 // Read environment variables, including variables passed by jenkins continuous integration server
 val env: MutableMap<String, String> = System.getenv()!!
@@ -47,7 +46,7 @@ val displayVersion = versionBase
 application {
     applicationName = "Terasology"
     executableDir = ""
-    mainClass.set(extra.get("mainClassName") as String)
+    mainClass.set(mainClassName)
 }
 
 // Base the engine tests on the same version number as the engine
@@ -59,7 +58,7 @@ group = "org.terasology.facades"
 
 dependencies {
     implementation(libs.jna.platform)
-    implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
+    implementation("info.picocli:picocli:4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
 
     implementation(project(":engine"))
@@ -67,7 +66,7 @@ dependencies {
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "5.0.0")
+    implementation("org.terasology.crashreporter:cr-terasology:5.0.0")
 
     runtimeOnly(libs.logback) {
         because("to configure logging with logback.xml")

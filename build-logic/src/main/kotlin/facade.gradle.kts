@@ -9,7 +9,7 @@ plugins {
     id("terasology-common")
 }
 
-val dirNatives: String by rootProject.extra
+val dirNatives = rootProject.extra["dirNatives"] as String
 
 configurations {
     register("natives") {

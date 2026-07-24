@@ -26,7 +26,7 @@ dependencies {
     }
 }
 
-val jarCollection: Configuration by configurations.creating {
+val jarCollection: Configuration = configurations.create("jarCollection") {
     description = "Provides cacheModules with JAR_COLLECTION."
 
     isCanBeConsumed = true
@@ -38,7 +38,7 @@ val jarCollection: Configuration by configurations.creating {
     }
 }
 
-val fetchModuleDependencies by tasks.registering(Sync::class) {
+val fetchModuleDependencies = tasks.register<Sync>("fetchModuleDependencies") {
     group = "build"
 
     destinationDir = CACHE_MODULES_DIR
@@ -47,7 +47,7 @@ val fetchModuleDependencies by tasks.registering(Sync::class) {
     from(artifactsProvider.map { artifacts -> artifacts.map(ResolvedArtifactResult::getFile) })
 }
 
-val cleanFetchModuleDependencies by tasks.registering(Delete::class) {
+val cleanFetchModuleDependencies = tasks.register<Delete>("cleanFetchModuleDependencies") {
     delete(CACHE_MODULES_DIR)
 }
 
@@ -70,7 +70,7 @@ tasks.named("clean").configure {
     }
 }
 
-val reportModuleOrder by tasks.registering {
+val reportModuleOrder = tasks.register("reportModuleOrder") {
     moduleDependencyOrdering(configurations.getByName("classpath")).forEach {
         println(it)
     }
