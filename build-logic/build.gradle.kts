@@ -55,7 +55,7 @@ dependencies {
     constraints {
         implementation("com.google.guava:guava:31.1-jre")
         implementation("org.javassist:javassist:3.29.0-GA")
-        implementation("net.bytebuddy:bytebuddy:1.14.8")
+        implementation("net.bytebuddy:byte-buddy:1.18.11")
     }
 
     // graph analysis

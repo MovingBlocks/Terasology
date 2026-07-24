@@ -79,8 +79,11 @@ dependencies {
         because("classes like HeadlessEnvironment use mocks")
     }
     constraints {
-        implementation("net.bytebuddy:bytebuddy:1.14.8") {
-            because("we need a newer bytebuddy version for Java 17")
+        implementation("net.bytebuddy:byte-buddy:1.18.11") {
+            because("Mockito's inline mock maker needs a byte-buddy that recognizes newer JDK class file versions")
+        }
+        implementation("net.bytebuddy:byte-buddy-agent:1.18.11") {
+            because("keep in sync with byte-buddy")
         }
     }
 
