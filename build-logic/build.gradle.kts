@@ -7,10 +7,6 @@ plugins {
     `kotlin-dsl`
 }
 
-kotlin {
-    jvmToolchain(17)
-}
-
 // Since build-logic is special we have to cheat to test/get the alternativeResolutionRepo
 val gradlePropertiesFile = file("../gradle.properties")
 val alternativeResolutionRepo = if (gradlePropertiesFile.exists()) {
