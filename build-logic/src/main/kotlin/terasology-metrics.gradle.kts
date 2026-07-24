@@ -39,6 +39,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito:mockito-core:5.6.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
