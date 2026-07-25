@@ -110,12 +110,40 @@ public class WorldBuilderTest {
     }
 
     @Test
-    public void testIncorrectProviderOrder() {
+    public void testProviderRegistrationOrderDoesNotMatter() {
+        // Providers reach WorldBuilder in whatever order the module/class scan hands them over, which is
+        // hash-based and varies between JVM runs. Registering a consumer before its producer must therefore
+        // still build a valid world rather than reporting the producer as missing.
+        WorldBuilder consumerFirst = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
+        consumerFirst.setSeed(12);
+        consumerFirst.addProvider(new Facet1Provider()); // requires Facet2
+        consumerFirst.addProvider(new Facet2Provider()); // produces Facet2
+
+        WorldBuilder producerFirst = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
+        producerFirst.setSeed(12);
+        producerFirst.addProvider(new Facet2Provider());
+        producerFirst.addProvider(new Facet1Provider());
+
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
+
+        Region consumerFirstData = consumerFirst.build().getWorldData(regionToGenerate);
+        Region producerFirstData = producerFirst.build().getWorldData(regionToGenerate);
+
+        // Both orders must agree, and must agree with the borders asserted by testBorderCalculation.
+        assertEquals(regionToGenerate, consumerFirstData.getFacet(Facet1.class).getWorldRegion());
+        assertEquals(producerFirstData.getFacet(Facet1.class).getWorldRegion(),
+                consumerFirstData.getFacet(Facet1.class).getWorldRegion());
+        assertEquals(producerFirstData.getFacet(Facet2.class).getWorldRegion(),
+                consumerFirstData.getFacet(Facet2.class).getWorldRegion());
+    }
+
+    @Test
+    public void testGenuinelyMissingProviderStillThrows() {
+        // Order independence must not weaken the real check: a required facet that nothing produces
+        // or updates is still a configuration error, whatever order the providers arrived in.
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
-        // Facet1Provider requires Facet2Provider, add them in incorrect order
-        worldBuilder.addProvider(new Facet1Provider());
-        worldBuilder.addProvider(new Facet2Provider());
+        worldBuilder.addProvider(new Facet1Provider()); // requires Facet2, which nothing here provides
 
         assertThrows(IllegalStateException.class, worldBuilder::build);
     }
