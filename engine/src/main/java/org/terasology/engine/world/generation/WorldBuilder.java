@@ -174,6 +174,11 @@ public class WorldBuilder extends ProviderStore {
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains(boolean scalable) {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
         Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
+
+        // Collect every facet produced or updated by any provider before checking requirements
+        // below. providersList's order comes from hash-based module/class-index iteration, so a
+        // provider's position gives no guarantee that its own producer already ran - checking
+        // requirements in the same pass would make this check order-dependent.
         for (FacetProvider provider : providersList) {
             Class<? extends FacetProvider> providerClass = provider.getClass();
             Produces produces = providerClass.getAnnotation(Produces.class);
@@ -181,6 +186,16 @@ public class WorldBuilder extends ProviderStore {
                 facets.addAll(Arrays.asList(produces.value()));
             }
 
+            Updates updates = providerClass.getAnnotation(Updates.class);
+            if (updates != null) {
+                for (Facet facet : updates.value()) {
+                    facets.add(facet.value());
+                }
+            }
+        }
+
+        for (FacetProvider provider : providersList) {
+            Class<? extends FacetProvider> providerClass = provider.getClass();
             Requires requires = providerClass.getAnnotation(Requires.class);
             if (requires != null) {
                 for (Facet facet : requires.value()) {
@@ -189,13 +204,6 @@ public class WorldBuilder extends ProviderStore {
                         logger.error("Facet provider for {} is missing. It is required by {}", facetValue, providerClass);
                         throw new IllegalStateException("Missing facet provider");
                     }
-                }
-            }
-
-            Updates updates = providerClass.getAnnotation(Updates.class);
-            if (updates != null) {
-                for (Facet facet : updates.value()) {
-                    facets.add(facet.value());
                 }
             }
         }
@@ -339,18 +347,25 @@ public class WorldBuilder extends ProviderStore {
     private int updatePriority(FacetProvider provider, Class<? extends WorldFacet> facet) {
         Updates updates = provider.getClass().getAnnotation(Updates.class);
         if (updates != null) {
-            return updates.priority();
-        } else {
-            Requires requires = provider.getClass().getAnnotation(Requires.class);
-            if (requires != null) {
-                for (Facet f : requires.value()) {
-                    if (f.value() == facet) {
-                        return UpdatePriority.PRIORITY_REQUIRES;
-                    }
+            // Only the facets this provider actually updates get its update priority. Returning it for
+            // every facet - including ones the provider merely requires - understates how much of the
+            // facet's provider chain that requirement depends on, because addProviderChain then skips
+            // updaters at or below the returned priority.
+            for (Facet f : updates.value()) {
+                if (f.value() == facet) {
+                    return updates.priority();
                 }
             }
-            return UpdatePriority.PRIORITY_PRODUCES;
         }
+        Requires requires = provider.getClass().getAnnotation(Requires.class);
+        if (requires != null) {
+            for (Facet f : requires.value()) {
+                if (f.value() == facet) {
+                    return UpdatePriority.PRIORITY_REQUIRES;
+                }
+            }
+        }
+        return UpdatePriority.PRIORITY_PRODUCES;
     }
 
     // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
