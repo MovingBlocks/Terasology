@@ -81,78 +81,6 @@ case "`uname`" in
 esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar:$APP_HOME/gradle/wrapper/groovy-wrapper.jar
-GROOVY_MAIN_CLASS=org.gradle.wrapper.GroovyWrapperMain
-
-# NOTE: the wrapper's own org.gradle.wrapper.GroovyWrapperMain / GroovyBootstrapMainStarter (above,
-# the fallback if nothing below applies) is broken against modern (Gradle 9+) distributions - its
-# classpath assembly looks for a jar matching an old naming pattern ("junit") that no longer exists,
-# regardless of whether the distribution was freshly downloaded or already cached. So below we try
-# hard to find an already-available matching distribution (installed or wrapper-cached) and drive
-# Groovy directly, only falling through to the known-broken path as an absolute last resort.
-
-# Sets CLASSPATH/GROOVY_MAIN_CLASS from a Gradle distribution root (a dir containing lib/, lib/plugins/)
-# and returns 0, or returns 1 if $1 doesn't look like one.
-use_gradle_install() {
-    _dir="$1"
-    # Some package managers (e.g. Homebrew) put a delegating shim at bin/gradle that execs into a
-    # libexec/ subdirectory holding the actual distribution (with its own bin/, lib/).
-    if [ ! -d "$_dir/lib" ] && [ -d "$_dir/libexec/lib" ]; then
-        _dir="$_dir/libexec"
-    fi
-    if [ ! -d "$_dir/lib" ]; then
-        return 1
-    fi
-    # Only the specific jars actually needed to run these scripts (core Groovy + JsonSlurper's module
-    # + Ivy for Grape's @Grab resolution) - not the rest of Gradle's own lib/ (which bundles its own
-    # JGit etc. that could otherwise shadow and conflict with what @Grab-ed scripts, like common.groovy's
-    # grgit, need) nor Groovy's other unused modules (groovydoc, ant, astbuilder...). Startup with a cold
-    # OS file cache (e.g. a wrapper-cache distribution nobody else reads regularly) pays real disk I/O
-    # per jar on the classpath, so keeping this list short matters more than it would look like it should.
-    _jars=`find "$_dir/lib" -maxdepth 1 -iname "groovy-[0-9]*.jar" 2>/dev/null | tr '\n' ':'`
-    _jars="$_jars`find "$_dir/lib" -maxdepth 1 -iname "groovy-json-*.jar" 2>/dev/null | tr '\n' ':'`"
-    _jars="$_jars`find "$_dir/lib/plugins" -maxdepth 1 -iname "ivy-*.jar" 2>/dev/null | tr '\n' ':'`"
-    if [ -z "$_jars" ]; then
-        return 1
-    fi
-    CLASSPATH="$_jars"
-    GROOVY_MAIN_CLASS=groovy.ui.GroovyMain
-    return 0
-}
-
-PINNED_VERSION=`sed -n 's/^distributionUrl=.*gradle-\([0-9.]*\)-bin\.zip$/\1/p' "$APP_HOME/gradle/wrapper/gradle-wrapper.properties"`
-GRADLE_FOUND=false
-
-# 1) A system 'gradle' matching the wrapper's pinned version.
-if [ -n "$PINNED_VERSION" ] && command -v gradle >/dev/null 2>&1; then
-    INSTALLED_VERSION=`gradle --version 2>/dev/null | sed -n 's/^Gradle \(.*\)$/\1/p'`
-    if [ "$INSTALLED_VERSION" = "$PINNED_VERSION" ]; then
-        GRADLE_BIN=`command -v gradle`
-        GRADLE_BIN=`cd "$(dirname "$GRADLE_BIN")" >/dev/null && pwd -P`/`basename "$GRADLE_BIN"`
-        while [ -h "$GRADLE_BIN" ] ; do
-            ls=`ls -ld "$GRADLE_BIN"`
-            link=`expr "$ls" : '.*-> \(.*\)$'`
-            if expr "$link" : '/.*' > /dev/null; then
-                GRADLE_BIN="$link"
-            else
-                GRADLE_BIN=`cd "$(dirname "$GRADLE_BIN")" >/dev/null && pwd -P`/"$link"
-            fi
-        done
-        GRADLE_INSTALL=`cd "$(dirname "$(dirname "$GRADLE_BIN")")" >/dev/null && pwd -P`
-        use_gradle_install "$GRADLE_INSTALL" && GRADLE_FOUND=true
-    fi
-fi
-
-# 2) Failing that, a matching distribution gradlew/the wrapper itself already downloaded and cached
-#    (so we still avoid a second, redundant download even with no system gradle on PATH).
-if [ "$GRADLE_FOUND" = "false" ] && [ -n "$PINNED_VERSION" ]; then
-    GRADLE_USER_HOME_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}"
-    for _cached in "$GRADLE_USER_HOME_DIR"/wrapper/dists/gradle-"$PINNED_VERSION"-bin/*/gradle-"$PINNED_VERSION"; do
-        if [ -d "$_cached" ] && use_gradle_install "$_cached"; then
-            GRADLE_FOUND=true
-            break
-        fi
-    done
-fi
 
 
 # Determine the Java command to use to start the JVM.
@@ -252,6 +180,6 @@ save () {
 APP_ARGS=`save "$@"`
 
 # Collect all arguments for the java command, following the shell quoting and substitution rules
-eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS "\"-Dorg.gradle.appname=$APP_BASE_NAME\"" -classpath "\"$CLASSPATH\"" $GROOVY_MAIN_CLASS config/groovy/util.groovy "$APP_ARGS"
+eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS "\"-Dorg.gradle.appname=$APP_BASE_NAME\"" -classpath "\"$CLASSPATH\"" org.gradle.wrapper.GroovyWrapperMain config/groovy/util.groovy "$APP_ARGS"
 
 exec "$JAVACMD" "$@"
