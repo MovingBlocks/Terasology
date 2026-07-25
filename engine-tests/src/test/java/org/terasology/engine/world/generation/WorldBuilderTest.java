@@ -148,6 +148,96 @@ public class WorldBuilderTest {
         assertThrows(IllegalStateException.class, worldBuilder::build);
     }
 
+    @Test
+    public void testRequiredFacetCoversUpdatedFacet() {
+        // Mirrors the CoreWorlds/Caves arrangement behind Terasology/CoreWorlds#48:
+        //   DensityUpdater  updates Density, requires Roughness with no border of its own
+        //   SurfaceSpreader updates Spread,  requires Density with a sides border
+        // The sides border SurfaceSpreader asks for on Density has to reach Roughness too, otherwise
+        // DensityUpdater iterates a Density region wider than the Roughness it reads per column and
+        // walks off the end of it.
+        WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
+        worldBuilder.setSeed(12);
+        worldBuilder.addProvider(new RoughnessProvider());
+        worldBuilder.addProvider(new DensityProvider());
+        worldBuilder.addProvider(new DensityUpdater());
+        worldBuilder.addProvider(new SpreadProvider());
+        worldBuilder.addProvider(new SurfaceSpreader());
+
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
+        Region regionData = worldBuilder.build().getWorldData(regionToGenerate);
+
+        BlockRegion density = regionData.getFacet(DensityLike.class).getWorldRegion();
+        BlockRegion roughness = regionData.getFacet(RoughnessLike.class).getWorldRegion();
+
+        assertTrue(roughness.getSizeX() >= density.getSizeX() && roughness.getSizeZ() >= density.getSizeZ(),
+                "Roughness " + roughness + " must cover every column of Density " + density
+                        + "; DensityUpdater reads one from the other by world coordinate.");
+    }
+
+    public static class DensityLike extends BaseFacet3D {
+        public DensityLike(BlockRegion targetRegion, Border3D border) {
+            super(targetRegion, border);
+        }
+    }
+
+    public static class RoughnessLike extends BaseFacet3D {
+        public RoughnessLike(BlockRegion targetRegion, Border3D border) {
+            super(targetRegion, border);
+        }
+    }
+
+    public static class SpreadLike extends BaseFacet3D {
+        public SpreadLike(BlockRegion targetRegion, Border3D border) {
+            super(targetRegion, border);
+        }
+    }
+
+    @Produces(RoughnessLike.class)
+    public static class RoughnessProvider implements FacetProvider {
+        @Override
+        public void process(GeneratingRegion region) {
+            region.setRegionFacet(RoughnessLike.class,
+                    new RoughnessLike(region.getRegion(), region.getBorderForFacet(RoughnessLike.class)));
+        }
+    }
+
+    @Produces(DensityLike.class)
+    public static class DensityProvider implements FacetProvider {
+        @Override
+        public void process(GeneratingRegion region) {
+            region.setRegionFacet(DensityLike.class,
+                    new DensityLike(region.getRegion(), region.getBorderForFacet(DensityLike.class)));
+        }
+    }
+
+    @Produces(SpreadLike.class)
+    public static class SpreadProvider implements FacetProvider {
+        @Override
+        public void process(GeneratingRegion region) {
+            region.setRegionFacet(SpreadLike.class,
+                    new SpreadLike(region.getRegion(), region.getBorderForFacet(SpreadLike.class)));
+        }
+    }
+
+    /** Stands in for CoreWorlds' DensityNoiseProvider. */
+    @Requires(@Facet(RoughnessLike.class))
+    @Updates(@Facet(value = DensityLike.class, border = @FacetBorder(top = 1)))
+    public static class DensityUpdater implements FacetProvider {
+        @Override
+        public void process(GeneratingRegion region) {
+        }
+    }
+
+    /** Stands in for Caves' CaveToSurfaceProvider. */
+    @Requires(@Facet(value = DensityLike.class, border = @FacetBorder(sides = 3)))
+    @Updates(@Facet(value = SpreadLike.class, border = @FacetBorder(sides = 3)))
+    public static class SurfaceSpreader implements FacetProvider {
+        @Override
+        public void process(GeneratingRegion region) {
+        }
+    }
+
     public static class Facet1 extends BaseFacet3D {
         public boolean updated;
 
