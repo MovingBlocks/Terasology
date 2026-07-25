@@ -174,6 +174,11 @@ public class WorldBuilder extends ProviderStore {
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains(boolean scalable) {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
         Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
+
+        // Collect every facet produced or updated by any provider before checking requirements
+        // below. providersList's order comes from hash-based module/class-index iteration, so a
+        // provider's position gives no guarantee that its own producer already ran - checking
+        // requirements in the same pass would make this check order-dependent.
         for (FacetProvider provider : providersList) {
             Class<? extends FacetProvider> providerClass = provider.getClass();
             Produces produces = providerClass.getAnnotation(Produces.class);
@@ -181,6 +186,16 @@ public class WorldBuilder extends ProviderStore {
                 facets.addAll(Arrays.asList(produces.value()));
             }
 
+            Updates updates = providerClass.getAnnotation(Updates.class);
+            if (updates != null) {
+                for (Facet facet : updates.value()) {
+                    facets.add(facet.value());
+                }
+            }
+        }
+
+        for (FacetProvider provider : providersList) {
+            Class<? extends FacetProvider> providerClass = provider.getClass();
             Requires requires = providerClass.getAnnotation(Requires.class);
             if (requires != null) {
                 for (Facet facet : requires.value()) {
@@ -189,13 +204,6 @@ public class WorldBuilder extends ProviderStore {
                         logger.error("Facet provider for {} is missing. It is required by {}", facetValue, providerClass);
                         throw new IllegalStateException("Missing facet provider");
                     }
-                }
-            }
-
-            Updates updates = providerClass.getAnnotation(Updates.class);
-            if (updates != null) {
-                for (Facet facet : updates.value()) {
-                    facets.add(facet.value());
                 }
             }
         }
