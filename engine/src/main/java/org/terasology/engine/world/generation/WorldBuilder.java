@@ -347,18 +347,25 @@ public class WorldBuilder extends ProviderStore {
     private int updatePriority(FacetProvider provider, Class<? extends WorldFacet> facet) {
         Updates updates = provider.getClass().getAnnotation(Updates.class);
         if (updates != null) {
-            return updates.priority();
-        } else {
-            Requires requires = provider.getClass().getAnnotation(Requires.class);
-            if (requires != null) {
-                for (Facet f : requires.value()) {
-                    if (f.value() == facet) {
-                        return UpdatePriority.PRIORITY_REQUIRES;
-                    }
+            // Only the facets this provider actually updates get its update priority. Returning it for
+            // every facet - including ones the provider merely requires - understates how much of the
+            // facet's provider chain that requirement depends on, because addProviderChain then skips
+            // updaters at or below the returned priority.
+            for (Facet f : updates.value()) {
+                if (f.value() == facet) {
+                    return updates.priority();
                 }
             }
-            return UpdatePriority.PRIORITY_PRODUCES;
         }
+        Requires requires = provider.getClass().getAnnotation(Requires.class);
+        if (requires != null) {
+            for (Facet f : requires.value()) {
+                if (f.value() == facet) {
+                    return UpdatePriority.PRIORITY_REQUIRES;
+                }
+            }
+        }
+        return UpdatePriority.PRIORITY_PRODUCES;
     }
 
     // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
