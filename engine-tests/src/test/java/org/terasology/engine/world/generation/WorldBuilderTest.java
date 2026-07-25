@@ -170,7 +170,11 @@ public class WorldBuilderTest {
         BlockRegion density = regionData.getFacet(DensityLike.class).getWorldRegion();
         BlockRegion roughness = regionData.getFacet(RoughnessLike.class).getWorldRegion();
 
-        assertTrue(roughness.getSizeX() >= density.getSizeX() && roughness.getSizeZ() >= density.getSizeZ(),
+        // Containment by world coordinate, not merely a comparison of sizes: the read is
+        // roughness.getWorld(x, z) for each (x, z) of density, so a roughness region that were larger
+        // but offset would still throw. Assert the bounds actually enclose density's.
+        assertTrue(roughness.minX() <= density.minX() && roughness.maxX() >= density.maxX()
+                        && roughness.minZ() <= density.minZ() && roughness.maxZ() >= density.maxZ(),
                 "Roughness " + roughness + " must cover every column of Density " + density
                         + "; DensityUpdater reads one from the other by world coordinate.");
     }
