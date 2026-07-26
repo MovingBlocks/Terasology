@@ -96,6 +96,27 @@ exists to stop a runaway loop; exceeding it throws `UncheckedTimeoutException`
 regardless of which helper you used. Adjust it with `setSafetyTimeoutMs` if a
 test legitimately needs to run long.
 
+### When a client will not connect
+
+`createClient()` is the most common place for an MTE test to fail
+intermittently, so its failure is written to be read rather than re-run. On
+timeout it reports the client's state when the wait was abandoned, plus the
+`JoinStatus` — whether the join was `IN_PROGRESS` or `FAILED`, which activity it
+was on, how far through, and any error message:
+
+```
+Could not connect client TerasologyEngine@1d3aefd to local host. Client state
+when we gave up: StateLoading; join status IN_PROGRESS during 'Awaiting
+Connection...' (0%)
+```
+
+The distinction that matters: a `FAILED` status with an error message means the
+host actively refused the join, and no amount of waiting would have helped —
+look at the host. `IN_PROGRESS` means the handshake was still going, which
+points at timing or a stalled loading step, and the reported activity says
+which. Retrying a `FAILED` join wastes CI cycles; extending the timeout on an
+`IN_PROGRESS` one may be legitimate.
+
 ## Network Event Testing
 
 ### The Event Registration Problem
