@@ -323,7 +323,7 @@ public final class Terasology implements Callable<Integer> {
         Path logPath = LoggingContext.getLoggingPath();
 
         if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
-            CrashReporter.report(throwable, logPath);
+            new Thread(() -> CrashReporter.report(throwable, logPath), "CrashReporter").start();
         } else {
             throwable.printStackTrace();
             System.err.println("For more details, see the log files in " + logPath.toAbsolutePath().normalize());

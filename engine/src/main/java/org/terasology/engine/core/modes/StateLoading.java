@@ -247,7 +247,7 @@ public class StateLoading implements GameState {
                 String errorMessage = String.format("Failed to load game. There was an error during \"%s\".",
                         current == null ? "the last part" : current.getMessage());
                 gameEngine.changeState(new StateMainMenu(errorMessage));
-                CrashReporter.report(e, LoggingContext.getLoggingPath());
+                new Thread(() -> CrashReporter.report(e, LoggingContext.getLoggingPath()), "CrashReporter").start();
                 return;
             }
         }
