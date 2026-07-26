@@ -156,9 +156,55 @@ public class MainLoop {
     }
 
     /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     * <p>
+     * Prefer this over {@link #runUntil(Supplier)} in tests. {@code runUntil} reports a timeout by
+     * <em>returning</em> {@code true}, which is easy to ignore and easy to read backwards, so a test
+     * that times out silently carries on to its assertions and then fails somewhere else with no
+     * indication that the wait was the problem. This throws instead, naming what was awaited and how
+     * long it ran.
+     * <pre><code>
+     *     mainLoop.awaitUntil("client 2 receives the chat message", () -&gt; probe.received);
+     * </code></pre>
+     *
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within DEFAULT_GAME_TIME_TIMEOUT of game time
+     */
+    public void awaitUntil(String description, Supplier<Boolean> condition) {
+        awaitUntil(ModuleTestingEnvironment.DEFAULT_GAME_TIME_TIMEOUT, description, condition);
+    }
+
+    /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     *
+     * @param gameTimeTimeoutMs how long to wait, in game time
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within {@code gameTimeTimeoutMs} of game time
+     * @see #awaitUntil(String, Supplier)
+     */
+    public void awaitUntil(long gameTimeTimeoutMs, String description, Supplier<Boolean> condition) {
+        Time hostTime = engines.getHostContext().get(Time.class);
+        long startGameTime = hostTime.getGameTimeInMs();
+        long startRealTime = System.currentTimeMillis();
+
+        if (runUntil(gameTimeTimeoutMs, condition)) {
+            throw new AssertionError(String.format(
+                    "Timed out waiting for %s - gave up after %d ms of game time (%d ms real time, "
+                            + "limit %d ms game time). The condition never became true; if it needed longer, "
+                            + "pass a larger gameTimeTimeoutMs.",
+                    description,
+                    hostTime.getGameTimeInMs() - startGameTime,
+                    System.currentTimeMillis() - startRealTime,
+                    gameTimeTimeoutMs));
+        }
+    }
+
+    /**
      * Runs tick() on the engine until f evaluates to true or DEFAULT_GAME_TIME_TIMEOUT milliseconds have passed in game time
      *
      * @return true if execution timed out
+     * @see #awaitUntil(String, Supplier) for a variant that fails the test on timeout instead of
+     *         returning a status that is easy to drop
      */
     public boolean runUntil(Supplier<Boolean> f) {
         return runWhile(() -> !f.get());

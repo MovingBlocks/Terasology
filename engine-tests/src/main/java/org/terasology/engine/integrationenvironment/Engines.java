@@ -147,9 +147,7 @@ public class Engines {
         TerasologyEngine client = createHeadlessEngine();
 
         client.changeState(new StateMainMenu());
-        if (!connectToHost(client, mainLoop)) {
-            throw new RuntimeException(String.format("Could not connect client %s to local host - timeout.", client));
-        }
+        connectToHost(client, mainLoop);
         Context context = client.getState().getContext();
         context.put(ScreenGrabber.class, hostContext.get(ScreenGrabber.class));
 
@@ -297,7 +295,7 @@ public class Engines {
      *
      * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
      */
-    boolean connectToHost(TerasologyEngine client, MainLoop mainLoop) {
+    void connectToHost(TerasologyEngine client, MainLoop mainLoop) {
         Context coreContextOverride = client.createChildContext();
         CoreRegistry.setContext(coreContextOverride);
         coreContextOverride.put(Config.class, client.getFromEngineContext(Config.class));
@@ -313,6 +311,41 @@ public class Engines {
 
         // TODO: subscribe to state change and return an asynchronous result
         //     so that we don't need to pass mainLoop to here.
-        return !mainLoop.runUntil(() -> client.getState() instanceof StateIngame);
+        try {
+            mainLoop.awaitUntil("client to finish joining and reach the in-game state",
+                    () -> client.getState() instanceof StateIngame);
+        } catch (AssertionError e) {
+            throw new RuntimeException(describeJoinFailure(client, joinStatus), e);
+        }
+    }
+
+    /**
+     * Explain why a client never reached in-game.
+     * <p>
+     * The connection previously failed with a bare "could not connect - timeout", which does not
+     * distinguish a join the host actively <em>refused</em> from one that was merely slow, and gave no
+     * hint where it stalled. {@link JoinStatus} knows all of that and was being discarded, so a flaky
+     * connection failure was effectively undiagnosable after the fact - which matters most in CI,
+     * where re-running to watch it is not an option.
+     */
+    private static String describeJoinFailure(TerasologyEngine client, JoinStatus joinStatus) {
+        StringBuilder message = new StringBuilder("Could not connect client ").append(client)
+                .append(" to local host. Client state when we gave up: ")
+                .append(client.getState() == null ? "none" : client.getState().getClass().getSimpleName());
+
+        if (joinStatus == null) {
+            message.append("; the join was interrupted before it reported any status");
+            return message.toString();
+        }
+
+        message.append("; join status ").append(joinStatus.getStatus())
+                .append(" during '").append(joinStatus.getCurrentActivity())
+                .append("' (").append(Math.round(joinStatus.getCurrentActivityProgress() * 100)).append("%)");
+
+        String error = joinStatus.getErrorMessage();
+        if (error != null && !error.isEmpty()) {
+            message.append("; error: ").append(error);
+        }
+        return message.toString();
     }
 }

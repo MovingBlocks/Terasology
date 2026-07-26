@@ -34,4 +34,20 @@ public class ModuleTestingEnvironmentTest {
         ListenableFuture<Integer> valueFuture = Futures.immediateFuture(THE_ANSWER);
         assertThat(mainLoop.runUntil(valueFuture)).isEqualTo(THE_ANSWER);
     }
+
+    @Test
+    public void awaitUntilReturnsQuietlyWhenConditionHolds(MainLoop mainLoop) {
+        mainLoop.awaitUntil("a condition that is already true", () -> true);
+    }
+
+    @Test
+    public void awaitUntilNamesWhatItWasWaitingFor(MainLoop mainLoop) {
+        // A short game-time timeout keeps this well under the safety timeout, so we exercise the
+        // game-time path - the one runUntil reports by returning true rather than throwing.
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> mainLoop.awaitUntil(200, "the thing that never happens", () -> false));
+
+        assertThat(error).hasMessageThat().contains("the thing that never happens");
+        assertThat(error).hasMessageThat().contains("game time");
+    }
 }
