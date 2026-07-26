@@ -96,6 +96,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
     @Inject
     public TypeHandlerLibraryImpl(ModuleManager moduleManager, TypeRegistry typeRegistry) {
         super(new ModuleEnvironmentSandbox(moduleManager, typeRegistry));
+        addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
 
         // TODO: This used to be done in TypeHandlerLibraryImpl.forModuleEnvironment().
         populateWithDefaultHandlers(this);
