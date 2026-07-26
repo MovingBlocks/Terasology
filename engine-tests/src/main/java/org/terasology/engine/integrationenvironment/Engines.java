@@ -289,11 +289,14 @@ public class Engines {
     }
 
     /**
+     * Joins {@code client} to the local host and runs the engines until it reaches
+     * {@link StateIngame in-game}.
      *
      * @param client the client engine to connect to the local host
-     * @param mainLoop
-     *
-     * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
+     * @param mainLoop used to tick the engines while the join completes
+     * @throws RuntimeException if the client does not reach in-game before the wait times out. The
+     *         message reports the client's state at that point and the {@link JoinStatus}, which
+     *         distinguishes a join the host refused from one that was merely slow.
      */
     void connectToHost(TerasologyEngine client, MainLoop mainLoop) {
         Context coreContextOverride = client.createChildContext();
