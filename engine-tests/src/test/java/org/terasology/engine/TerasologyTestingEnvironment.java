@@ -50,8 +50,8 @@ public abstract class TerasologyTestingEnvironment {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
+    private static Context baseContext;
     private static ModuleManager moduleManager;
-
     private static HeadlessEnvironment env;
 
     protected EngineTime mockTime;
@@ -68,21 +68,25 @@ public abstract class TerasologyTestingEnvironment {
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
         env = new HeadlessEnvironment(new Name("engine"), new Name("unittest"));
-        context = env.getContext();
-        CoreRegistry.setContext(context);
+        baseContext = env.getContext();
+        context = baseContext;
+        CoreRegistry.setContext(context); // initial setup for @BeforeAll lookups
         moduleManager = context.get(ModuleManager.class);
 
     }
 
     @BeforeEach
     public void setup() throws Exception {
+        CoreRegistry.setContext(baseContext); // clear stale per-test context from previous run
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
         mockTime = mock(EngineTime.class);
         serviceRegistry.with(Time.class).lifetime(Lifetime.Singleton).use(() -> mockTime);
-        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
-        serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(Game::new);
+        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, baseContext);
+        Game game = new Game();
+        game.load(new GameManifest("world1", "world1", 0));
+        serviceRegistry.with(Game.class).lifetime(Lifetime.Singleton).use(() -> game);
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
 
@@ -94,13 +98,12 @@ public abstract class TerasologyTestingEnvironment {
         serviceRegistry.with(DirectionAndOriginPosRecorderList.class).lifetime(Lifetime.Singleton).use(() -> directionAndOriginPosRecorderList);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
 
-        Game game = new Game();
-        game.load(new GameManifest("world1", "world1", 0));
         serviceRegistry.with(StorageManager.class).lifetime(Lifetime.Singleton).use(ReadWriteStorageManager.class);
 
         serviceRegistry.with(ComponentSystemManager.class).lifetime(Lifetime.Singleton).use(ComponentSystemManager.class);
         serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
-        context = new ContextImpl(context, serviceRegistry);
+        context = new ContextImpl(baseContext, serviceRegistry);
+        CoreRegistry.setContext(context); // switch to per-test child context
         engineEntityManager = context.get(EngineEntityManager.class);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(context.get(TypeHandlerLibrary.class),
                 context.get(EntitySystemLibrary.class), moduleManager.getEnvironment(), engineEntityManager);
@@ -113,7 +116,7 @@ public abstract class TerasologyTestingEnvironment {
             complete = prefabLoadStep.step();
         }
         context.get(ComponentSystemManager.class).initialise();
-        CoreRegistry.setContext(context);
+        CoreRegistry.setContext(context); // reassert after prefab loading and system init
     }
 
     @AfterAll

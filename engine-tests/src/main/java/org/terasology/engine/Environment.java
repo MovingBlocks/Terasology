@@ -87,6 +87,7 @@ class Environment {
         setupCelestialSystem(serviceRegistry);
 
         this.context = new ContextImpl(serviceRegistry);
+        CoreRegistry.setContext(this.context);
 
         registerBlockTypeHandlers(this.context);
         registerCollisionTypeHandlers(this.context);
