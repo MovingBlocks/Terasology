@@ -340,8 +340,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 }
             } else {
                 NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
-                if (networkComponent != null && netRelevant.contains(networkComponent.getNetworkId())
-                        || netInitial.contains(networkComponent.getNetworkId())) {
+                if (networkComponent != null && (netRelevant.contains(networkComponent.getNetworkId())
+                        || netInitial.contains(networkComponent.getNetworkId()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
                         .setTargetId(networkComponent.getNetworkId())
                         .setEvent(eventSerializer.serialize(event)).build());
