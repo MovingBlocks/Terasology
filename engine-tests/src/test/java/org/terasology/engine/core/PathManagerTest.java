@@ -32,10 +32,22 @@ public class PathManagerTest {
         pathManager.useOverrideHomePath(tempHome);
     }
 
+    /**
+     * Leave the singleton pointing at a directory that actually exists.
+     * <p>
+     * Restoring the original is only right while it is still there. Simply skipping restoration when
+     * it is not - which is what a bare guard does - is the worse option: it leaves the singleton on
+     * this test's {@link TempDir}, which JUnit deletes the moment this class finishes, so the next
+     * class to read the home path fails and the problem propagates instead of stopping here.
+     */
     @AfterEach
     public void tearDown() throws IOException {
         if (originalHomePath != null && Files.isDirectory(originalHomePath)) {
             pathManager.useOverrideHomePath(originalHomePath);
+        } else {
+            Path fallback = Files.createTempDirectory("terasology-pathmanager");
+            fallback.toFile().deleteOnExit();
+            pathManager.useOverrideHomePath(fallback);
         }
     }
 

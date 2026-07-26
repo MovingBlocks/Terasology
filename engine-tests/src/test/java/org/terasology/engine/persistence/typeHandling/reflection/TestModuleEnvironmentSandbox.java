@@ -49,13 +49,20 @@ public class TestModuleEnvironmentSandbox {
     /**
      * Put the PathManager singleton back where we found it. Without this the global instance keeps
      * pointing at the {@link TempDir} above, which JUnit deletes once this class finishes - any later
-     * test class reading {@code PathManager.getHomePath()} then hits a directory that is gone. Same
-     * restore (and the same already-deleted guard) as PathManagerTest.
+     * test class reading {@code PathManager.getHomePath()} then hits a directory that is gone.
+     * <p>
+     * If the original is itself already gone, fall back to a fresh directory that outlives this class
+     * rather than skipping the restore: skipping would leave the singleton on the doomed
+     * {@link TempDir} and pass the same breakage on to whatever runs next. Mirrors PathManagerTest.
      */
     @AfterEach
     public void restorePathManager() throws IOException {
         if (originalHomePath != null && Files.isDirectory(originalHomePath)) {
             PathManager.getInstance().useOverrideHomePath(originalHomePath);
+        } else {
+            Path fallback = Files.createTempDirectory("terasology-pathmanager");
+            fallback.toFile().deleteOnExit();
+            PathManager.getInstance().useOverrideHomePath(fallback);
         }
     }
 
