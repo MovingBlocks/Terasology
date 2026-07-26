@@ -46,8 +46,9 @@ public class ExtrasMenuScreen extends CoreScreenLayer {
         });
         WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."),
-                LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> new Thread(() ->
+                CrashReporter.report(new Throwable("There is no error."),
+                        LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER), "CrashReporter").start());
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
