@@ -10,6 +10,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -87,6 +88,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private BindsManager bindsManager;
 
+    @In
+    private DisplayDevice display;
+
     private Camera playerCamera;
     private boolean localPlayerInitialized = false;
 
@@ -138,6 +142,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
+        if (!display.hasFocus()) {
+            return;
+        }
+
         lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
         lookPitch = (float) Math.clamp(-89, 89, lookPitch + lookPitchDelta);
