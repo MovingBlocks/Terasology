@@ -119,9 +119,16 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     public String getInstigatorName(EntityRef instigator) {
         if (instigator.hasComponent(CharacterComponent.class)) {
             EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
-            EntityRef instigatorClientInfo = instigatorClient.getComponent(ClientComponent.class).clientInfo;
-            return instigatorClientInfo.getComponent(DisplayNameComponent.class).name;
-        } else if (instigator.getParentPrefab() != null) {
+            ClientComponent clientComponent = instigatorClient.getComponent(ClientComponent.class);
+            if (clientComponent != null) {
+                DisplayNameComponent instigatorDisplayName = clientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+                if (instigatorDisplayName != null) {
+                    return instigatorDisplayName.name;
+                }
+            }
+        }
+
+        if (instigator.getParentPrefab() != null) {
             //A DisplayName can be specified in the entity prefab
             //Otherwise, the game will attempt to generate one from the name of that prefab
             Prefab parentPrefab = instigator.getParentPrefab();
