@@ -59,7 +59,7 @@ public class TwoClientChatTest {
 
         // Wait for both clients to register on the host
         NetworkSystem hostNetwork = helper.getHostContext().get(NetworkSystem.class);
-        helper.runUntil(() -> {
+        helper.awaitUntil("both clients to register on the host", () -> {
             int count = 0;
             for (Client ignored : hostNetwork.getPlayers()) {
                 count++;
@@ -88,7 +88,7 @@ public class TwoClientChatTest {
         logger.info("Chat messages sent at {}ms", System.currentTimeMillis() - startTime);
 
         // Wait for client 2's probe to receive the message
-        helper.runUntil(() -> probe.received);
+        helper.awaitUntil("client 2 to receive the chat message", () -> probe.received);
 
         long totalMs = System.currentTimeMillis() - startTime;
         reporter.publishEntry("total_ms", String.valueOf(totalMs));

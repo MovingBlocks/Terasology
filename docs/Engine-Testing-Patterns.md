@@ -55,6 +55,47 @@ public class MyNetworkTest {
 }
 ```
 
+## Waiting for the Engine
+
+Nothing in MTE happens until you run the engine. The engine is ready when your
+test method starts, but it does not tick on its own — you drive it with one of
+the wait helpers while a condition is unmet.
+
+**Use `awaitUntil`, not `runUntil`.**
+
+```java
+helper.awaitUntil("client 2 to receive the chat message", () -> probe.received);
+```
+
+`awaitUntil` throws an `AssertionError` naming what was awaited, how much game
+time and real time elapsed, and what the limit was. `runUntil` instead reports a
+timeout by *returning* `true`:
+
+```java
+// Reads like "if the condition was met" but means "if it timed out".
+boolean timedOut = mainLoop.runUntil(() -> probe.received);
+```
+
+That return value is easy to drop, and a dropped timeout is silent: the test
+carries on to its assertions and fails somewhere later with no sign that the wait
+was the real problem. This is the single most common way an MTE test produces a
+confusing failure. `runUntil` remains for callers that genuinely want to branch
+on the result — but if you are about to assert on the thing you waited for, you
+want `awaitUntil`.
+
+Both take an optional game-time timeout as the first argument when the default
+(`DEFAULT_GAME_TIME_TIMEOUT`, 30s of game time) is not enough:
+
+```java
+helper.awaitUntil(60_000, "the world to finish generating", () -> worldReady);
+```
+
+Two different timeouts are in play. The **game-time** timeout is the one above,
+measured by the host's `Time`. The **safety** timeout is real wall-clock and
+exists to stop a runaway loop; exceeding it throws `UncheckedTimeoutException`
+regardless of which helper you used. Adjust it with `setSafetyTimeoutMs` if a
+test legitimately needs to run long.
+
 ## Network Event Testing
 
 ### The Event Registration Problem

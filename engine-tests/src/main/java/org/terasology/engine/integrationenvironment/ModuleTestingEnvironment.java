@@ -44,9 +44,30 @@ public interface ModuleTestingEnvironment {
     <T> T runUntil(ListenableFuture<T> future);
 
     /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     * <p>
+     * Prefer this over {@link #runUntil(Supplier)} in tests: a timeout throws with the description
+     * instead of returning a status that is easy to drop.
+     *
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within DEFAULT_GAME_TIME_TIMEOUT of game time
+     */
+    void awaitUntil(String description, Supplier<Boolean> condition);
+
+    /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     *
+     * @param gameTimeTimeoutMs how long to wait, in game time
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within {@code gameTimeTimeoutMs} of game time
+     */
+    void awaitUntil(long gameTimeTimeoutMs, String description, Supplier<Boolean> condition);
+
+    /**
      * Runs tick() on the engine until f evaluates to true or DEFAULT_GAME_TIME_TIMEOUT milliseconds have passed in game time
      *
      * @return true if execution timed out
+     * @see #awaitUntil(String, Supplier) for a variant that fails the test on timeout
      */
     boolean runUntil(Supplier<Boolean> f);
 

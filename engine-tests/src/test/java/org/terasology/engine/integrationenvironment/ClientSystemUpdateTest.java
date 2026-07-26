@@ -43,7 +43,8 @@ public class ClientSystemUpdateTest {
         csm.register(tickCounter);
 
         int targetTicks = 5;
-        helper.runUntil(() -> tickCounter.updateCount >= targetTicks);
+        helper.awaitUntil("the client system to receive " + targetTicks + " updates",
+                () -> tickCounter.updateCount >= targetTicks);
 
         reporter.publishEntry("ticks_received", String.valueOf(tickCounter.updateCount));
         reporter.publishEntry("total_ms", String.valueOf(System.currentTimeMillis() - start));

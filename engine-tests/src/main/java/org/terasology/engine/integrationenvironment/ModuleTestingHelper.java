@@ -62,6 +62,16 @@ public class ModuleTestingHelper implements ModuleTestingEnvironment {
     }
 
     @Override
+    public void awaitUntil(String description, Supplier<Boolean> condition) {
+        mainLoop.awaitUntil(description, condition);
+    }
+
+    @Override
+    public void awaitUntil(long gameTimeTimeoutMs, String description, Supplier<Boolean> condition) {
+        mainLoop.awaitUntil(gameTimeTimeoutMs, description, condition);
+    }
+
+    @Override
     public boolean runUntil(Supplier<Boolean> f) {
         return mainLoop.runUntil(f);
     }

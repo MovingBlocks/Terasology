@@ -58,7 +58,8 @@ public class ExampleTest {
         int expectedClients = currentClients + 2;
 
         // wait for both clients to be known to the server
-        helper.runUntil(() -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size() >= expectedClients);
+        helper.awaitUntil("both clients to be known to the server",
+                () -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size() >= expectedClients);
         Assertions.assertEquals(expectedClients,
                 Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size());
     }
