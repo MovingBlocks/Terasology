@@ -1,8 +1,3 @@
-// Create an instance of the common script to operate on
-File sourceFile = new File("config/groovy/common.groovy")
-Class sourceClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile)
-GroovyObject common = (GroovyObject) sourceClass.newInstance()
-
 // User didn't enter a type (example: `groovyw`)
 if (args.length == 0) {
     println "You need to supply some parameters! See 'groovyw usage' for details"
@@ -26,6 +21,11 @@ if (args.length == 1) {
     println "You need to supply a sub-command as well as a type of object to act on. See 'groovyw usage' for details"
     return
 }
+
+// Create an instance of the common script to operate on
+File sourceFile = new File("config/groovy/common.groovy")
+Class sourceClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile)
+GroovyObject common = (GroovyObject) sourceClass.newInstance()
 
 // Initialize the type target to load in things specific to that type
 common.initialize(args[0])

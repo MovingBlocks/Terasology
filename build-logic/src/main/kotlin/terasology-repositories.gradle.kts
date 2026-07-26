@@ -37,7 +37,7 @@ repositories {
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
             name = "from alternativeResolutionRepo property"
-            url =  URI(rootProject.properties["alternativeResolutionRepo"] as String)
+            url =  URI(rootProject.property("alternativeResolutionRepo") as String)
         } else if (repoViaEnv != null && repoViaEnv != "") {
             name = "from \$RESOLUTION_REPO"
             url = URI(repoViaEnv)
