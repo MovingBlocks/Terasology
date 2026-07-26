@@ -3,6 +3,7 @@
 
 package org.terasology.engine.persistence.typeHandling.reflection;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -15,6 +16,8 @@ import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.ExampleInterface;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
@@ -26,8 +29,11 @@ public class TestModuleEnvironmentSandbox {
     private TypeRegistry typeRegistry;
     private ModuleManager moduleManager;
     private ModuleEnvironment environment;
+    private Path originalHomePath;
+
     @BeforeEach
     protected void provideSandbox(@TempDir Path tempHome) throws Exception {
+        originalHomePath = PathManager.getInstance().getHomePath();
         PathManager.getInstance().useOverrideHomePath(tempHome);
         moduleManager = ModuleManagerFactory.create();
         environment = moduleManager.getEnvironment();
@@ -38,6 +44,19 @@ public class TestModuleEnvironmentSandbox {
         sandbox = new ModuleEnvironmentSandbox(moduleManager, typeRegistry);
 
         // module = environment.get(new Name("unittest"));
+    }
+
+    /**
+     * Put the PathManager singleton back where we found it. Without this the global instance keeps
+     * pointing at the {@link TempDir} above, which JUnit deletes once this class finishes - any later
+     * test class reading {@code PathManager.getHomePath()} then hits a directory that is gone. Same
+     * restore (and the same already-deleted guard) as PathManagerTest.
+     */
+    @AfterEach
+    public void restorePathManager() throws IOException {
+        if (originalHomePath != null && Files.isDirectory(originalHomePath)) {
+            PathManager.getInstance().useOverrideHomePath(originalHomePath);
+        }
     }
 
     @Test
