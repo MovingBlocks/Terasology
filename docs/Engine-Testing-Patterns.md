@@ -229,6 +229,78 @@ handshake is the most common source of timeout failures.
 **Recommended entry names:** `client_connect_ms`, `client2_connect_ms`,
 `both_registered_ms`, `messages_sent_ms`, `total_ms`, `ticks_received`.
 
+## Test Context Pattern
+
+When tests use `@BeforeAll` to build an expensive base context (module
+loading, asset types) and `@BeforeEach` to add per-test services, follow
+this pattern to avoid context pollution across test methods:
+
+- **Keep a stable `baseContext`** from `@BeforeAll` — never reassign it
+- **Create per-test child contexts** from `baseContext`, not from the
+  previous test's `context`
+- **Update `CoreRegistry`** to point at the per-test context in `@BeforeEach`
+- **Register loaded instances**, not lazy constructors
+  (e.g., `use(() -> game)` with a loaded Game, not `use(Game::new)`)
+
+**Anti-pattern:**
+
+```java
+// BAD — context is static and reassigned each @BeforeEach.
+// Each test chains onto the previous test's context, leaking services.
+private static Context context;
+
+@BeforeEach
+void setUp() {
+    context = new ContextImpl(context, serviceRegistry);  // deep chain
+}
+```
+
+**Correct pattern:**
+
+```java
+private static Context baseContext;  // built once, never reassigned
+private Context context;              // per-test, child of baseContext
+
+@BeforeAll
+static void setUpClass() {
+    baseContext = new ContextImpl();
+    // ... expensive one-time setup ...
+}
+
+@BeforeEach
+void setUp() {
+    context = new ContextImpl(baseContext, serviceRegistry);
+    CoreRegistry.setContext(context);
+}
+```
+
+## DI Patterns
+
+Living reference for Terasology's dependency injection conventions,
+harvested during the Gestalt DI migration.
+
+- **Constructor injection preferred.** `@javax.inject.Inject` on
+  protected members is an acceptable compromise. `@In` is legacy *except*
+  for MTE test fields — the integration environment harness specifically
+  looks for `@In` via `InjectionHelper`.
+- **Never inject `Context` directly.** Inject the specific dependencies
+  your class needs.
+- **Use `ServiceRegistry` during registration**, **`ImmutableContextImpl`
+  after** — the immutable variant catches rogue writes during runtime.
+- **Gestalt auto-registers interfaces.** `.with(Impl.class).lifetime(Singleton)`
+  auto-maps all implemented interfaces via `interfaceMapping`. Do NOT also
+  add `.with(Interface.class).use(Impl.class)` — creates duplicate bean
+  keys and breaks resolution. Only use explicit interface mapping when the
+  target is not the impl itself (e.g., `.with(Interface.class).use(() -> specificInstance)`).
+- **`Context.put()` should not be called.** Migrate to `ServiceRegistry`-based
+  initialization.
+- **`CoreRegistry` is being eliminated.** No new uses. The test environment
+  is a reluctant exception while MTE still depends on it.
+
+Reference implementations on `develop` at the time of writing:
+- `engine-tests/src/test/java/org/terasology/engine/persistence/ComponentSerializerTest.java` (lines 59-79)
+- `engine/src/main/java/org/terasology/engine/core/TerasologyEngine.java` (around line 260)
+
 ## Gradle Test Execution
 
 ```bash
