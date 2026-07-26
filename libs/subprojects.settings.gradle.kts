@@ -7,14 +7,16 @@
 //    ./gradlew :TeraNUI:build
 File(rootDir, "libs").listFiles()?.filter { it.isDirectory }?.forEach { possibleSubprojectDir ->
     val subprojectName = ":libs:" + possibleSubprojectDir.name
-    val buildFile = File(possibleSubprojectDir, "build.gradle")
-    val settingsFile = File(possibleSubprojectDir, "settings.gradle")
-    if (!buildFile.exists()) {
-        logger.warn("***** WARNING: Found a lib without a build.gradle, corrupt dir? NOT including {} *****", subprojectName)
+    val buildFileExists = File(possibleSubprojectDir, "build.gradle").exists() ||
+        File(possibleSubprojectDir, "build.gradle.kts").exists()
+    val settingsFileExists = File(possibleSubprojectDir, "settings.gradle").exists() ||
+        File(possibleSubprojectDir, "settings.gradle.kts").exists()
+    if (!buildFileExists) {
+        logger.warn("***** WARNING: Found a lib without a build.gradle(.kts), corrupt dir? NOT including {} *****", subprojectName)
         return@forEach
     }
-    if (!settingsFile.exists()) {
-        logger.warn("lib {} has build.gradle, but no settings.gradle? NOT including it.", subprojectName)
+    if (!settingsFileExists) {
+        logger.warn("lib {} has build.gradle(.kts), but no settings.gradle(.kts)? NOT including it.", subprojectName)
         return@forEach
     }
     logger.info("lib {} has a build file so counting it complete and including it.", subprojectName)
