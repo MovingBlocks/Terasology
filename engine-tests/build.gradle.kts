@@ -114,10 +114,16 @@ tasks.withType<Jar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+// Tests that touch real user directories rather than a @TempDir. Opt in with
+// `gradlew :engine-tests:filesystemSideEffectTest` - see that task below.
+val filesystemSideEffects = "filesystem-side-effects"
+
 tasks.named<Test>("test") {
     dependsOn(tasks.getByPath(":extractNatives"))
     description = "Runs all tests (slow)"
-    useJUnitPlatform ()
+    useJUnitPlatform {
+        excludeTags(filesystemSideEffects)
+    }
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
 }
 
@@ -126,7 +132,17 @@ tasks.register<Test>("unitTest") {
     group =  "Verification"
     description = "Runs unit tests (fast)"
     useJUnitPlatform {
-        excludeTags("MteTest", "TteTest")
+        excludeTags("MteTest", "TteTest", filesystemSideEffects)
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+tasks.register<Test>("filesystemSideEffectTest") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    group = "Verification"
+    description = "Runs tests that write outside a @TempDir, into real user directories. Opt-in."
+    useJUnitPlatform {
+        includeTags(filesystemSideEffects)
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
 }

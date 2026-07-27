@@ -53,19 +53,13 @@ public class TwoClientChatTest {
         Context client2Ctx = helper.createClient();
         assertNotNull(client2Ctx, "Client 2 context should be created");
         long client2Ms = System.currentTimeMillis() - client2Start;
+        long client2TotalMs = System.currentTimeMillis() - startTime;
         reporter.publishEntry("client2_connect_ms", String.valueOf(client2Ms));
-        logger.info("Client 2 connected in {}ms (total: {}ms)",
-                client2Ms, System.currentTimeMillis() - startTime);
+        logger.info("Client 2 connected in {}ms (total: {}ms)", client2Ms, client2TotalMs);
 
         // Wait for both clients to register on the host
         NetworkSystem hostNetwork = helper.getHostContext().get(NetworkSystem.class);
-        helper.awaitUntil("both clients to register on the host", () -> {
-            int count = 0;
-            for (Client ignored : hostNetwork.getPlayers()) {
-                count++;
-            }
-            return count >= 2;
-        });
+        helper.awaitClients(2);
         assertThat(hostNetwork.getPlayers()).hasSize(2);
         long registeredMs = System.currentTimeMillis() - startTime;
         reporter.publishEntry("both_registered_ms", String.valueOf(registeredMs));
@@ -84,8 +78,9 @@ public class TwoClientChatTest {
         for (Client client : hostNetwork.getPlayers()) {
             client.getEntity().send(new ChatMessageEvent(testMessage, senderInfo));
         }
-        reporter.publishEntry("messages_sent_ms", String.valueOf(System.currentTimeMillis() - startTime));
-        logger.info("Chat messages sent at {}ms", System.currentTimeMillis() - startTime);
+        long messagesSentMs = System.currentTimeMillis() - startTime;
+        reporter.publishEntry("messages_sent_ms", String.valueOf(messagesSentMs));
+        logger.info("Chat messages sent at {}ms", messagesSentMs);
 
         // Wait for client 2's probe to receive the message
         helper.awaitUntil("client 2 to receive the chat message", () -> probe.received);

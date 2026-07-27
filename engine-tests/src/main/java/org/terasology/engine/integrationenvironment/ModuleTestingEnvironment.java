@@ -100,6 +100,19 @@ public interface ModuleTestingEnvironment {
     Context createClient() throws IOException;
 
     /**
+     * Runs the engines until at least {@code expectedClients} clients are registered with the host.
+     * <p>
+     * {@link #createClient()} returns once that client itself is in-game, which is not the same as the
+     * host having finished registering it - so a test that creates clients and immediately inspects
+     * {@code NetworkSystem.getPlayers()} can see fewer than it created. Waiting for the host's own view
+     * is the fix, and doing it by hand is easy to get subtly wrong.
+     *
+     * @param expectedClients how many clients the host should know about
+     * @throws AssertionError if that many never register within the default game-time timeout
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety timeout is exceeded
+     */
+
+    /**
      * The engines active in this instance of the module testing environment.
      * <p>
      * Engines are created for the host and connecting clients.
