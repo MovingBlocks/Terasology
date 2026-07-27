@@ -169,7 +169,7 @@ public class PathManagerTest {
         // that property. So this is the one test in the class that escapes its sandbox.
         pathManager.useDefaultHomePath();
         assertNotNull(pathManager.getHomePath());
-        
+
         // It should end with Terasology
         assertTrue(pathManager.getHomePath().toString().endsWith("Terasology"));
         assertTrue(Files.isDirectory(pathManager.getHomePath()));
