@@ -292,6 +292,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         EntityRef controller = characterComponent.controller;
 
         ClientComponent clientComponent = controller.getComponent(ClientComponent.class);
+        if (clientComponent == null) {
+            return "?";
+        }
         EntityRef clientInfo = clientComponent.clientInfo;
 
         DisplayNameComponent displayNameComponent = clientInfo.getComponent(DisplayNameComponent.class);
