@@ -37,7 +37,7 @@ public abstract class AbstractState implements GameState {
         CoreRegistry.setContext(context);
 
         // let's get the entity event system running
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
 
         serviceRegistry.with(Console.class).lifetime(Lifetime.Singleton).use(ConsoleImpl.class);
         if (!isHeadless) {

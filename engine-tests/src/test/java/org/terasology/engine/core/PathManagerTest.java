@@ -4,6 +4,7 @@ package org.terasology.engine.core;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -154,10 +155,18 @@ public class PathManagerTest {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
+    @Tag("filesystem-side-effects")
     public void useDefaultHomePathWindows() throws IOException {
         // Windows relies on JNA (Shell32Util) which directly interrogates the Windows Registry/API.
         // We cannot easily redirect this to a @TempDir. We only verify that the path resolves to a valid Windows dir.
-        // Note: This will create a 'Terasology' folder in the local user's AppData/Saved Games! 
+        //
+        // This really does create a 'Terasology' folder in the developer's own Saved Games directory,
+        // which is why it is tagged and excluded from `test` and `unitTest`. Run it deliberately with
+        // `gradlew :engine-tests:filesystemSideEffectTest`.
+        //
+        // Note the Mac and Linux equivalents above do not need the tag: they redirect `user.home` to a
+        // @TempDir first, which Windows cannot do because the lookup goes through the OS rather than
+        // that property. So this is the one test in the class that escapes its sandbox.
         pathManager.useDefaultHomePath();
         assertNotNull(pathManager.getHomePath());
         

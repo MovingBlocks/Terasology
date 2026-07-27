@@ -49,7 +49,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(ServerConnectListManager.class).lifetime(Lifetime.Singleton).use(ServerConnectListManager.class);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         context = new ContextImpl(context, serviceRegistry);
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(
                 context.get(TypeHandlerLibrary.class), context.get(EntitySystemLibrary.class),
