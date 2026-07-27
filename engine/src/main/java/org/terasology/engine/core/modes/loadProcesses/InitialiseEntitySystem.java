@@ -25,7 +25,7 @@ public class InitialiseEntitySystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context, serviceRegistry);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         return true;
     }
 
