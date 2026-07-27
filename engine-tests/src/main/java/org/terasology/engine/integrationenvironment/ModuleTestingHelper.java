@@ -98,8 +98,11 @@ public class ModuleTestingHelper implements ModuleTestingEnvironment {
         return engines.createClient(mainLoop);
     }
 
-    @Override
+    `@Override`
     public void awaitClients(int expectedClients) {
+        if (expectedClients < 0) {
+            throw new IllegalArgumentException("expectedClients must be non-negative");
+        }
         NetworkSystem networkSystem = getHostContext().get(NetworkSystem.class);
         mainLoop.awaitUntil(
                 String.format("%d client(s) to register with the host", expectedClients),
