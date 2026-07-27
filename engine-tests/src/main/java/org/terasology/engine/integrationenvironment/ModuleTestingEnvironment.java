@@ -109,8 +109,8 @@ public interface ModuleTestingEnvironment {
      *
      * @param expectedClients how many clients the host should know about
      * @throws AssertionError if that many never register within the default game-time timeout
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety timeout is exceeded
      */
-    void awaitClients(int expectedClients);
 
     /**
      * The engines active in this instance of the module testing environment.
