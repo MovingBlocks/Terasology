@@ -123,7 +123,8 @@ public class TerasologyEngine implements GameEngine {
      * You don't want to add to this! If you need a module, make a module!
      */
     private static final Set<String> LEGACY_ENGINE_MODULE_POLLUTERS = Set.of(
-            "org.terasology.subsystem.discordrpc.DiscordRPCSubSystem"
+            "org.terasology.subsystem.discordrpc.DiscordRPCSubSystem",
+            "org.terasology.subsystem.nakama.NakamaSubSystem"
     );
 
     private final List<Class<?>> classesOnClasspathsToAddToEngine = new ArrayList<>();
