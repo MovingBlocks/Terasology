@@ -95,6 +95,15 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
                         }
                     }
 
+                    // ObjectFieldMapTypeHandler.deserialize() writes non-private fields directly via
+                    // field.set(...) - writing a `final` field via reflection always requires
+                    // setAccessible(true) first, regardless of the field's own visibility (this is a
+                    // plain Java reflection rule, unrelated to any JDK version's deprecation warnings
+                    // about *already-accessible* final-field mutation). Without this, any `public final`
+                    // field - e.g. LocationComponent.position - throws IllegalAccessException the moment
+                    // it needs to be deserialized to a non-default value.
+                    field.setAccessible(true);
+
                     Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
                     fields.put(field, fieldType);
                 }
