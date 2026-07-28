@@ -7,6 +7,7 @@ import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
@@ -40,26 +41,34 @@ public class ExampleTest {
 
     @Test
     @Tag("flaky")
-    public void testClientCreation() {
+    public void testClientCreation(TestReporter reporter) {
         logger.info("Starting test 'testClientCreation'");
+        long start = System.currentTimeMillis();
         Assertions.assertDoesNotThrow(helper::createClient);
+        reporter.publishEntry("client_connect_ms", String.valueOf(System.currentTimeMillis() - start));
         logger.info("Done with test 'testClientCreation'");
     }
 
     @Test
     @Tag("flaky")
-    public void testClientConnection() throws IOException {
+    public void testClientConnection(TestReporter reporter) throws IOException {
+        long start = System.currentTimeMillis();
         int currentClients = Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size();
 
         // create some clients (the library connects them automatically)
         Context clientContext1 = helper.createClient();
+        reporter.publishEntry("client1_connect_ms", String.valueOf(System.currentTimeMillis() - start));
+
+        long client2Start = System.currentTimeMillis();
         Context clientContext2 = helper.createClient();
+        reporter.publishEntry("client2_connect_ms", String.valueOf(System.currentTimeMillis() - client2Start));
 
         int expectedClients = currentClients + 2;
 
         // wait for both clients to be known to the server
         helper.awaitUntil("both clients to be known to the server",
                 () -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size() >= expectedClients);
+        reporter.publishEntry("both_known_ms", String.valueOf(System.currentTimeMillis() - start));
         Assertions.assertEquals(expectedClients,
                 Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size());
     }
@@ -76,11 +85,14 @@ public class ExampleTest {
 
     @Test
     @Tag("flaky")
-    public void testSendEvent() throws IOException {
+    public void testSendEvent(TestReporter reporter) throws IOException {
+        long start = System.currentTimeMillis();
         Context clientContext = helper.createClient();
+        reporter.publishEntry("client_connect_ms", String.valueOf(System.currentTimeMillis() - start));
 
         // send an event to a client's local player just for fun
         clientContext.get(LocalPlayer.class).getClientEntity().send(new DummyEvent());
+        reporter.publishEntry("total_ms", String.valueOf(System.currentTimeMillis() - start));
     }
 
     @Test

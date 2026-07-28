@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.integrationenvironment;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.StateIngame;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 
@@ -94,6 +97,18 @@ public class ModuleTestingHelper implements ModuleTestingEnvironment {
     @Override
     public Context createClient() throws IOException {
         return engines.createClient(mainLoop);
+    }
+
+    @Override
+    public void awaitClients(int expectedClients) {
+        // Without this a negative count is silently satisfied by the >= below before the engine ticks
+        // even once, so a test that computed its expectation wrong would pass rather than say so.
+        Preconditions.checkArgument(expectedClients >= 0, "expectedClients must not be negative, was %s",
+                expectedClients);
+        NetworkSystem networkSystem = getHostContext().get(NetworkSystem.class);
+        mainLoop.awaitUntil(
+                String.format("%d client(s) to register with the host", expectedClients),
+                () -> Iterables.size(networkSystem.getPlayers()) >= expectedClients);
     }
 
     @Override

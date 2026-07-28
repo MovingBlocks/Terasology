@@ -5,6 +5,7 @@ package org.terasology.engine.integrationenvironment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,11 +290,14 @@ public class Engines {
     }
 
     /**
+     * Joins {@code client} to the local host and runs the engines until it reaches
+     * {@link StateIngame in-game}.
      *
      * @param client the client engine to connect to the local host
-     * @param mainLoop
-     *
-     * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
+     * @param mainLoop used to tick the engines while the join completes
+     * @throws RuntimeException if the client does not reach in-game before the wait times out. The
+     *         message reports the client's state at that point and the {@link JoinStatus}, which
+     *         distinguishes a join the host refused from one that was merely slow.
      */
     void connectToHost(TerasologyEngine client, MainLoop mainLoop) {
         Context coreContextOverride = client.createChildContext();
@@ -314,7 +318,12 @@ public class Engines {
         try {
             mainLoop.awaitUntil("client to finish joining and reach the in-game state",
                     () -> client.getState() instanceof StateIngame);
-        } catch (AssertionError e) {
+        } catch (AssertionError | UncheckedTimeoutException e) {
+            // Both timeouts have to be caught here. awaitUntil throws AssertionError when the game-time
+            // limit is reached, but MainLoop throws UncheckedTimeoutException when the real-time safety
+            // timeout is hit first - and for a stuck join that is the likelier of the two, since an
+            // engine that is not progressing may not advance game time at all. Letting that one through
+            // would lose the diagnostics in exactly the case they are most needed.
             throw new RuntimeException(describeJoinFailure(client, joinStatus), e);
         }
     }
@@ -329,9 +338,12 @@ public class Engines {
      * where re-running to watch it is not an option.
      */
     private static String describeJoinFailure(TerasologyEngine client, JoinStatus joinStatus) {
+        // Read the state once: the engine is still running while we build this message, so calling
+        // getState() twice could report one state and describe another, or NPE on the second call.
+        GameState state = client.getState();
         StringBuilder message = new StringBuilder("Could not connect client ").append(client)
                 .append(" to local host. Client state when we gave up: ")
-                .append(client.getState() == null ? "none" : client.getState().getClass().getSimpleName());
+                .append(state == null ? "none" : state.getClass().getSimpleName());
 
         if (joinStatus == null) {
             message.append("; the join was interrupted before it reported any status");
