@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
@@ -13,6 +15,8 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import java.util.Optional;
 
 public class BlockPrefabManager implements BlockRegistrationListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(BlockPrefabManager.class);
 
     private EntityManager entityManager;
     private BlockManager blockManager;
@@ -46,6 +50,16 @@ public class BlockPrefabManager implements BlockRegistrationListener {
         if (prefab.isPresent()) {
             for (Component comp : prefab.get().iterateComponents()) {
                 ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+                if (metadata == null) {
+                    // A component with no registered metadata shouldn't take down block
+                    // registration for the whole family - log enough to diagnose why (root cause
+                    // found once: duplicate/shadowed module copies on the classpath causing
+                    // ComponentLibrary and a block's prefab to disagree on which class is live)
+                    // and skip just this component instead of NPEing.
+                    logger.error("No ComponentMetadata for {} (classLoader={}), referenced by block {}'s prefab {} - skipping",
+                            comp.getClass().getName(), comp.getClass().getClassLoader(), block.getURI(), prefab.get().getUrn());
+                    continue;
+                }
                 if (metadata.isForceBlockActive()) {
                     keepActive = true;
                     break;
