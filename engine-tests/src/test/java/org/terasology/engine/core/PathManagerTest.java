@@ -118,7 +118,7 @@ public class PathManagerTest {
         try {
             System.setProperty("user.home", tempHome.toString());
             pathManager.useDefaultHomePath();
-            
+
             Path expectedMacPath = tempHome.resolve("Library/Application Support/Terasology");
             assertEquals(expectedMacPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
             assertTrue(Files.isDirectory(pathManager.getHomePath()));
@@ -139,7 +139,7 @@ public class PathManagerTest {
         try {
             System.setProperty("user.home", tempHome.toString());
             pathManager.useDefaultHomePath();
-            
+
             Path expectedLinuxPath = tempHome.resolve(".local/share/terasology");
             assertEquals(expectedLinuxPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
             assertTrue(Files.isDirectory(pathManager.getHomePath()));
@@ -169,7 +169,7 @@ public class PathManagerTest {
         // that property. So this is the one test in the class that escapes its sandbox.
         pathManager.useDefaultHomePath();
         assertNotNull(pathManager.getHomePath());
-        
+
         // It should end with Terasology
         assertTrue(pathManager.getHomePath().toString().endsWith("Terasology"));
         assertTrue(Files.isDirectory(pathManager.getHomePath()));

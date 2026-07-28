@@ -48,9 +48,17 @@ public interface ModuleTestingEnvironment {
      * <p>
      * Prefer this over {@link #runUntil(Supplier)} in tests: a timeout throws with the description
      * instead of returning a status that is easy to drop.
+     * <p>
+     * Two timeouts can end the wait. The game-time one below throws {@link AssertionError}. The
+     * real-time safety timeout is enforced further down in the main loop and throws
+     * {@link com.google.common.util.concurrent.UncheckedTimeoutException} instead - and for a
+     * condition that never becomes true because the engine has stopped progressing, that is the
+     * likelier of the two, since game time only advances while the engine ticks.
      *
      * @param description what is being waited for, phrased to read after "timed out waiting for"
      * @throws AssertionError if the condition does not hold within DEFAULT_GAME_TIME_TIMEOUT of game time
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #setSafetyTimeoutMs(long)}
      */
     void awaitUntil(String description, Supplier<Boolean> condition);
 
@@ -60,6 +68,9 @@ public interface ModuleTestingEnvironment {
      * @param gameTimeTimeoutMs how long to wait, in game time
      * @param description what is being waited for, phrased to read after "timed out waiting for"
      * @throws AssertionError if the condition does not hold within {@code gameTimeTimeoutMs} of game time
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #setSafetyTimeoutMs(long)}
+     * @see #awaitUntil(String, Supplier)
      */
     void awaitUntil(long gameTimeTimeoutMs, String description, Supplier<Boolean> condition);
 
@@ -107,8 +118,12 @@ public interface ModuleTestingEnvironment {
      * {@code NetworkSystem.getPlayers()} can see fewer than it created. Waiting for the host's own view
      * is the fix, and doing it by hand is easy to get subtly wrong.
      *
-     * @param expectedClients how many clients the host should know about
+     * @param expectedClients how many clients the host should know about; zero returns immediately
+     * @throws IllegalArgumentException if {@code expectedClients} is negative, which no wait could satisfy
+     *         meaningfully and which would otherwise pass silently
      * @throws AssertionError if that many never register within the default game-time timeout
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #awaitUntil(String, Supplier)}
      */
     void awaitClients(int expectedClients);
 
