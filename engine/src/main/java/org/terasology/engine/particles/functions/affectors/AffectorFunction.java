@@ -8,12 +8,14 @@ import org.terasology.engine.particles.functions.ParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.context.annotation.API;
+import org.terasology.context.annotation.IndexInherited;
 
 /**
  * A affector function is called on a particle's data when it is updated to set its fields (Ex. Apply a force to a particle).
  */
 
 @API
+@IndexInherited
 public abstract class AffectorFunction<T extends Component> extends ParticleSystemFunction<T> implements Cloneable {
     public AffectorFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
         super(dataMask, dataMasks);
