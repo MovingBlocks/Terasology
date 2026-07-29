@@ -92,6 +92,11 @@ public class LocalChunkProvider implements ChunkProvider {
     private final Map<Vector3ic, Chunk> chunkCache;
 
     private final Map<Vector3ic, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
+    // The ChunkStore loaded (from disk) for a chunk in createOrLoadChunk()'s async task, carried
+    // through to processReadyChunk() so it isn't read from disk, decompressed, and re-parsed a
+    // second time there just to reach restoreEntities() - mirrors how generateQueuedEntities
+    // above already carries a freshly *generated* chunk's entities across the same handoff.
+    private final Map<Vector3ic, ChunkStore> loadedChunkStores = new ConcurrentHashMap<>();
 
     private final StorageManager storageManager;
     private final WorldGenerator generator;
@@ -140,6 +145,7 @@ public class LocalChunkProvider implements ChunkProvider {
                     generateQueuedEntities.put(chunk.getPosition(), buffer.getAll());
                 } else {
                     chunk = chunkStore.getChunk();
+                    loadedChunkStores.put(chunk.getPosition(), chunkStore);
                 }
                 return chunk;
             });
@@ -177,7 +183,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunkPos);
+        ChunkStore store = loadedChunkStores.remove(chunkPos);
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
