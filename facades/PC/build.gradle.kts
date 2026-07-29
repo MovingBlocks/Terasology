@@ -66,7 +66,7 @@ dependencies {
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    implementation("org.terasology.crashreporter:cr-terasology:5.0.0")
+    implementation("org.terasology.crashreporter:cr-terasology:5.1.0")
 
     runtimeOnly(libs.logback) {
         because("to configure logging with logback.xml")
