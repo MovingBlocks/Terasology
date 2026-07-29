@@ -3,6 +3,7 @@
 
 package org.terasology.engine.core;
 
+import ch.qos.logback.classic.BasicConfigurator;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -104,6 +105,11 @@ public final class LoggingContext {
                 new ContextInitializer(context).autoConfig();
             } catch (JoranException e) {
                 e.printStackTrace(); //NOPMD
+                // reset() has already cleared the appenders, so without a fallback here a failed
+                // reconfigure leaves logging silently dead for the rest of the run.
+                BasicConfigurator basicConfigurator = new BasicConfigurator();
+                basicConfigurator.setContext(context);
+                basicConfigurator.configure(context);
             }
         }
     }
