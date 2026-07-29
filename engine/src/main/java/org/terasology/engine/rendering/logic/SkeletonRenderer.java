@@ -101,6 +101,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             if (boneEntity == null || !boneEntity.exists() || !boneEntity.hasComponent(LocationComponent.class)) {
                 if (boneEntity != null && boneEntity.exists()) {
                     logger.warn("Bone entity for \"{}\" exists but has no LocationComponent, recreating", bone.getName());
+                    // Destroy before replacing the map entry, or the old one is orphaned in the
+                    // world - these accumulate on every load of an affected save.
+                    boneEntity.destroy();
                 }
                 boneEntity = entityManager.create(new LocationComponent());
                 skeleton.boneEntities.put(bone.getName(), boneEntity);
