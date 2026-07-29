@@ -46,7 +46,7 @@ Terasology relies on [Gestalt Module Sandboxing](https://github.com/MovingBlocks
 
 * [o.t.engine.core.module.ExternalApiWhitelist](https://github.com/MovingBlocks/Terasology/blob/develop/engine/src/main/java/org/terasology/engine/core/module/ExternalApiWhitelist.java) defines a hardcoded list of allowable packages and classes.
 
-### What counts as permitted
+## What counts as permitted
 
 Gestalt's `PermissionSet.isPermitted(Class)` is `apiClasses.contains(type) || apiPackages.contains(packageOf(type))` — **an exact match on the class itself or on its own package, with no walk up the type hierarchy**.
 
@@ -55,7 +55,7 @@ Two consequences that are easy to get wrong:
 * **`@API` on a base class does not cover its subclasses.** `APIScanner` adds exactly the annotated class (or, for an annotated `package-info`, that one package). A concrete subtype in an un-annotated package stays unpermitted no matter what its supertype is annotated with — so it must either carry its own `@API`, live in a package with an `@API` `package-info.java`, or have its package listed in `ExternalApiWhitelist`.
 * **The check only applies to classes loaded outside a `ModuleClassLoader`.** `JavaModuleClassLoader.loadClass` returns straight away when the resolved class came from another `ModuleClassLoader`, so module-to-module access never consults this. Engine classes reached from module-scoped code are loaded by the base loader, and those *are* gated.
 
-### `@API` is not `@IndexInherited`
+## `@API` is not `@IndexInherited`
 
 They are unrelated annotations and are frequently conflated:
 

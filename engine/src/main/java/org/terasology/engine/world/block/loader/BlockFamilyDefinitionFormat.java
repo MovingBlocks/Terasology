@@ -338,6 +338,12 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 throws JsonParseException {
 
             BlockFamilyLibrary library = blockFamilyLibrarySupplier.get();
+            if (library == null) {
+                // Reachable via the CoreRegistry-backed fallback supplier, which can be empty
+                // mid state-transition. Without this the NPE surfaces as an opaque Gson failure.
+                throw new JsonParseException("No BlockFamilyLibrary available while resolving block family '"
+                        + json.getAsString() + "'");
+            }
             return library.getBlockFamily(json.getAsString());
         }
     }
