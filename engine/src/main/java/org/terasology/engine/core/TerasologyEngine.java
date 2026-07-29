@@ -54,6 +54,7 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.rendering.gltf.ByteBufferAsset;
 import org.terasology.engine.version.TerasologyVersion;
+import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
@@ -421,7 +422,8 @@ public class TerasologyEngine implements GameEngine {
                 assetTypeManager.createAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
 
         assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionAssetType).addAssetFormat(
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(),
+                        () -> getState().getContext().get(BlockFamilyLibrary.class)));
         assetTypeManager.createAssetType(UISkinAsset.class, UISkinAsset::new, "skins");
         assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new, "behaviors");
         assetTypeManager.createAssetType(UIElement.class, UIElement::new, "ui");

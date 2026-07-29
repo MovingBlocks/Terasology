@@ -193,11 +193,20 @@ allprojects {
 
 // Magic for replace remote dependency on local project (source)
 // For exists modules
-project(":modules").subprojects.forEach { proj ->
-    project(":modules").subprojects {
-        configurations.all {
-            resolutionStrategy.dependencySubstitution {
-                substitute(module("org.terasology.modules:${proj.name}")).using(project(":modules:${proj.name}"))
+//
+// Applies to :modules itself as well as its subprojects - the substitution rule was previously
+// only being configured on the subprojects' own configurations, never on :modules's own
+// "classpath" configuration (the one :modules:fetchModuleDependencies actually resolves to
+// populate cachedModules/). That gap meant every module with a local source checkout still got
+// its external artifact pulled into cachedModules/ right alongside the local build, and gestalt's
+// module scanner (which doesn't know about Gradle's substitution rules at all) would discover
+// both at runtime - keeping whichever it happened to scan first, non-deterministically.
+val moduleProjectNames = project(":modules").subprojects.map { it.name }
+(project(":modules").subprojects + project(":modules")).forEach { targetProject ->
+    targetProject.configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            moduleProjectNames.forEach { moduleName ->
+                substitute(module("org.terasology.modules:$moduleName")).using(project(":modules:$moduleName"))
                     .because("we have sources!")
             }
         }

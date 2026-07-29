@@ -3,6 +3,11 @@
 
 package org.terasology.engine.core;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.core.joran.spi.JoranException;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.version.TerasologyVersion;
@@ -78,24 +83,29 @@ public final class LoggingContext {
             e.printStackTrace(); //NOPMD
         }
 
-        // Unfortunately, setting context-based variables works only after initialization
-        // has completed. Manual initialization will work but is overriden by the first
-        // (static) access to slf4j's StaticLoggerBinder.
-        // This default initialization will attempt to create a folder "logFileFolder_IS_UNDEFINED" though.
-        // TODO: file a report at logback/slf4j
-
-//        LoggerContext context = new LoggerContext();
-//        context.setName(CoreConstants.DEFAULT_CONTEXT_NAME);
-//        context.putProperty("targetFolder", pathString);
-//        JoranConfigurator configurator = new JoranConfigurator();
-//        configurator.setContext(context);
-//
-//        try {
-//            ContextInitializer ci = new ContextInitializer(context);
-//            ci.autoConfig();
-//        } catch (JoranException e) {
-//            e.printStackTrace();
-//        }
+        // Logback's context may already be bound by the first (static) access to slf4j's
+        // StaticLoggerBinder, which can happen before this point - e.g. any class's own
+        // `private static final Logger logger = ...` field is initialized as soon as that class
+        // is loaded, regardless of whether it ever logs anything. If that happened before
+        // logFileFolder above was set, the sifting appender's ${logFileFolder} substitution
+        // resolves to "_IS_UNDEFINED" for any log statements up to this point.
+        //
+        // Reset and reconfigure the *existing* context now that the correct value is set, rather
+        // than creating a new, disconnected one (which is what an earlier attempt at this got
+        // wrong) - existing Logger references stay correctly bound to it since they delegate to
+        // the context dynamically rather than caching resolved appenders, so this retroactively
+        // fixes logging for the rest of this run, including a fresh sifting-appender instance for
+        // whichever phase is currently active.
+        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+        if (loggerFactory instanceof LoggerContext) {
+            LoggerContext context = (LoggerContext) loggerFactory;
+            context.reset();
+            try {
+                new ContextInitializer(context).autoConfig();
+            } catch (JoranException e) {
+                e.printStackTrace(); //NOPMD
+            }
+        }
     }
 
     public static Path getLoggingPath() {

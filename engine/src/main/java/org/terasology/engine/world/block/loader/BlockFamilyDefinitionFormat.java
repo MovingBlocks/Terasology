@@ -63,6 +63,21 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
     private final Gson gson;
 
     public BlockFamilyDefinitionFormat(AssetManager assetManager) {
+        this(assetManager, () -> CoreRegistry.get(BlockFamilyLibrary.class));
+    }
+
+    /**
+     * @param blockFamilyLibrarySupplier resolves the {@link BlockFamilyLibrary} to use for
+     *         {@code basedOn}/family lookups while parsing. Prefer this over the single-arg
+     *         constructor when a specific engine instance's own context is available: the
+     *         single-arg constructor falls back to {@link CoreRegistry}, which is a single
+     *         process-wide static - in the integration test harness, host and client engines
+     *         run in the same JVM and repeatedly overwrite it with their own context on every
+     *         tick, so a deserialization racing against that can observe the wrong engine's (or
+     *         a momentarily null) library. Supplying this engine's own current-state context
+     *         instead of going through CoreRegistry sidesteps that race entirely.
+     */
+    public BlockFamilyDefinitionFormat(AssetManager assetManager, Supplier<BlockFamilyLibrary> blockFamilyLibrarySupplier) {
         super("block");
         this.assetManager = assetManager;
         gson = new GsonBuilder()
@@ -71,7 +86,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
-                .registerTypeAdapter(Class.class, new BlockFamilyHandler())
+                .registerTypeAdapter(Class.class, new BlockFamilyHandler(blockFamilyLibrarySupplier))
                 .create();
     }
 
@@ -312,14 +327,23 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
     }
 
     private static class BlockFamilyHandler implements JsonDeserializer<Class<? extends BlockFamily>> {
-        BlockFamilyHandler() {
+        private final Supplier<BlockFamilyLibrary> blockFamilyLibrarySupplier;
+
+        BlockFamilyHandler(Supplier<BlockFamilyLibrary> blockFamilyLibrarySupplier) {
+            this.blockFamilyLibrarySupplier = blockFamilyLibrarySupplier;
         }
 
         @Override
         public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
 
-            BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
+            BlockFamilyLibrary library = blockFamilyLibrarySupplier.get();
+            if (library == null) {
+                // Reachable via the CoreRegistry-backed fallback supplier, which can be empty
+                // mid state-transition. Without this the NPE surfaces as an opaque Gson failure.
+                throw new JsonParseException("No BlockFamilyLibrary available while resolving block family '"
+                        + json.getAsString() + "'");
+            }
             return library.getBlockFamily(json.getAsString());
         }
     }

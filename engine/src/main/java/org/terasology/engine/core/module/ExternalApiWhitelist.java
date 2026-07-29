@@ -59,6 +59,14 @@ public final class ExternalApiWhitelist {
             .addAll(GESTALT_ECS_PACKAGES)
             // Allow persistence internals needed during client join (EntityRestorer, etc.)
             .add("org.terasology.engine.persistence.internal")
+            // Allow built-in particle Affector/Generator subtypes to be resolved by name during
+            // deserialization (RuntimeDelegatingTypeHandler/ModuleTypeRegistry load saved particle
+            // emitter data through the module-scoped classloader, same as EntityRestorer above).
+            // Listed per-package because PermissionSet matches the exact class or its own package
+            // with no hierarchy walk, so the @API on the abstract AffectorFunction/GeneratorFunction
+            // covers only those two base classes - not subtypes like AccelerationAffectorFunction.
+            .add("org.terasology.engine.particles.functions.affectors")
+            .add("org.terasology.engine.particles.functions.generators")
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")

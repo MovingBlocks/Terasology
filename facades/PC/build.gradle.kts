@@ -71,9 +71,6 @@ dependencies {
     runtimeOnly(libs.logback) {
         because("to configure logging with logback.xml")
     }
-    runtimeOnly("org.codehaus.janino:janino:3.1.7") {
-        because("allows use of EvaluatorFilter in logback.xml")
-    }
     runtimeOnly(libs.slf4j.jul) {
         because("redirects java.util.logging from miscellaneous dependencies through slf4j")
     }
