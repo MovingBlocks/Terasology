@@ -132,12 +132,17 @@ public class ChunkRegionFuture {
     }
 
     protected void onChunkRelevant(Chunk chunk) {
+        // Only chunks actually inside the requested region count toward completion. Without this,
+        // any relevant chunk anywhere - e.g. a padding/margin chunk outside what was asked for -
+        // could satisfy loadedChunks.size() >= chunks.volume() and resolve the future before the
+        // requested chunk(s) themselves are actually available.
+        if (!chunks.isValid() || !chunks.contains(chunk.getPosition())) {
+            return;
+        }
         loadedChunks.add(chunk);
-        if (chunks.isValid()) {
-            logger.debug("Got chunk {} / {}", loadedChunks.size(), chunks.volume());
-            if (loadedChunks.size() >= chunks.volume() && !future.isDone()) {
-                future.set(this);
-            }
+        logger.debug("Got chunk {} / {}", loadedChunks.size(), chunks.volume());
+        if (loadedChunks.size() >= chunks.volume() && !future.isDone()) {
+            future.set(this);
         }
     }
 
