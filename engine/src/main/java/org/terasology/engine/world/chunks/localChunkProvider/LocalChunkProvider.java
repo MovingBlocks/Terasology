@@ -177,6 +177,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private void processReadyChunk(final Chunk chunk) {
         Vector3ic chunkPos = chunk.getPosition();
         if (chunkCache.get(chunkPos) != null) {
+            loadedChunkStores.remove(chunkPos);
             return; // TODO move it in pipeline;
         }
         chunkCache.put(new Vector3i(chunkPos), chunk);
@@ -387,6 +388,8 @@ public class LocalChunkProvider implements ChunkProvider {
             chunk.dispose();
         }
         chunkCache.clear();
+        loadedChunkStores.clear();
+        generateQueuedEntities.clear();
         /*
          * The chunk monitor needs to clear chunk references, so it's important
          * that no new chunk get created
@@ -420,6 +423,12 @@ public class LocalChunkProvider implements ChunkProvider {
             chunk.dispose();
         });
         chunkCache.clear();
+        // Positions in-flight or orphaned (early-returned/canceled) in these maps may have been
+        // populated from the world we're about to delete; a stale entry surviving here could
+        // later be matched to a freshly-generated chunk at the same position after the purge,
+        // wrongly restoring entities from the deleted world onto it.
+        loadedChunkStores.clear();
+        generateQueuedEntities.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
 
