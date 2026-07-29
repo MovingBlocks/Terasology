@@ -406,7 +406,9 @@ class common {
                 }
                 currentPageUrl = getLink(connection, "next")
                 // TODO: This comparison is vulnerable to a page request size of "100" or anything that starts with a 1, but just using 99 above ..
-                if (currentPageUrl.contains("page=1")) {
+                // Safe-navigated: getLink returns null when there is no "next" link at all,
+                // which is the normal case for a result set that fits on one page (e.g. libs).
+                if (currentPageUrl?.contains("page=1")) {
                     //println "The pagination warped back to page 1, we're done!"
                     currentPageUrl = null
                 }
