@@ -145,7 +145,7 @@ dependencies {
     api(fileTree("libs") { include("*.jar") })
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
-    implementation("org.terasology.crashreporter:cr-terasology:5.0.0")
+    implementation("org.terasology.crashreporter:cr-terasology:5.1.0")
 
     api(project(":subsystems:TypeHandlerLibrary"))
 }
