@@ -46,6 +46,24 @@ Terasology relies on [Gestalt Module Sandboxing](https://github.com/MovingBlocks
 
 * [o.t.engine.core.module.ExternalApiWhitelist](https://github.com/MovingBlocks/Terasology/blob/develop/engine/src/main/java/org/terasology/engine/core/module/ExternalApiWhitelist.java) defines a hardcoded list of allowable packages and classes.
 
+### What counts as permitted
+
+Gestalt's `PermissionSet.isPermitted(Class)` is `apiClasses.contains(type) || apiPackages.contains(packageOf(type))` — **an exact match on the class itself or on its own package, with no walk up the type hierarchy**.
+
+Two consequences that are easy to get wrong:
+
+* **`@API` on a base class does not cover its subclasses.** `APIScanner` adds exactly the annotated class (or, for an annotated `package-info`, that one package). A concrete subtype in an un-annotated package stays unpermitted no matter what its supertype is annotated with — so it must either carry its own `@API`, live in a package with an `@API` `package-info.java`, or have its package listed in `ExternalApiWhitelist`.
+* **The check only applies to classes loaded outside a `ModuleClassLoader`.** `JavaModuleClassLoader.loadClass` returns straight away when the resolved class came from another `ModuleClassLoader`, so module-to-module access never consults this. Engine classes reached from module-scoped code are loaded by the base loader, and those *are* gated.
+
+### `@API` is not `@IndexInherited`
+
+They are unrelated annotations and are frequently conflated:
+
+* `@API` (`org.terasology.context.annotation.API`) — *permission*. Controls what sandboxed module code is allowed to reference, as above.
+* `@IndexInherited` / `@Index` — *discovery*. Drives gestalt's `ClassIndexProcessor` to emit a build-time index at `META-INF/subtypes/<baseType>`, which is what `ModuleTypeRegistry.getSubtypesOf()` reads. There is no live classpath scan at runtime.
+
+A hierarchy annotated `@API` but not `@IndexInherited` produces no subtype index at all, so resolving a saved subtype by name silently falls back to the base type. A hierarchy that is indexed but not permitted resolves the name and then fails to load it. Deserializing a saved subtype through the sandbox needs **both**.
+
 ## ClassLoaders
 
 * `ModuleManager.setupSandbox` configures a PermissionProviderFactory with modules and the allowable packages and classes.
