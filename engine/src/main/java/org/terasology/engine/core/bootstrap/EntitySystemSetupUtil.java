@@ -155,10 +155,31 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
                 Name module = verifyNotNull(environment.getModuleProviding(type),
-                        "Environment has no module for %s", type.getSimpleName());
+                        "Environment has no module for %s", unattributedClassReport(type, environment));
                 eventSystem.registerEvent(new ResourceUrn(module.toString(), type.getSimpleName()), type);
             }
         }
+    }
+
+    /**
+     * Describe a class the environment turned up but cannot attribute to any of its modules.
+     * <p>
+     * This means the environment's class index and its modules disagree: something indexed the
+     * class, but no module's class predicate claims it. The two facts needed to tell those apart -
+     * where the class was loaded from, and which modules were actually asked - are otherwise
+     * invisible at the point of failure, and reconstructing them costs hours.
+     */
+    private static String unattributedClassReport(Class<?> type, ModuleEnvironment environment) {
+        String codeSource;
+        try {
+            codeSource = String.valueOf(type.getProtectionDomain().getCodeSource().getLocation());
+        } catch (NullPointerException | SecurityException e) {
+            codeSource = "unknown";
+        }
+        List<String> moduleIds = new ArrayList<>();
+        environment.getModuleIdsOrderedByDependencies().forEach(id -> moduleIds.add(id.toString()));
+        return String.format("%s (loaded from %s; environment modules: %s)",
+                type.getName(), codeSource, moduleIds);
     }
 
     private static List<Class<?>> createSelectedClassesToRecordList() {

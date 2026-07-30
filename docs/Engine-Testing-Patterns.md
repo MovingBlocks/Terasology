@@ -257,6 +257,77 @@ Distinguish between:
 Some functionality (like chat) requires an ECS system to be registered and
 processing events — just having the service in the context isn't enough.
 
+## Choosing a World Generator
+
+`@IntegrationEnvironment` defaults to `unittest:dummy`, whose
+`FlatSurfaceHeightProvider` produces an `ElevationFacet` and a `SurfacesFacet`.
+Setting up the local player needs one of those (or a `SpawnHeightFacet`) —
+`AbstractSpawner.findSpawnPosition` throws
+`IllegalStateException: No spawn height facet or elevation facet facet found`
+without one, and the engine never finishes loading.
+
+`unittest:empty` produces **no facets at all**. It is only usable for tests
+that never bring up a player, which in practice means almost none of them.
+Unless you specifically need an empty world, leave `worldGenerator` unset.
+
+## Module Attribution Failures
+
+A failure like this during engine startup:
+
+```
+VerifyException: Environment has no module for SomeEvent
+    at EntitySystemSetupUtil.registerEvents
+```
+
+means the environment's *class index* and its *modules* disagree. Something
+indexed the class, but no module's class predicate claims it. Two independent
+mechanisms decide this, and both have to agree:
+
+| Mechanism | Question it answers | Built by |
+|-----------|--------------------|----------|
+| Class index | "what classes exist here?" | `UrlClassIndex`, per classpath entry |
+| Class predicate | "is this class mine?" | `Module.getClassPredicate()` |
+
+Two things make this confusing to diagnose:
+
+**Startup runs against a pre-game environment.** `StateHeadlessSetup.init`
+calls `initEntityAndComponentManagers()` — and therefore `registerEvents` —
+*before* it builds the game manifest and hands off to `StateLoading`. At that
+point the environment holds only `engine` and `unittest`; the modules your
+test declared in `dependencies` are not in it yet. Any class the index turns
+up that does not belong to those two has nothing to attribute it to.
+
+**Only some modules get a real predicate.** `ClasspathCompromisingModuleFactory`
+is used only when `org.terasology.load_classpath_modules` is set (MTE sets it
+in `Engines.createEngine`). Modules built by the plain gestalt `ModuleFactory`
+get `x -> false`, so they never claim anything. The `engine` module gets its
+own lambda from `ModuleManager.loadAndConfigureEngineModule`.
+
+### Diagnosing
+
+The exception message names the class, where it was loaded from, and which
+modules the environment actually contained. That is usually enough: if the
+class came from a module jar that is not in the module list, the index is
+reaching further than the predicates do.
+
+When you need more, note that the class predicate is only consulted for
+modules in the environment — instrumenting `ClassesInModule.test` tells you
+nothing if the module is not there, which reads misleadingly like the
+logging is broken rather than the code path never running. Dump
+`ModuleEnvironment.getModuleIdsOrderedByDependencies()` first.
+
+### A module's code lives in two places
+
+In a development build a module's classes exist both in `build/classes` and
+in the jar packed from it, and gestalt puts *both* on the module's classpath
+list. Which one the JVM serves a class from depends on how the module reached
+the classpath — Gradle gives the module under test its own `build/classes` but
+resolves its module *dependencies* as jar artifacts.
+
+Compare code sources as normalised `Path`s, never as URLs: the same jar is
+`file:...jar` as a code source but `jar:file:...jar!/` as a classpath root, and
+URL equality is exact-string over those spellings.
+
 ## Test Timing Diagnostics
 
 MTE integration tests — especially those creating clients — are prone to
