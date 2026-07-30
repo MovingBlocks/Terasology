@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -44,9 +46,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class WorldProviderCoreImpl implements WorldProviderCore {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldProviderCoreImpl.class);
+
+    /** How many example positions to report per chunk before falling silent about that chunk. */
+    private static final int DROPPED_WRITE_SAMPLES_PER_CHUNK = 3;
+
+    /** Caps the memory a long session can spend remembering which chunks it has already complained about. */
+    private static final int DROPPED_WRITE_CHUNK_REPORT_LIMIT = 256;
+
+    private final Map<Vector3ic, AtomicInteger> droppedWritesPerChunk = new ConcurrentHashMap<>();
 
     private String title;
     private String seed = "";
@@ -193,7 +207,43 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             return oldBlockType;
 
         }
+        logDroppedWrite(worldPos, type);
         return null;
+    }
+
+    /**
+     * Report a block write that was thrown away because its chunk was not loaded.
+     * <p>
+     * {@link #setBlock} returning {@code null} is the documented signal for this, but callers
+     * routinely ignore the return value - so the world silently does not change, later reads come
+     * back as {@code engine:unloaded}, and the failure surfaces somewhere else entirely. Saying so
+     * at the point of loss turns that into an ordinary log line.
+     * <p>
+     * Logged at {@code warn}, because dropping a write is a caller bug rather than routine: the
+     * position should have been made relevant first. A caller writing a region into missing chunks
+     * loses thousands of blocks at a time, so this reports only the first
+     * {@value #DROPPED_WRITE_SAMPLES_PER_CHUNK} positions per chunk - enough to see concrete
+     * coordinates without the log becoming the failure.
+     */
+    private void logDroppedWrite(Vector3ic worldPos, Block type) {
+        Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
+        AtomicInteger dropped = droppedWritesPerChunk.get(chunkPos);
+        if (dropped == null) {
+            if (droppedWritesPerChunk.size() >= DROPPED_WRITE_CHUNK_REPORT_LIMIT) {
+                return;
+            }
+            dropped = droppedWritesPerChunk.computeIfAbsent(chunkPos, unused -> new AtomicInteger());
+        }
+        int seen = dropped.incrementAndGet();
+        if (seen > DROPPED_WRITE_SAMPLES_PER_CHUNK) {
+            return;
+        }
+        logger.warn("Discarding block change to {} at ({}, {}, {}) - its chunk ({}, {}, {}) is not loaded. "
+                        + "Make the position relevant before writing to it.{}",
+                type != null ? type.getURI() : null,
+                worldPos.x(), worldPos.y(), worldPos.z(),
+                chunkPos.x(), chunkPos.y(), chunkPos.z(),
+                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK ? " Further discards for this chunk are not reported." : "");
     }
 
     @Override
@@ -228,6 +278,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 }
                 result.put(worldPos, oldBlockType);
             } else {
+                logDroppedWrite(worldPos, entry.getValue());
                 result.put(worldPos, null);
             }
         }
