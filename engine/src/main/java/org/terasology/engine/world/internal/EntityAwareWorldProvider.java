@@ -474,7 +474,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {
-                    entity.addComponent(entityManager.getComponentLibrary().copy(comp));
+                    Component copy = entityManager.getComponentLibrary().copy(comp);
+                    if (copy == null) {
+                        // No registered ComponentMetadata for comp's class, most likely because a
+                        // module it depends on isn't loaded - see BlockPrefabManager.updateBlock().
+                        logger.error("No ComponentMetadata for {}, referenced by prefab {} - skipping",
+                                comp.getClass().getName(), prefab.getUrn());
+                        continue;
+                    }
+                    entity.addComponent(copy);
                 } else {
                     ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                     boolean changed = false;
