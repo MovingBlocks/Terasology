@@ -5,7 +5,6 @@ package org.terasology.engine.core.module;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
-import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.gestalt.module.Module;
@@ -16,11 +15,11 @@ import org.terasology.gestalt.module.ModuleMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.ProtectionDomain;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -157,29 +156,40 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
 
     static class ClassesInModule implements Predicate<Class<?>> {
 
-        private final Set<URL> classpaths;
+        private final Set<Path> classpaths;
         private final String name;
 
         ClassesInModule(Module module) {
-            classpaths = module.getClasspaths().stream().map(f -> {
-                try {
-                    URL url = f.toURI().toURL();
-                    if (f.getName().endsWith(".jar")) {
-                        // Code from jars has a `jar:` URL.
-                        return new URL("jar", null, url.toString() + "!/");
-                    }
-                    return url;
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(ImmutableSet.toImmutableSet());
+            // Compare resolved filesystem paths rather than URLs. The same location has several
+            // valid URL spellings - a jar is `file:...jar` as a code source but `jar:file:...jar!/`
+            // when addressed as a classpath root - and URL equality is exact-string over those
+            // forms, so a class served from a module's own jar never matched its module. A
+            // development build has both spellings in play: the module directory contributes
+            // `build/classes` and the jar built from it, and which one a class is served from
+            // depends on how the module reached the classpath.
+            classpaths = module.getClasspaths().stream()
+                    .map(f -> f.toPath().toAbsolutePath().normalize())
+                    .collect(ImmutableSet.toImmutableSet());
             name = module.getId().toString();
         }
 
         @Override
         public boolean test(Class<?> aClass) {
-            URL classUrl = ClasspathHelper.forClass(aClass);
-            return classpaths.contains(classUrl);
+            Path codeSource = codeSourceOf(aClass);
+            return codeSource != null && classpaths.contains(codeSource);
+        }
+
+        private static Path codeSourceOf(Class<?> aClass) {
+            ProtectionDomain domain = aClass.getProtectionDomain();
+            if (domain == null || domain.getCodeSource() == null || domain.getCodeSource().getLocation() == null) {
+                return null;
+            }
+            try {
+                return Paths.get(domain.getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                // Not a filesystem location (e.g. a jrt: or bundle: URL) - not ours either way.
+                return null;
+            }
         }
 
         @Override
