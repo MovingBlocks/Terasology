@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -55,12 +56,17 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private static final Logger logger = LoggerFactory.getLogger(WorldProviderCoreImpl.class);
 
     /** How many example positions to report per chunk before falling silent about that chunk. */
-    private static final int DROPPED_WRITE_SAMPLES_PER_CHUNK = 3;
+    private static final int DROPPED_WRITE_SAMPLES_PER_CHUNK = 5;
 
-    /** Caps the memory a long session can spend remembering which chunks it has already complained about. */
-    private static final int DROPPED_WRITE_CHUNK_REPORT_LIMIT = 256;
+    /** How many distinct chunks to report at all. Past this it is one bug, not N. */
+    private static final int DROPPED_WRITE_CHUNK_REPORT_LIMIT = 10;
+
+    private static final String DROPPED_WRITE_LIMIT_NOTE =
+            " Reporting limit reached - further discarded writes are silent. "
+                    + "Fix the underlying cause until this message stops appearing.";
 
     private final Map<Vector3ic, AtomicInteger> droppedWritesPerChunk = new ConcurrentHashMap<>();
+    private final AtomicBoolean droppedWriteLimitAnnounced = new AtomicBoolean();
 
     private String title;
     private String seed = "";
@@ -221,15 +227,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
      * <p>
      * Logged at {@code warn}, because dropping a write is a caller bug rather than routine: the
      * position should have been made relevant first. A caller writing a region into missing chunks
-     * loses thousands of blocks at a time, so this reports only the first
-     * {@value #DROPPED_WRITE_SAMPLES_PER_CHUNK} positions per chunk - enough to see concrete
-     * coordinates without the log becoming the failure.
+     * loses thousands of blocks across hundreds of chunks at a time, and that is one bug rather
+     * than hundreds - so this reports at most {@value #DROPPED_WRITE_SAMPLES_PER_CHUNK} positions
+     * each from at most {@value #DROPPED_WRITE_CHUNK_REPORT_LIMIT} chunks. Reaching either limit
+     * says so, so that a silent log is never mistaken for a solved problem.
      */
     private void logDroppedWrite(Vector3ic worldPos, Block type) {
         Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
         AtomicInteger dropped = droppedWritesPerChunk.get(chunkPos);
         if (dropped == null) {
             if (droppedWritesPerChunk.size() >= DROPPED_WRITE_CHUNK_REPORT_LIMIT) {
+                if (droppedWriteLimitAnnounced.compareAndSet(false, true)) {
+                    logger.warn("Discarded block writes across more than {} chunks.{}",
+                            DROPPED_WRITE_CHUNK_REPORT_LIMIT, DROPPED_WRITE_LIMIT_NOTE);
+                }
                 return;
             }
             dropped = droppedWritesPerChunk.computeIfAbsent(chunkPos, unused -> new AtomicInteger());
@@ -243,7 +254,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 type != null ? type.getURI() : null,
                 worldPos.x(), worldPos.y(), worldPos.z(),
                 chunkPos.x(), chunkPos.y(), chunkPos.z(),
-                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK ? " Further discards for this chunk are not reported." : "");
+                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK ? DROPPED_WRITE_LIMIT_NOTE : "");
     }
 
     @Override
