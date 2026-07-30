@@ -274,7 +274,7 @@ Unless you specifically need an empty world, leave `worldGenerator` unset.
 
 A failure like this during engine startup:
 
-```
+```text
 VerifyException: Environment has no module for SomeEvent
     at EntitySystemSetupUtil.registerEvents
 ```
@@ -324,9 +324,14 @@ list. Which one the JVM serves a class from depends on how the module reached
 the classpath — Gradle gives the module under test its own `build/classes` but
 resolves its module *dependencies* as jar artifacts.
 
-Compare code sources as normalised `Path`s, never as URLs: the same jar is
+Compare code sources as normalised `Path`s, never as `URL`s: the same jar is
 `file:...jar` as a code source but `jar:file:...jar!/` as a classpath root, and
-URL equality is exact-string over those spellings.
+those differ in both protocol and file component, so they never compare equal.
+
+`URL.equals` is the wrong tool for this regardless — it compares URL components
+and resolves host names to do it, which makes it a blocking call. Where a URL
+comparison really is wanted, use `java.net.URI`; for classpath locations, a
+normalised `Path` is better still.
 
 ## Test Timing Diagnostics
 
