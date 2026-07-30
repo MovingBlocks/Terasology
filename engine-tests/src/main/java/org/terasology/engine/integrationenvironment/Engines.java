@@ -84,6 +84,9 @@ public class Engines {
     TerasologyEngine host;
     private final NetworkMode networkMode;
 
+    /** The CoreRegistry context from before {@link #setup()}, restored by {@link #tearDown()}. */
+    private Context contextBeforeSetup;
+
     public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode,
                    List<Class<? extends EngineSubsystem>> subsystems) {
         this.networkMode = networkMode;
@@ -101,6 +104,9 @@ public class Engines {
      * Every instance should be shut down properly by calling {@link #tearDown()}.
      */
     public void setup() {
+        // Captured before anything starts an engine: bringing up the host installs its own context
+        // into CoreRegistry, and this needs the one from before this environment existed.
+        contextBeforeSetup = CoreRegistry.get(Context.class);
         mockPathManager();
         try {
             host = createHost(networkMode);
@@ -123,6 +129,11 @@ public class Engines {
         engines.forEach(TerasologyEngine::shutdown);
         engines.forEach(TerasologyEngine::cleanup);
         engines.clear();
+        // CoreRegistry is process-global. Leaving this environment's context installed means the
+        // next one wraps it as a parent, so a chain of contexts belonging to shut-down engines
+        // accumulates across a test class and lookups can still resolve to them.
+        CoreRegistry.setContext(contextBeforeSetup);
+        contextBeforeSetup = null;
         try {
             pathManagerCleaner.close();
         } catch (RuntimeException e) {
