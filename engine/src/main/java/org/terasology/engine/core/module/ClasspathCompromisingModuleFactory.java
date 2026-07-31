@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.ProtectionDomain;
@@ -160,15 +161,9 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
         private final String name;
 
         ClassesInModule(Module module) {
-            // Compare resolved filesystem paths rather than URLs. One location has several valid
-            // URL spellings - a jar is `file:...jar` as a code source but `jar:file:...jar!/` when
-            // addressed as a classpath root - and URL equality compares protocol and file
-            // components, which differ between those two forms, so a class served from a module's
-            // own jar never matched its module. (URL.equals also resolves host names, making it a
-            // blocking call; java.net.URI is the safe choice when a URL comparison is wanted.)
-            // A development build has both spellings in play: the module directory contributes
-            // `build/classes` and the jar built from it, and which one a class is served from
-            // depends on how the module reached the classpath.
+            // Normalise to filesystem paths so a classpath entry and a loaded class's code source
+            // are comparable: the same jar is `file:...jar` as a code source but `jar:file:...jar!/`
+            // as a classpath root, which are not equal as URLs.
             classpaths = module.getClasspaths().stream()
                     .map(f -> f.toPath().toAbsolutePath().normalize())
                     .collect(ImmutableSet.toImmutableSet());
@@ -188,8 +183,9 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
             }
             try {
                 return Paths.get(domain.getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
-            } catch (URISyntaxException | IllegalArgumentException e) {
-                // Not a filesystem location (e.g. a jrt: or bundle: URL) - not ours either way.
+            } catch (URISyntaxException | IllegalArgumentException | FileSystemNotFoundException e) {
+                // Not a filesystem location (e.g. a jrt: or bundle: URL, or a scheme with no
+                // installed provider) - not ours either way.
                 return null;
             }
         }

@@ -84,8 +84,8 @@ public class Engines {
     TerasologyEngine host;
     private final NetworkMode networkMode;
 
-    /** The CoreRegistry context from before {@link #setup()}, restored by {@link #tearDown()}. */
-    private Context contextBeforeSetup;
+    /** What {@link CoreRegistry} held before {@link #setup()}, restored by {@link #tearDown()}. */
+    private Context coreRegistryBeforeSetup;
 
     public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode,
                    List<Class<? extends EngineSubsystem>> subsystems) {
@@ -106,7 +106,7 @@ public class Engines {
     public void setup() {
         // Captured before anything starts an engine: bringing up the host installs its own context
         // into CoreRegistry, and this needs the one from before this environment existed.
-        contextBeforeSetup = CoreRegistry.get(Context.class);
+        coreRegistryBeforeSetup = CoreRegistry.get(Context.class);
         mockPathManager();
         try {
             host = createHost(networkMode);
@@ -126,14 +126,19 @@ public class Engines {
      * Used to properly shut down and clean up a testing environment set up and started with {@link #setup()}.
      */
     public void tearDown() {
-        engines.forEach(TerasologyEngine::shutdown);
-        engines.forEach(TerasologyEngine::cleanup);
-        engines.clear();
-        // CoreRegistry is process-global. Leaving this environment's context installed means the
-        // next one wraps it as a parent, so a chain of contexts belonging to shut-down engines
-        // accumulates across a test class and lookups can still resolve to them.
-        CoreRegistry.setContext(contextBeforeSetup);
-        contextBeforeSetup = null;
+        try {
+            engines.forEach(TerasologyEngine::shutdown);
+            engines.forEach(TerasologyEngine::cleanup);
+            engines.clear();
+        } finally {
+            // CoreRegistry is process-global, so this has to happen even if shutdown throws:
+            // leaving this environment's context installed means the next one wraps it as a
+            // parent, and a chain of contexts belonging to shut-down engines accumulates across a
+            // test class. (CoreRegistry is deprecated and on its way out; until it is gone,
+            // anything read from it may be stale.)
+            CoreRegistry.setContext(coreRegistryBeforeSetup);
+            coreRegistryBeforeSetup = null;
+        }
         try {
             pathManagerCleaner.close();
         } catch (RuntimeException e) {

@@ -33,6 +33,7 @@ import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.recording.RecordingClasses;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.recording.RecordingEventSystemDecorator;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.di.ServiceRegistry;
@@ -160,32 +161,11 @@ public final class EntitySystemSetupUtil {
                     // Built here rather than passed to verifyNotNull, whose arguments are
                     // evaluated for every event whether or not it fails.
                     throw new VerifyException("Environment has no module for "
-                            + unattributedClassReport(type, environment));
+                            + ModuleAttribution.describeUnattributedClass(type, environment));
                 }
                 eventSystem.registerEvent(new ResourceUrn(module.toString(), type.getSimpleName()), type);
             }
         }
-    }
-
-    /**
-     * Describe a class the environment turned up but cannot attribute to any of its modules.
-     * <p>
-     * This means the environment's class index and its modules disagree: something indexed the
-     * class, but no module's class predicate claims it. The two facts needed to tell those apart -
-     * where the class was loaded from, and which modules were actually asked - are otherwise
-     * invisible at the point of failure, and reconstructing them costs hours.
-     */
-    private static String unattributedClassReport(Class<?> type, ModuleEnvironment environment) {
-        String codeSource;
-        try {
-            codeSource = String.valueOf(type.getProtectionDomain().getCodeSource().getLocation());
-        } catch (NullPointerException | SecurityException e) {
-            codeSource = "unknown";
-        }
-        List<String> moduleIds = new ArrayList<>();
-        environment.getModuleIdsOrderedByDependencies().forEach(id -> moduleIds.add(id.toString()));
-        return String.format("%s (loaded from %s; environment modules: %s)",
-                type.getName(), codeSource, moduleIds);
     }
 
     private static List<Class<?>> createSelectedClassesToRecordList() {

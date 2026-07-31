@@ -61,12 +61,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     /** How many distinct chunks to report at all. Past this it is one bug, not N. */
     private static final int DROPPED_WRITE_CHUNK_REPORT_LIMIT = 10;
 
-    private static final String DROPPED_WRITE_LIMIT_NOTE =
-            " Reporting limit reached - further discarded writes are silent. "
-                    + "Fix the underlying cause until this message stops appearing.";
+    /** Quiet period after which discarded writes are reported afresh. */
+    private static final long DROPPED_WRITE_REPORT_RESET_MS = 30_000;
 
     private final Map<Vector3ic, AtomicInteger> droppedWritesPerChunk = new ConcurrentHashMap<>();
     private final AtomicBoolean droppedWriteLimitAnnounced = new AtomicBoolean();
+    private volatile long lastDroppedWriteReportMs;
 
     private String title;
     private String seed = "";
@@ -231,15 +231,29 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
      * than hundreds - so this reports at most {@value #DROPPED_WRITE_SAMPLES_PER_CHUNK} positions
      * each from at most {@value #DROPPED_WRITE_CHUNK_REPORT_LIMIT} chunks. Reaching either limit
      * says so, so that a silent log is never mistaken for a solved problem.
+     * <p>
+     * A world provider lives for the whole session, so those limits are not spent permanently:
+     * after {@value #DROPPED_WRITE_REPORT_RESET_MS}ms without a discarded write, reporting starts
+     * over. A later, unrelated burst is worth hearing about even if an earlier one used up the
+     * budget.
      */
     private void logDroppedWrite(Vector3ic worldPos, Block type) {
+        long now = System.currentTimeMillis();
+        if (now - lastDroppedWriteReportMs > DROPPED_WRITE_REPORT_RESET_MS) {
+            droppedWritesPerChunk.clear();
+            droppedWriteLimitAnnounced.set(false);
+        }
+        lastDroppedWriteReportMs = now;
+
         Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
         AtomicInteger dropped = droppedWritesPerChunk.get(chunkPos);
         if (dropped == null) {
             if (droppedWritesPerChunk.size() >= DROPPED_WRITE_CHUNK_REPORT_LIMIT) {
                 if (droppedWriteLimitAnnounced.compareAndSet(false, true)) {
-                    logger.warn("Discarded block writes across more than {} chunks.{}",
-                            DROPPED_WRITE_CHUNK_REPORT_LIMIT, DROPPED_WRITE_LIMIT_NOTE);
+                    logger.warn("Discarded block writes across more than {} chunks."
+                                    + " Reporting limit reached - further discarded writes are silent."
+                                    + " Fix the underlying cause until this message stops appearing.",
+                            DROPPED_WRITE_CHUNK_REPORT_LIMIT);
                 }
                 return;
             }
@@ -254,7 +268,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 type != null ? type.getURI() : null,
                 worldPos.x(), worldPos.y(), worldPos.z(),
                 chunkPos.x(), chunkPos.y(), chunkPos.z(),
-                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK ? DROPPED_WRITE_LIMIT_NOTE : "");
+                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK
+                        ? " Reporting limit reached for this chunk - further discards are silent."
+                        : "");
     }
 
     @Override
