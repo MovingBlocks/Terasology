@@ -118,11 +118,16 @@ tasks.withType<Jar> {
 // `gradlew :engine-tests:filesystemSideEffectTest` - see that task below.
 val filesystemSideEffects = "filesystem-side-effects"
 
+// Diagnostic/manual tests - report timings for comparison, not pass/fail checks. Not run
+// automatically anywhere. Opt in with `gradlew :engine-tests:integrationTestDiagnostic`,
+// or target one directly: `gradlew :engine-tests:integrationTestDiagnostic --tests ManyUsersChunkLoadTest`.
+val diagnostic = "diagnostic"
+
 tasks.named<Test>("test") {
     dependsOn(tasks.getByPath(":extractNatives"))
     description = "Runs all tests (slow)"
     useJUnitPlatform {
-        excludeTags(filesystemSideEffects)
+        excludeTags(filesystemSideEffects, diagnostic)
     }
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
 }
@@ -132,7 +137,7 @@ tasks.register<Test>("unitTest") {
     group =  "Verification"
     description = "Runs unit tests (fast)"
     useJUnitPlatform {
-        excludeTags("MteTest", "TteTest", filesystemSideEffects)
+        excludeTags("MteTest", "TteTest", filesystemSideEffects, diagnostic)
     }
     systemProperty("junit.jupiter.execution.timeout.default", "1m")
 }
@@ -153,7 +158,7 @@ tasks.register<Test>("integrationTest") {
     description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest', exclude tests tagged 'flaky'."
 
     useJUnitPlatform {
-        excludeTags("flaky")
+        excludeTags("flaky", diagnostic)
         includeTags("MteTest", "TteTest")
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
@@ -166,8 +171,20 @@ tasks.register<Test>("integrationTestFlaky") {
 
     useJUnitPlatform {
         includeTags("MteTest & flaky", "TteTest & flaky")
+        excludeTags(diagnostic)
     }
     systemProperty("junit.jupiter.execution.timeout.default", "5m")
+}
+
+tasks.register<Test>("integrationTestDiagnostic") {
+    dependsOn(tasks.getByPath(":extractNatives"))
+    group = "Verification"
+    description = "Runs integration tests tagged 'diagnostic' - manual/timing tools, not pass/fail regression checks. Opt-in."
+
+    useJUnitPlatform {
+        includeTags(diagnostic)
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "10m")
 }
 
 idea {

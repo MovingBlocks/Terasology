@@ -64,7 +64,11 @@ public class ManyUsersChunkLoadTest {
     private static final long RELOAD_TIMEOUT_MS = 300_000;
 
     @Test
-    @Tag("flaky") // heavy (9 engines); timing is sensitive to contention from other tests sharing the JVM
+    // Heavy: spins up 9 engines (1 host + 8 simulated clients, each its own TerasologyEngine) to
+    // simulate 8 players exploring distinct regions concurrently, then bulk-reloads all their chunks
+    // from disk at once. Reports timings for manual comparison, not a pass/fail regression check -
+    // see class javadoc.
+    @Tag("diagnostic")
     public void manySimulatedUsersLoadDifferentAreasConcurrently(ModuleTestingHelper helper, TestReporter reporter)
             throws Exception {
         helper.setSafetyTimeoutMs(RELOAD_TIMEOUT_MS + 60_000);
