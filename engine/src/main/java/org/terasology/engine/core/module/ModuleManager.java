@@ -213,9 +213,17 @@ public class ModuleManager {
         Collection<File> classPaths = new HashSet<>(packageModule.getClasspaths());
         for (Class<?> aClass : classesOnClasspathsToAddToEngine) {
             URL url = ClasspathHelper.forClass(aClass);
+            File classPath = urlToFile(url);
             config.addUrls(url);  // include this in reflections scan
-            classPaths.add(urlToFile(url));  // also include in Module.moduleClasspaths
-            packageClassIndex.add(UrlClassIndex.byClassLoader(aClass.getClassLoader()));
+            classPaths.add(classPath);  // also include in Module.moduleClasspaths
+            // Index only the classpath entry this class came from. Indexing the whole
+            // classloader pulls in every entry on the classpath - which in a development or test
+            // run includes the modules' own build outputs - while the class predicate below still
+            // (correctly) refuses to own those classes. Anything in that gap is discovered by
+            // getSubtypesOf but has no module to attribute it to, so registering it fails.
+            packageClassIndex.add(classPath.isDirectory()
+                    ? UrlClassIndex.byDirectory(classPath)
+                    : UrlClassIndex.byArchive(classPath));
             logger.debug("Adding path to engine module for class: {} {}", url, aClass);
         }
 

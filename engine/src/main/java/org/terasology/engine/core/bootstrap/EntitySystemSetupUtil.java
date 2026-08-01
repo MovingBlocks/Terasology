@@ -3,6 +3,7 @@
 
 package org.terasology.engine.core.bootstrap;
 
+import com.google.common.base.VerifyException;
 import org.terasology.context.Lifetime;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
@@ -32,6 +33,7 @@ import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.recording.RecordingClasses;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.recording.RecordingEventSystemDecorator;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.di.ServiceRegistry;
@@ -154,8 +156,13 @@ public final class EntitySystemSetupUtil {
     public static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
-                Name module = verifyNotNull(environment.getModuleProviding(type),
-                        "Environment has no module for %s", type.getSimpleName());
+                Name module = environment.getModuleProviding(type);
+                if (module == null) {
+                    // Built here rather than passed to verifyNotNull, whose arguments are
+                    // evaluated for every event whether or not it fails.
+                    throw new VerifyException("Environment has no module for "
+                            + ModuleAttribution.describeUnattributedClass(type, environment));
+                }
                 eventSystem.registerEvent(new ResourceUrn(module.toString(), type.getSimpleName()), type);
             }
         }
