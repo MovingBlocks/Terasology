@@ -70,7 +70,7 @@ tasks.withType<Test> {
     reports {
         junitXml.required.set(true)
     }
-    jvmArgs("-Xms512m", "-Xmx1024m")
+    jvmArgs("-Xms512m", "-Xmx4096m")
 
     // Make sure the natives have been extracted, but only for multi-workspace setups (not for solo module builds)
     if (project.name != project(":").name) {
