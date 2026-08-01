@@ -11,6 +11,7 @@ import org.terasology.engine.config.BindsConfig;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.facade.BindsConfiguration;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.input.BindAxisEvent;
@@ -229,11 +230,31 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         mouseWheelDownBind = null;
     }
 
+    /**
+     * The module a bind belongs to, or null - having said so - if the environment cannot name one.
+     * <p>
+     * A null module here would otherwise produce a bind URI with no module part, which registers
+     * but never matches anything, so the bind is quietly absent in game.
+     */
+    private Name moduleProvidingBind(ModuleEnvironment environment, Class<?> registerBindClass) {
+        Name moduleId = environment.getModuleProviding(registerBindClass);
+        if (moduleId == null) {
+            logger.error("Cannot register bind {}, no module provides it: {}", //NOPMD
+                    registerBindClass.getSimpleName(),
+                    ModuleAttribution.describeUnattributedClass(registerBindClass, environment));
+        }
+        return moduleId;
+    }
+
     private void registerButtonBinds(ModuleEnvironment environment) {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindButton.class);
         for (Class<?> registerBindClass : classes) {
             RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
-            SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
+            SimpleUri bindUri = new SimpleUri(moduleId, info.id());
             if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
                 try {
                     BindableButton bindButton = registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
@@ -258,7 +279,10 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterBindAxis info = registerBindClass.getAnnotation(RegisterBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
             SimpleUri id = new SimpleUri(moduleId, info.id());
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
                 BindableButton positiveButton = getBindButton(new SimpleUri(info.positiveButton()));
@@ -289,7 +313,10 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
             SimpleUri id = new SimpleUri(moduleId, info.id());
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
                 try {

@@ -4,6 +4,7 @@ package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.world.block.BlockBuilderHelper;
@@ -11,6 +12,7 @@ import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.util.reflection.ParameterProvider;
 import org.terasology.gestalt.util.reflection.SimpleClassFactory;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -41,10 +43,17 @@ public class BlockFamilyLibrary {
                 logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName()); //NOPMD
                 continue;
             }
+            Name moduleProviding = moduleEnvironment.getModuleProviding(entry);
+            if (moduleProviding == null) {
+                // Without this the line below dereferences null and takes the whole library down.
+                logger.error("Cannot load {}, no module provides it: {}", entry.getSimpleName(), //NOPMD
+                        ModuleAttribution.describeUnattributedClass(entry, moduleEnvironment));
+                continue;
+            }
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(),
+            library.register(new ResourceUrn(moduleProviding.toString(), registerInfo.value()).toString(),
                     (Class<? extends BlockFamily>) entry);
 
         }

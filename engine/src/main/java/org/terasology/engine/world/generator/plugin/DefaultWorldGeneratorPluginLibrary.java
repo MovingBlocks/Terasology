@@ -3,7 +3,11 @@
 package org.terasology.engine.world.generator.plugin;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -18,6 +22,8 @@ import java.util.List;
 
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultWorldGeneratorPluginLibrary.class);
+
     private final ClassLibrary<WorldGeneratorPlugin> library;
 
     public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, Context context) {
@@ -29,7 +35,14 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
         library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, reflectFactory, copyStrategyLibrary);
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                ResourceUrn resourceUrn = new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName());
+                Name moduleProviding = moduleEnvironment.getModuleProviding(entry);
+                if (moduleProviding == null) {
+                    // Without this the line below dereferences null and takes the whole library down.
+                    logger.error("Cannot register world generator plugin {}, no module provides it: {}", //NOPMD
+                            entry.getSimpleName(), ModuleAttribution.describeUnattributedClass(entry, moduleEnvironment));
+                    continue;
+                }
+                ResourceUrn resourceUrn = new ResourceUrn(moduleProviding.toString(), entry.getSimpleName());
                 library.register(resourceUrn.toString(), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
