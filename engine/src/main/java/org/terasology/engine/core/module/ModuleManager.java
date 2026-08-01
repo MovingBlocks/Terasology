@@ -72,6 +72,7 @@ public class ModuleManager {
             new WarnOnlyProviderFactory(permissionProviderFactory);
 
     private final ModuleRegistry registry = new TableModuleRegistry();
+    private final Set<Module> classpathModules = new HashSet<>();
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader = newMetadataReader();
     private final ModuleFactory moduleFactory = newModuleFactory(metadataReader);
@@ -177,6 +178,7 @@ public class ModuleManager {
                     continue;
                 }
                 if (registry.add(module)) {
+                    classpathModules.add(module);
                     logger.info("Loaded {} from {}", module.getId(), path); //NOPMD
                 } else {
                     logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path); //NOPMD
@@ -260,8 +262,15 @@ public class ModuleManager {
         ExternalApiWhitelist.CLASSES.forEach(permissionSet::addAPIClass);
         ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
+        // Only the engine module, and (in dev mode) modules explicitly loaded onto the JVM
+        // classpath, have classes resolvable via the system classloader APIScanner uses here.
+        // Modules loaded from the application/module path (the normal case) are only ever
+        // accessible through their own ModuleClassLoader - JavaModuleClassLoader#loadClass
+        // doesn't consult this permission set for inter-module access at all, so scanning
+        // those modules here is both guaranteed to fail and pointless.
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        for (Module module : registry) {
+        apiScanner.scan(engineModule.getClassIndex());
+        for (Module module : classpathModules) {
             apiScanner.scan(module.getClassIndex());
         }
 
