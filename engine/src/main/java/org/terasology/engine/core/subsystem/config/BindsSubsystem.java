@@ -237,13 +237,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
      * but never matches anything, so the bind is quietly absent in game.
      */
     private Name moduleProvidingBind(ModuleEnvironment environment, Class<?> registerBindClass) {
-        Name moduleId = environment.getModuleProviding(registerBindClass);
-        if (moduleId == null) {
-            logger.error("Cannot register bind {}, no module provides it: {}", //NOPMD
-                    registerBindClass.getSimpleName(),
-                    ModuleAttribution.describeUnattributedClass(registerBindClass, environment));
-        }
-        return moduleId;
+        return ModuleAttribution.moduleProvidingOrReport(logger, "register bind", registerBindClass, environment);
     }
 
     private void registerButtonBinds(ModuleEnvironment environment) {

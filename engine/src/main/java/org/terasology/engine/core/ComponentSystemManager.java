@@ -74,12 +74,10 @@ public class ComponentSystemManager {
                 logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName()); //NOPMD
                 continue;
             }
-            Name moduleId = environment.getModuleProviding(type);
+            Name moduleId = ModuleAttribution.moduleProvidingOrReport(logger, "load", type, environment);
             if (moduleId == null) {
                 // Filing this under a null key would drop it silently: the loop below walks the
                 // environment's modules, so a system with no module is simply never loaded.
-                logger.error("Cannot load {}, no module provides it: {}", type.getSimpleName(), //NOPMD
-                        ModuleAttribution.describeUnattributedClass(type, environment));
                 continue;
             }
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);

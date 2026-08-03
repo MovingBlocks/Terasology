@@ -50,12 +50,8 @@ public abstract class ModuleRendering {
      * {@code "null:fbo.something"}, which register happily and then fail to match anything.
      */
     private Name moduleProviding(Class<?> implementingClass) {
-        Name module = moduleManager.getEnvironment().getModuleProviding(implementingClass);
-        if (module == null) {
-            logger.error("No module provides rendering class {}: {}", implementingClass.getSimpleName(), //NOPMD
-                    ModuleAttribution.describeUnattributedClass(implementingClass, moduleManager.getEnvironment()));
-        }
-        return module;
+        return ModuleAttribution.moduleProvidingOrReport(logger, "use rendering class", implementingClass,
+                moduleManager.getEnvironment());
     }
 
     public boolean isEnabled() {

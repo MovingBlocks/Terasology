@@ -43,11 +43,9 @@ public class BlockFamilyLibrary {
                 logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName()); //NOPMD
                 continue;
             }
-            Name moduleProviding = moduleEnvironment.getModuleProviding(entry);
+            Name moduleProviding = ModuleAttribution.moduleProvidingOrReport(logger, "load", entry, moduleEnvironment);
             if (moduleProviding == null) {
                 // Without this the line below dereferences null and takes the whole library down.
-                logger.error("Cannot load {}, no module provides it: {}", entry.getSimpleName(), //NOPMD
-                        ModuleAttribution.describeUnattributedClass(entry, moduleEnvironment));
                 continue;
             }
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);

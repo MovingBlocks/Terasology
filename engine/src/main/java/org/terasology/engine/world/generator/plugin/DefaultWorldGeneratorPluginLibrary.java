@@ -35,11 +35,10 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
         library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, reflectFactory, copyStrategyLibrary);
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                Name moduleProviding = moduleEnvironment.getModuleProviding(entry);
+                Name moduleProviding = ModuleAttribution.moduleProvidingOrReport(logger,
+                        "register world generator plugin", entry, moduleEnvironment);
                 if (moduleProviding == null) {
                     // Without this the line below dereferences null and takes the whole library down.
-                    logger.error("Cannot register world generator plugin {}, no module provides it: {}", //NOPMD
-                            entry.getSimpleName(), ModuleAttribution.describeUnattributedClass(entry, moduleEnvironment));
                     continue;
                 }
                 ResourceUrn resourceUrn = new ResourceUrn(moduleProviding.toString(), entry.getSimpleName());

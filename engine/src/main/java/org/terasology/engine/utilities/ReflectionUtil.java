@@ -7,10 +7,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.UIWidget;
@@ -38,8 +35,6 @@ import java.util.stream.Stream;
 
 
 public final class ReflectionUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ReflectionUtil.class);
-
     private ReflectionUtil() {
     }
 
@@ -658,10 +653,6 @@ public final class ReflectionUtil {
         Name moduleProvidingType = moduleEnvironment.getModuleProviding(getRawType(type));
 
         if (moduleProvidingType == null) {
-            // Usually legitimate - plenty of non-module classes reach here - but a module class
-            // that fails attribution lands in the same branch and silently loses its module
-            // qualifier, so the URI stops matching. Throttled because this runs per type.
-            ModuleAttribution.reportUnattributedOnce(logger, "build a type URI", getRawType(type), moduleEnvironment);
             return typeSimpleName;
         }
 
@@ -683,7 +674,6 @@ public final class ReflectionUtil {
         Name moduleProviding = environment.getModuleProviding(clazz);
 
         if (moduleProviding == null) {
-            ModuleAttribution.reportUnattributedOnce(logger, "build a simple URI", clazz, environment);
             return null;
         }
 
@@ -705,7 +695,6 @@ public final class ReflectionUtil {
         Name moduleProviding = environment.getModuleProviding(clazz);
 
         if (moduleProviding == null) {
-            ModuleAttribution.reportUnattributedOnce(logger, "build a fully qualified URI", clazz, environment);
             return null;
         }
 

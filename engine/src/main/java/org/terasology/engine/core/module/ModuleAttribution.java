@@ -9,70 +9,37 @@ import org.terasology.gestalt.naming.Name;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Helpers for reporting when a {@link ModuleEnvironment} cannot say which module a class came from.
  */
 public final class ModuleAttribution {
 
-    /** How many distinct classes {@link #reportUnattributedOnce} names before it falls quiet. */
-    private static final int DISTINCT_CLASS_REPORT_LIMIT = 20;
-
-    /**
-     * How long the throttle stays quiet before reporting afresh.
-     * <p>
-     * Long enough that one startup's worth of failures counts as a single burst, short enough that
-     * a later unrelated one is still heard.
-     */
-    private static final long REPORT_RESET_MS = 60_000;
-
-    private static final Set<String> reportedClasses = ConcurrentHashMap.newKeySet();
-    private static final AtomicBoolean limitAnnounced = new AtomicBoolean();
-    private static volatile long lastReportMs;
-
     private ModuleAttribution() {
         // static utility class, no instance needed
     }
 
     /**
-     * Report a class the environment cannot attribute, at most once per class and not many times.
+     * The module providing {@code type}, or null - having said so - if the environment cannot name one.
      * <p>
-     * For callers on paths hot enough that reporting every occurrence would drown the log - type
-     * handling runs this per type, per serialization - or where a null is usually legitimate and
-     * only occasionally a real fault. Names at most {@value #DISTINCT_CLASS_REPORT_LIMIT} distinct
-     * classes, says so when it stops, and starts over after {@value #REPORT_RESET_MS}ms of quiet.
-     * <p>
-     * The throttle is deliberately crude, and deliberately static: it exists to make a
-     * currently-invisible problem visible without making it unbearable, and should go away once
-     * the underlying attribution failures are fixed rather than becoming permanent furniture.
+     * What a null means is the caller's to decide, and the reason differs per site, so each one keeps
+     * its own comment and its own handling. What they share is the report, which lives here so every
+     * site says the same thing in the same shape.
      *
      * @param logger the caller's logger, so the message is attributed to where it happened
-     * @param what a short description of what could not be done, e.g. "build a type URI"
-     * @param type the class that could not be attributed
-     * @param environment the environment that was asked
+     * @param what a short description of what could not be done, e.g. "load", "register bind"
+     * @param type the class to attribute
+     * @param environment the environment to ask
+     * @return the module providing {@code type}, or null if the environment cannot name one
      */
-    public static void reportUnattributedOnce(Logger logger, String what, Class<?> type, ModuleEnvironment environment) {
-        long now = System.currentTimeMillis();
-        if (now - lastReportMs > REPORT_RESET_MS) {
-            reportedClasses.clear();
-            limitAnnounced.set(false);
+    public static Name moduleProvidingOrReport(Logger logger, String what, Class<?> type,
+                                               ModuleEnvironment environment) {
+        Name moduleId = environment.getModuleProviding(type);
+        if (moduleId == null) {
+            logger.error("Cannot {} {}, no module provides it: {}", what, type.getSimpleName(), //NOPMD
+                    describeUnattributedClass(type, environment));
         }
-        lastReportMs = now;
-
-        if (!reportedClasses.add(type.getName())) {
-            return;
-        }
-        if (reportedClasses.size() > DISTINCT_CLASS_REPORT_LIMIT) {
-            if (limitAnnounced.compareAndSet(false, true)) {
-                logger.warn("More than {} classes could not be attributed to a module. Further reports are"
-                        + " suppressed until this stops happening.", DISTINCT_CLASS_REPORT_LIMIT);
-            }
-            return;
-        }
-        logger.warn("Could not {} - no module provides {}", what, describeUnattributedClass(type, environment));
+        return moduleId;
     }
 
     /**
