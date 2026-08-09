@@ -96,7 +96,7 @@ val codeMetrics = configurations.create("codeMetrics")
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
     natives(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
-    listOf("natives-linux", "natives-windows", "natives-macos", "natives-macos-arm64").forEach {
+    listOf("natives-linux", "natives-windows", "natives-windows-arm64", "natives-macos", "natives-macos-arm64").forEach {
         natives("org.lwjgl:lwjgl::$it")
         natives("org.lwjgl:lwjgl-assimp::$it")
         natives("org.lwjgl:lwjgl-glfw::$it")
@@ -113,7 +113,9 @@ dependencies {
     natives("org.terasology.jnlua:jnlua_natives:0.1.0-SNAPSHOT@zip")
 
     // Natives for JNBullet
-    natives("org.terasology.jnbullet:JNBullet:1.0.4@zip")
+    // 1.0.5-SNAPSHOT until a proper release is tagged - see MovingBlocks/JNBullet#23, which added
+    // the linux_windows_arm64_llvm_mingw32 (and linux_aarch64) native build targets we need here.
+    natives("org.terasology.jnbullet:JNBullet:1.0.5-SNAPSHOT@zip")
 
 }
 
