@@ -62,7 +62,7 @@ dependencies {
     implementation("org.jgrapht:jgrapht-core:1.5.0")
 
     // for inspecting modules
-    implementation("org.terasology.gestalt:gestalt-module:8.0.1-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-module:8.0.2-SNAPSHOT")
 
     // plugins we configure
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3")
