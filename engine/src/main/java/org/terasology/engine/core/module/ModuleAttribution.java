@@ -3,6 +3,7 @@
 
 package org.terasology.engine.core.module;
 
+import org.slf4j.Logger;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 
@@ -16,6 +17,29 @@ public final class ModuleAttribution {
 
     private ModuleAttribution() {
         // static utility class, no instance needed
+    }
+
+    /**
+     * The module providing {@code type}, or null - having said so - if the environment cannot name one.
+     * <p>
+     * What a null means is the caller's to decide, and the reason differs per site, so each one keeps
+     * its own comment and its own handling. What they share is the report, which lives here so every
+     * site says the same thing in the same shape.
+     *
+     * @param logger the caller's logger, so the message is attributed to where it happened
+     * @param what a short description of what could not be done, e.g. "load", "register bind"
+     * @param type the class to attribute
+     * @param environment the environment to ask
+     * @return the module providing {@code type}, or null if the environment cannot name one
+     */
+    public static Name moduleProvidingOrReport(Logger logger, String what, Class<?> type,
+                                               ModuleEnvironment environment) {
+        Name moduleId = environment.getModuleProviding(type);
+        if (moduleId == null) {
+            logger.error("Cannot {} {}, no module provides it: {}", what, type.getSimpleName(), //NOPMD
+                    describeUnattributedClass(type, environment));
+        }
+        return moduleId;
     }
 
     /**

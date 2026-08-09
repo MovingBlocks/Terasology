@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
@@ -39,7 +40,18 @@ public abstract class ModuleRendering {
     public ModuleRendering(Context context) {
         this.context = context;
         moduleManager = context.get(ModuleManager.class);
-        providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+        providingModule = moduleProviding(this.getClass());
+    }
+
+    /**
+     * The module providing this rendering class, complaining if the environment cannot name one.
+     * <p>
+     * A null here is not obviously fatal, so it is easy to miss: it goes on to build FBO URIs like
+     * {@code "null:fbo.something"}, which register happily and then fail to match anything.
+     */
+    private Name moduleProviding(Class<?> implementingClass) {
+        return ModuleAttribution.moduleProvidingOrReport(logger, "use rendering class", implementingClass,
+                moduleManager.getEnvironment());
     }
 
     public boolean isEnabled() {
@@ -80,8 +92,7 @@ public abstract class ModuleRendering {
     }
 
     protected void setProvidingModule(Class implementingClass) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        this.providingModule = moduleManager.getEnvironment().getModuleProviding(implementingClass);
+        this.providingModule = moduleProviding(implementingClass);
     }
 
     protected BufferPair createBufferPair(String primaryBufferName, String secondaryBufferName,

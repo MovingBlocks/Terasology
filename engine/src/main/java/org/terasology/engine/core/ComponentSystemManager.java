@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
@@ -73,7 +74,12 @@ public class ComponentSystemManager {
                 logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName()); //NOPMD
                 continue;
             }
-            Name moduleId = environment.getModuleProviding(type);
+            Name moduleId = ModuleAttribution.moduleProvidingOrReport(logger, "load", type, environment);
+            if (moduleId == null) {
+                // Filing this under a null key would drop it silently: the loop below walks the
+                // environment's modules, so a system with no module is simply never loaded.
+                continue;
+            }
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode.isAuthority(), isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
                 systemsByModule.put(moduleId, type);
