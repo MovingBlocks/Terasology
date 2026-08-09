@@ -143,6 +143,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
         if (!display.hasFocus()) {
+            // Otherwise stale pre-focus-loss deltas get sent as the next command once focus returns.
+            relativeMovement.set(0, 0, 0);
+            lookPitchDelta = 0;
+            lookYawDelta = 0;
+            jump = false;
             return;
         }
 
