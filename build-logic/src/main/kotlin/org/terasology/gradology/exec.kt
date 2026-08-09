@@ -27,9 +27,11 @@ private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
  * other architecture - normalize both down to the two buckets LWJGL actually ships classifiers for.
  */
 private fun nativeArchName(): String {
-    return when (System.getProperty("os.arch")) {
+    val arch = System.getProperty("os.arch")
+    return when (arch) {
         "aarch64", "arm64" -> "arm64"
-        else -> "amd64"
+        "amd64", "x86_64" -> "amd64"
+        else -> error("Unsupported native architecture: $arch")
     }
 }
 
