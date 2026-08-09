@@ -119,24 +119,47 @@ dependencies {
 
 }
 
-tasks.register<Copy>("extractWindowsNatives") {
-    description = "Extracts the Windows natives from the downloaded zip"
-    from(configurations["natives"].filter { it.name.contains("natives-windows") }.map { zipTree(it) })
-    into("$dirNatives/windows")
+// "natives-windows" is a substring of "natives-windows-arm64" (same for macos), so a plain
+// .contains() filter pulled both classifiers into one directory and one architecture's files
+// silently overwrote the other's. Every directory below is suffixed with its architecture -
+// amd64/arm64, matching what System.getProperty("os.arch") actually reports - even linux,
+// which has no second classifier to collide with yet, for consistency.
+tasks.register<Copy>("extractWindowsAmd64Natives") {
+    description = "Extracts the Windows amd64 natives from the downloaded zip"
+    from(configurations["natives"].filter {
+        it.name.contains("natives-windows") && !it.name.contains("natives-windows-arm64")
+    }.map { zipTree(it) })
+    into("$dirNatives/windows-amd64")
     exclude("META-INF/**")
 }
 
-tasks.register<Copy>("extractMacOSXNatives") {
-    description = "Extracts the OSX natives from the downloaded zip"
-    from(configurations["natives"].filter { it.name.contains("natives-macos") }.map { zipTree(it) })
-    into("$dirNatives/macosx")
+tasks.register<Copy>("extractWindowsArm64Natives") {
+    description = "Extracts the Windows arm64 natives from the downloaded zip"
+    from(configurations["natives"].filter { it.name.contains("natives-windows-arm64") }.map { zipTree(it) })
+    into("$dirNatives/windows-arm64")
+    exclude("META-INF/**")
+}
+
+tasks.register<Copy>("extractMacOSAmd64Natives") {
+    description = "Extracts the macOS amd64 natives from the downloaded zip"
+    from(configurations["natives"].filter {
+        it.name.contains("natives-macos") && !it.name.contains("natives-macos-arm64")
+    }.map { zipTree(it) })
+    into("$dirNatives/macos-amd64")
+    exclude("META-INF/**")
+}
+
+tasks.register<Copy>("extractMacOSArm64Natives") {
+    description = "Extracts the macOS arm64 natives from the downloaded zip"
+    from(configurations["natives"].filter { it.name.contains("natives-macos-arm64") }.map { zipTree(it) })
+    into("$dirNatives/macos-arm64")
     exclude("META-INF/**")
 }
 
 tasks.register<Copy>("extractLinuxNatives") {
-    description = "Extracts the Linux natives from the downloaded zip"
+    description = "Extracts the Linux amd64 natives from the downloaded zip"
     from(configurations["natives"].filter { it.name.contains("natives-linux") }.map { zipTree(it) })
-    into("$dirNatives/linux")
+    into("$dirNatives/linux-amd64")
     exclude("META-INF/**")
 }
 
@@ -155,9 +178,11 @@ tasks.register<Copy>("extractNativeBulletNatives") {
 tasks.register("extractNatives") {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn(
-        "extractWindowsNatives",
+        "extractWindowsAmd64Natives",
+        "extractWindowsArm64Natives",
         "extractLinuxNatives",
-        "extractMacOSXNatives",
+        "extractMacOSAmd64Natives",
+        "extractMacOSArm64Natives",
         "extractJNLuaNatives",
         "extractNativeBulletNatives"
     )
