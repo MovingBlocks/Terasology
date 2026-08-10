@@ -21,10 +21,8 @@ public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> 
         if (data.isString()) {
             String value = data.getAsString();
             if (value == null) {
-                // A PersistedData can report isString() true while still holding no actual
-                // content (e.g. a stale/renamed reference in older save data) - treat that the
-                // same as "absent" instead of forwarding null into getFromString(), which for
-                // handlers like ComponentClassTypeHandler ends up constructing a SimpleUri(null).
+                // PersistedString reports isString() unconditionally, so stale save data can
+                // arrive with null content - treat as absent rather than call getFromString(null).
                 return Optional.empty();
             }
             return Optional.ofNullable(getFromString(value));
