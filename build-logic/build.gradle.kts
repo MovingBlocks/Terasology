@@ -64,15 +64,16 @@ dependencies {
     // for inspecting modules
     implementation("org.terasology.gestalt:gestalt-module:8.0.1-SNAPSHOT")
 
-    // JSON parsing for build-time asset validation
-    implementation("org.json:json:20240303")
+    // JSON parsing for build-time asset validation.
+    // Must match the engine's parser (settings.gradle.kts pins gson 2.8.6) so that validation
+    // accepts exactly what the engine's asset loaders accept - see ValidateJsonAssets.
+    implementation("com.google.code.gson:gson:2.8.6")
 
     // plugins we configure
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638")
 
     api(kotlin("test"))
-    testImplementation(gradleTestKit())
 }
 
 group = "org.terasology.gradology"
