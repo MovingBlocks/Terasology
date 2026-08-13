@@ -5,6 +5,7 @@ package org.terasology.gradology
 
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
+import com.google.gson.stream.MalformedJsonException
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -65,7 +66,10 @@ object JsonAssetInspector {
                 // by the outer handler - otherwise it would be reported as a parse failure.
                 val hasTrailingContent = try {
                     reader.peek() != JsonToken.END_DOCUMENT
-                } catch (e: Exception) {
+                } catch (e: MalformedJsonException) {
+                    // Only malformed trailing bytes count as trailing content. A read failure is
+                    // not a verdict about the file, so it falls through to the outer handler and
+                    // is reported as an error rather than being swallowed as a passing warning.
                     true
                 }
 
@@ -158,8 +162,12 @@ abstract class ValidateJsonAssets : DefaultTask() {
      *
      * This exists mainly so the task has a declared output. Without one Gradle has no up-to-date
      * criterion and re-parses every asset on every build - which matters, because the
-     * `terasology-module` plugin wires this into `processResources` for every module. With it,
-     * an unchanged asset tree is skipped outright and the task can be served from the build cache.
+     * `terasology-module` plugin wires this into `processResources` for every module. With it, an
+     * unchanged asset tree is skipped outright.
+     *
+     * Deliberately not `@CacheableTask`: the findings name files by absolute path, so the output is
+     * not relocatable and sharing it between machines would report paths that do not exist there.
+     * Up-to-date checking is the win here; build-cache reuse would need relative paths first.
      */
     @get:OutputFile
     val report: RegularFileProperty = project.objects.fileProperty()

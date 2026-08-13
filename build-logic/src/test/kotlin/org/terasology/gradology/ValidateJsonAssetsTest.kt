@@ -3,11 +3,13 @@
 
 package org.terasology.gradology
 
+import org.gradle.api.GradleException
 import org.gradle.testfixtures.ProjectBuilder
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -236,6 +238,58 @@ class ValidateJsonAssetsTest {
             "a missing separator must fail - the engine cannot parse it either"
         )
     }
+
+    /**
+     * The tests above cover parsing. This one covers the task: `jsonAssets` wiring, report
+     * creation, and that a clean tree succeeds.
+     *
+     * Worth having on its own terms - a regression in any of that would leave every
+     * inspector test green, which is the same shape of gap that let the original strict parser
+     * ship with a passing suite.
+     */
+    @Test
+    fun `task validates its configured sources and writes a report`() {
+        val projectDir = newProjectDir()
+        val assets = projectDir.resolve("assets").also { it.mkdirs() }
+        assets.resolve("ok.prefab").writeText("""{ "persisted": true }""")
+
+        val task = newTask(projectDir)
+        task.source(task.project.fileTree(assets))
+
+        task.validate()
+
+        val report = task.report.get().asFile
+        assertTrue(report.exists(), "expected a report at ${report.path}")
+        assertTrue(report.readText().contains("errors: 0"), "report was: ${report.readText()}")
+    }
+
+    /**
+     * Failure propagation and warning aggregation, at the task level: an unparseable asset must
+     * fail the build, while a merely defective one is still only recorded.
+     */
+    @Test
+    fun `task fails on unparseable assets and still records warnings`() {
+        val projectDir = newProjectDir()
+        val assets = projectDir.resolve("assets").also { it.mkdirs() }
+        assets.resolve("broken.prefab").writeText("""{ "a": {""")
+        assets.resolve("duplicate.prefab").writeText("""{ "a": 1, "a": 2 }""")
+
+        val task = newTask(projectDir)
+        task.source(task.project.fileTree(assets))
+
+        assertFailsWith<GradleException> { task.validate() }
+
+        val report = task.report.get().asFile.readText()
+        assertTrue(report.contains("ERROR"), "expected the error in the report, got: $report")
+        assertTrue(report.contains("duplicate key"), "expected the warning too, got: $report")
+    }
+
+    private fun newProjectDir(): File =
+        Files.createTempDirectory("terasology-task").toFile().also { it.deleteOnExit() }
+
+    private fun newTask(projectDir: File): ValidateJsonAssets =
+        ProjectBuilder.builder().withProjectDir(projectDir).build()
+            .tasks.register("validateJsonAssets", ValidateJsonAssets::class.java).get()
 
     private fun writeAsset(name: String, content: String): File {
         val dir = Files.createTempDirectory("terasology-test").toFile()
