@@ -340,26 +340,62 @@ public final class PathManager {
         }
 
         // --------------------------------- Setup native paths ---------------------
-        final Path path;
+        // Two layouts coexist, so they need two paths.
+        //
+        // LWJGL natives are extracted per architecture - natives/windows-amd64, natives/macos-arm64
+        // and so on - because "natives-windows" is a substring of "natives-windows-arm64", so a
+        // single directory had one architecture silently overwriting the other. JNBullet and JNLua
+        // still extract to the legacy per-OS directory. Pointing every loader at one path leaves
+        // whichever library is not in that path unable to load.
+        final String legacyDirName;
+        final String lwjglOsName;
         switch (OS.get()) {
             case WINDOWS:
-                path = nativesPath.resolve("windows");
+                legacyDirName = "windows";
+                lwjglOsName = "windows";
                 break;
             case MACOSX:
-                path = nativesPath.resolve("macosx");
+                legacyDirName = "macosx";
+                lwjglOsName = "macos";  // deliberately not "macosx" - matches the LWJGL classifier
                 break;
             case LINUX:
-                path = nativesPath.resolve("linux");
+                legacyDirName = "linux";
+                lwjglOsName = "linux";
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
                         ".name"));
         }
-        final String natives = path.toAbsolutePath().toString();
-        System.setProperty("org.lwjgl.librarypath", natives);
+        final String natives = nativesPath.resolve(legacyDirName).toAbsolutePath().toString();
+        final String lwjglNatives =
+                nativesPath.resolve(lwjglOsName + "-" + nativeArchName()).toAbsolutePath().toString();
+
+        System.setProperty("org.lwjgl.librarypath", lwjglNatives);
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
         System.setProperty("org.terasology.librarypath", natives); // JNBullet
 
+    }
+
+    /**
+     * "amd64" or "arm64", matching the suffix on the native directories produced by the build.
+     *
+     * <p>The JVM reports "aarch64" for arm64 on every OS, and "amd64" or "x86_64" depending on the
+     * platform for the other - normalize both down to the two buckets LWJGL ships classifiers for.
+     * Kept in step with {@code nativeArchName()} in build-logic's {@code exec.kt}, which names the
+     * directories this resolves against.
+     */
+    private static String nativeArchName() {
+        String arch = System.getProperty("os.arch");
+        switch (arch) {
+            case "aarch64":
+            case "arm64":
+                return "arm64";
+            case "amd64":
+            case "x86_64":
+                return "amd64";
+            default:
+                throw new UnsupportedOperationException("Unsupported native architecture: " + arch);
+        }
     }
 
     protected ImmutableList<Path> defaultModPaths() throws IOException {

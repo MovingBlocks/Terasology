@@ -96,7 +96,7 @@ val codeMetrics = configurations.create("codeMetrics")
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
     natives(platform("org.lwjgl:lwjgl-bom:$LwjglVersion"))
-    listOf("natives-linux", "natives-windows", "natives-macos", "natives-macos-arm64").forEach {
+    listOf("natives-linux", "natives-linux-arm64", "natives-windows", "natives-windows-arm64", "natives-macos", "natives-macos-arm64").forEach {
         natives("org.lwjgl:lwjgl::$it")
         natives("org.lwjgl:lwjgl-assimp::$it")
         natives("org.lwjgl:lwjgl-glfw::$it")
@@ -113,28 +113,61 @@ dependencies {
     natives("org.terasology.jnlua:jnlua_natives:0.1.0-SNAPSHOT@zip")
 
     // Natives for JNBullet
-    natives("org.terasology.jnbullet:JNBullet:1.0.4@zip")
+    // 1.0.5-SNAPSHOT until a proper release is tagged - see MovingBlocks/JNBullet#23, which added
+    // the linux_windows_arm64_llvm_mingw32 (and linux_aarch64) native build targets we need here.
+    natives("org.terasology.jnbullet:JNBullet:1.0.5-SNAPSHOT@zip")
 
 }
 
-tasks.register<Copy>("extractWindowsNatives") {
-    description = "Extracts the Windows natives from the downloaded zip"
-    from(configurations["natives"].filter { it.name.contains("natives-windows") }.map { zipTree(it) })
-    into("$dirNatives/windows")
+// "natives-windows" is a substring of "natives-windows-arm64" (same for linux and macos), so a
+// plain .contains() filter pulled both classifiers into one directory and one architecture's
+// files silently overwrote the other's. Every directory below is suffixed with its architecture -
+// amd64/arm64, matching what System.getProperty("os.arch") actually reports.
+tasks.register<Copy>("extractWindowsAmd64Natives") {
+    description = "Extracts the Windows amd64 natives from the downloaded zip"
+    from(configurations["natives"].filter {
+        it.name.contains("natives-windows") && !it.name.contains("natives-windows-arm64")
+    }.map { zipTree(it) })
+    into("$dirNatives/windows-amd64")
     exclude("META-INF/**")
 }
 
-tasks.register<Copy>("extractMacOSXNatives") {
-    description = "Extracts the OSX natives from the downloaded zip"
-    from(configurations["natives"].filter { it.name.contains("natives-macos") }.map { zipTree(it) })
-    into("$dirNatives/macosx")
+tasks.register<Copy>("extractWindowsArm64Natives") {
+    description = "Extracts the Windows arm64 natives from the downloaded zip"
+    from(configurations["natives"].filter { it.name.contains("natives-windows-arm64") }.map { zipTree(it) })
+    into("$dirNatives/windows-arm64")
     exclude("META-INF/**")
 }
 
-tasks.register<Copy>("extractLinuxNatives") {
-    description = "Extracts the Linux natives from the downloaded zip"
-    from(configurations["natives"].filter { it.name.contains("natives-linux") }.map { zipTree(it) })
-    into("$dirNatives/linux")
+tasks.register<Copy>("extractMacOSAmd64Natives") {
+    description = "Extracts the macOS amd64 natives from the downloaded zip"
+    from(configurations["natives"].filter {
+        it.name.contains("natives-macos") && !it.name.contains("natives-macos-arm64")
+    }.map { zipTree(it) })
+    into("$dirNatives/macos-amd64")
+    exclude("META-INF/**")
+}
+
+tasks.register<Copy>("extractMacOSArm64Natives") {
+    description = "Extracts the macOS arm64 natives from the downloaded zip"
+    from(configurations["natives"].filter { it.name.contains("natives-macos-arm64") }.map { zipTree(it) })
+    into("$dirNatives/macos-arm64")
+    exclude("META-INF/**")
+}
+
+tasks.register<Copy>("extractLinuxAmd64Natives") {
+    description = "Extracts the Linux amd64 natives from the downloaded zip"
+    from(configurations["natives"].filter {
+        it.name.contains("natives-linux") && !it.name.contains("natives-linux-arm64")
+    }.map { zipTree(it) })
+    into("$dirNatives/linux-amd64")
+    exclude("META-INF/**")
+}
+
+tasks.register<Copy>("extractLinuxArm64Natives") {
+    description = "Extracts the Linux arm64 natives from the downloaded zip"
+    from(configurations["natives"].filter { it.name.contains("natives-linux-arm64") }.map { zipTree(it) })
+    into("$dirNatives/linux-arm64")
     exclude("META-INF/**")
 }
 
@@ -153,9 +186,12 @@ tasks.register<Copy>("extractNativeBulletNatives") {
 tasks.register("extractNatives") {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn(
-        "extractWindowsNatives",
-        "extractLinuxNatives",
-        "extractMacOSXNatives",
+        "extractWindowsAmd64Natives",
+        "extractWindowsArm64Natives",
+        "extractLinuxAmd64Natives",
+        "extractLinuxArm64Natives",
+        "extractMacOSAmd64Natives",
+        "extractMacOSArm64Natives",
         "extractJNLuaNatives",
         "extractNativeBulletNatives"
     )
