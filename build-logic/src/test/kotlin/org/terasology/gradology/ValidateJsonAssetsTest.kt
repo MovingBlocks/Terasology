@@ -182,6 +182,61 @@ class ValidateJsonAssetsTest {
         assertNotNull(JsonAssetInspector.inspect(file).error)
     }
 
+    /**
+     * A stray closing brace after the root object warns rather than failing.
+     *
+     * The engine's loaders read one root value and never check what follows, so the file loads
+     * fine - failing the build would punish a defect the engine does not care about. Modelled on
+     * `Apiculture/assets/ui/extractor.ui`, found by the first full Omega sweep.
+     *
+     * Note this shape makes `JsonReader.peek()` itself throw, so it is not enough to compare
+     * against END_DOCUMENT; the regression here is the error/warning classification.
+     */
+    @Test
+    fun `trailing content after the root value warns without failing`() {
+        val file = writeAsset("extractor.ui", """
+            {
+              "type": "UIBox",
+              "contents": []
+            }
+            }
+        """.trimIndent())
+
+        val inspection = JsonAssetInspector.inspect(file)
+
+        assertNull(inspection.error, "the engine loads this, so it must not fail the build")
+        assertTrue(
+            inspection.warnings.single().contains("unexpected content after the root value"),
+            "expected a trailing-content warning, got: ${inspection.warnings}"
+        )
+    }
+
+    /**
+     * A missing separator between object members is a hard failure - no JSON parser accepts it,
+     * lenient or not, so the engine cannot load the file either.
+     *
+     * Modelled on `Cooking/assets/prefabs/CookingRecipes.prefab`, which is broken in the shipped
+     * module: its recipes silently do not load today.
+     */
+    @Test
+    fun `missing comma between members is an error`() {
+        val file = writeAsset("CookingRecipes.prefab", """
+            {
+              "ListRecipes": {
+                "recipes": {
+                  "Cooking:Coconut": { "outputCount": 1 }
+                  "Cooking:BoiledEgg": { "outputCount": 1 }
+                }
+              }
+            }
+        """.trimIndent())
+
+        assertNotNull(
+            JsonAssetInspector.inspect(file).error,
+            "a missing separator must fail - the engine cannot parse it either"
+        )
+    }
+
     private fun writeAsset(name: String, content: String): File {
         val dir = Files.createTempDirectory("terasology-test").toFile()
         dir.deleteOnExit()

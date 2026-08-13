@@ -35,6 +35,12 @@ data class AssetInspection(val error: String?, val warnings: List<String>)
  * share of shipped assets use them - `CoreAssets` alone has dozens. A strict parser here would
  * reject content the engine loads happily.
  *
+ * The contract that follows from this: **an error is something the engine genuinely cannot load;
+ * a warning is something it loads despite the file being defective.** Duplicate keys and trailing
+ * content are both warnings for that reason - Gson keeps the last duplicate, and the loaders read
+ * a single root value without checking what comes after it. Anything that fails the parse outright
+ * fails the build, because the engine would fail on it too.
+ *
  * Kept free of Gradle types so it can be tested directly, without standing up a nested build.
  */
 object JsonAssetInspector {
@@ -52,10 +58,21 @@ object JsonAssetInspector {
 
                 walk(reader, file, "", warnings)
 
-                if (reader.peek() != JsonToken.END_DOCUMENT) {
-                    return AssetInspection(
-                        "${file.path}: unexpected trailing content after the root value",
-                        warnings
+                // Content after the root value is a defect, but not a fatal one: the engine's
+                // loaders read a single value and never check what follows, so the file still
+                // loads. Peeking can itself throw when the trailing bytes are not the start of a
+                // value (a stray closing brace, say), so that has to be caught here rather than
+                // by the outer handler - otherwise it would be reported as a parse failure.
+                val hasTrailingContent = try {
+                    reader.peek() != JsonToken.END_DOCUMENT
+                } catch (e: Exception) {
+                    true
+                }
+
+                if (hasTrailingContent) {
+                    warnings.add(
+                        "${file.path}: unexpected content after the root value" +
+                            " - the engine reads the first value and silently ignores the rest"
                     )
                 }
             }
