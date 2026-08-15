@@ -54,10 +54,10 @@ object JsonAssetInspector {
                 reader.isLenient = true
 
                 if (reader.peek() == JsonToken.END_DOCUMENT) {
-                    return AssetInspection("${file.path}: file is empty", warnings)
+                    return AssetInspection("file is empty", warnings)
                 }
 
-                walk(reader, file, "", warnings)
+                walk(reader, "", warnings)
 
                 // Content after the root value is a defect, but not a fatal one: the engine's
                 // loaders read a single value and never check what follows, so the file still
@@ -75,14 +75,14 @@ object JsonAssetInspector {
 
                 if (hasTrailingContent) {
                     warnings.add(
-                        "${file.path}: unexpected content after the root value" +
+                        "unexpected content after the root value" +
                             " - the engine reads the first value and silently ignores the rest"
                     )
                 }
             }
             AssetInspection(null, warnings)
         } catch (e: Exception) {
-            AssetInspection("${file.path}: ${e.message ?: e.javaClass.simpleName}", warnings)
+            AssetInspection(e.message ?: e.javaClass.simpleName, warnings)
         }
     }
 
@@ -94,7 +94,7 @@ object JsonAssetInspector {
      * a duplicate never breaks loading - but it does mean an earlier value is being discarded
      * without anyone noticing, which is nearly always a mistake.
      */
-    private fun walk(reader: JsonReader, file: File, path: String, warnings: MutableList<String>) {
+    private fun walk(reader: JsonReader, path: String, warnings: MutableList<String>) {
         when (reader.peek()) {
             JsonToken.BEGIN_OBJECT -> {
                 reader.beginObject()
@@ -104,11 +104,11 @@ object JsonAssetInspector {
                     val childPath = if (path.isEmpty()) name else "$path.$name"
                     if (!seen.add(name)) {
                         warnings.add(
-                            "${file.path}: duplicate key \"$name\" at $childPath" +
+                            "duplicate key \"$name\" at $childPath" +
                                 " - the last occurrence wins, the earlier value is silently discarded"
                         )
                     }
-                    walk(reader, file, childPath, warnings)
+                    walk(reader, childPath, warnings)
                 }
                 reader.endObject()
             }
@@ -117,7 +117,7 @@ object JsonAssetInspector {
                 reader.beginArray()
                 var index = 0
                 while (reader.hasNext()) {
-                    walk(reader, file, "$path[${index++}]", warnings)
+                    walk(reader, "$path[${index++}]", warnings)
                 }
                 reader.endArray()
             }
@@ -158,20 +158,24 @@ abstract class ValidateJsonAssets : DefaultTask() {
     val jsonAssets: ConfigurableFileCollection = project.files()
 
     /**
-     * Where the findings are written.
+     * Where the findings are written, in CheckStyle XML.
      *
-     * This exists mainly so the task has a declared output. Without one Gradle has no up-to-date
-     * criterion and re-parses every asset on every build - which matters, because the
-     * `terasology-module` plugin wires this into `processResources` for every module. With it, an
-     * unchanged asset tree is skipped outright.
+     * Two jobs. It gives the task a declared output, without which Gradle has no up-to-date
+     * criterion and re-parses every asset on every build — that matters because the
+     * `terasology-module` plugin wires this into `processResources` for every module.
      *
-     * Deliberately not `@CacheableTask`: the findings name files by absolute path, so the output is
-     * not relocatable and sharing it between machines would report paths that do not exist there.
-     * Up-to-date checking is the win here; build-cache reuse would need relative paths first.
+     * And it makes the findings *visible*. Warnings that only reach the console are warnings
+     * nobody reads. CheckStyle XML is the format the Jenkinsfile already parses with the Warnings
+     * Next Generation plugin, so recording these alongside checkstyle, PMD and SpotBugs is one
+     * more `recordIssues` block rather than new infrastructure — including the reference-build
+     * comparison that distinguishes a warning you just introduced from the existing backlog.
+     *
+     * Deliberately not `@CacheableTask`: findings name files by absolute path, as every other
+     * analysis report here does, so the output is not relocatable between machines.
      */
     @get:OutputFile
     val report: RegularFileProperty = project.objects.fileProperty()
-        .convention(project.layout.buildDirectory.file("reports/json-assets/validation.txt"))
+        .convention(project.layout.buildDirectory.file("reports/json-assets/json-assets.xml"))
 
     /**
      * Add files or file trees of JSON assets to validate.
@@ -183,25 +187,25 @@ abstract class ValidateJsonAssets : DefaultTask() {
     @TaskAction
     fun validate() {
         val errors = mutableListOf<String>()
-        val warnings = mutableListOf<String>()
+        val findings = LinkedHashMap<File, MutableList<Pair<String, String>>>()
 
         for (file in jsonAssets) {
             val inspection = JsonAssetInspector.inspect(file)
-            inspection.error?.let { errors.add(it) }
-            warnings.addAll(inspection.warnings)
+            val perFile = findings.getOrPut(file) { mutableListOf() }
+            inspection.error?.let {
+                errors.add("${file.path}: $it")
+                perFile.add("error" to it)
+            }
+            inspection.warnings.forEach {
+                logger.warn("  ! ${file.path}: $it")
+                perFile.add("warning" to it)
+            }
+            if (perFile.isEmpty()) {
+                findings.remove(file)
+            }
         }
 
-        warnings.forEach { logger.warn("  ! $it") }
-
-        val reportFile = report.get().asFile
-        reportFile.parentFile.mkdirs()
-        reportFile.writeText(buildString {
-            appendLine("checked: ${jsonAssets.count()}")
-            appendLine("errors: ${errors.size}")
-            appendLine("warnings: ${warnings.size}")
-            errors.forEach { appendLine("ERROR $it") }
-            warnings.forEach { appendLine("WARN $it") }
-        })
+        writeCheckstyleReport(findings)
 
         if (errors.isNotEmpty()) {
             val message = buildString {
@@ -213,4 +217,41 @@ abstract class ValidateJsonAssets : DefaultTask() {
 
         logger.lifecycle("All JSON assets are valid.")
     }
+
+    /**
+     * Emit findings as CheckStyle XML — the schema the Warnings Next Generation plugin already
+     * parses for this project. Severity carries the contract: `error` is something the engine
+     * cannot load, `warning` is something it loads despite the file being defective.
+     *
+     * No line numbers: Gson's reader reports a JSON path rather than a position, so the path is
+     * put in the message instead and the line is left at 0. Grouping and trend still work; only
+     * inline annotation precision is lost.
+     */
+    private fun writeCheckstyleReport(findings: Map<File, List<Pair<String, String>>>) {
+        val reportFile = report.get().asFile
+        reportFile.parentFile.mkdirs()
+        reportFile.writeText(buildString {
+            appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
+            appendLine("""<checkstyle version="8.0">""")
+            findings.forEach { (file, entries) ->
+                appendLine("""  <file name="${xmlAttr(file.path)}">""")
+                entries.forEach { (severity, message) ->
+                    appendLine(
+                        """    <error line="0" severity="$severity" """ +
+                            """message="${xmlAttr(message)}" source="JsonAssets" />"""
+                    )
+                }
+                appendLine("  </file>")
+            }
+            appendLine("</checkstyle>")
+        })
+    }
+
+    /** Escape the five characters that cannot appear literally in an XML attribute value. */
+    private fun xmlAttr(value: String): String =
+        value.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;")
 }

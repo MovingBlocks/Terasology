@@ -70,9 +70,11 @@ class ValidateJsonAssetsTest {
         val inspection = JsonAssetInspector.inspect(file)
 
         assertNotNull(inspection.error)
+        // Naming the file is the task's job, not the inspector's — keeping them separate is what
+        // lets the path and the message land in different XML attributes without duplication.
         assertTrue(
-            inspection.error!!.contains("broken.prefab"),
-            "Expected the error to name the file, got: ${inspection.error}"
+            !inspection.error!!.contains("broken.prefab"),
+            "the inspector should describe the fault, not embed the path: ${inspection.error}"
         )
     }
 
@@ -260,7 +262,9 @@ class ValidateJsonAssetsTest {
 
         val report = task.report.get().asFile
         assertTrue(report.exists(), "expected a report at ${report.path}")
-        assertTrue(report.readText().contains("errors: 0"), "report was: ${report.readText()}")
+        val xml = report.readText()
+        assertTrue(xml.contains("<checkstyle"), "report was: $xml")
+        assertTrue(!xml.contains("severity="), "a clean tree must record no findings: $xml")
     }
 
     /**
@@ -280,8 +284,11 @@ class ValidateJsonAssetsTest {
         assertFailsWith<GradleException> { task.validate() }
 
         val report = task.report.get().asFile.readText()
-        assertTrue(report.contains("ERROR"), "expected the error in the report, got: $report")
-        assertTrue(report.contains("duplicate key"), "expected the warning too, got: $report")
+        assertTrue(report.contains("""severity="error""""), "expected the error, got: $report")
+        assertTrue(report.contains("""severity="warning""""), "expected the warning, got: $report")
+        assertTrue(report.contains("duplicate key"), "expected the warning text, got: $report")
+        // The severity split is the contract Jenkins keys on, so both must survive a failing run.
+        assertTrue(report.contains("broken.prefab"), "expected the file named, got: $report")
     }
 
     private fun newProjectDir(): File =
