@@ -138,6 +138,22 @@ pipeline {
                             [threshold: 1, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
                         ])
 
+                    // JSON asset validation. Assets the engine genuinely cannot load already fail
+                    // the Build stage, so what reaches here is the other half: files that load
+                    // despite being defective, such as a duplicate key whose earlier value is
+                    // silently discarded. Those must stay visible without blocking anyone.
+                    //
+                    // Gated on NEW only, deliberately. There is an existing backlog, and a gate on
+                    // TOTAL would mark every build unstable until it is cleared — which trains
+                    // people to ignore the signal. New findings mark the stage unstable; the
+                    // backlog is reported and trended without crying wolf.
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: checkStyle(id: 'json-assets', name: 'JSON Assets',
+                                         pattern: '**/build/reports/json-assets/*.xml'),
+                        qualityGates: [
+                            [threshold: 1, type: 'NEW_NORMAL', unstable: true]
+                        ])
+
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tool: spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true))
 

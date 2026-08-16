@@ -6,6 +6,7 @@
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.terasology.gradology.ModuleMetadataForGradle
+import org.terasology.gradology.ValidateJsonAssets
 
 plugins {
     `java-library`
@@ -138,9 +139,24 @@ tasks.register<Copy>("syncModuleInfo") {
     into(mainSourceSet.output.classesDirs.first())
 }
 
+// Validate all JSON assets (prefabs, blocks, ui, etc.) at build time
+tasks.register<ValidateJsonAssets>("validateJsonAssets") {
+    val assetsDir = project.file("assets")
+    if (assetsDir.exists()) {
+        listOf("prefabs", "blocks", "blockSounds", "ui", "shapes", "materials", "fonts", "behaviors").forEach { assetType ->
+            val dir = assetsDir.resolve(assetType)
+            if (dir.exists()) {
+                source(project.fileTree(dir) { include("**/*.json", "**/*.prefab", "**/*.block", "**/*.ui") })
+            }
+        }
+        // Also catch any other .json files directly in assets
+        source(project.fileTree(assetsDir) { include("**/*.json") })
+    }
+}
+
 tasks.named("processResources") {
     // Make sure the assets directory is included
-    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
+    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo", "validateJsonAssets")
 }
 
 tasks.named<JavaCompile>("compileJava") {
