@@ -35,6 +35,7 @@ import org.terasology.engine.world.block.OnAddedBlocks;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.LateLightMerger;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkGenerated;
@@ -49,7 +50,6 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
-import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import javax.inject.Inject;
@@ -90,6 +90,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3ic, Chunk> chunkCache;
+    private final LateLightMerger lateLightMerger;
 
     private final Map<Vector3ic, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
     // The ChunkStore loaded (from disk) for a chunk in createOrLoadChunk()'s async task, carried
@@ -121,6 +122,7 @@ public class LocalChunkProvider implements ChunkProvider {
         this.config = config;
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkCache = chunkCache;
+        this.lateLightMerger = new LateLightMerger(chunkCache);
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
@@ -182,6 +184,9 @@ public class LocalChunkProvider implements ChunkProvider {
         }
         chunkCache.put(new Vector3i(chunkPos), chunk);
         chunk.markReady();
+        // Light merging is no longer a pipeline stage the chunk waits on before this point - it now
+        // happens here, incrementally, once neighbours are available. See LateLightMerger.
+        lateLightMerger.chunkReady(chunkPos);
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         ChunkStore store = loadedChunkStores.remove(chunkPos);
@@ -259,6 +264,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 break;
             }
         }
+        lateLightMerger.processPending();
     }
 
     private void deactivateBlocks() {
@@ -308,6 +314,9 @@ public class LocalChunkProvider implements ChunkProvider {
         if (chunk == null) {
             return false;
         }
+        // Otherwise a position at the edge of the loaded world - which never completes its
+        // neighbourhood and so never gets merged - would sit in this bookkeeping forever.
+        lateLightMerger.chunkUnloaded(pos);
 
         worldEntity.send(new BeforeChunkUnload(pos));
         storageManager.deactivateChunk(chunk);
@@ -371,6 +380,7 @@ public class LocalChunkProvider implements ChunkProvider {
     public void restart() {
         loadingPipeline.restart();
         unloadRequestTaskMaster.restart();
+        lateLightMerger.clear();
     }
 
     @Override
@@ -429,6 +439,7 @@ public class LocalChunkProvider implements ChunkProvider {
         // wrongly restoring entities from the deleted world onto it.
         loadedChunkStores.clear();
         generateQueuedEntities.clear();
+        lateLightMerger.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
 
@@ -438,12 +449,6 @@ public class LocalChunkProvider implements ChunkProvider {
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                    return LightMerger.merge(localChunks);
-                }, LightMerger::requiredChunks
-            ))
             .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -474,12 +479,6 @@ public class LocalChunkProvider implements ChunkProvider {
                         ChunkTaskProvider.create("Chunk generate internal lightning",
                                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-                .addStage(ChunkTaskProvider.createMulti("Light merging",
-                        chunks -> {
-                            Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                            return LightMerger.merge(localChunks);
-                        }, LightMerger::requiredChunks
-                ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }

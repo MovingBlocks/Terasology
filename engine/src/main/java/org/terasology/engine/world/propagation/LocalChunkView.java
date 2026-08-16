@@ -54,6 +54,13 @@ public class LocalChunkView implements PropagatorWorldView {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
             rules.setValue(chunk, Chunks.toRelative(pos, new Vector3i()), value);
+            // Mark only what actually changed, as AbstractFullWorldView does for runtime block
+            // changes. This used to mark nothing: light merging ran before a chunk was ready, so its
+            // first mesh was still to come and picked the result up for free. Now that merging
+            // happens on live chunks, the caller would otherwise have to mark whole neighbourhoods
+            // dirty speculatively - which re-meshes chunks whose light never moved, and a chunk sits
+            // in 27 different neighbourhoods.
+            chunk.setDirty(true);
         }
     }
 
