@@ -13,6 +13,9 @@ import org.terasology.engine.world.chunks.Chunks;
  */
 public class LocalChunkView implements PropagatorWorldView {
 
+    /** This view spans a 3x3x3 neighbourhood, as {@code LightMerger} supplies it. */
+    private static final int LOCAL_CHUNKS_SIDE_LENGTH = 3;
+
     private PropagationRules rules;
     private Chunk[] chunks;
 
@@ -28,12 +31,37 @@ public class LocalChunkView implements PropagatorWorldView {
      * Gets the index of the chunk in {@link #chunks}
      *
      * @param blockPos The position of the block in world coordinates
-     * @return The index of the chunk in the array
+     * @return The index of the chunk in the array, or -1 if the position lies outside this view
      */
     private int chunkIndexOf(Vector3ic blockPos) {
-        return Chunks.toChunkPos(blockPos.x(), Chunks.POWER_X) - topLeft.x
-                + 3 * (Chunks.toChunkPos(blockPos.y(), Chunks.POWER_Y) - topLeft.y
-                + 3 * (Chunks.toChunkPos(blockPos.z(), Chunks.POWER_Z) - topLeft.z));
+        return indexOf(
+                Chunks.toChunkPos(blockPos.x(), Chunks.POWER_X) - topLeft.x,
+                Chunks.toChunkPos(blockPos.y(), Chunks.POWER_Y) - topLeft.y,
+                Chunks.toChunkPos(blockPos.z(), Chunks.POWER_Z) - topLeft.z);
+    }
+
+    /**
+     * Index into {@link #chunks} for a chunk offset within this view, or -1 if outside it.
+     * <p>
+     * The stride order has to match how the caller laid the array out. {@code LightMerger.merge} sorts
+     * by x, then y, then z before constructing this view, so x is the slowest-varying coordinate and z
+     * the fastest - the same order its own {@code indexOf(Side)} assumes. This previously used the
+     * opposite convention, making x fastest, which silently transposed x and z: a lookup for the +X
+     * neighbour returned the +Z one. Nothing failed, because reads and writes shared the same wrong
+     * mapping and the centre (1,1,1) is invariant under the swap - so light merging simply propagated
+     * into the wrong neighbours.
+     * <p>
+     * Bounds are checked per axis rather than on the flat index. Clamping the index alone is not
+     * enough: an offset like (3, 0, 0) is out of view but still lands inside the array, aliasing onto
+     * a real but unrelated chunk.
+     */
+    private static int indexOf(int chunkX, int chunkY, int chunkZ) {
+        if (chunkX < 0 || chunkX >= LOCAL_CHUNKS_SIDE_LENGTH
+                || chunkY < 0 || chunkY >= LOCAL_CHUNKS_SIDE_LENGTH
+                || chunkZ < 0 || chunkZ >= LOCAL_CHUNKS_SIDE_LENGTH) {
+            return -1;
+        }
+        return chunkZ + LOCAL_CHUNKS_SIDE_LENGTH * (chunkY + LOCAL_CHUNKS_SIDE_LENGTH * chunkX);
     }
 
     @Override
@@ -51,7 +79,11 @@ public class LocalChunkView implements PropagatorWorldView {
 
     @Override
     public void setValueAt(Vector3ic pos, byte value) {
-        Chunk chunk = chunks[chunkIndexOf(pos)];
+        int index = chunkIndexOf(pos);
+        if (index < 0) {
+            return;
+        }
+        Chunk chunk = chunks[index];
         if (chunk != null) {
             Vector3i relative = Chunks.toRelative(pos, new Vector3i());
             rules.setValue(chunk, relative, value);
@@ -106,7 +138,7 @@ public class LocalChunkView implements PropagatorWorldView {
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    Chunk affected = chunks[x + 3 * (y + 3 * z)];
+                    Chunk affected = chunks[indexOf(x, y, z)];
                     if (affected != null) {
                         affected.setDirty(true);
                     }
@@ -118,6 +150,9 @@ public class LocalChunkView implements PropagatorWorldView {
     @Override
     public Block getBlockAt(Vector3ic pos) {
         int index = chunkIndexOf(pos);
+        if (index < 0) {
+            return null;
+        }
         Chunk chunk = chunks[index];
         if (chunk != null) {
             return chunk.getBlock(Chunks.toRelative(pos, new Vector3i()));
