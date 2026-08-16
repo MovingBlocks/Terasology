@@ -61,12 +61,12 @@ dependencies {
         if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
-            compileOnly(gradleDep.asMap())
+            compileOnly(gradleDep.asNotation())
             // though modules also sometimes use "optional" to describe their test dependencies;
             // they're not required for runtime, but they *are* required for tests.
-            testImplementation(gradleDep.asMap())
+            testImplementation(gradleDep.asNotation())
         } else {
-            implementation(gradleDep.asMap())
+            implementation(gradleDep.asNotation())
         }
     }
 

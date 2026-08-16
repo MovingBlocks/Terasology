@@ -16,9 +16,7 @@ import java.io.File
 // or something else from gradle.api.artifacts, but it exposes no concrete implementation
 // of those interfaces.
 data class GradleDependencyInfo(val group: String, val module: String, val version: String) {
-    fun asMap(): Map<String, String> {
-        return mapOf("group" to group, "name" to module, "version" to version)
-    }
+    fun asNotation(): String = "$group:$module:$version"
 }
 
 
