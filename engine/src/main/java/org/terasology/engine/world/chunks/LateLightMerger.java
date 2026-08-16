@@ -89,9 +89,17 @@ public final class LateLightMerger {
      * merging used to run on pipeline threads and this moved it onto the main thread - so it adds to
      * frame time rather than overlapping with it.
      * <p>
-     * A tick whose budget is already gone therefore merges nothing and catches up later. That is the
-     * right way round: becoming visible is what the player is waiting on, and correcting the lighting
-     * behind it is the deferrable half.
+     * A tick whose budget is already gone therefore merges nothing further and catches up later. That
+     * is the right way round: becoming visible is what the player is waiting on, and correcting the
+     * lighting behind it is the deferrable half.
+     * <p>
+     * One merge always runs before the budget is consulted, deliberately. The ready-chunk drain ahead
+     * of this routinely spends the entire allowance during a world load - it logs "took too long" for
+     * tick after consecutive tick while its backlog comes down - so testing the budget first would
+     * find it already gone every time and merge nothing at all for the whole load. That is not
+     * deferral, it is starvation: lighting would never be corrected for as long as chunks keep
+     * arriving, which while exploring is continuously. Overshooting by a single bounded merge is the
+     * cost of guaranteeing forward progress.
      */
     public void processPending(long tickStartTime, int tickBudgetMs) {
         Vector3ic pos;
