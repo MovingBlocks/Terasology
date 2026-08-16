@@ -29,6 +29,7 @@ val env = System.getenv()
 val moduleFile = layout.projectDirectory.file("src/main/resources/org/terasology/unittest/module.txt").asFile
 
 println("Scanning for version in module.txt for engine-tests")
+@Suppress("UNCHECKED_CAST")
 val moduleConfig = groovy.json.JsonSlurper().parseText(moduleFile.readText()) as Map<String, String>
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
@@ -53,7 +54,7 @@ dependencies {
     // Dependency not provided for modules, but required for module-tests
     implementation(libs.gson)
     implementation("org.codehaus.plexus:plexus-utils:3.0.16")
-    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get().toString()}")
+    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get()}")
     implementation("org.terasology:reflections:0.9.12-MB")
 
     implementation("com.github.zafarkhaja:java-semver:0.10.2")

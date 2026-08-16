@@ -63,7 +63,7 @@ dependencies {
     api(libs.gson)
     api("net.sf.trove4j:trove4j:3.0.3")
     implementation("io.netty:netty-all:4.1.77.Final")
-    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get().toString()}")
+    implementation("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get()}")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     // Javax for protobuf due to @Generated - needed on Java 9 or newer Javas
@@ -154,7 +154,7 @@ dependencies {
 protobuf {
     protoc {
         // See https://github.com/google/protobuf-gradle-plugin/issues/563
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get().toString()}"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
     plugins {
     }
@@ -169,6 +169,7 @@ protobuf {
 val moduleFile = layout.projectDirectory.file("src/main/resources/org/terasology/engine/module.txt").asFile
 
 println("Scanning for version in module.txt for engine")
+@Suppress("UNCHECKED_CAST")
 val moduleConfig = groovy.json.JsonSlurper().parseText(moduleFile.readText()) as Map<String, String>
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
