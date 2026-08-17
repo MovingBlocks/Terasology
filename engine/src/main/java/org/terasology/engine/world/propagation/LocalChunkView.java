@@ -13,7 +13,7 @@ import org.terasology.engine.world.chunks.Chunks;
  */
 public class LocalChunkView implements PropagatorWorldView {
 
-    /** This view spans a 3x3x3 neighbourhood, as {@code LightMerger} supplies it. */
+    /** This view spans a fixed 3x3x3 neighbourhood of chunks. */
     private static final int LOCAL_CHUNKS_SIDE_LENGTH = 3;
 
     private PropagationRules rules;
@@ -81,6 +81,10 @@ public class LocalChunkView implements PropagatorWorldView {
     public void setValueAt(Vector3ic pos, byte value) {
         int index = chunkIndexOf(pos);
         if (index < 0) {
+            // Propagation routinely reaches one step past the edge of this view; silently dropping
+            // it here matches getValueAt's UNAVAILABLE for the same case, rather than the
+            // ArrayIndexOutOfBoundsException this used to throw. Not logged: this is the ordinary
+            // case at every boundary of every merge, not a fault to surface.
             return;
         }
         Chunk chunk = chunks[index];
@@ -135,10 +139,14 @@ public class LocalChunkView implements PropagatorWorldView {
         int minZ = Math.max(Chunks.toChunkPos(pos.z() - 1, Chunks.POWER_Z) - topLeft.z, 0);
         int maxZ = Math.min(Chunks.toChunkPos(pos.z() + 1, Chunks.POWER_Z) - topLeft.z, 2);
 
+        // Inlined rather than routed through indexOf: minX/maxX etc. above already clamp into
+        // [0, LOCAL_CHUNKS_SIDE_LENGTH), so indexOf's own bounds check is redundant here - and this
+        // is the innermost loop of a per-write scan, where that extra call and branch cost real
+        // frame time. Must still match indexOf's z-fastest ordering.
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    Chunk affected = chunks[indexOf(x, y, z)];
+                    Chunk affected = chunks[z + LOCAL_CHUNKS_SIDE_LENGTH * (y + LOCAL_CHUNKS_SIDE_LENGTH * x)];
                     if (affected != null) {
                         affected.setDirty(true);
                     }

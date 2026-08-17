@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.block.tiles.NullWorldAtlas;
 import org.terasology.engine.world.chunks.Chunk;
@@ -34,7 +33,7 @@ class LocalChunkViewTest extends TerasologyTestingEnvironment {
     @Override
     public void setup() throws Exception {
         super.setup();
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), CoreRegistry.get(AssetManager.class), true);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), context.get(AssetManager.class), true);
         extraDataManager = new ExtraBlockDataManager();
     }
 
