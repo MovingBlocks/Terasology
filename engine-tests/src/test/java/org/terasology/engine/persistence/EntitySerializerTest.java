@@ -27,6 +27,7 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.LazyLoadEntityRef;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
@@ -297,6 +298,35 @@ public class EntitySerializerTest {
 
         assertTrue(loadedEntity.exists());
         assertTrue(loadedEntity.hasComponent(MappedTypeComponent.class));
+    }
+
+    /**
+     * Reproduces the forward-reference scenario from a real load: entity A's component references entity B by id
+     * before B itself has been deserialized (e.g. a save file lists an inventory-holding entity before an item
+     * inside it). {@link org.terasology.engine.persistence.typeHandling.extensionTypes.LazyLoadEntityRef} is what
+     * {@link org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler} hands back in
+     * that situation - this exercises it directly against a real {@link EngineEntityManager}, since going through
+     * a full serialize/{@link EngineEntityManager#clear()}/deserialize round trip doesn't actually clear the
+     * manager's id-to-pool mapping (a pre-existing quirk of {@code clear()}, unrelated to this fix) and so can't
+     * reproduce "id not yet known" the way a genuinely fresh load does.
+     */
+    @Test
+    public void testForwardReferenceResolvesOnceTargetIsCreated() {
+        long futureId = entityManager.getNextId();
+        EntityRef entityRef = new LazyLoadEntityRef(entityManager, futureId);
+
+        // Nothing has been created with this id yet - must not resolve to a dead stub.
+        assertFalse(entityRef.exists());
+
+        // The next entity created is assigned futureId, exactly as if it were deserialized moments later in the
+        // same batch that already handed out a reference to it.
+        EntityRef created = entityManager.create();
+        created.addComponent(new IntegerComponent(42));
+        assertEquals(futureId, created.getId());
+
+        assertTrue(entityRef.exists());
+        assertEquals(futureId, entityRef.getId());
+        assertEquals(42, entityRef.getComponent(IntegerComponent.class).value);
     }
 
     private EntityRef serializeDeserializeEntity(EntityRef entity) {
