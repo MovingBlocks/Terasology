@@ -3,6 +3,7 @@
 package org.terasology.engine.logic.behavior.asset;
 
 import com.google.common.base.Charsets;
+import com.google.gson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -53,6 +54,12 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
         }
         try (InputStream stream = list.get(0).openStream()) {
             return load(stream);
+        } catch (JsonParseException e) {
+            // Gestalt only isolates a single asset's load failure (logs it, returns Optional.empty()) for
+            // *checked* exceptions - an unchecked JsonParseException would instead propagate all the way out
+            // and abort whatever triggered the load (e.g. crash the whole game on startup, see #5099).
+            // Rethrowing as the IOException this method already declares routes it through that safety net.
+            throw new IOException("Malformed behavior tree asset '" + resourceUrn + "': " + e.getMessage(), e);
         }
     }
 
