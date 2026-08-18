@@ -264,7 +264,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 break;
             }
         }
-        lateLightMerger.processPending();
+        lateLightMerger.processPending(processingStartTime, UPDATE_PROCESSING_DEADLINE_MS);
     }
 
     private void deactivateBlocks() {

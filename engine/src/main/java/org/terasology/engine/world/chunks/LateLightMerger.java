@@ -37,13 +37,6 @@ import java.util.Set;
  * WorldProviderCoreImpl.processPropagation()}) also runs on the main thread rather than in parallel.
  */
 public final class LateLightMerger {
-    /**
-     * Per-tick budget for {@link #processPending}, in the spirit of the ready-chunk drain loop it runs
-     * alongside. Merging a position re-propagates light across a full 3x3x3 of chunks, which is not
-     * free, and a single newly-ready chunk can complete several neighbourhoods at once (see {@link
-     * #chunkReady}), so this is drained gradually rather than all at once.
-     */
-    private static final int PROCESSING_DEADLINE_MS = 24;
     private static final Logger logger = LoggerFactory.getLogger(LateLightMerger.class);
 
     private final Map<Vector3ic, Chunk> chunkCache;
@@ -96,23 +89,42 @@ public final class LateLightMerger {
     }
 
     /**
-     * Drain queued merges until {@link #PROCESSING_DEADLINE_MS} of wall-clock time has been spent.
+     * Drain queued merges with whatever is left of this tick's chunk-work budget.
+     * <p>
+     * The caller passes the time its own tick started and the budget for the whole of it, rather than
+     * this starting a fresh clock. Two independent budgets in one {@code update()} would not bound
+     * anything: the ready-chunk drain ahead of this can spend the full allowance and merging then
+     * spends it again, so the tick costs twice what either says - 48ms against a 16.7ms frame at
+     * 60fps. That matters more here than it would elsewhere, because merging used to run on pipeline
+     * threads and this moved it onto the main thread, so it adds to frame time rather than
+     * overlapping with it.
+     * <p>
+     * A tick whose budget is already gone therefore merges nothing further and catches up later. That
+     * is the right way round: becoming visible is what the player is waiting on, and correcting the
+     * lighting behind it is the deferrable half.
+     * <p>
+     * One merge always runs before the budget is consulted, deliberately. The ready-chunk drain
+     * routinely spends the entire allowance during a world load - it logs "took too long" for tick
+     * after consecutive tick while its backlog comes down - so testing the budget first would find it
+     * already gone every time and merge nothing at all for the whole load. That is not deferral, it
+     * is starvation: lighting would never be corrected for as long as chunks keep arriving, which
+     * while exploring is continuously. Overshooting by a single bounded merge is the cost of
+     * guaranteeing forward progress.
      */
-    public void processPending() {
-        long processingStartTime = System.currentTimeMillis();
+    public void processPending(long tickStartTime, int tickBudgetMs) {
         Vector3ic pos;
         while ((pos = readyToMerge.poll()) != null) {
             readyToMergeSet.remove(pos);
             mergeAt(pos);
-            long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
-            if (!readyToMerge.isEmpty() && totalProcessingTime > PROCESSING_DEADLINE_MS) {
+            long totalProcessingTime = System.currentTimeMillis() - tickStartTime;
+            if (!readyToMerge.isEmpty() && totalProcessingTime > tickBudgetMs) {
                 // Debug, not warn, unlike the ready-chunk drain this sits beside: there, overrunning
                 // the budget means cheap per-chunk work took implausibly long and something is wrong.
                 // Here a backlog is the designed steady state - merging is expensive and world
                 // generation queues it faster than a frame can absorb - so warning would fire every
                 // tick for the whole of a normal world load.
                 logger.debug("Light merging hit its budget this tick ({}/{}ms). {} positions remain.",
-                        totalProcessingTime, PROCESSING_DEADLINE_MS, readyToMerge.size());
+                        totalProcessingTime, tickBudgetMs, readyToMerge.size());
                 break;
             }
         }

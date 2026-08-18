@@ -87,7 +87,9 @@ class LateLightMergerTest extends TerasologyTestingEnvironment {
         Chunk removedNeighbour = chunkCache.remove(missingNeighbour);
         merger.chunkUnloaded(missingNeighbour);
 
-        merger.processPending();
+        // A budget this test can never hit, so the drain runs to completion and the assertions below
+        // are about the bookkeeping rather than about how much of it one tick got through.
+        merger.processPending(System.currentTimeMillis(), Integer.MAX_VALUE);
 
         // mergeAt() must have found the hole and backed off rather than merging with it.
         assertThat(chunkCache.get(center).isDirty()).isFalse();
@@ -97,7 +99,9 @@ class LateLightMergerTest extends TerasologyTestingEnvironment {
         // recover it and the assertions below would fail.
         chunkCache.put(new Vector3i(missingNeighbour), removedNeighbour);
         merger.chunkReady(missingNeighbour);
-        merger.processPending();
+        // A budget this test can never hit, so the drain runs to completion and the assertions below
+        // are about the bookkeeping rather than about how much of it one tick got through.
+        merger.processPending(System.currentTimeMillis(), Integer.MAX_VALUE);
 
         // The seeded light has now propagated into the center chunk, which is both the proof that
         // mergeAt() ran for it and the reason ChunkMeshWorker will re-mesh it.

@@ -50,6 +50,14 @@ import java.util.function.Consumer;
  */
 public class RemoteChunkProvider implements ChunkProvider {
 
+    /**
+     * Main-thread budget for a tick's chunk work, matching {@code LocalChunkProvider}. Only light
+     * merging consults it - the ready-chunk drain below has never been bounded here, unlike the local
+     * provider's - but merging has to be bounded by the tick rather than by a clock of its own, or a
+     * tick's two budgets stack. See {@link LateLightMerger#processPending}.
+     */
+    private static final int UPDATE_PROCESSING_DEADLINE_MS = 24;
+
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<Vector3ic> invalidateChunks = Queues.newLinkedBlockingQueue();
     private final Map<Vector3ic, Chunk> chunkCache = Maps.newHashMap();
@@ -93,6 +101,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             checkForUnload();
         }
         Chunk chunk;
+        long processingStartTime = System.currentTimeMillis();
         while ((chunk = readyChunks.poll()) != null) {
             Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
             if (oldChunk != null) {
@@ -107,7 +116,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             }
             worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         }
-        lateLightMerger.processPending();
+        lateLightMerger.processPending(processingStartTime, UPDATE_PROCESSING_DEADLINE_MS);
     }
 
     private void checkForUnload() {
