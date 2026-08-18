@@ -91,7 +91,10 @@ public final class LightMerger {
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks,
                 LIGHT_RULES, willSelfCorrect)));
-        PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, SUNLIGHT_REGEN_RULES, willSelfCorrect);
+        // Regen is the one quantity here that no mesh samples, so its writes mark nothing dirty - see
+        // LocalChunkView.withoutDirtyMarking. It still drives sunlight, which does reach meshes and
+        // does mark, through sunlightWorldView below.
+        PropagatorWorldView regenWorldView = LocalChunkView.withoutDirtyMarking(localChunks, SUNLIGHT_REGEN_RULES);
         PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
         PropagatorWorldView sunlightWorldView = new LocalChunkView(localChunks, sunlightRules, willSelfCorrect);
         BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);

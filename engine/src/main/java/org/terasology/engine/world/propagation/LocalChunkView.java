@@ -21,11 +21,12 @@ public class LocalChunkView implements PropagatorWorldView {
     private PropagationRules rules;
     private Chunk[] chunks;
     private final Predicate<Vector3ic> willSelfCorrect;
+    private final boolean writesReachMeshes;
 
     private final Vector3i topLeft = new Vector3i();
 
     public LocalChunkView(Chunk[] chunks, PropagationRules rules) {
-        this(chunks, rules, pos -> false);
+        this(chunks, rules, pos -> false, true);
     }
 
     /**
@@ -35,9 +36,34 @@ public class LocalChunkView implements PropagatorWorldView {
      *         knowledge should pass {@code pos -> false} - always mark, the safe default.
      */
     public LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect) {
+        this(chunks, rules, willSelfCorrect, true);
+    }
+
+    /**
+     * A view whose writes never mark anything dirty, for propagating a quantity no mesh samples.
+     * <p>
+     * Dirty exists only to make {@code ChunkMeshWorker} re-mesh a chunk - it and
+     * {@code RenderableWorldImpl} are the engine's only readers of {@link Chunk#isDirty()}. Mesh
+     * generation samples {@code getSunlight} and {@code getLight} and nothing else (see
+     * {@code BlockMeshPart.appendLightData}), so a view over {@code SunlightRegenPropagationRules},
+     * whose {@code setValue} writes only {@code setSunlightRegen}, has nothing to mark for.
+     * <p>
+     * Not an optimization: measured, regen dirties no chunk that sunlight has not already dirtied, so
+     * dropping these marks changes no re-mesh count. It is here to keep the flag meaning what it says.
+     * <p>
+     * Sunlight itself still marks - regen feeds the sunlight propagator, whose own view marks for any
+     * sunlight it actually changes.
+     */
+    public static LocalChunkView withoutDirtyMarking(Chunk[] chunks, PropagationRules rules) {
+        return new LocalChunkView(chunks, rules, pos -> false, false);
+    }
+
+    private LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect,
+                           boolean writesReachMeshes) {
         this.chunks = chunks;
         this.rules = rules;
         this.willSelfCorrect = willSelfCorrect;
+        this.writesReachMeshes = writesReachMeshes;
         topLeft.set(chunks[0].getPosition());
     }
 
@@ -105,6 +131,9 @@ public class LocalChunkView implements PropagatorWorldView {
         if (chunk != null) {
             Vector3i relative = Chunks.toRelative(pos, new Vector3i());
             rules.setValue(chunk, relative, value);
+            if (!writesReachMeshes) {
+                return;
+            }
             chunk.setDirty(true);
             // Only a write within a block of a face can affect a neighbour's mesh, and in a 32x64x32
             // chunk the overwhelming majority of writes are interior. This is the innermost loop of

@@ -133,6 +133,25 @@ class LocalChunkViewTest extends TerasologyTestingEnvironment {
         assertThat(chunkAt(chunks, new Vector3i(0, 0, 0)).isDirty()).isTrue();
     }
 
+    /**
+     * A view built for a quantity no mesh samples must write the value but mark nothing - dirty only
+     * ever causes a re-mesh. See {@code LocalChunkView#withoutDirtyMarking}, and {@code
+     * LightMerger.merge}, which uses it for sunlight regen.
+     */
+    @Test
+    void viewWithoutDirtyMarkingWritesButDoesNotMark() {
+        Chunk[] chunks = sortedNeighbourhoodAround(new Vector3i(0, 0, 0));
+        LocalChunkView view = LocalChunkView.withoutDirtyMarking(chunks, new LightPropagationRules());
+        Arrays.stream(chunks).forEach(c -> c.setDirty(false));
+
+        // On a boundary, so it would otherwise mark both the written chunk and its +X neighbour.
+        view.setValueAt(new Vector3i(Chunks.SIZE_X - 1, Chunks.SIZE_Y / 2, Chunks.SIZE_Z / 2), (byte) 15);
+
+        assertThat(chunkAt(chunks, new Vector3i(0, 0, 0))
+                .getLight(Chunks.SIZE_X - 1, Chunks.SIZE_Y / 2, Chunks.SIZE_Z / 2)).isEqualTo((byte) 15);
+        Arrays.stream(chunks).forEach(c -> assertThat(c.isDirty()).isFalse());
+    }
+
     private static Chunk chunkAt(Chunk[] chunks, Vector3ic pos) {
         return Arrays.stream(chunks).filter(c -> c.getPosition().equals(pos)).findFirst().orElseThrow();
     }
