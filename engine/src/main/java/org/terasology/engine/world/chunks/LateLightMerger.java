@@ -7,6 +7,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.world.propagation.LocalChunkView;
 import org.terasology.engine.world.propagation.light.LightMerger;
 
 import java.util.ArrayDeque;
@@ -54,6 +55,13 @@ public final class LateLightMerger {
      * (not cheap) - see {@link #processPending}.
      */
     private final Deque<Vector3ic> readyToMerge = new ArrayDeque<>();
+    /**
+     * Same membership as {@link #readyToMerge}, kept as a second copy purely for O(1) {@code contains}.
+     * {@link #mergeAt} tests this once per boundary write in {@link LocalChunkView}'s innermost loop, so
+     * an {@code ArrayDeque} scan there would trade one cost for a worse one. Mutated in lockstep with
+     * {@link #readyToMerge} everywhere the latter is.
+     */
+    private final Set<Vector3ic> readyToMergeSet = Sets.newHashSet();
 
     public LateLightMerger(Map<Vector3ic, Chunk> chunkCache) {
         this.chunkCache = chunkCache;
@@ -73,6 +81,7 @@ public final class LateLightMerger {
             if (needsMerging.contains(candidate) && hasFullNeighbourhood(candidate)) {
                 needsMerging.remove(candidate);
                 readyToMerge.add(candidate);
+                readyToMergeSet.add(candidate);
             }
         }
     }
@@ -93,6 +102,7 @@ public final class LateLightMerger {
         long processingStartTime = System.currentTimeMillis();
         Vector3ic pos;
         while ((pos = readyToMerge.poll()) != null) {
+            readyToMergeSet.remove(pos);
             mergeAt(pos);
             long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
             if (!readyToMerge.isEmpty() && totalProcessingTime > PROCESSING_DEADLINE_MS) {
@@ -135,18 +145,24 @@ public final class LateLightMerger {
         // Deliberately not marking the whole neighbourhood here instead: a chunk belongs to 27 of
         // them, so that re-meshes each chunk many times over during a world load - enough to exhaust
         // the heap in mesh generation - and most of those merges never touch its light at all.
-        LightMerger.merge(chunks);
+        //
+        // A neighbour already queued in readyToMergeSet needs no boundary mark from this merge either:
+        // its own merge, due imminently, writes and marks it the same way as any other centre. See
+        // LocalChunkView's willSelfCorrect.
+        LightMerger.merge(chunks, readyToMergeSet::contains);
     }
 
     /** Drop any bookkeeping for {@code pos}. Call on unload, or edge positions leak forever. */
     public void chunkUnloaded(Vector3ic pos) {
         needsMerging.remove(pos);
         readyToMerge.remove(pos);
+        readyToMergeSet.remove(pos);
     }
 
     /** Discard all bookkeeping, e.g. when the world is purged or the provider restarts. */
     public void clear() {
         needsMerging.clear();
         readyToMerge.clear();
+        readyToMergeSet.clear();
     }
 }

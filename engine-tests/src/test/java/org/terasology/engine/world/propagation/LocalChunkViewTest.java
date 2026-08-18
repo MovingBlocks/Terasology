@@ -95,4 +95,45 @@ class LocalChunkViewTest extends TerasologyTestingEnvironment {
         view.setValueAt(outside, (byte) 15);
         Arrays.stream(chunks).forEach(c -> assertThat(c.getLight(0, 0, 0)).isEqualTo((byte) 0));
     }
+
+    /**
+     * A write on the shared face between the centre chunk and its +X neighbour must dirty both, with
+     * the default constructor - no chunk is ever exempted as self-correcting.
+     * <p>
+     * The write lands mid-face (not a corner) so only those two chunks are in range: see {@link
+     * #selfCorrectingNeighbourIsNotDirtiedAcrossBoundary}, which relies on that same write touching
+     * exactly one neighbour.
+     */
+    @Test
+    void boundaryWriteDirtiesTheAdjacentNeighbourByDefault() {
+        Chunk[] chunks = sortedNeighbourhoodAround(new Vector3i(0, 0, 0));
+        LocalChunkView view = new LocalChunkView(chunks, new LightPropagationRules());
+        Arrays.stream(chunks).forEach(c -> c.setDirty(false));
+
+        view.setValueAt(new Vector3i(Chunks.SIZE_X - 1, Chunks.SIZE_Y / 2, Chunks.SIZE_Z / 2), (byte) 15);
+
+        assertThat(chunkAt(chunks, new Vector3i(1, 0, 0)).isDirty()).isTrue();
+    }
+
+    /**
+     * The same boundary write as above must not dirty the +X neighbour when the caller marks it as
+     * already queued for a merge of its own - see {@code LateLightMerger#readyToMergeSet}. The centre
+     * chunk, which is not in that set, is still dirtied: only the neighbour is exempt.
+     */
+    @Test
+    void selfCorrectingNeighbourIsNotDirtiedAcrossBoundary() {
+        Chunk[] chunks = sortedNeighbourhoodAround(new Vector3i(0, 0, 0));
+        Vector3ic selfCorrecting = new Vector3i(1, 0, 0);
+        LocalChunkView view = new LocalChunkView(chunks, new LightPropagationRules(), selfCorrecting::equals);
+        Arrays.stream(chunks).forEach(c -> c.setDirty(false));
+
+        view.setValueAt(new Vector3i(Chunks.SIZE_X - 1, Chunks.SIZE_Y / 2, Chunks.SIZE_Z / 2), (byte) 15);
+
+        assertThat(chunkAt(chunks, selfCorrecting).isDirty()).isFalse();
+        assertThat(chunkAt(chunks, new Vector3i(0, 0, 0)).isDirty()).isTrue();
+    }
+
+    private static Chunk chunkAt(Chunk[] chunks, Vector3ic pos) {
+        return Arrays.stream(chunks).filter(c -> c.getPosition().equals(pos)).findFirst().orElseThrow();
+    }
 }

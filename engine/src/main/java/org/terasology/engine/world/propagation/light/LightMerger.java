@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Merging light in chunks
@@ -68,6 +69,15 @@ public final class LightMerger {
      *         chunk} not in center of {@code localChunks}
      */
     public static Chunk merge(Chunk[] localChunks) {
+        return merge(localChunks, pos -> false);
+    }
+
+    /**
+     * As {@link #merge(Chunk[])}, but {@code willSelfCorrect} lets the caller identify neighbouring
+     * chunk positions that do not need an explicit boundary dirty-mark from this merge because they
+     * are already queued for a merge of their own - see {@link LocalChunkView}.
+     */
+    public static Chunk merge(Chunk[] localChunks, Predicate<Vector3ic> willSelfCorrect) {
         Preconditions.checkArgument(localChunks.length == LOCAL_CHUNKS_ARRAY_LENGTH,
                 "Length of parameter [localChunks] must be equals [" + LOCAL_CHUNKS_ARRAY_LENGTH + "]");
         Preconditions.checkArgument(Arrays.stream(localChunks).noneMatch(Objects::isNull), "Parameter [localChunks] " +
@@ -80,10 +90,10 @@ public final class LightMerger {
 
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks,
-                LIGHT_RULES)));
-        PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, SUNLIGHT_REGEN_RULES);
+                LIGHT_RULES, willSelfCorrect)));
+        PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, SUNLIGHT_REGEN_RULES, willSelfCorrect);
         PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
-        PropagatorWorldView sunlightWorldView = new LocalChunkView(localChunks, sunlightRules);
+        PropagatorWorldView sunlightWorldView = new LocalChunkView(localChunks, sunlightRules, willSelfCorrect);
         BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
         propagators.add(new SunlightRegenBatchPropagator(SUNLIGHT_REGEN_RULES, regenWorldView, sunlightPropagator,
                 sunlightWorldView));
