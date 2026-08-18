@@ -21,8 +21,8 @@ javaPlatform {
 
 dependencies {
     // This platform depends on each of its subprojects.
-    subprojects.forEach {
-        api(project(it.path))
+    subprojects.forEach { subproject ->
+        api(project(subproject.path))
     }
 }
 
