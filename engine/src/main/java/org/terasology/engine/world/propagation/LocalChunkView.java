@@ -8,6 +8,8 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
 
+import java.util.function.Predicate;
+
 /**
  * Provides a simple view over some chunks using a propagation rule.
  */
@@ -18,12 +20,50 @@ public class LocalChunkView implements PropagatorWorldView {
 
     private PropagationRules rules;
     private Chunk[] chunks;
+    private final Predicate<Vector3ic> willSelfCorrect;
+    private final boolean writesReachMeshes;
 
     private final Vector3i topLeft = new Vector3i();
 
     public LocalChunkView(Chunk[] chunks, PropagationRules rules) {
+        this(chunks, rules, pos -> false, true);
+    }
+
+    /**
+     * @param willSelfCorrect tells {@link #markDirtyAcrossBoundary} which neighbouring chunk positions
+     *         it can skip marking: those already queued for a merge of their own, which will mark and
+     *         remesh themselves shortly regardless of what this merge does. A caller with no such
+     *         knowledge should pass {@code pos -> false} - always mark, the safe default.
+     */
+    public LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect) {
+        this(chunks, rules, willSelfCorrect, true);
+    }
+
+    /**
+     * A view whose writes never mark anything dirty, for propagating a quantity no mesh samples.
+     * <p>
+     * Dirty exists only to make {@code ChunkMeshWorker} re-mesh a chunk - it and
+     * {@code RenderableWorldImpl} are the engine's only readers of {@link Chunk#isDirty()}. Mesh
+     * generation samples {@code getSunlight} and {@code getLight} and nothing else (see
+     * {@code BlockMeshPart.appendLightData}), so a view over {@code SunlightRegenPropagationRules},
+     * whose {@code setValue} writes only {@code setSunlightRegen}, has nothing to mark for.
+     * <p>
+     * Not an optimization: measured, regen dirties no chunk that sunlight has not already dirtied, so
+     * dropping these marks changes no re-mesh count. It is here to keep the flag meaning what it says.
+     * <p>
+     * Sunlight itself still marks - regen feeds the sunlight propagator, whose own view marks for any
+     * sunlight it actually changes.
+     */
+    public static LocalChunkView withoutDirtyMarking(Chunk[] chunks, PropagationRules rules) {
+        return new LocalChunkView(chunks, rules, pos -> false, false);
+    }
+
+    private LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect,
+                           boolean writesReachMeshes) {
         this.chunks = chunks;
         this.rules = rules;
+        this.willSelfCorrect = willSelfCorrect;
+        this.writesReachMeshes = writesReachMeshes;
         topLeft.set(chunks[0].getPosition());
     }
 
@@ -91,6 +131,9 @@ public class LocalChunkView implements PropagatorWorldView {
         if (chunk != null) {
             Vector3i relative = Chunks.toRelative(pos, new Vector3i());
             rules.setValue(chunk, relative, value);
+            if (!writesReachMeshes) {
+                return;
+            }
             chunk.setDirty(true);
             // Only a write within a block of a face can affect a neighbour's mesh, and in a 32x64x32
             // chunk the overwhelming majority of writes are interior. This is the innermost loop of
@@ -121,10 +164,12 @@ public class LocalChunkView implements PropagatorWorldView {
      * B's mesh is exactly what shades that solid face. That is the ordinary case at a terrain
      * surface.
      * <p>
-     * Mostly this only shortens the life of a transient artifact, since B is corrected anyway once it
-     * is merged as a centre in its own right. It matters at the edge of the loaded world, where a
-     * chunk whose neighbourhood never completes is never merged as a centre and would otherwise keep
-     * a stale face indefinitely - which is precisely the case this whole change exists to handle.
+     * A candidate B is skipped, though, when {@link #willSelfCorrect} says B is already queued for a
+     * merge of its own: that merge writes through this same code as B's own centre, and marks and
+     * remeshes B regardless of what this one does. Marking B here too would only remesh it twice for
+     * one lighting change. B still gets the explicit mark when it is not queued - either because it
+     * was already centred earlier (no further merge coming to catch this write) or its own
+     * neighbourhood is still incomplete and may never finish, e.g. the edge of the loaded world.
      * <p>
      * The expansion is one block and no more: a write reaches at most 2, 4 or 8 chunks. Marking all
      * 27 speculatively from the caller instead is what exhausted the heap in mesh generation.
@@ -147,7 +192,7 @@ public class LocalChunkView implements PropagatorWorldView {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Chunk affected = chunks[z + LOCAL_CHUNKS_SIDE_LENGTH * (y + LOCAL_CHUNKS_SIDE_LENGTH * x)];
-                    if (affected != null) {
+                    if (affected != null && !willSelfCorrect.test(affected.getPosition())) {
                         affected.setDirty(true);
                     }
                 }
