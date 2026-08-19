@@ -111,6 +111,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private float lookYaw;
     private double lookYawDelta;
 
+    // Tracks whether the most recently sent CharacterMoveInputEvent already reported "nothing is
+    // happening" (see processInput) - lets us skip re-sending an identical no-op event every single
+    // tick while idle, per #4993, while still sending the one event that marks the transition into
+    // idle so the server's own periodic "repeat last input" fallback has a state to continue from.
+    private boolean sentIdleInput;
+    private boolean lastSentRun = run;
+    private boolean lastSentCrouch = crouch;
+
     @In
     private Time time;
 
@@ -148,6 +156,19 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             lookPitchDelta = 0;
             lookYawDelta = 0;
             jump = false;
+            // Force the first tick after refocus to send, whatever it finds.
+            sentIdleInput = false;
+            return;
+        }
+
+        boolean hasMovementOrLookInput = relativeMovement.x != 0 || relativeMovement.y != 0 || relativeMovement.z != 0
+                || lookYawDelta != 0 || lookPitchDelta != 0 || jump;
+        boolean toggleStateChanged = run != lastSentRun || crouch != lastSentCrouch;
+        if (!hasMovementOrLookInput && !toggleStateChanged && sentIdleInput) {
+            // Nothing changed since the last (already-sent) idle tick. ServerCharacterPredictionSystem's
+            // own periodic "repeat last input" fallback (~every 50ms, see MAX_INPUT_UNDERFLOW) keeps
+            // gravity and physics ticking for this character from the last sent state without us having
+            // to re-send an identical no-op event every single frame. See #4993.
             return;
         }
 
@@ -178,6 +199,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (relMove.isFinite()) {
             entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch,
                     jump, time.getGameDeltaInMs()));
+            sentIdleInput = !hasMovementOrLookInput && !toggleStateChanged;
+            lastSentRun = run;
+            lastSentCrouch = crouch;
         }
         jump = false;
     }
