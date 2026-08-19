@@ -118,6 +118,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private boolean sentIdleInput;
     private boolean lastSentRun = run;
     private boolean lastSentCrouch = crouch;
+    // setRotation() (SetDirectionEvent) sets lookPitch/lookYaw directly rather than going through
+    // lookPitchDelta/lookYawDelta, so the delta fields alone can't detect that kind of view change.
+    private float lastSentLookPitch = lookPitch;
+    private float lastSentLookYaw = lookYaw;
 
     @In
     private Time time;
@@ -164,7 +168,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         boolean hasMovementOrLookInput = relativeMovement.x != 0 || relativeMovement.y != 0 || relativeMovement.z != 0
                 || lookYawDelta != 0 || lookPitchDelta != 0 || jump;
         boolean toggleStateChanged = run != lastSentRun || crouch != lastSentCrouch;
-        if (!hasMovementOrLookInput && !toggleStateChanged && sentIdleInput) {
+        // setRotation() can move lookPitch/lookYaw directly between ticks, outside of lookPitchDelta/
+        // lookYawDelta - catch that here too, or a SetDirectionEvent arriving while otherwise idle
+        // would silently never reach the server.
+        boolean absoluteViewChanged = Float.compare(lookPitch, lastSentLookPitch) != 0
+                || Float.compare(lookYaw, lastSentLookYaw) != 0;
+        if (!hasMovementOrLookInput && !toggleStateChanged && !absoluteViewChanged && sentIdleInput) {
             // Nothing changed since the last (already-sent) idle tick. ServerCharacterPredictionSystem's
             // own periodic "repeat last input" fallback (~every 50ms, see MAX_INPUT_UNDERFLOW) keeps
             // gravity and physics ticking for this character from the last sent state without us having
@@ -202,6 +211,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             sentIdleInput = !hasMovementOrLookInput && !toggleStateChanged;
             lastSentRun = run;
             lastSentCrouch = crouch;
+            lastSentLookPitch = lookPitch;
+            lastSentLookYaw = lookYaw;
         }
         jump = false;
     }
@@ -258,6 +269,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             // the correct location.
             lookYaw = 0f;
             lookPitch = 0f;
+            // sentIdleInput may still be true from a previous character entity's idle streak (e.g.
+            // after death and respawn) - reset it so the new entity's first event always sends,
+            // instead of being mistaken for a repeat of an idle tick it never actually had.
+            sentIdleInput = false;
             update(0);
         }
     }
