@@ -29,12 +29,18 @@ import java.util.Set;
  * Shared by {@code LocalChunkProvider} and {@code RemoteChunkProvider}, which otherwise need
  * byte-for-byte the same bookkeeping over their own {@code chunkCache}. {@link #chunkReady} and {@link
  * #processPending} are meant to be called only from the owning provider's {@code update()} - always the
- * same thread, so no internal synchronization here. That matters beyond tidiness: merging now touches
- * chunks that are live, not chunks only the pipeline can see. The renderer may be tessellating them on
- * another thread, and deflated light storage can reallocate on write, so a concurrent merge would not be
- * merely a stale-value glitch. Running on the thread that already owns {@code chunkCache} sidesteps
- * that, mirroring how runtime light propagation for block changes ({@code
- * WorldProviderCoreImpl.processPropagation()}) also runs on the main thread rather than in parallel.
+ * same thread, so no internal synchronization guards the bookkeeping fields here (needsMerging,
+ * readyToMerge, readyToMergeSet).
+ * <p>
+ * The actual chunk light data is a different matter: merging touches chunks that are live, not chunks
+ * only the pipeline can see. The renderer tessellates them concurrently on other threads
+ * ({@code ChunkMeshWorker}), and deflated light storage ({@code TeraSparseArray8Bit}) reallocates its
+ * backing arrays on write as two separate, unsynchronized field writes - a reader on another thread can
+ * observe one updated and not the other. Running the merge itself on a single thread does not prevent
+ * that; it only rules out two merges racing each other. {@link ChunkLightLocks} is what actually guards
+ * this: {@link #mergeAt} locks its neighbourhood for the write, {@code ChunkMeshWorker} locks its own
+ * for the read - per chunk position, not one lock for everything, so merging a chunk on the far side of
+ * the world doesn't stall meshing one in front of the camera.
  */
 public final class LateLightMerger {
     private static final Logger logger = LoggerFactory.getLogger(LateLightMerger.class);
@@ -161,7 +167,7 @@ public final class LateLightMerger {
         // A neighbour already queued in readyToMergeSet needs no boundary mark from this merge either:
         // its own merge, due imminently, writes and marks it the same way as any other centre. See
         // LocalChunkView's willSelfCorrect.
-        LightMerger.merge(chunks, readyToMergeSet::contains);
+        ChunkLightLocks.withWriteLocks(neighbourhood, () -> LightMerger.merge(chunks, readyToMergeSet::contains));
     }
 
     /** Drop any bookkeeping for {@code pos}. Call on unload, or edge positions leak forever. */

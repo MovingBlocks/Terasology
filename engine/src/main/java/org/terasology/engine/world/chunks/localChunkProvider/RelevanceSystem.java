@@ -5,6 +5,8 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -46,6 +48,7 @@ import java.util.stream.StreamSupport;
  */
 public class RelevanceSystem implements UpdateSubscriberSystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(RelevanceSystem.class);
     private static final Vector3i UNLOAD_LEEWAY = new Vector3i(1, 1, 1);
     private final ReadWriteLock regionLock = new ReentrantReadWriteLock();
     private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
@@ -129,13 +132,32 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
             for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
                 chunkRelevanceRegion.update();
                 if (chunkRelevanceRegion.isDirty()) {
+                    long debugStart = logger.isDebugEnabled() ? System.nanoTime() : 0;
+                    int debugScanned = 0;
+                    int debugAlreadyLoaded = 0;
+                    int debugRequested = 0;
                     for (Vector3i pos : chunkRelevanceRegion.getNeededChunks()) {
+                        debugScanned++;
                         Chunk chunk = chunkProvider.getChunk(pos);
                         if (chunk != null) {
+                            debugAlreadyLoaded++;
                             chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
-                        } else {
+                        } else if (!chunkProvider.isPendingActivation(pos)) {
+                            // Not in the cache yet, but also not simply un-requested: it may already
+                            // be sitting fully processed in the pipeline's "ready" queue, waiting for
+                            // LocalChunkProvider#update to drain it. getChunk() can't see that state,
+                            // so without this check a wide-enough drain backlog (readyChunks running
+                            // into the hundreds/thousands under load) meant this loop kept re-requesting
+                            // - and regenerating - the same still-pending chunk on every dirty update.
+                            debugRequested++;
                             chunkProvider.createOrLoadChunk(pos);
                         }
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("perfProbe updateRelevance: {}us, scanned={}, alreadyLoaded={}, requested={}, "
+                                        + "regionVolume={}",
+                                (System.nanoTime() - debugStart) / 1000, debugScanned, debugAlreadyLoaded, debugRequested,
+                                chunkRelevanceRegion.getCurrentRegion().volume());
                     }
                     chunkRelevanceRegion.setUpToDate();
                 }
@@ -185,7 +207,8 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                             if (chunk != null) {
                                 region.checkIfChunkIsRelevant(chunk);
                                 // return Futures.immediateFuture(chunk);
-                            } else {
+                            } else if (!chunkProvider.isPendingActivation(pos)) {
+                                // See the equivalent check in updateRelevance() for why.
                                 chunkProvider.createOrLoadChunk(pos); // return this
                             }
                         }

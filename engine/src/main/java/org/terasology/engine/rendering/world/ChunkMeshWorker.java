@@ -16,7 +16,9 @@ import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkLightLocks;
 import org.terasology.engine.world.chunks.RenderableChunk;
+import org.terasology.engine.world.propagation.light.LightMerger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -166,9 +168,17 @@ public final class ChunkMeshWorker {
             chunk.setDirty(false);
             ChunkView chunkView = worldProvider.getLocalView(chunk.getPosition());
             if (chunkView != null && chunkView.isValidView()) {
-                ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                ChunkMonitor.fireChunkTessellated(chunk, newMesh);
-                return Mono.just(Tuples.of(chunk, newMesh));
+                // Tessellation reads light data (this chunk's and its neighbours', via chunkView) that
+                // LateLightMerger writes concurrently on another thread - see LateLightMerger's class
+                // doc and ChunkLightLocks for why this has to be locked, not just read. A read lock:
+                // this is the only reader-side user, so it only ever contends against an actual merge
+                // touching this neighbourhood, not against other mesh-worker threads reading elsewhere
+                // (or even the same chunk) at the same time.
+                ChunkMesh[] newMesh = new ChunkMesh[1];
+                ChunkLightLocks.withReadLocks(LightMerger.requiredChunks(chunk.getPosition()),
+                        () -> newMesh[0] = chunkTessellator.generateMesh(chunkView));
+                ChunkMonitor.fireChunkTessellated(chunk, newMesh[0]);
+                return Mono.just(Tuples.of(chunk, newMesh[0]));
             }
             return Mono.empty();
         });

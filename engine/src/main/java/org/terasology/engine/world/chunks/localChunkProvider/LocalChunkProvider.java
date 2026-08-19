@@ -6,6 +6,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -57,6 +58,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -88,6 +90,13 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final int UPDATE_PROCESSING_DEADLINE_MS = 24;
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
+    // Positions currently sitting in readyChunks, generated/loaded but not yet drained into
+    // chunkCache by update()'s per-frame budget. getChunk(pos) returns null for these too (it only
+    // looks in chunkCache), and readyChunks can back up badly under load (hundreds to low
+    // thousands during fast flight) - without this, anything re-deriving "needed" positions from
+    // getChunk()==null (RelevanceSystem, mainly) would see a position as still missing and request
+    // it all over again, racing a second createOrLoadChunk against the one already sitting here.
+    private final Set<Vector3ic> pendingActivation = Sets.newConcurrentHashSet();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3ic, Chunk> chunkCache;
     private final LateLightMerger lateLightMerger;
@@ -110,6 +119,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private BlockEntityRegistry registry;
 
     private RelevanceSystem relevanceSystem;
+    private long lastPerfProbeLogMs;
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, ExtraBlockDataManager extraDataManager, Config config,
@@ -138,6 +148,7 @@ public class LocalChunkProvider implements ChunkProvider {
         return loadingPipeline.invokeGeneratorTask(
             pos,
             () -> {
+                long debugStart = logger.isDebugEnabled() ? System.nanoTime() : 0;
                 ChunkStore chunkStore = storageManager.loadChunkStore(pos);
                 Chunk chunk;
                 EntityBufferImpl buffer = new EntityBufferImpl();
@@ -145,9 +156,15 @@ public class LocalChunkProvider implements ChunkProvider {
                     chunk = new ChunkImpl(pos, blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
                     generateQueuedEntities.put(chunk.getPosition(), buffer.getAll());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("perfProbe generateChunk: {}us pos={}", (System.nanoTime() - debugStart) / 1000, pos);
+                    }
                 } else {
                     chunk = chunkStore.getChunk();
                     loadedChunkStores.put(chunk.getPosition(), chunkStore);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("perfProbe loadChunk: {}us pos={}", (System.nanoTime() - debugStart) / 1000, pos);
+                    }
                 }
                 return chunk;
             });
@@ -175,6 +192,25 @@ public class LocalChunkProvider implements ChunkProvider {
         this.worldEntity = worldEntity;
     }
 
+
+    /**
+     * "Chunk ready" pipeline stage: the chunk has finished generating/loading and every later stage, but hasn't
+     * been drained into {@link #chunkCache} yet - see {@link #update()} - so {@link #getChunk} still returns
+     * null for it and {@link #pendingActivation} is the only place that's visible.
+     */
+    private void markChunkReady(Chunk chunk) {
+        pendingActivation.add(chunk.getPosition());
+        readyChunks.add(chunk);
+    }
+
+    /**
+     * Whether {@code pos} has already finished processing and is just waiting for {@link #update()} to drain it
+     * into the chunk cache - i.e. {@link #getChunk} returning null for it doesn't mean it needs to be
+     * (re-)requested via {@link #createOrLoadChunk}.
+     */
+    public boolean isPendingActivation(Vector3ic pos) {
+        return pendingActivation.contains(pos);
+    }
 
     private void processReadyChunk(final Chunk chunk) {
         Vector3ic chunkPos = chunk.getPosition();
@@ -215,7 +251,12 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
         } else {
             PerformanceMonitor.startActivity("Generating queued Entities");
-            generateQueuedEntities.remove(chunkPos).forEach(this::generateQueuedEntities);
+            List<EntityStore> queuedEntities = generateQueuedEntities.remove(chunkPos);
+            if (queuedEntities != null) {
+                queuedEntities.forEach(this::generateQueuedEntities);
+            } else {
+                logger.warn("No queued entities found for newly-generated chunk {} - already consumed?", chunkPos);
+            }
             PerformanceMonitor.endActivity();
 
             // send on activate
@@ -254,8 +295,15 @@ public class LocalChunkProvider implements ChunkProvider {
         checkForUnload();
         Chunk chunk;
 
+        if (logger.isDebugEnabled() && System.currentTimeMillis() - lastPerfProbeLogMs > 1000) {
+            lastPerfProbeLogMs = System.currentTimeMillis();
+            logger.debug("perfProbe occupancy: pipelinePositions={}, readyChunksQueued={}, chunkCacheSize={}",
+                    Iterators.size(loadingPipeline.getProcessingPosition().iterator()), readyChunks.size(), chunkCache.size());
+        }
+
         long processingStartTime = System.currentTimeMillis();
         while ((chunk = readyChunks.poll()) != null) {
+            pendingActivation.remove(chunk.getPosition());
             processReadyChunk(chunk);
             long totalProcessingTime = System.currentTimeMillis() - processingStartTime;
             if (!readyChunks.isEmpty() && totalProcessingTime > UPDATE_PROCESSING_DEADLINE_MS) {
@@ -400,6 +448,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunkCache.clear();
         loadedChunkStores.clear();
         generateQueuedEntities.clear();
+        pendingActivation.clear();
         /*
          * The chunk monitor needs to clear chunk references, so it's important
          * that no new chunk get created
@@ -439,6 +488,7 @@ public class LocalChunkProvider implements ChunkProvider {
         // wrongly restoring entities from the deleted world onto it.
         loadedChunkStores.clear();
         generateQueuedEntities.clear();
+        pendingActivation.clear();
         lateLightMerger.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
@@ -449,7 +499,7 @@ public class LocalChunkProvider implements ChunkProvider {
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+            .addStage(ChunkTaskProvider.create("Chunk ready", this::markChunkReady));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
@@ -479,6 +529,6 @@ public class LocalChunkProvider implements ChunkProvider {
                         ChunkTaskProvider.create("Chunk generate internal lightning",
                                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+                .addStage(ChunkTaskProvider.create("Chunk ready", this::markChunkReady));
     }
 }
