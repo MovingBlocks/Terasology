@@ -4,6 +4,7 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
@@ -49,7 +50,13 @@ public class LazyLoadEntityRef extends EntityRef {
 
     @Override
     public EntityRef copy() {
-        return resolve().copy();
+        EntityRef target = resolve();
+        if (target.exists()) {
+            return target.copy();
+        }
+        // Not resolvable yet - the copy has to stay lazy too, or it freezes into "doesn't exist"
+        // permanently the moment something copies this ref before its target has finished loading.
+        return new LazyLoadEntityRef(entityManager, id);
     }
 
     @Override
@@ -100,6 +107,31 @@ public class LazyLoadEntityRef extends EntityRef {
     @Override
     public void setOwner(EntityRef owner) {
         resolve().setOwner(owner);
+    }
+
+    @Override
+    public void setScope(EntityScope scope) {
+        resolve().setScope(scope);
+    }
+
+    @Override
+    public void setSectorScope(long maxDelta) {
+        resolve().setSectorScope(maxDelta);
+    }
+
+    @Override
+    public void setSectorScope(long unloadedMaxDelta, long loadedMaxDelta) {
+        resolve().setSectorScope(unloadedMaxDelta, loadedMaxDelta);
+    }
+
+    @Override
+    public EntityScope getScope() {
+        return resolve().getScope();
+    }
+
+    @Override
+    public void invalidate() {
+        resolve().invalidate();
     }
 
     @Override
