@@ -147,15 +147,22 @@ public class StateIngame implements GameState {
             worldRenderer.dispose();
             worldRenderer = null;
         }
+
+        // The save started above (waitForCompletionOfPreviousSaveAndStartSaving) runs on a
+        // background scheduler and, as part of serializing entities, sends deactivation events to
+        // ComponentSystems - the same systems componentSystemManager.shutdown() is about to tear
+        // down. Blocking on it here, before any system/entity teardown, keeps that in-flight save
+        // from dispatching events into systems (or entities) that have already been shut down.
+        // See #704.
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
+
         componentSystemManager.shutdown();
 
         context.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
-
-        if (storageManager != null) {
-            storageManager.finishSavingAndShutdown();
-        }
 
         ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
         context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
