@@ -132,8 +132,12 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     @Override
     public boolean pregenerateChunks() {
-        // TODO Auto-generated method stub
-        return false;
+        chunkProvider.update();
+        // force=true: updateChunksInProximity's "did the camera move" shortcut never fires here since the
+        // headless camera position never changes, so a forced full rescan is the only way to learn whether
+        // every chunk in view distance has actually loaded (see #5024).
+        updateChunksInProximity(true);
+        return !pendingChunks;
     }
 
     @Override
