@@ -2,17 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
+import dev.dirs.ProjectDirectories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
+import org.terasology.engine.utilities.OS;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -70,6 +71,25 @@ public class PathManagerTest {
         assertTrue(Files.isDirectory(pathManager.getConfigsPath()));
     }
 
+    /**
+     * The engine previously computed log/shader-log/module-cache paths from the OS-standard dev.dirs
+     * locations unconditionally, ignoring whatever homePath was actually set to - so a caller like
+     * TerasologyLauncher's {@code --homedir} override (portable installs, testing multiple clients
+     * against separate home directories) would still see its logs and cached modules land outside the
+     * directory it asked for. They need to nest under homePath like everything else updateDirs()
+     * computes, exactly as they did before dev.dirs was introduced.
+     */
+    @Test
+    public void overrideHomePathIsRespectedByLogAndModuleCachePaths() {
+        Path homePath = pathManager.getHomePath();
+        assertTrue(pathManager.getLogPath().startsWith(homePath),
+                "Expected log path to nest under the overridden home path: " + pathManager.getLogPath());
+        assertTrue(pathManager.getShaderLogPath().startsWith(homePath),
+                "Expected shader log path to nest under the overridden home path: " + pathManager.getShaderLogPath());
+        assertTrue(pathManager.getModulePaths().stream().anyMatch(path -> path.startsWith(homePath)),
+                "Expected the module cache path to nest under the overridden home path, among: " + pathManager.getModulePaths());
+    }
+
     @Test
     public void getSavePathSanitizesTitle() {
         Path savePath = pathManager.getSavePath("My!World@Test");
@@ -112,67 +132,62 @@ public class PathManagerTest {
     }
 
     @Test
-    @EnabledOnOs(OS.MAC)
-    public void useDefaultHomePathMac(@TempDir Path tempHome) throws IOException {
-        String originalHome = System.getProperty("user.home");
-        try {
-            System.setProperty("user.home", tempHome.toString());
-            pathManager.useDefaultHomePath();
-
-            Path expectedMacPath = tempHome.resolve("Library/Application Support/Terasology");
-            assertEquals(expectedMacPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
-            assertTrue(Files.isDirectory(pathManager.getHomePath()));
-            assertTrue(Files.isDirectory(pathManager.getSavesPath()));
-        } finally {
-            if (originalHome != null) {
-                System.setProperty("user.home", originalHome);
-            } else {
-                System.clearProperty("user.home");
-            }
-        }
-    }
-
-    @Test
-    @EnabledOnOs(OS.LINUX)
-    public void useDefaultHomePathLinux(@TempDir Path tempHome) throws IOException {
-        String originalHome = System.getProperty("user.home");
-        try {
-            System.setProperty("user.home", tempHome.toString());
-            pathManager.useDefaultHomePath();
-
-            Path expectedLinuxPath = tempHome.resolve(".local/share/terasology");
-            assertEquals(expectedLinuxPath.toAbsolutePath(), pathManager.getHomePath().toAbsolutePath());
-            assertTrue(Files.isDirectory(pathManager.getHomePath()));
-            assertTrue(Files.isDirectory(pathManager.getSavesPath()));
-        } finally {
-            if (originalHome != null) {
-                System.setProperty("user.home", originalHome);
-            } else {
-                System.clearProperty("user.home");
-            }
-        }
-    }
-
-    @Test
-    @EnabledOnOs(OS.WINDOWS)
     @Tag("filesystem-side-effects")
-    public void useDefaultHomePathWindows() throws IOException {
-        // Windows relies on JNA (Shell32Util) which directly interrogates the Windows Registry/API.
-        // We cannot easily redirect this to a @TempDir. We only verify that the path resolves to a valid Windows dir.
-        //
-        // This really does create a 'Terasology' folder in the developer's own Saved Games directory,
-        // which is why it is tagged and excluded from `test` and `unitTest`. Run it deliberately with
+    public void useDefaultHomePathResolvesToARealProjectDirectory() throws IOException {
+        // dev.dirs (ProjectDirectories) asks the OS directly (platform APIs on Windows/macOS, XDG env
+        // vars/spec on Linux) rather than going through Java's `user.home` system property, so unlike
+        // the old hand-rolled per-OS logic this replaced, that property can no longer be redirected to
+        // a @TempDir to sandbox this call - every platform now does what only Windows used to: this
+        // really creates a directory in the developer's own OS-standard data location. That's why it's
+        // tagged and excluded from `test`/`unitTest` - run it deliberately with
         // `gradlew :engine-tests:filesystemSideEffectTest`.
-        //
-        // Note the Mac and Linux equivalents above do not need the tag: they redirect `user.home` to a
-        // @TempDir first, which Windows cannot do because the lookup goes through the OS rather than
-        // that property. So this is the one test in the class that escapes its sandbox.
         pathManager.useDefaultHomePath();
-        assertNotNull(pathManager.getHomePath());
 
-        // It should end with Terasology
-        assertTrue(pathManager.getHomePath().toString().endsWith("Terasology"));
-        assertTrue(Files.isDirectory(pathManager.getHomePath()));
+        Path homePath = pathManager.getHomePath();
+        assertNotNull(homePath);
+        assertTrue(homePath.toString().toLowerCase().contains("terasology"),
+                "Expected the default home path to be namespaced under \"terasology\": " + homePath);
+        assertTrue(Files.isDirectory(homePath));
         assertTrue(Files.isDirectory(pathManager.getSavesPath()));
+    }
+
+    /**
+     * Without {@code --homedir} (or a manual pick), logs, the module cache, and configs should each
+     * keep following their own OS-standard location ({@code $XDG_STATE_HOME}/dataLocalDir, cacheDir,
+     * configDir) instead of always nesting under homePath (dataDir) - homePath overriding everything
+     * is only supposed to kick in once something actually overrides homePath. Both need to hold: the
+     * override still relocates everything when used, and leaving it alone still gets the OS-standard
+     * split.
+     */
+    @Test
+    @Tag("filesystem-side-effects")
+    public void defaultHomePathKeepsLogCacheAndConfigsOnTheirOwnOsStandardLocations() throws IOException {
+        pathManager.useDefaultHomePath();
+
+        ProjectDirectories projectDirs = ProjectDirectories.from("org", "terasology", "terasology");
+        Path expectedCacheBase = Paths.get(projectDirs.cacheDir);
+        Path expectedConfigBase = Paths.get(projectDirs.configDir);
+        // Logs are state, not data: on Linux that's $XDG_STATE_HOME, not dataLocalDir - dev.dirs
+        // itself has no state_dir field to compare against, so mirror PathManager's own fallback here.
+        Path expectedLogBase;
+        if (OS.get() == OS.LINUX) {
+            String xdgStateHome = System.getenv("XDG_STATE_HOME");
+            Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty())
+                    ? Paths.get(xdgStateHome)
+                    : Paths.get(System.getProperty("user.home"), ".local", "state");
+            expectedLogBase = stateHome.resolve(Paths.get(projectDirs.dataDir).getFileName());
+        } else {
+            expectedLogBase = Paths.get(projectDirs.dataLocalDir);
+        }
+
+        assertTrue(pathManager.getLogPath().startsWith(expectedLogBase),
+                "Expected log path under the OS-standard state dir " + expectedLogBase
+                        + ", got: " + pathManager.getLogPath());
+        assertTrue(pathManager.getModulePaths().stream().anyMatch(path -> path.startsWith(expectedCacheBase)),
+                "Expected the module cache under the OS-standard cache dir " + expectedCacheBase
+                        + ", among: " + pathManager.getModulePaths());
+        assertTrue(pathManager.getConfigsPath().startsWith(expectedConfigBase),
+                "Expected configs under the OS-standard config dir " + expectedConfigBase
+                        + ", got: " + pathManager.getConfigsPath());
     }
 }

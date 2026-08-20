@@ -274,7 +274,12 @@ public final class Terasology implements Callable<Integer> {
             setMemoryLimit(maxDataSize);
         }
 
-        PathManager.getInstance().useDefaultHomePath();
+        if (homeDir != null) {
+            logger.info("homeDir is {}", homeDir);
+            PathManager.getInstance().useOverrideHomePath(homeDir);
+        } else {
+            PathManager.getInstance().useDefaultHomePath();
+        }
 
         if (isHeadless) {
             crashReportEnabled = false;

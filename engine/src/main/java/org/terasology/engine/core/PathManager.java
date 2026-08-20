@@ -36,10 +36,10 @@ public final class PathManager {
     private static final Path PROJECT_PATH = Paths.get(PROJECT_DIRS.dataDir);
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String RECORDINGS_LIBRARY_DIR = "recordings";
-    private static final String LOG_DIR = PROJECT_DIRS.dataLocalDir + "/logs";
-    private static final String SHADER_LOG_DIR = PROJECT_DIRS.dataLocalDir + "/shaders";
+    private static final String LOG_DIR = "logs";
+    private static final String SHADER_LOG_DIR = "shaders";
     private static final String MODULE_DIR = "modules";
-    private static final String MODULE_CACHE_DIR = PROJECT_DIRS.cacheDir + "/cachedModules";
+    private static final String MODULE_CACHE_DIR = "cachedModules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
@@ -63,9 +63,22 @@ public final class PathManager {
     private Path nativesPath;
     private Path configsPath;
 
+    // Logs and the module cache have a real OS-standard home (dataLocalDir / cacheDir) that's
+    // different from where saves/configs/etc. live (dataDir). That split only makes sense while
+    // homePath is the OS default; once something picks its own homePath (--homedir, or the user
+    // choosing one), there's no separate OS-standard location to defer to anymore, so everything
+    // - logs and module cache included - nests under that chosen homePath instead. See updateDirs().
+    private boolean usingOsStandardDirs = true;
+
     private PathManager() {
         installPath = findInstallPath();
-        homePath = PROJECT_PATH;
+        // Only a fallback for whoever constructs a PathManager without then calling useDefaultHomePath()/
+        // useOverrideHomePath()/chooseHomePathManually() - the normal launch path always calls one of those
+        // before this default is ever read. findInstallPath() already has its own fallback (the current
+        // directory) for when native-library detection fails, e.g. in a dev workspace; keeping homePath in
+        // step with that here means an unconfigured PathManager still behaves the way it always has instead
+        // of silently switching to the OS home directory underneath something that isn't expecting it to.
+        homePath = installPath;
     }
 
     private static Path findInstallPath() {
@@ -160,13 +173,17 @@ public final class PathManager {
      * Uses the given path as the home instead of the default home path. Especially interesting for unit tests, as java>17 does not
      * make it easy to set environment variables. see: https://www.baeldung.com/java-unit-testing-environment-variables .
      *
-     * Currently LOG_DIR and LOG_SHADER_DIR are not affected here, as not based on homePath.
+     * Everything updateDirs() computes - saves, logs, shader logs, the module cache, and the rest -
+     * nests under whatever homePath is set to here, so callers of this method (notably
+     * TerasologyLauncher, via {@code --homedir}) get a fully self-contained tree at the path they
+     * asked for, not just the save data.
      *
      * @param rootPath Path to use as the home path.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useOverrideHomePath(Path rootPath) throws IOException {
         this.homePath = rootPath.toRealPath();
+        usingOsStandardDirs = false;
         updateDirs();
     }
 
@@ -177,6 +194,7 @@ public final class PathManager {
     public void useDefaultHomePath() throws IOException {
         // use datadir, .local/share for linux e.g.
         homePath = PROJECT_PATH;
+        usingOsStandardDirs = true;
         updateDirs();
     }
 
@@ -195,6 +213,7 @@ public final class PathManager {
             // If the system is headless
             homePath = Paths.get("").toAbsolutePath();
         }
+        usingOsStandardDirs = false;
         updateDirs();
     }
 
@@ -293,11 +312,24 @@ public final class PathManager {
     private void updateDirs() throws IOException {
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         recordingsPath = homePath.resolve(RECORDINGS_LIBRARY_DIR);
-        logPath = Paths.get(LOG_DIR);
-        shaderLogPath = Paths.get(SHADER_LOG_DIR);
+        // Logs are state, not data - $XDG_STATE_HOME on Linux, not dev.dirs' dataDir/dataLocalDir.
+        // dev.dirs has no state_dir field at all (it predates that part of the spec), so resolveStateDir()
+        // reads $XDG_STATE_HOME itself on Linux. macOS/Windows have no OS-standard state location
+        // either, so dataLocalDir stays the fallback there. Only used while homePath itself is still
+        // the OS default - once homePath is chosen by something else (--homedir, manual pick), logs
+        // move under it too so the whole tree stays self-contained.
+        Path logBase = usingOsStandardDirs ? resolveStateDir() : homePath;
+        logPath = logBase.resolve(LOG_DIR);
+        shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         nativesPath = installPath.resolve(NATIVES_DIR);
-        configsPath = homePath.resolve(CONFIGS_DIR);
+        // configDir is dev.dirs' own OS-standard location for config (XDG_CONFIG_HOME on Linux,
+        // \config under RoamingAppData on Windows) - genuinely separate from dataDir there. On macOS
+        // dev.dirs has no such split; configDir just points back at the same Application Support
+        // folder as dataDir/homePath, so still appending CONFIGS_DIR keeps config files in their own
+        // subfolder there too, instead of dumping them loose at the tree root.
+        Path configBase = usingOsStandardDirs ? Paths.get(PROJECT_DIRS.configDir) : homePath;
+        configsPath = configBase.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
@@ -375,9 +407,31 @@ public final class PathManager {
         }
     }
 
+    /**
+     * The OS-standard location for logs (state, not data). Only Linux/XDG defines one -
+     * {@code $XDG_STATE_HOME} (default {@code ~/.local/state}) - dev.dirs has no {@code state_dir}
+     * field for it since it predates that part of the spec, so this reads the environment itself
+     * instead. macOS and Windows have no equivalent OS-standard state location at all, so those fall
+     * back to {@code dataLocalDir}, same as before.
+     */
+    private static Path resolveStateDir() {
+        if (OS.get() != OS.LINUX) {
+            return Paths.get(PROJECT_DIRS.dataLocalDir);
+        }
+        String xdgStateHome = System.getenv("XDG_STATE_HOME");
+        Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty())
+                ? Paths.get(xdgStateHome)
+                : Paths.get(System.getProperty("user.home"), ".local", "state");
+        // Reuse dataDir's project-name segment ("terasology") rather than hardcoding it again.
+        return stateHome.resolve(Paths.get(PROJECT_DIRS.dataDir).getFileName());
+    }
+
     protected ImmutableList<Path> defaultModPaths() throws IOException {
         Path homeModPath = homePath.resolve(MODULE_DIR);
-        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
+        // Same OS-standard-vs-homePath split as logPath in updateDirs(): the module cache is a
+        // cache (cacheDir, e.g. ~/.cache on Linux) only while homePath is still the OS default.
+        Path modCacheBase = usingOsStandardDirs ? Paths.get(PROJECT_DIRS.cacheDir) : homePath;
+        Path modCachePath = modCacheBase.resolve(MODULE_CACHE_DIR);
 
         if (homePath.equals(installPath)) {
             return ImmutableList.of(modCachePath, homeModPath);
