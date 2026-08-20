@@ -33,6 +33,12 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     private float haltedTime = 0f;
 
+    /**
+     * Length of a full lunar cycle, in game days. Defaults to the real-world synodic month so a
+     * calendar built on top of this lines up with familiar phase names/timing.
+     */
+    private static final float MOON_CYCLE_DAYS = 29.53f;
+
     public DefaultCelestialSystem(CelestialModel model, Context context) {
         WorldProvider worldProvider = context.get(WorldProvider.class);
         entityManager = context.get(EntityManager.class);
@@ -56,13 +62,7 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     @Override
     public float getSunPosAngle() {
-        float days;
-        if (isSunHalted()) {
-            days = haltedTime;
-        } else {
-            days = getWorldTime().getDays();
-        }
-        return  model.getSunPosAngle(days);
+        return model.getSunPosAngle(getCurrentDays());
     }
 
     @Override
@@ -74,6 +74,18 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     public void toggleSunHalting(float timeInDays) {
         haltSunPosition = !haltSunPosition;
         haltedTime = timeInDays;
+    }
+
+    @Override
+    public float getMoonPhase() {
+        float phase = getCurrentDays() % MOON_CYCLE_DAYS / MOON_CYCLE_DAYS;
+        // getCurrentDays() is expected to always be non-negative, but guard against a negative
+        // result from a halted/rewound time anyway rather than return an out-of-range phase.
+        return phase < 0 ? phase + 1 : phase;
+    }
+
+    private float getCurrentDays() {
+        return isSunHalted() ? haltedTime : getWorldTime().getDays();
     }
     /**
      * Updates the game perception of the time of day via launching a new OnMiddayEvent(),

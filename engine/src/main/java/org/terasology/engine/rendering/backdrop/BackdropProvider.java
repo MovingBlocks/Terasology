@@ -28,4 +28,6 @@ public interface BackdropProvider {
 
     Vector3f getSunDirection(boolean moonlightFlip);
 
+    float getMoonPhase();
+
 }
