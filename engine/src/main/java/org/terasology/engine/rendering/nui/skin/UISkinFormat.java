@@ -113,6 +113,14 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
                 Optional<? extends UISkinAsset> skin = Assets.get(inherit, UISkinAsset.class);
                 if (skin.isPresent()) {
                     builder.setBaseSkin(skin.get().getSkin());
+                } else {
+                    // Silently proceeding here is what made #1621 so hard to track down: an unresolved
+                    // "inherit" doesn't fail this skin's load, it just quietly omits every property the
+                    // base skin would have supplied (textures included) - the skin loads "successfully"
+                    // with nothing wrong logged anywhere.
+                    logger.warn("Could not resolve inherited skin '{}' - properties from it (including "
+                            + "textures) will be missing from this skin. The module providing it may not "
+                            + "be available yet in the current module environment.", inherit);
                 }
             }
             if (families != null) {
