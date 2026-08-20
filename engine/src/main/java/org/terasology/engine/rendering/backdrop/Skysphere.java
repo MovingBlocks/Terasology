@@ -70,4 +70,9 @@ public class Skysphere implements BackdropProvider {
 
         return sunDirection;
     }
+
+    @Override
+    public float getMoonPhase() {
+        return celSystem.getMoonPhase();
+    }
 }
