@@ -14,26 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StringRepresentationTypeHandlerTest {
 
-    /**
-     * Records whether {@link #getFromString} was reached. The contract under test is not just
-     * "returns empty" but "never forwards null to the subclass" — asserting only on the returned
-     * Optional would still pass if a subclass happened to tolerate null and return null itself.
-     */
-    private static final class RecordingHandler extends StringRepresentationTypeHandler<String> {
-        private boolean getFromStringCalled;
-
-        @Override
-        public String getAsString(String item) {
-            return item;
-        }
-
-        @Override
-        public String getFromString(String representation) {
-            getFromStringCalled = true;
-            return representation;
-        }
-    }
-
     private final RecordingHandler typeHandler = new RecordingHandler();
 
     @Test
@@ -62,5 +42,25 @@ class StringRepresentationTypeHandlerTest {
 
         assertFalse(result.isPresent());
         assertFalse(typeHandler.getFromStringCalled);
+    }
+
+    /**
+     * Records whether {@link #getFromString} was reached. The contract under test is not just
+     * "returns empty" but "never forwards null to the subclass" — asserting only on the returned
+     * Optional would still pass if a subclass happened to tolerate null and return null itself.
+     */
+    private static final class RecordingHandler extends StringRepresentationTypeHandler<String> {
+        private boolean getFromStringCalled;
+
+        @Override
+        public String getAsString(String item) {
+            return item;
+        }
+
+        @Override
+        public String getFromString(String representation) {
+            getFromStringCalled = true;
+            return representation;
+        }
     }
 }

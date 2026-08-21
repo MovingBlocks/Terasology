@@ -31,9 +31,6 @@ import static com.google.common.truth.Truth.assertThat;
 @Tag("TteTest")
 class LateLightMergerTest extends TerasologyTestingEnvironment {
 
-    /** Generous, so a slow machine cannot make the drain give up mid-test. */
-    private static final int TICK_BUDGET_MS = 10_000;
-
     private BlockManagerImpl blockManager;
     private ExtraBlockDataManager extraDataManager;
 
@@ -90,7 +87,9 @@ class LateLightMergerTest extends TerasologyTestingEnvironment {
         Chunk removedNeighbour = chunkCache.remove(missingNeighbour);
         merger.chunkUnloaded(missingNeighbour);
 
-        merger.processPending(System.currentTimeMillis(), TICK_BUDGET_MS);
+        // A budget this test can never hit, so the drain runs to completion and the assertions below
+        // are about the bookkeeping rather than about how much of it one tick got through.
+        merger.processPending(System.currentTimeMillis(), Integer.MAX_VALUE);
 
         // mergeAt() must have found the hole and backed off rather than merging with it.
         assertThat(chunkCache.get(center).isDirty()).isFalse();
@@ -100,7 +99,9 @@ class LateLightMergerTest extends TerasologyTestingEnvironment {
         // recover it and the assertions below would fail.
         chunkCache.put(new Vector3i(missingNeighbour), removedNeighbour);
         merger.chunkReady(missingNeighbour);
-        merger.processPending(System.currentTimeMillis(), TICK_BUDGET_MS);
+        // A budget this test can never hit, so the drain runs to completion and the assertions below
+        // are about the bookkeeping rather than about how much of it one tick got through.
+        merger.processPending(System.currentTimeMillis(), Integer.MAX_VALUE);
 
         // The seeded light has now propagated into the center chunk, which is both the proof that
         // mergeAt() ran for it and the reason ChunkMeshWorker will re-mesh it.
