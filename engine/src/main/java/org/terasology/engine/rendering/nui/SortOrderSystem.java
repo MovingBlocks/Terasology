@@ -98,19 +98,22 @@ public class SortOrderSystem extends BaseComponentSystem {
          if (keys.containsKey(Keyboard.Key.RIGHT_CTRL.getId())) {
              keys.get(Keyboard.Key.RIGHT_CTRL.getId()).subscribe(controlSubscriber);
          } else {
-             keys.put(Keyboard.Key.RIGHT_CTRL.getId(), new BindableButtonImpl(new SimpleUri(TerasologyConstants.ENGINE_MODULE, "ctrlMod"), "Control Modifier", new BindButtonEvent()));
+             keys.put(Keyboard.Key.RIGHT_CTRL.getId(), new BindableButtonImpl(
+                    new SimpleUri(TerasologyConstants.ENGINE_MODULE, "ctrlMod"), "Control Modifier", new BindButtonEvent()));
              keys.get(Keyboard.Key.RIGHT_CTRL.getId()).subscribe(controlSubscriber);
          }
          if (keys.containsKey(Keyboard.Key.LEFT_CTRL.getId())) {
              keys.get(Keyboard.Key.LEFT_CTRL.getId()).subscribe(controlSubscriber);
          } else {
-             keys.put(Keyboard.Key.LEFT_CTRL.getId(), new BindableButtonImpl(new SimpleUri(TerasologyConstants.ENGINE_MODULE, "ctrlMod"), "Control Modifier", new BindButtonEvent()));
+             keys.put(Keyboard.Key.LEFT_CTRL.getId(), new BindableButtonImpl(
+                    new SimpleUri(TerasologyConstants.ENGINE_MODULE, "ctrlMod"), "Control Modifier", new BindButtonEvent()));
              keys.get(Keyboard.Key.LEFT_CTRL.getId()).subscribe(controlSubscriber);
          }
          if (keys.containsKey(Keyboard.Key.TAB.getId())) {
              keys.get(Keyboard.Key.TAB.getId()).subscribe(tabSubscriber);
          } else {
-             keys.put(Keyboard.Key.TAB.getId(), new BindableButtonImpl(new SimpleUri(TerasologyConstants.ENGINE_MODULE, "changeFocus"), "Change Focus", new BindButtonEvent()));
+             keys.put(Keyboard.Key.TAB.getId(), new BindableButtonImpl(
+                    new SimpleUri(TerasologyConstants.ENGINE_MODULE, "changeFocus"), "Change Focus", new BindButtonEvent()));
              keys.get(Keyboard.Key.TAB.getId()).subscribe(tabSubscriber);
          }
 
