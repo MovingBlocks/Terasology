@@ -86,8 +86,19 @@ public class PathManagerTest {
                 "Expected log path to nest under the overridden home path: " + pathManager.getLogPath());
         assertTrue(pathManager.getShaderLogPath().startsWith(homePath),
                 "Expected shader log path to nest under the overridden home path: " + pathManager.getShaderLogPath());
-        assertTrue(pathManager.getModulePaths().stream().anyMatch(path -> path.startsWith(homePath)),
+        Path moduleCachePath = homePath.resolve("cachedModules");
+        assertTrue(pathManager.getModulePaths().contains(moduleCachePath),
                 "Expected the module cache path to nest under the overridden home path, among: " + pathManager.getModulePaths());
+    }
+
+    /**
+     * getHomeModPath() used to return modPaths.get(0) - the cache or install path, never homePath's
+     * own module dir. Callers (install, download, behavior save) want that dir specifically.
+     */
+    @Test
+    public void getHomeModPathReturnsHomeDirectorysOwnModulesFolder() {
+        Path expected = pathManager.getHomePath().resolve("modules");
+        assertEquals(expected, pathManager.getHomeModPath());
     }
 
     @Test
@@ -172,7 +183,7 @@ public class PathManagerTest {
         Path expectedLogBase;
         if (OS.get() == OS.LINUX) {
             String xdgStateHome = System.getenv("XDG_STATE_HOME");
-            Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty())
+            Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty() && Paths.get(xdgStateHome).isAbsolute())
                     ? Paths.get(xdgStateHome)
                     : Paths.get(System.getProperty("user.home"), ".local", "state");
             expectedLogBase = stateHome.resolve(Paths.get(projectDirs.dataDir).getFileName());

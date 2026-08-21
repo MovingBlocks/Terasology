@@ -418,8 +418,9 @@ public final class PathManager {
         if (OS.get() != OS.LINUX) {
             return Paths.get(PROJECT_DIRS.dataLocalDir);
         }
+        // Spec requires $XDG_STATE_HOME to be absolute. Relative -> invalid -> ignore, use default.
         String xdgStateHome = System.getenv("XDG_STATE_HOME");
-        Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty())
+        Path stateHome = (xdgStateHome != null && !xdgStateHome.isEmpty() && Paths.get(xdgStateHome).isAbsolute())
                 ? Paths.get(xdgStateHome)
                 : Paths.get(System.getProperty("user.home"), ".local", "state");
         // Reuse dataDir's project-name segment ("terasology") rather than hardcoding it again.
@@ -442,7 +443,9 @@ public final class PathManager {
     }
 
     public Path getHomeModPath() {
-        return modPaths.get(0);
+        // Not modPaths.get(0) - that's install or cache dir, not homePath's own module dir. Callers
+        // (ModuleInstaller, ClientConnectionHandler, Behavior[/Collective]System) want the latter.
+        return homePath.resolve(MODULE_DIR);
     }
 
     public Path getSavePath(String title) {
