@@ -10,6 +10,7 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -67,6 +68,9 @@ public class PojoEntityPoolTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         ServiceRegistry serviceRegistry = new ServiceRegistry();
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(true);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> displayDevice);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         context = new ContextImpl(baseContext, serviceRegistry);

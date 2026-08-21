@@ -10,6 +10,7 @@ import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -92,6 +93,9 @@ public class EntitySerializerTest {
 
         TypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
         serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(true);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> displayDevice);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         context = new ContextImpl(baseContext, serviceRegistry);
