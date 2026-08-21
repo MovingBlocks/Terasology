@@ -19,7 +19,9 @@ public final class ChunkProcessingInfo {
     private Chunk chunk;
     private ChunkTaskProvider chunkTaskProvider;
 
-    private Future<Chunk> currentFuture;
+    // volatile: written by invokeGeneratorTask's thread, read by stopProcessingAt's - could be a
+    // different thread. See ChunkProcessingPipeline#invokeGeneratorTask for the race this closes.
+    private volatile Future<Chunk> currentFuture;
     private org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask;
 
     public ChunkProcessingInfo(Vector3ic position, SettableFuture<Chunk> externalFuture) {

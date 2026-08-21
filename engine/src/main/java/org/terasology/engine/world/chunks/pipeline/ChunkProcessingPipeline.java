@@ -322,10 +322,17 @@ logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProce
             return new ChunkProcessingInfo(pos, SettableFuture.create());
         });
         if (createdHere[0]) {
-            // Submitted outside the computeIfAbsent lambda on purpose - ConcurrentHashMap holds a
-            // per-bin lock for the lambda's duration, and submitting to another executor from inside
-            // it is exactly the kind of external call that lock shouldn't be held across.
-            chunkProcessingInfo.setCurrentFuture(chunkProcessor.submit(generatorTask::get, position));
+            // Submit stays outside the computeIfAbsent lambda - that holds a per-bin map lock, and an
+            // external executor call shouldn't run under it. Gap: stopProcessingAt could remove the
+            // entry before we submit, see currentFuture still null, and cancel nothing. Fix: re-check
+            // we're still the map's entry right after submitting. Still there -> stopProcessingAt hasn't
+            // run yet, will see currentFuture when it does. Gone -> it already ran and missed us, so
+            // cancel here instead. cancel() is safe to call twice, so no coordination needed either way.
+            Future<Chunk> future = chunkProcessor.submit(generatorTask::get, position);
+            chunkProcessingInfo.setCurrentFuture(future);
+            if (chunkProcessingInfoMap.get(position) != chunkProcessingInfo) {
+                future.cancel(true);
+            }
         }
         return chunkProcessingInfo.getExternalFuture();
     }
