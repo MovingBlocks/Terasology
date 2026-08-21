@@ -51,9 +51,9 @@ public final class ChunkLightLocks {
     // Contention accounting, debug-gated - see logStatsIfDebugAndDue(). Per-lock-acquisition, not
     // per-withLocks-call: a 27-chunk merge that contends on one of its 27 locks counts as one
     // contended acquisition out of 27, not one contended call out of many.
-    private static final LongAdder totalAcquisitions = new LongAdder();
-    private static final LongAdder contendedAcquisitions = new LongAdder();
-    private static final LongAdder contendedWaitNanos = new LongAdder();
+    private static final LongAdder TOTAL_ACQUISITIONS = new LongAdder();
+    private static final LongAdder CONTENDED_ACQUISITIONS = new LongAdder();
+    private static final LongAdder CONTENDED_WAIT_NANOS = new LongAdder();
     private static volatile long lastStatsLogMs;
 
     private ChunkLightLocks() {
@@ -77,12 +77,12 @@ public final class ChunkLightLocks {
         try {
             for (Vector3ic pos : sorted) {
                 Lock lock = side.apply(LOCKS.computeIfAbsent(new Vector3i(pos), p -> new ReentrantReadWriteLock()));
-                totalAcquisitions.increment();
+                TOTAL_ACQUISITIONS.increment();
                 if (!lock.tryLock()) {
-                    contendedAcquisitions.increment();
+                    CONTENDED_ACQUISITIONS.increment();
                     long start = System.nanoTime();
                     lock.lock();
-                    contendedWaitNanos.add(System.nanoTime() - start);
+                    CONTENDED_WAIT_NANOS.add(System.nanoTime() - start);
                 }
                 held.add(lock);
             }
@@ -100,9 +100,9 @@ public final class ChunkLightLocks {
             return;
         }
         lastStatsLogMs = System.currentTimeMillis();
-        long total = totalAcquisitions.sum();
-        long contended = contendedAcquisitions.sum();
-        long waitMs = contendedWaitNanos.sum() / 1_000_000;
+        long total = TOTAL_ACQUISITIONS.sum();
+        long contended = CONTENDED_ACQUISITIONS.sum();
+        long waitMs = CONTENDED_WAIT_NANOS.sum() / 1_000_000;
         logger.debug("perfProbe chunkLightLock: totalAcquisitions={}, contended={} ({}%), cumulativeContendedWait={}ms",
                 total, contended, total == 0 ? 0 : (100 * contended / total), waitMs);
     }

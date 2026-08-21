@@ -39,6 +39,15 @@ public class LocalChunkView implements PropagatorWorldView {
         this(chunks, rules, willSelfCorrect, true);
     }
 
+    private LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect,
+                           boolean writesReachMeshes) {
+        this.chunks = chunks;
+        this.rules = rules;
+        this.willSelfCorrect = willSelfCorrect;
+        this.writesReachMeshes = writesReachMeshes;
+        topLeft.set(chunks[0].getPosition());
+    }
+
     /**
      * A view whose writes never mark anything dirty, for propagating a quantity no mesh samples.
      * <p>
@@ -56,15 +65,6 @@ public class LocalChunkView implements PropagatorWorldView {
      */
     public static LocalChunkView withoutDirtyMarking(Chunk[] chunks, PropagationRules rules) {
         return new LocalChunkView(chunks, rules, pos -> false, false);
-    }
-
-    private LocalChunkView(Chunk[] chunks, PropagationRules rules, Predicate<Vector3ic> willSelfCorrect,
-                           boolean writesReachMeshes) {
-        this.chunks = chunks;
-        this.rules = rules;
-        this.willSelfCorrect = willSelfCorrect;
-        this.writesReachMeshes = writesReachMeshes;
-        topLeft.set(chunks[0].getPosition());
     }
 
     /**
