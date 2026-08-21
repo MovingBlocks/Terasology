@@ -21,6 +21,12 @@ import java.math.RoundingMode;
  */
 public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 
+    /**
+     * Length of a full lunar cycle, in game days. Defaults to the real-world synodic month so a
+     * calendar built on top of this lines up with familiar phase names/timing.
+     */
+    private static final float MOON_CYCLE_DAYS = 29.53f;
+
     private final WorldTime worldTime;
 
     private long lastUpdate;
@@ -32,12 +38,6 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     private boolean haltSunPosition = false;
 
     private float haltedTime = 0f;
-
-    /**
-     * Length of a full lunar cycle, in game days. Defaults to the real-world synodic month so a
-     * calendar built on top of this lines up with familiar phase names/timing.
-     */
-    private static final float MOON_CYCLE_DAYS = 29.53f;
 
     public DefaultCelestialSystem(CelestialModel model, Context context) {
         WorldProvider worldProvider = context.get(WorldProvider.class);
