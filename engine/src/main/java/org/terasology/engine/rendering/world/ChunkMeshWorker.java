@@ -57,6 +57,12 @@ public final class ChunkMeshWorker {
 
     private final Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
+    // Scratch buffer for update(): update() is only ever invoked once per frame, from the single
+    // rendering/main thread that owns this worker (see RenderableWorldImpl.queueVisibleChunks /
+    // WorldRendererImpl.preRenderUpdate), so it is never accessed concurrently or re-entrantly.
+    // Reusing it avoids reallocating a new ArrayList every frame; it is cleared on every exit from
+    // update() so it never retains contents or is observable between calls.
+    private final List<Chunk> toQueueScratch = new ArrayList<>();
     private final Flux<Tuple2<Chunk, ChunkMesh>> chunksAndNewMeshes;
     private final Flux<Chunk> completedChunks;
 
@@ -132,39 +138,43 @@ public final class ChunkMeshWorker {
      * @return the number of dirty chunks added to the queue
      */
     public int update() {
-        List<Chunk> toQueue = new ArrayList<>();
-        for (Chunk chunk : chunksInProximityOfCamera) {
-            if (!chunk.isReady()) {
-                // Chunk was added as part of some region, but not yet ready.
-                // Leave it here with the expectation that it will be ready later.
-                continue;
+        List<Chunk> toQueue = toQueueScratch;
+        try {
+            for (Chunk chunk : chunksInProximityOfCamera) {
+                if (!chunk.isReady()) {
+                    // Chunk was added as part of some region, but not yet ready.
+                    // Leave it here with the expectation that it will be ready later.
+                    continue;
+                }
+                if (!chunk.isDirty()) {
+                    // Chunk is in proximity list, but is no longer dirty. Probably already processed.
+                    // Will poll it again next tick to see if it got dirty since then.
+                    continue;
+                }
+                toQueue.add(chunk);
             }
-            if (!chunk.isDirty()) {
-                // Chunk is in proximity list, but is no longer dirty. Probably already processed.
-                // Will poll it again next tick to see if it got dirty since then.
-                continue;
-            }
-            toQueue.add(chunk);
-        }
 
-        toQueue.sort(frontToBackComparator);
+            toQueue.sort(frontToBackComparator);
 
-        int statDirtyChunks = 0;
-        for (Chunk chunk : toQueue) {
-            // Re-checked here, not just when the list was built: emitting can drive mesh generation
-            // synchronously, and that clears the flag. A chunk sitting in the proximity list more than
-            // once - add() does not deduplicate - would otherwise be queued again for a mesh the
-            // emission before it has already produced.
-            if (!chunk.isDirty()) {
-                continue;
+            int statDirtyChunks = 0;
+            for (Chunk chunk : toQueue) {
+                // Re-checked here, not just when the list was built: emitting can drive mesh generation
+                // synchronously, and that clears the flag. A chunk sitting in the proximity list more than
+                // once - add() does not deduplicate - would otherwise be queued again for a mesh the
+                // emission before it has already produced.
+                if (!chunk.isDirty()) {
+                    continue;
+                }
+                statDirtyChunks++;
+                Sinks.EmitResult result = chunkMeshPublisher.tryEmitNext(chunk);
+                if (result.isFailure()) {
+                    logger.error("failed to process chunk {} : {}", chunk, result);
+                }
             }
-            statDirtyChunks++;
-            Sinks.EmitResult result = chunkMeshPublisher.tryEmitNext(chunk);
-            if (result.isFailure()) {
-                logger.error("failed to process chunk {} : {}", chunk, result);
-            }
+            return statDirtyChunks;
+        } finally {
+            toQueue.clear();
         }
-        return statDirtyChunks;
     }
 
     public int numberChunkMeshProcessing() {
