@@ -198,7 +198,13 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public boolean isArray() {
-        return true;
+        // A single EntityData.Value message doubles as a scalar, an array (repeated scalar/nested-value
+        // fields) and a value map (name-value pairs), so unlike the Gson-backed PersistedData this can't
+        // just check "is this element shaped like a JSON array". Every other kind (including scalars,
+        // which callers already treat as size-1 arrays via getAsArray()/getArrayItem()) genuinely can be
+        // read as an array; only a real value map can't - mirror isValueMap()'s own check instead of
+        // reporting true unconditionally. See #5069.
+        return data.getNameValueCount() == 0;
     }
 
     @Override
