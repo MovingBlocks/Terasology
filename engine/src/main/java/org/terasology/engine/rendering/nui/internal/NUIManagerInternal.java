@@ -773,6 +773,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Priority(EventPriority.PRIORITY_HIGH)
     @ReceiveEvent(components = ClientComponent.class)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if (!event.getId().isValid()) {
+            // A malformed bind id (e.g. built from the single-arg SimpleUri(String) constructor without a
+            // ":" separator) would otherwise crash the ResourceUrn constructor below on every press. See #5224.
+            logger.warn("Ignoring bind event with invalid id: {}", event.getId());
+            return;
+        }
         NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard,
                 new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(),
                 event.getState());
