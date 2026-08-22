@@ -14,8 +14,9 @@ publishing {
 
             if (rootProject.hasProperty("publishRepo")) {
                 // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
-                url = "https://artifactory.terasology.io/artifactory/$publishRepo"
-                logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
+                String explicitPublishRepo = rootProject.property("publishRepo")
+                url = "https://artifactory.terasology.io/artifactory/$explicitPublishRepo"
+                logger.info("Changing PUBLISH repoKey set via Gradle property to {}", explicitPublishRepo)
             } else {
                 // Support override from the environment to use a different target publish org
                 String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
@@ -43,8 +44,8 @@ publishing {
 
             if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
                 credentials {
-                    username = "$mavenUser"
-                    password = "$mavenPass"
+                    username = rootProject.property("mavenUser")
+                    password = rootProject.property("mavenPass")
                 }
                 authentication {
                     basic(BasicAuthentication)
