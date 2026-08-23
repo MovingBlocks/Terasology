@@ -23,9 +23,13 @@ dependencies {
     api("com.jagrosh:DiscordIPC:0.4")
 
     constraints {
-        // Upgrades for old transitive dependencies of DiscordIPC that Checkmarx doesn't like
-        implementation("com.kohlschutter.junixsocket:junixsocket-common:2.4.0")
-        implementation("com.kohlschutter.junixsocket:junixsocket-native-common:2.4.0")
-        implementation("org.json:json:20220320")
+        // Upgrades for old transitive dependencies of DiscordIPC that Checkmarx doesn't like.
+        // DiscordIPC itself is api (line above), so these constraints must be api too - scoping
+        // them to implementation means they never actually apply to DiscordIPC's own dependency
+        // graph, and the vulnerable old junixsocket 2.0.4 (with its own log4j 1.2.17) is what
+        // consumers like facades:PC actually get instead of the intended upgrade.
+        api("com.kohlschutter.junixsocket:junixsocket-common:2.4.0")
+        api("com.kohlschutter.junixsocket:junixsocket-native-common:2.4.0")
+        api("org.json:json:20220320")
     }
 }
