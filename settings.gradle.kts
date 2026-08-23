@@ -31,9 +31,17 @@ dependencyResolutionManagement {
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4j)
             library("slf4j-jul", "org.slf4j", "jul-to-slf4j").versionRef(slf4j)
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
-            val nui = version("nui", "4.0.0-SNAPSHOT")
+            // Was pinned to 4.0.0-SNAPSHOT, a version TeraNUI has never actually published (its
+            // real history goes 1.x -> 3.0 -> 3.1.x) - all three artifacts were resolving to
+            // whatever got published under that fictional coordinate years ago, frozen ever since,
+            // regardless of what TeraNUI's current source actually contains. Corrected to match
+            // TeraNUI's real current version (its build.gradle.kts's nuiVersion).
+            val nui = version("nui", "3.1.1-SNAPSHOT")
             library("terasology-nui", "org.terasology.nui", "nui").versionRef(nui)
-            library("terasology-nuigestalt", "org.terasology.nui", "nui-gestalt").versionRef(nui)
+            // Was "nui-gestalt" - orphaned since TeraNUI split it into nui-gestalt5/nui-gestalt7 in
+            // 2021 (MovingBlocks/TeraNUI@0784aad); see #5393. nui-gestalt8 (MovingBlocks/TeraNUI#86)
+            // is the module actually compatible with this project's gestalt 8.0.2-SNAPSHOT.
+            library("terasology-nuigestalt", "org.terasology.nui", "nui-gestalt8").versionRef(nui)
             library("terasology-nuireflect", "org.terasology.nui", "nui-reflect").versionRef(nui)
         }
     }
