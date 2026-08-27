@@ -393,7 +393,17 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public float getMainLightIntensityAt(Vector3f position) {
-        return backdropProvider.getDaylight() * worldProvider.getSunlight(position) / 15.0f;
+        // Deliberately NOT scaled by backdropProvider.getDaylight() here. This value ends up as the
+        // "sunlight" G-buffer channel for block items, held items and meshes (MeshRenderer,
+        // SkeletonRenderer), consumed by the deferred main-light pass (DeferredMainLightNode /
+        // lightGeometryPass_frag.glsl -> calcSunlightColorDeferred -> calcDayAndNightLightingFactor),
+        // which already multiplies by its own "daylight" uniform - sourced from this same
+        // backdropProvider.getDaylight() - and adds a NIGHT_BRIGHTNESS moonlight term on top. Chunk
+        // terrain feeds that same deferred pass an unscaled raw sunlight value for the same reason.
+        // Pre-multiplying by daylight here double-applied the day/night curve and skipped the
+        // moonlight term entirely, leaving held/thrown blocks and particles far darker than world
+        // blocks at night. See #181.
+        return worldProvider.getSunlight(position) / 15.0f;
     }
 
     @Override
