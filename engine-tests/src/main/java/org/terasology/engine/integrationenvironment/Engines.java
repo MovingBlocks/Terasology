@@ -321,7 +321,8 @@ public class Engines {
         coreContextOverride.put(Config.class, client.getFromEngineContext(Config.class));
         JoinStatus joinStatus = null;
         try {
-            joinStatus = coreContextOverride.get(NetworkSystem.class).join("localhost", 25777);
+            int hostPort = hostContext.get(NetworkSystem.class).getBoundPort();
+            joinStatus = coreContextOverride.get(NetworkSystem.class).join("localhost", hostPort);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while joining: ", e);
         }
