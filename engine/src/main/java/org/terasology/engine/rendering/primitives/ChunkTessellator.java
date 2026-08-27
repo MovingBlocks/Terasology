@@ -37,6 +37,8 @@ public final class ChunkTessellator {
         // of the chunk rather than a tuned number - skips the cheapest-but-most-frequent early growth
         // steps for typical terrain, without meaningfully over-reserving near-empty (all-air or
         // all-solid-interior) chunks.
+        // Pooling/reusing these buffers instead of allocating fresh each call would help further, but
+        // needs real lifecycle coordination with the GL upload (a separate thread) - not done here.
         int initialVertexReservation = Chunks.SIZE_X * Chunks.SIZE_Z;
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
             ChunkMesh.VertexElements elements = mesh.getVertexElements(type);
