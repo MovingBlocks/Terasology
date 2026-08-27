@@ -249,10 +249,6 @@ public class GLSLShader extends Shader {
         if (renderConfig.isInscattering()) {
             builder.append("#define INSCATTERING \n");
         }
-        // TODO A 3D wizard should take a look at this. Configurable for the moment to make better comparisons possible.
-        if (renderConfig.isClampLighting()) {
-            builder.append("#define CLAMP_LIGHTING \n");
-        }
 
         for (ChunkVertexFlag vertexFlag : ChunkVertexFlag.values()) {
             builder.append("#define ").append(vertexFlag.getDefineName()).append(" int(").append(vertexFlag.getValue()).append(") \n");
