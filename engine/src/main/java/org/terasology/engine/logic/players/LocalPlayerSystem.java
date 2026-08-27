@@ -111,6 +111,18 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private float lookYaw;
     private double lookYawDelta;
 
+    // Tracks whether the most recently sent CharacterMoveInputEvent already reported "nothing is
+    // happening" (see processInput) - lets us skip re-sending an identical no-op event every single
+    // tick while idle, per #4993, while still sending the one event that marks the transition into
+    // idle so the server's own periodic "repeat last input" fallback has a state to continue from.
+    private boolean sentIdleInput;
+    private boolean lastSentRun = run;
+    private boolean lastSentCrouch = crouch;
+    // setRotation() (SetDirectionEvent) sets lookPitch/lookYaw directly rather than going through
+    // lookPitchDelta/lookYawDelta, so the delta fields alone can't detect that kind of view change.
+    private float lastSentLookPitch = lookPitch;
+    private float lastSentLookYaw = lookYaw;
+
     @In
     private Time time;
 
@@ -148,6 +160,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             lookPitchDelta = 0;
             lookYawDelta = 0;
             jump = false;
+            // Force the first tick after refocus to send, whatever it finds.
+            sentIdleInput = false;
+            return;
+        }
+
+        boolean hasMovementOrLookInput = relativeMovement.x != 0 || relativeMovement.y != 0 || relativeMovement.z != 0
+                || lookYawDelta != 0 || lookPitchDelta != 0 || jump;
+        boolean toggleStateChanged = run != lastSentRun || crouch != lastSentCrouch;
+        // setRotation() can move lookPitch/lookYaw directly between ticks, outside of lookPitchDelta/
+        // lookYawDelta - catch that here too, or a SetDirectionEvent arriving while otherwise idle
+        // would silently never reach the server.
+        boolean absoluteViewChanged = Float.compare(lookPitch, lastSentLookPitch) != 0
+                || Float.compare(lookYaw, lastSentLookYaw) != 0;
+        if (!hasMovementOrLookInput && !toggleStateChanged && !absoluteViewChanged && sentIdleInput) {
+            // Nothing changed since the last (already-sent) idle tick. ServerCharacterPredictionSystem's
+            // own periodic "repeat last input" fallback (~every 50ms, see MAX_INPUT_UNDERFLOW) keeps
+            // gravity and physics ticking for this character from the last sent state without us having
+            // to re-send an identical no-op event every single frame. See #4993.
             return;
         }
 
@@ -178,6 +208,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (relMove.isFinite()) {
             entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch,
                     jump, time.getGameDeltaInMs()));
+            sentIdleInput = !hasMovementOrLookInput && !toggleStateChanged;
+            lastSentRun = run;
+            lastSentCrouch = crouch;
+            lastSentLookPitch = lookPitch;
+            lastSentLookYaw = lookYaw;
         }
         jump = false;
     }
@@ -234,6 +269,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             // the correct location.
             lookYaw = 0f;
             lookPitch = 0f;
+            // sentIdleInput may still be true from a previous character entity's idle streak (e.g.
+            // after death and respawn) - reset it so the new entity's first event always sends,
+            // instead of being mistaken for a repeat of an idle tick it never actually had.
+            sentIdleInput = false;
             update(0);
         }
     }
