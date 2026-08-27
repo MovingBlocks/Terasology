@@ -43,6 +43,11 @@ import static com.google.common.primitives.Ints.constrainToRange;
  */
 public class ChunkProcessingPipeline {
 
+    // Raising this past 4 was tried and reverted: more worker threads means more chunks
+    // simultaneously in the large, undeflated "generated but not yet through light+deflate" state,
+    // and on a constrained heap that's enough to OOM mid-flight. The backlog behind the cap
+    // (executor queue reaching 358+ during fast flight in testing) is real, but the fix has to
+    // bound how much is in flight at once, not just how many threads chew through it.
     @SuppressWarnings("UnstableApiUsage")
     private static final int DEFAULT_TASK_THREADS = constrainToRange(
             Runtime.getRuntime().availableProcessors() - 2, 1, 4);
@@ -77,6 +82,8 @@ public class ChunkProcessingPipeline {
     /** Reactor-thread-only; counts consecutive poll timeouts with nothing completing anywhere. */
     private int consecutiveIdlePolls;
     private int threadIndex;
+    /** Reactor-thread-only; throttles the perfProbe occupancy log below to ~1/sec. */
+    private long lastPerfProbeLogMs;
 
     /**
      * Create ChunkProcessingPipeline.
@@ -116,6 +123,12 @@ public class ChunkProcessingPipeline {
                     continue;
                 }
                 consecutiveIdlePolls = 0;
+                if (logger.isDebugEnabled() && System.currentTimeMillis() - lastPerfProbeLogMs > 1000) {
+                    lastPerfProbeLogMs = System.currentTimeMillis();
+                    logger.debug("perfProbe pipeline: activeThreads={}, executorQueue={}, inPipeline={}, blocked={}",
+                            executor.getActiveCount(), executor.getQueue().size(), chunkProcessingInfoMap.size(),
+                            blockedPositions.size());
+                }
                 ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(future.getPosition());
                 if (chunkProcessingInfo == null) {
                     continue; // chunk processing was cancelled.
@@ -298,16 +311,30 @@ logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProce
      */
     public ListenableFuture<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
         Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must to have at least one stage");
-        ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(position);
-        if (chunkProcessingInfo != null) {
-            return chunkProcessingInfo.getExternalFuture();
-        } else {
-            SettableFuture<Chunk> exitFuture = SettableFuture.create();
-            chunkProcessingInfo = new ChunkProcessingInfo(position, exitFuture);
-            chunkProcessingInfoMap.put(position, chunkProcessingInfo);
-            chunkProcessingInfo.setCurrentFuture(chunkProcessor.submit(generatorTask::get, position));
-            return exitFuture;
+        // computeIfAbsent, not get-then-put: the old check-then-act let two threads both see "not
+        // present" under load and both submit a generator task for the same position - two independent
+        // Chunk objects for one position, each separately racing to claim
+        // LocalChunkProvider#generateQueuedEntities's entry for it, so whichever one drained from
+        // readyChunks second found the entry already removed and NPE'd.
+        boolean[] createdHere = new boolean[1];
+        ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.computeIfAbsent(position, pos -> {
+            createdHere[0] = true;
+            return new ChunkProcessingInfo(pos, SettableFuture.create());
+        });
+        if (createdHere[0]) {
+            // Submit stays outside the computeIfAbsent lambda - that holds a per-bin map lock, and an
+            // external executor call shouldn't run under it. Gap: stopProcessingAt could remove the
+            // entry before we submit, see currentFuture still null, and cancel nothing. Fix: re-check
+            // we're still the map's entry right after submitting. Still there -> stopProcessingAt hasn't
+            // run yet, will see currentFuture when it does. Gone -> it already ran and missed us, so
+            // cancel here instead. cancel() is safe to call twice, so no coordination needed either way.
+            Future<Chunk> future = chunkProcessor.submit(generatorTask::get, position);
+            chunkProcessingInfo.setCurrentFuture(future);
+            if (chunkProcessingInfoMap.get(position) != chunkProcessingInfo) {
+                future.cancel(true);
+            }
         }
+        return chunkProcessingInfo.getExternalFuture();
     }
 
     /**

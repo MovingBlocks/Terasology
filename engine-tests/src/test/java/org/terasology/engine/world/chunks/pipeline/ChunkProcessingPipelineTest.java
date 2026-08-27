@@ -30,8 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -233,6 +237,67 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                     "Non relative futures must be cancelled or done");
 
             Thread.sleep(new Random().nextInt(500)); //think time
+        }
+    }
+
+    /**
+     * Soak test for the invokeGeneratorTask/stopProcessingAt race from #5374's review. Races both calls
+     * for 500 positions and checks no future hangs forever.
+     * <p>
+     * Not a guaranteed repro - the actual race window is a few nanoseconds inside invokeGeneratorTask,
+     * not visible from the public API, and a trivial generator task completes too fast for "orphaned"
+     * vs. "fine" to look any different from outside anyway. This just checks nothing throws, hangs, or
+     * deadlocks under concurrent load.
+     */
+    @Test
+    void concurrentInvokeAndStopDoesNotHang() throws InterruptedException {
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
+        pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
+
+        int iterations = 500;
+        ExecutorService raceExecutor = Executors.newFixedThreadPool(2);
+        try {
+            for (int i = 0; i < iterations; i++) {
+                Vector3i position = new Vector3i(i, 0, 0);
+                Chunk chunk = createChunkAt(position);
+                CyclicBarrier start = new CyclicBarrier(2);
+                AtomicReference<Future<Chunk>> futureRef = new AtomicReference<>();
+
+                Future<?> invoker = raceExecutor.submit(() -> {
+                    await(start);
+                    futureRef.set(pipeline.invokeGeneratorTask(position, () -> chunk));
+                });
+                Future<?> stopper = raceExecutor.submit(() -> {
+                    await(start);
+                    pipeline.stopProcessingAt(position);
+                });
+
+                invoker.get(1, TimeUnit.SECONDS);
+                stopper.get(1, TimeUnit.SECONDS);
+
+                Future<Chunk> future = futureRef.get();
+                Assertions.assertDoesNotThrow(
+                        () -> {
+                            try {
+                                future.get(1, TimeUnit.SECONDS);
+                            } catch (CancellationException | ExecutionException ignored) {
+                                // cancelled or failed, both fine - just must not hang
+                            }
+                        },
+                        "future for " + position + " hung");
+            }
+        } catch (ExecutionException | TimeoutException e) {
+            Assertions.fail(e);
+        } finally {
+            raceExecutor.shutdownNow();
+        }
+    }
+
+    private void await(CyclicBarrier barrier) {
+        try {
+            barrier.await(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
+            throw new RuntimeException(e);
         }
     }
 
