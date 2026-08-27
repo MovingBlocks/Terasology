@@ -26,10 +26,12 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -173,6 +175,44 @@ public final class ChunkMeshWorker {
 
     public Collection<Chunk> chunks() {
         return chunksInProximityOfCamera;
+    }
+
+    /**
+     * Like {@link #chunks()}, but the first {@code frontCount} entries are front-to-back sorted.
+     * Rest are unordered. Top-K heap, not a full sort - see {@link #update()}.
+     *
+     * @param frontCount how many leading entries must be sorted
+     */
+    public List<Chunk> chunks(int frontCount) {
+        if (frontCount <= 0) {
+            return new ArrayList<>(chunksInProximityOfCamera);
+        }
+        if (chunksInProximityOfCamera.size() <= frontCount) {
+            List<Chunk> all = new ArrayList<>(chunksInProximityOfCamera);
+            all.sort(frontToBackComparator);
+            return all;
+        }
+
+        PriorityQueue<Chunk> nearest = new PriorityQueue<>(frontCount, frontToBackComparator.reversed());
+        List<Chunk> rest = new ArrayList<>(chunksInProximityOfCamera.size() - frontCount);
+        for (Chunk chunk : chunksInProximityOfCamera) {
+            if (nearest.size() < frontCount) {
+                nearest.add(chunk);
+            } else if (frontToBackComparator.compare(chunk, nearest.peek()) < 0) {
+                rest.add(nearest.poll());
+                nearest.add(chunk);
+            } else {
+                rest.add(chunk);
+            }
+        }
+
+        Chunk[] front = nearest.toArray(new Chunk[0]);
+        Arrays.sort(front, frontToBackComparator);
+
+        List<Chunk> result = new ArrayList<>(chunksInProximityOfCamera.size());
+        result.addAll(Arrays.asList(front));
+        result.addAll(rest);
+        return result;
     }
 
     Flux<Chunk> getCompletedChunks() {
