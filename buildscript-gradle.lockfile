@@ -1,0 +1,40 @@
+# This is a Gradle generated file for dependency locking.
+# Manual edits can break the build and are not advised.
+# This file is expected to be part of source control.
+# To regenerate this file, run: ./gradlew dependencies --write-locks
+com.android.support:support-annotations:28.0.0=classpath
+com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.3=classpath
+com.github.zafarkhaja:java-semver:0.10.2=classpath
+com.google.code.findbugs:jsr305:3.0.2=classpath
+com.google.code.gson:gson:2.8.6=classpath
+com.google.errorprone:error_prone_annotations:2.11.0=classpath
+com.google.gradle:osdetector-gradle-plugin:1.7.3=classpath
+com.google.guava:failureaccess:1.0.1=classpath
+com.google.guava:guava:31.1-jre=classpath
+com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava=classpath
+com.google.j2objc:j2objc-annotations:1.3=classpath
+com.google.protobuf:com.google.protobuf.gradle.plugin:0.9.4=classpath
+com.google.protobuf:protobuf-gradle-plugin:0.9.4=classpath
+com.googlecode.gentyref:gentyref:1.2.0=classpath
+commons-logging:commons-logging:1.2=classpath
+gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:1.1.7=classpath
+javax.inject:javax.inject:1=classpath
+kr.motd.maven:os-maven-plugin:1.7.1=classpath
+org.apache.commons:commons-vfs2:2.2=classpath
+org.checkerframework:checker-qual:3.12.0=classpath
+org.javassist:javassist:3.29.0-GA=classpath
+org.jetbrains.gradle.plugin.idea-ext:org.jetbrains.gradle.plugin.idea-ext.gradle.plugin:1.1.7=classpath
+org.jetbrains.kotlin:kotlin-stdlib:2.4.0=classpath
+org.jetbrains.kotlin:kotlin-test:2.4.0=classpath
+org.jetbrains:annotations:13.0=classpath
+org.jgrapht:jgrapht-core:1.5.0=classpath
+org.jheaps:jheaps:0.13=classpath
+org.slf4j:slf4j-api:1.7.25=classpath
+org.sonarsource.scanner.api:sonar-scanner-api:2.16.2.588=classpath
+org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638=classpath
+org.terasology.gestalt:gestalt-di:8.0.2-SNAPSHOT=classpath
+org.terasology.gestalt:gestalt-inject:8.0.2-SNAPSHOT=classpath
+org.terasology.gestalt:gestalt-module:8.0.2-SNAPSHOT=classpath
+org.terasology.gestalt:gestalt-util:8.0.2-SNAPSHOT=classpath
+org.terasology:reflections:0.9.12-MB=classpath
+empty=
