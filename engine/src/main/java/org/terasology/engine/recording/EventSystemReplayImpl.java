@@ -18,6 +18,7 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.PathManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
@@ -87,6 +88,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
+    private DisplayDevice displayDevice;
 
     //Event replaying
     /** if the recorded events were loaded from the RecordedEventStore. */
@@ -112,15 +114,15 @@ public class EventSystemReplayImpl implements EventSystem {
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
                                  RecordAndReplayUtils recordAndReplayUtils, RecordingClasses recordingClasses,
-                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus, DisplayDevice displayDevice) {
         this(eventLibrary, networkSystem, entityManager, recordedEventStore, recordAndReplaySerializer, recordAndReplayUtils,
-                recordingClasses.getClassesToRecord(), recordAndReplayCurrentStatus);
+                recordingClasses.getClassesToRecord(), recordAndReplayCurrentStatus, displayDevice);
     }
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
                                  RecordAndReplayUtils recordAndReplayUtils, List<Class<?>> selectedClassesToReplay,
-                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus, DisplayDevice displayDevice) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
@@ -130,6 +132,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.selectedClassesToReplay = selectedClassesToReplay;
         this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
+        this.displayDevice = displayDevice;
     }
 
     /**
@@ -321,7 +324,8 @@ public class EventSystemReplayImpl implements EventSystem {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
                 NetFilterEvent netFilterAnnotation =  method.getAnnotation(NetFilterEvent.class);
-                if (netFilterAnnotation != null && !netFilterAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
+                if (netFilterAnnotation != null
+                        && !netFilterAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), displayDevice.isHeadless())) {
                     continue;
                 }
 
