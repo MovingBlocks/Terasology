@@ -83,14 +83,15 @@ public class BlockMeshPart {
     public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
                          ChunkMesh.RenderType renderType, Colorc colorOffset, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
-        for (Vector2f texCoord : texCoords) {
-            elements.uv0.put(texCoord);
-        }
 
         int nextIndex = elements.vertexCount;
         elements.buffer.reserveElements(nextIndex + vertices.length);
         Vector3f pos = new Vector3f();
+        // uv0 used to be written in its own pass before this loop; texCoords[vIdx] lines up with
+        // vertices[vIdx] the same as every other per-vertex attribute here, so it belongs in this
+        // loop too - this runs per visible block face, so the extra full pass wasn't free.
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
+            elements.uv0.put(texCoords[vIdx]);
             elements.color.put(colorOffset);
             elements.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
             elements.normals.put(normals[vIdx]);
