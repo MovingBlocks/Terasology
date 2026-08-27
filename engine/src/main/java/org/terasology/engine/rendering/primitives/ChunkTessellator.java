@@ -31,6 +31,19 @@ public final class ChunkTessellator {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMeshImpl mesh = new ChunkMeshImpl();
 
+        // Each render type's vertex/index buffers start at zero capacity and grow by doubling, every
+        // growth step being a fresh native ByteBuffer allocation plus a copy of everything written so
+        // far. Seeding a modest initial reservation - one XZ layer's worth of quads, a real property
+        // of the chunk rather than a tuned number - skips the cheapest-but-most-frequent early growth
+        // steps for typical terrain, without meaningfully over-reserving near-empty (all-air or
+        // all-solid-interior) chunks.
+        int initialVertexReservation = Chunks.SIZE_X * Chunks.SIZE_Z;
+        for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
+            ChunkMesh.VertexElements elements = mesh.getVertexElements(type);
+            elements.buffer.reserveElements(initialVertexReservation);
+            elements.indices.reserveElements(initialVertexReservation);
+        }
+
         final Stopwatch watch = Stopwatch.createStarted();
 
         // The mesh extends into the borders in the horizontal directions, but not vertically upwards, in order to cover
