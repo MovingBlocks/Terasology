@@ -29,7 +29,9 @@ public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
     @Override
     public Optional<EntityRef> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return Optional.ofNullable(entityManager.getEntity(data.getAsLong()));
+            // Deferred: the referenced id may belong to an entity later in the same batch that hasn't been
+            // deserialized yet. See ForwardReferenceEntityRef for why resolving eagerly here would lose the reference.
+            return Optional.of(new ForwardReferenceEntityRef(entityManager, data.getAsLong()));
         }
         return Optional.ofNullable(EntityRef.NULL);
     }
