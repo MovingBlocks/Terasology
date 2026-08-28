@@ -38,4 +38,7 @@ public class NullPerformanceMonitor implements PerformanceMonitorInternal {
         return metrics;
     }
 
+    @Override
+    public void shutdown() {
+    }
 }
