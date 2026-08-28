@@ -26,6 +26,7 @@ import org.terasology.engine.core.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessShader;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessSkeletalMesh;
+import org.terasology.engine.core.subsystem.headless.assets.HeadlessSkinnedMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
@@ -53,6 +54,7 @@ import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontImpl;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
@@ -245,6 +247,8 @@ public class HeadlessEnvironment extends Environment {
                 HeadlessMesh::new, "mesh");
         assetTypeManager.createAssetType(SkeletalMesh.class,
                 HeadlessSkeletalMesh::new, "skeletalMesh");
+        assetTypeManager.createAssetType(SkinnedMesh.class,
+                HeadlessSkinnedMesh::new, "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class,
                 MeshAnimationImpl::new, "animations");
 
