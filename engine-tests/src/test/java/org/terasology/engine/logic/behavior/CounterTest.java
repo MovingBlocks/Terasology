@@ -1,9 +1,10 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.logic.behavior.actions.CounterAction;
 import org.terasology.engine.logic.behavior.actions.Print;
 import org.terasology.engine.logic.behavior.actions.TimeoutAction;
@@ -45,7 +46,7 @@ public class CounterTest {
     @BeforeEach
     public void setup() {
 
-        treeBuilder = new BehaviorTreeBuilder();
+        treeBuilder = new BehaviorTreeBuilder(new ContextImpl());
         treeBuilder.registerAction("print", Print.class);
         treeBuilder.registerDecorator("counter", CounterAction.class);
         treeBuilder.registerDecorator("timeout", TimeoutAction.class);

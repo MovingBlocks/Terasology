@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.core;
 
@@ -21,10 +21,10 @@ import com.google.gson.stream.JsonWriter;
 import org.apache.commons.codec.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.logic.behavior.BehaviorAction;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -54,10 +54,12 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
     private Gson gson;
 
     private int nextId = 1;
+    private final Context context;
 
-    public BehaviorTreeBuilder() {
+    public BehaviorTreeBuilder(Context context) {
+        this.context = context;
 
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
 
         if (moduleManager != null) {
             ModuleEnvironment environment = moduleManager.getEnvironment();
@@ -127,7 +129,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                 @Override
                 public BehaviorTree read(JsonReader in) throws IOException {
                     String uri = in.nextString();
-                    AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+                    AssetManager assetManager = context.getValue(AssetManager.class);
                     return assetManager.getAsset(new ResourceUrn(uri), BehaviorTree.class)
                             .orElse(assetManager.getAsset(new ResourceUrn("engine:default"), BehaviorTree.class).get());
 
@@ -138,29 +140,29 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
     }
 
     @Override
-    public BehaviorNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public BehaviorNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext jsonContext) throws JsonParseException {
         BehaviorNode node;
         if (json.isJsonPrimitive()) {
-            node = getPrimitiveNode(json, context);
+            node = getPrimitiveNode(json, jsonContext);
         } else {
-            node = getCompositeNode(json, context);
+            node = getCompositeNode(json, jsonContext);
         }
         node = createNode(node);
         return node;
     }
 
     @Override
-    public JsonElement serialize(BehaviorNode src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(BehaviorNode src, Type typeOfSrc, JsonSerializationContext jsonContext) {
         JsonObject node = new JsonObject();
         if (src instanceof DelegateNode) {
             DelegateNode delegateNode = (DelegateNode) src;
-            return serialize(delegateNode.delegate, BehaviorNode.class, context);
+            return serialize(delegateNode.delegate, BehaviorNode.class, jsonContext);
         }
         if (src instanceof CompositeNode) {
             String name = src.getName();
             JsonArray array = new JsonArray();
             for (int i = 0; i < src.getChildrenCount(); i++) {
-                array.add(serialize(src.getChild(i), BehaviorNode.class, context));
+                array.add(serialize(src.getChild(i), BehaviorNode.class, jsonContext));
             }
             node.add(name, array);
         } else if (src instanceof ActionNode) {
@@ -168,7 +170,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
             JsonObject content;
             String name;
             if (actionNode.action != null) {
-                content = (JsonObject) context.serialize(actionNode.action);
+                content = (JsonObject) jsonContext.serialize(actionNode.action);
                 name = actionNode.action.getName();
             } else {
                 content = new JsonObject();
@@ -178,7 +180,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
             if (src instanceof DecoratorNode) {
                 DecoratorNode decoratorNode = (DecoratorNode) src;
                 if (decoratorNode.getChildrenCount() > 0) {
-                    content.add("child", serialize(decoratorNode.getChild(0), BehaviorNode.class, context));
+                    content.add("child", serialize(decoratorNode.getChild(0), BehaviorNode.class, jsonContext));
                 }
             }
 
@@ -193,14 +195,14 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
         return node;
     }
 
-    private BehaviorNode getPrimitiveNode(JsonElement json, JsonDeserializationContext context) {
+    private BehaviorNode getPrimitiveNode(JsonElement json, JsonDeserializationContext jsonContext) {
         String type = json.getAsString();
         BehaviorNode node = createNode(type);
         if (actions.containsKey(type)) {
-            Action action = context.deserialize(new JsonObject(), actions.get(type));
+            Action action = jsonContext.deserialize(new JsonObject(), actions.get(type));
             addAction((ActionNode) node, action);
         } else if (decorators.containsKey(type)) {
-            Action action = context.deserialize(new JsonObject(), decorators.get(type));
+            Action action = jsonContext.deserialize(new JsonObject(), decorators.get(type));
             addAction((ActionNode) node, action);
         }
         return node;
@@ -210,11 +212,11 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
         action.setId(nextId);
         nextId++;
         node.setAction(action);
-        InjectionHelper.inject(action);
+        InjectionHelper.inject(action, context);
         action.setup();
     }
 
-    private BehaviorNode getCompositeNode(JsonElement json, JsonDeserializationContext context) {
+    private BehaviorNode getCompositeNode(JsonElement json, JsonDeserializationContext jsonContext) {
         String type;
         JsonObject obj = json.getAsJsonObject();
         Map.Entry<String, JsonElement> entry = obj.entrySet().iterator().next();
@@ -224,16 +226,16 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
         BehaviorNode node = createNode(type);
 
         if (actions.containsKey(type)) {
-            Action action = context.deserialize(jsonElement, actions.get(type));
+            Action action = jsonContext.deserialize(jsonElement, actions.get(type));
             addAction((ActionNode) node, action);
         } else if (decorators.containsKey(type)) {
-            Action action = context.deserialize(jsonElement, decorators.get(type));
+            Action action = jsonContext.deserialize(jsonElement, decorators.get(type));
             addAction((ActionNode) node, action);
             JsonElement childJson = jsonElement.getAsJsonObject().get("child");
-            BehaviorNode child = context.deserialize(childJson, BehaviorNode.class);
+            BehaviorNode child = jsonContext.deserialize(childJson, BehaviorNode.class);
             node.insertChild(0, child);
         } else if (jsonElement.isJsonArray()) {
-            List<BehaviorNode> children = context.deserialize(jsonElement, new TypeToken<List<BehaviorNode>>() {
+            List<BehaviorNode> children = jsonContext.deserialize(jsonElement, new TypeToken<List<BehaviorNode>>() {
             }.getType());
             for (int i = 0; i < children.size(); i++) {
                 BehaviorNode child = children.get(i);
