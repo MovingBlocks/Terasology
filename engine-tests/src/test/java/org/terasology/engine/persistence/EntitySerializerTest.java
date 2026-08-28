@@ -27,6 +27,8 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
@@ -37,6 +39,7 @@ import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.entitysystem.component.EmptyComponent;
+import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.ModuleTypeRegistry;
@@ -297,6 +300,37 @@ public class EntitySerializerTest {
 
         assertTrue(loadedEntity.exists());
         assertTrue(loadedEntity.hasComponent(MappedTypeComponent.class));
+    }
+
+    /**
+     * Reproduces the forward-reference scenario from a real load: entity A's component references entity B by id
+     * before B itself has been deserialized (e.g. a save file lists an inventory-holding entity before an item
+     * inside it). Goes through {@link org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler#deserialize}
+     * itself, the way {@code ComponentSerializer} actually calls it, rather than constructing
+     * {@link org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardReferenceEntityRef} by hand - a full
+     * serialize/{@link EngineEntityManager#clear()}/deserialize round trip isn't used here because
+     * {@code clear()} doesn't actually clear the manager's id-to-pool mapping (a pre-existing quirk, unrelated to
+     * this fix) and so can't reproduce "id not yet known" the way a genuinely fresh load does.
+     */
+    @Test
+    public void testForwardReferenceResolvesOnceTargetIsCreated() {
+        long futureId = entityManager.getNextId();
+        PersistedData persistedFutureId = new ProtobufPersistedDataSerializer().serialize(futureId);
+        EntityRef entityRef = new EntityRefTypeHandler(entityManager).deserialize(persistedFutureId)
+                .orElseThrow(() -> new AssertionError("expected a numeric id to deserialize to some EntityRef"));
+
+        // Nothing has been created with this id yet - must not resolve to a dead stub.
+        assertFalse(entityRef.exists());
+
+        // The next entity created is assigned futureId, exactly as if it were deserialized moments later in the
+        // same batch that already handed out a reference to it.
+        EntityRef created = entityManager.create();
+        created.addComponent(new IntegerComponent(42));
+        assertEquals(futureId, created.getId());
+
+        assertTrue(entityRef.exists());
+        assertEquals(futureId, entityRef.getId());
+        assertEquals(42, entityRef.getComponent(IntegerComponent.class).value);
     }
 
     private EntityRef serializeDeserializeEntity(EntityRef entity) {
