@@ -184,7 +184,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 // Start the server.
                 serverChannelFuture = b.bind();
 
-                logger.info("Started server on port {}", port);
                 if (config.getServerMOTD() != null) {
                     logger.info("Server MOTD is \"{}\"", config.getServerMOTD()); //NOPMD
                 } else {
@@ -195,6 +194,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     logger.info("Server started");
                 }
                 serverChannelFuture.sync();
+                // Local address is only reliably populated once bind() has completed - hence after sync(),
+                // not next to the bind() call above. Matters when port was 0 (see getBoundPort()).
+                logger.info("Started server on port {}", getBoundPort());
                 nextNetworkTick = time.getRealTimeInMs();
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
@@ -372,6 +374,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public NetworkMode getMode() {
         return mode;
+    }
+
+    @Override
+    public int getBoundPort() {
+        if (serverChannelFuture == null) {
+            return -1;
+        }
+        return ((InetSocketAddress) serverChannelFuture.channel().localAddress()).getPort();
     }
 
     @Override

@@ -70,6 +70,10 @@ public class TestingStateHeadlessSetup extends StateHeadlessSetup {
         worldGenerationConfig.setDefaultGenerator(worldGeneratorUri);
         worldGenerationConfig.setWorldTitle(WORLD_TITLE);
         worldGenerationConfig.setDefaultSeed(DEFAULT_SEED);
+
+        // 0 = OS picks a free port. Tests run many hosts in parallel; the default.cfg port would
+        // collide across them. See NetworkSystem#getBoundPort().
+        config.getNetwork().setServerPort(0);
     }
 
     @Override
