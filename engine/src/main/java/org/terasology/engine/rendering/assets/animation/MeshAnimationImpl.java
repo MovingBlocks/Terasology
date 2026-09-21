@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.animation;
 
+import org.terasology.engine.rendering.assets.mesh.SkinnedMesh;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.joml.geom.AABBf;
 
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class MeshAnimationImpl extends MeshAnimation {
     }
 
     @Override
-    public boolean isValidAnimationFor(SkeletalMesh mesh) {
+    public boolean isValidAnimationFor(SkinnedMesh mesh) {
         for (int i = 0; i < data.getBoneNames().size(); ++i) {
             Bone bone = mesh.getBone(data.getBoneNames().get(i));
             boolean hasParent = data.getBoneParent().get(i) != MeshAnimationData.NO_PARENT;

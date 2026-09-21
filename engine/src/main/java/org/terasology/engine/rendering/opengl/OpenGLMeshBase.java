@@ -57,8 +57,16 @@ public interface OpenGLMeshBase {
             });
             for (VertexResource.VertexDefinition attribute : resource.definitions()) {
                 GL30.glEnableVertexAttribArray(attribute.location);
-                GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
-                        attribute.attribute.mapping.glType, false, resource.inStride(), offset + attribute.offset);
+                boolean normalized = (attribute.features & VertexResource.FEATURE_NORMALIZED) > 0;
+                if ((attribute.features & VertexResource.FEATURE_INTEGER) > 0) {
+                    GL30.glVertexAttribIPointer(attribute.location, attribute.attribute.count,
+                            attribute.attribute.mapping.glType, resource.inStride(), offset + attribute.offset);
+                } else {
+                    GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
+                            attribute.attribute.mapping.glType, normalized, resource.inStride(), offset + attribute.offset);
+                }
+
+
             }
             offset += resource.inSize();
         }
