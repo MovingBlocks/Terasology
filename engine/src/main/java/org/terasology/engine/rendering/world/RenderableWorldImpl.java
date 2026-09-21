@@ -411,14 +411,13 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
-        // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
-        // comments are in use instead of appropriately named vectors.
-        Vector3f result = chunk.getRenderPosition();
-        result.add(CHUNK_CENTER_OFFSET);
-
-        result.sub(cameraPosition); // camera to chunk vector
-
-        return result.lengthSquared();
+        // distanceSquared() lets non-default implementations (Chunk, LodChunk) compute this from
+        // their raw offset fields, avoiding a getRenderPosition() Vector3f allocation per call -
+        // this runs twice per PriorityQueue comparison, every frame.
+        return chunk.distanceSquared(
+                cameraPosition.x - CHUNK_CENTER_OFFSET.x(),
+                cameraPosition.y - CHUNK_CENTER_OFFSET.y(),
+                cameraPosition.z - CHUNK_CENTER_OFFSET.z());
     }
 
     // TODO: find the right place to check if the activeCamera has changed,

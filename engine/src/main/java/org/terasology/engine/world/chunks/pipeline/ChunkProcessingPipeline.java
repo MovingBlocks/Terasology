@@ -139,12 +139,18 @@ public class ChunkProcessingPipeline {
             if (chunkProcessingInfo.hasNextStage(stages)) {
                 chunkProcessingInfo.nextStage(stages);
                 chunkProcessingInfo.makeChunkTask();
+                // Only this one info can newly have a pending (chunkTask set, no future yet) state -
+                // resetTaskState() just cleared it, and makeChunkTask() is the only place that sets it.
+                processChunkInfo(chunkProcessingInfo);
             } else {
                 // haven't next stage
                 chunkProcessingInfo.endProcessing();
                 cleanup(chunkProcessingInfo);
             }
-            processChunkTasks();
+            // Either branch may have just satisfied a neighbour's requirement (reached a stage far
+            // enough along, or finished and become visible via chunkProvider) - retry everyone who
+            // was blocked on that, rather than rescanning every in-flight chunk.
+            retryBlockedPositions();
 
         } catch (ExecutionException e) {
             String stageName =
@@ -157,9 +163,20 @@ logger.error("ChunkTask at position {} and stage [{}] catch error: ", chunkProce
         }
     }
 
-    private void processChunkTasks() {
-        for (ChunkProcessingInfo info : chunkProcessingInfoMap.values()) {
-            processChunkInfo(info);
+    /**
+     * Retry every position blocked on a missing requirement. A position only ever lands here because
+     * some other chunk hadn't reached the stage (or existence) it needed - and this fires right after
+     * a stage completion or chunk finish, which is the only thing that can have changed that.
+     */
+    private void retryBlockedPositions() {
+        if (blockedPositions.isEmpty()) {
+            return;
+        }
+        for (Vector3ic pos : Lists.newArrayList(blockedPositions)) {
+            ChunkProcessingInfo info = chunkProcessingInfoMap.get(pos);
+            if (info != null) {
+                processChunkInfo(info);
+            }
         }
     }
 

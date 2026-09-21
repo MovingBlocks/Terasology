@@ -39,6 +39,14 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
+    public float distanceSquared(float x, float y, float z) {
+        float dx = position.x() * Chunks.SIZE_X - x;
+        float dy = position.y() * Chunks.SIZE_Y - y;
+        float dz = position.z() * Chunks.SIZE_Z - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    @Override
     public AABBfc getAABB() {
         Vector3f min = getRenderPosition();
         return new AABBf(min, new Vector3f(Chunks.CHUNK_SIZE).mul(1 << scale).add(min));
