@@ -55,15 +55,20 @@ pipeline {
         stage('Merge Queue Check') {
             steps {
                 script {
-                    String tree = sh(script: 'git rev-parse "HEAD^{tree}"', returnStdout: true).trim()
-                    writeFile file: 'tested-tree.txt', text: tree
-                    archiveArtifacts 'tested-tree.txt'
+                    try {
+                        String tree = sh(script: 'git rev-parse "HEAD^{tree}"', returnStdout: true).trim()
+                        writeFile file: 'tested-tree.txt', text: tree
+                        archiveArtifacts 'tested-tree.txt'
 
-                    if (env.BRANCH_NAME.startsWith('gh-readonly-queue/')) {
-                        try {
+                        if (env.BRANCH_NAME.startsWith('gh-readonly-queue/')) {
                             // "pr-5403-f2b8434a..." -> "5403"
                             String pr = env.BRANCH_NAME.tokenize('/').last().tokenize('-')[1]
                             String prJob = '/' + env.JOB_NAME.substring(0, env.JOB_NAME.lastIndexOf('/')) + "/PR-${pr}"
+                            // The workspace outlives a build, and an optional copy that finds nothing leaves the
+                            // target alone: without this, an older build's record could stand in for this PR's.
+                            dir('pr-build') {
+                                deleteDir()
+                            }
                             copyArtifacts projectName: prJob, selector: lastSuccessful(stable: true),
                                 filter: 'tested-tree.txt', target: 'pr-build', optional: true
                             if (fileExists('pr-build/tested-tree.txt')) {
@@ -81,11 +86,12 @@ pipeline {
                             } else {
                                 echo "Merge queue: no stable build of ${prJob} recorded a tree. Running the full build."
                             }
-                        } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException aborted) {
-                            throw aborted
-                        } catch (err) {
-                            echo "Merge queue: could not compare against the PR build (${err}). Running the full build."
                         }
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException aborted) {
+                        throw aborted
+                    } catch (err) {
+                        alreadyTested = false
+                        echo "Merge queue check could not complete (${err}). Running the full build."
                     }
                 }
             }

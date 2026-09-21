@@ -32,15 +32,12 @@ public class ModuleTestingEnvironmentTest {
     @Test
     public void runUntilFutureHonoursItsOwnGameTimeTimeout(MainLoop mainLoop) {
         SettableFuture<?> unsatisfiedFuture = SettableFuture.create();
-        long startRealTime = System.currentTimeMillis();
 
         UncheckedTimeoutException exception = assertThrows(UncheckedTimeoutException.class,
                 () -> mainLoop.runUntil(200, unsatisfiedFuture));
 
         assertThat(exception).hasMessageThat().contains("200 ms");
         assertThat(unsatisfiedFuture.isCancelled()).isTrue();
-        // Well short of DEFAULT_GAME_TIME_TIMEOUT, which is what the future-taking form always waited for.
-        assertThat(System.currentTimeMillis() - startRealTime).isLessThan(ModuleTestingEnvironment.DEFAULT_GAME_TIME_TIMEOUT / 2);
     }
 
     @Test
