@@ -67,6 +67,9 @@ dependencies {
     testImplementation(libs.logback) {
         because("implementation: a test directly uses logback.classic classes")
     }
+    testImplementation("dev.dirs:directories:26") {
+        because("PathManagerTest checks default log/module-cache paths against the same OS-standard locations PathManager computes them from")
+    }
 
 
     // Test lib dependencies
