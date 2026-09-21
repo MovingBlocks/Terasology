@@ -141,8 +141,9 @@ public class MainLoop {
     /**
      * Runs until this future is complete or gameTimeTimeoutMs has passed in game time.
      * <p>
-     * Raising {@link #setSafetyTimeoutMs the safety timeout} does not lengthen this wait: that one is a real-time
-     * ceiling, and the game-time limit is reached first. A slow machine waiting on chunk generation needs this.
+     * Two independent limits apply and the first one reached ends the wait: this one, counted in game time, and
+     * {@link #setSafetyTimeoutMs the safety timeout}, counted in real time. A slow machine waiting on chunk generation
+     * may need both raised.
      *
      * @return the result of the future
      * @throws UncheckedTimeoutException if the future is not complete within {@code gameTimeTimeoutMs} of game time
