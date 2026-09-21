@@ -43,6 +43,10 @@ buildscript {
         // Our locally included /build-logic
         classpath("org.terasology.gradology:build-logic")
     }
+
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
 }
 
 plugins {
@@ -376,4 +380,19 @@ tasks.register<Zip>("assembleBuildHarness") {
 
     // set the archive name
     archiveFileName.set("build-harness.zip")
+}
+
+// Pass -PnoLock to resolve every dependency range fresh against whatever version satisfies it right now,
+// ignoring gradle.lockfile entirely for that one build - useful for trying out an update locally before
+// committing to it via --write-locks. Locking isn't activated at all in that case, so nothing gets
+// checked against or written to the lockfile either.
+//
+// Locks every resolvable configuration, not just compileClasspath - otherwise dependencies unique to
+// other configurations could still silently float to a newer version picked up from their declared range.
+if (!project.hasProperty("noLock")) {
+    subprojects {
+        dependencyLocking {
+            lockAllConfigurations()
+        }
+    }
 }
