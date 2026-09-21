@@ -16,9 +16,12 @@ public class VertexAttributeBinding<T, I extends T> extends VertexBinding {
         this.attribute = attribute;
     }
 
-
     public int elements() {
         return getResource().elements();
+    }
+
+    public boolean isEmpty() {
+        return getResource().isEmpty();
     }
 
     @Override
@@ -30,6 +33,22 @@ public class VertexAttributeBinding<T, I extends T> extends VertexBinding {
     public void allocate(int elements) {
         resource.allocateElements(elements);
         resource.mark();
+    }
+
+    /**
+     *
+     * @param from data getting copied from
+     * @param position position to start copying to dest
+     * @param dest the destination to fill
+     * @param target a temporary object to transfer data between from and dest
+     * @param <T>
+     * @param <I>
+     */
+    public static <T,I extends T> void copy(VertexAttributeBinding<T, I> from, int position, VertexAttributeBinding<T, I> dest, I target) {
+        dest.setPosition(position);
+        for (int i = 0; i < from.elements(); i++) {
+            dest.put(from.get(i, target));
+        }
     }
 
     /**
