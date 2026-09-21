@@ -105,8 +105,8 @@ public class ChunkProcessingPipeline {
      * Reactor thread. Handles all ChunkTask dependency logic and running.
      */
     private void chunkTaskHandler() {
-        try {
-            while (!executor.isTerminated()) {
+        while (!executor.isTerminated()) {
+            try {
                 PositionFuture<Chunk> future =
                         (PositionFuture<Chunk>) chunkProcessor.poll(POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
                 if (future == null) {
@@ -121,12 +121,15 @@ public class ChunkProcessingPipeline {
                     continue; // chunk processing was cancelled.
                 }
                 onStageDone(future, chunkProcessingInfo);
+            } catch (InterruptedException e) {
+                // shutdown() interrupts this thread to stop it. Any other interrupt must not end chunk
+                // processing: nothing restarts the reactor, so every later chunk would wait forever.
+                if (executor.isShutdown()) {
+                    reactor.interrupt();
+                    return;
+                }
+                logger.warn("Reactor thread was interrupted outside of shutdown; chunk processing continues", e);
             }
-        } catch (InterruptedException e) {
-            if (!executor.isTerminated()) {
-                logger.error("Reactor thread was interrupted", e);
-            }
-            reactor.interrupt();
         }
     }
 
