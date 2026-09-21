@@ -63,7 +63,9 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
+    // On Jenkins failing tests are findings: the junit step reads the reports and marks the build UNSTABLE, so the
+    // exit code stays reserved for a broken build. Locally nothing reads the reports, so a failing test fails the task.
+    ignoreFailures = System.getenv("JENKINS_URL") != null
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     // If false, the outputs are still collected and visible in the test report, but they don't spam the console.
     testLogging.showStandardStreams = false
