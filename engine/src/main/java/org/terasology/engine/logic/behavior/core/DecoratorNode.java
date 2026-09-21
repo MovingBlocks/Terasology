@@ -36,6 +36,7 @@ public class DecoratorNode extends ActionNode {
 
     @Override
     public BehaviorNode deepCopy() {
+        reinjectAction();
         DecoratorNode node = new DecoratorNode();
         node.setAction(action);
         node.child = child;
