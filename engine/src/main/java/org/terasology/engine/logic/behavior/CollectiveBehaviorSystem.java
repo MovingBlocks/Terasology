@@ -1,4 +1,4 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2022 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
@@ -6,12 +6,12 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
@@ -52,10 +52,11 @@ import java.util.Set;
 public class CollectiveBehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final Name BEHAVIORS = new Name("Behaviors");
     private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
+
+    @In
+    private Context context;
     @In
     private EntityManager entityManager;
-    @In
-    private PrefabManager prefabManager;
     @In
     private AssetManager assetManager;
 
@@ -117,7 +118,7 @@ public class CollectiveBehaviorSystem extends BaseComponentSystem implements Upd
             Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("overrides");
             savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");
         }
-        BehaviorTreeFormat loader = new BehaviorTreeFormat();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat(context);
         try {
             Files.createDirectories(savePath);
             Path file = savePath.resolve(uri.getResourceName() + ".behavior");
