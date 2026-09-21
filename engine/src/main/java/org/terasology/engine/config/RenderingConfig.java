@@ -61,7 +61,6 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String FRAME_LIMIT = "FrameLimit";
     public static final String FBO_SCALE = "FboScale";
     public static final String UI_SCALE = "UiScale";
-    public static final String CLAMP_LIGHTING = "ClampLighting";
     public static final String SCREENSHOT_SIZE = "screenshotSize";
     public static final String SCREENSHOT_FORMAT = "ScreenshotFormat";
     public static final String DUMP_SHADERS = "DumpShaders";
@@ -110,7 +109,6 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean inscattering;
     private boolean localReflections;
     private boolean vSync;
-    private boolean clampLighting;
     private int fboScale;
     private int uiScale = 100;
     private boolean dumpShaders;
@@ -628,16 +626,6 @@ public class RenderingConfig extends AbstractSubscribable {
         int oldScale = this.uiScale;
         this.uiScale = uiScale;
         propertyChangeSupport.firePropertyChange(UI_SCALE, oldScale, this.uiScale);
-    }
-
-    public boolean isClampLighting() {
-        return clampLighting;
-    }
-
-    public void setClampLighting(boolean clampLighting) {
-        boolean oldValue = this.clampLighting;
-        this.clampLighting = clampLighting;
-        propertyChangeSupport.firePropertyChange(CLAMP_LIGHTING, oldValue, this.clampLighting);
     }
 
     public ScreenshotSize getScreenshotSize() {
