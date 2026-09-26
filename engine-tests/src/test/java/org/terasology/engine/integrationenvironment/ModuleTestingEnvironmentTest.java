@@ -30,6 +30,17 @@ public class ModuleTestingEnvironmentTest {
     }
 
     @Test
+    public void runUntilFutureHonoursItsOwnGameTimeTimeout(MainLoop mainLoop) {
+        SettableFuture<?> unsatisfiedFuture = SettableFuture.create();
+
+        UncheckedTimeoutException exception = assertThrows(UncheckedTimeoutException.class,
+                () -> mainLoop.runUntil(200, unsatisfiedFuture));
+
+        assertThat(exception).hasMessageThat().contains("200 ms");
+        assertThat(unsatisfiedFuture.isCancelled()).isTrue();
+    }
+
+    @Test
     public void runUntilWithImmediateFutureReturnsValue(MainLoop mainLoop) {
         ListenableFuture<Integer> valueFuture = Futures.immediateFuture(THE_ANSWER);
         assertThat(mainLoop.runUntil(valueFuture)).isEqualTo(THE_ANSWER);
