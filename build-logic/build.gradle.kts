@@ -62,7 +62,7 @@ dependencies {
     implementation("org.jgrapht:jgrapht-core:1.5.0")
 
     // for inspecting modules
-    implementation("org.terasology.gestalt:gestalt-module:8.0.2-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-module:8.0.2")
 
     // JSON parsing for build-time asset validation.
     // Must match the engine's parser (settings.gradle.kts pins gson 2.8.6) so that validation

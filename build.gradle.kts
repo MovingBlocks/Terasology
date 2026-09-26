@@ -113,9 +113,7 @@ dependencies {
     natives("org.terasology.jnlua:jnlua_natives:0.1.0-SNAPSHOT@zip")
 
     // Natives for JNBullet
-    // 1.0.5-SNAPSHOT until a proper release is tagged - see MovingBlocks/JNBullet#23, which added
-    // the linux_windows_arm64_llvm_mingw32 (and linux_aarch64) native build targets we need here.
-    natives("org.terasology.jnbullet:JNBullet:1.0.5-SNAPSHOT@zip")
+    natives("org.terasology.jnbullet:JNBullet:1.0.5@zip")
 
 }
 
