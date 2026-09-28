@@ -133,7 +133,14 @@ public class BlockManagerImpl extends BlockManager {
      */
     private Block getAirBlock() {
         if (airBlock == null) {
-            airBlock = getBlock(AIR_ID);
+            Block resolved = getBlock(AIR_ID);
+            if (resolved == null) {
+                // getBlock(BlockUri) never falls back to getAirBlock() for AIR_ID itself,
+                // to avoid recursing before this field is set (was a StackOverflowError).
+                throw new IllegalStateException("Unable to resolve the air block (" + AIR_ID
+                        + "); the block family system is not fully initialised yet");
+            }
+            airBlock = resolved;
         }
         return airBlock;
     }
@@ -308,6 +315,10 @@ public class BlockManagerImpl extends BlockManager {
                 block = family.getBlockFor(uri);
             }
             if (block == null) {
+                if (uri.equals(AIR_ID)) {
+                    // Don't fall back to getAirBlock() while resolving AIR_ID itself - see getAirBlock().
+                    return null;
+                }
                 return getAirBlock();
             }
         }

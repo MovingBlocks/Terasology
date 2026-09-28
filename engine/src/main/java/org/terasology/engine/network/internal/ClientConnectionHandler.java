@@ -99,6 +99,16 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // Without this, a channel that closes before completeJoin() (e.g. before scheduleTimeout()
+        // ever ran) leaves joinStatus stuck IN_PROGRESS instead of failing JoinServer promptly.
+        if (joinStatus.getStatus() == JoinStatus.Status.IN_PROGRESS) {
+            joinStatus.setErrorMessage("Disconnected From Server");
+        }
+        super.channelInactive(ctx);
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // If we timed out, don't handle anymore messages.
         if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
