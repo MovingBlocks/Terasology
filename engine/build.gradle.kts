@@ -149,6 +149,8 @@ dependencies {
     implementation("org.terasology.crashreporter:cr-terasology:5.1.0")
 
     api(project(":subsystems:TypeHandlerLibrary"))
+
+    implementation("io.github.benjaminamos.TracyJavaBindings:TracyJavaBindings:1.0.0-SNAPSHOT")
 }
 
 protobuf {

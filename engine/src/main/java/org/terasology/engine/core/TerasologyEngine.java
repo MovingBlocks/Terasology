@@ -522,12 +522,10 @@ public class TerasologyEngine implements GameEngine {
      */
     @SuppressWarnings("checkstyle:EmptyBlock")
     private void mainLoop() {
-        PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         while (tick()) {
             /* do nothing */
         }
-        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -536,6 +534,7 @@ public class TerasologyEngine implements GameEngine {
      * @return true if the loop requesting a tick should continue running
      */
     public boolean tick() {
+        PerformanceMonitor.startActivity("Tick");
         if (shutdownRequested) {
             return false;
         }
@@ -583,8 +582,8 @@ public class TerasologyEngine implements GameEngine {
         }
         assetTypeManager.disposedUnusedAssets();
 
+        PerformanceMonitor.endActivity();
         PerformanceMonitor.rollCycle();
-        PerformanceMonitor.startActivity("Other");
         return true;
     }
 
