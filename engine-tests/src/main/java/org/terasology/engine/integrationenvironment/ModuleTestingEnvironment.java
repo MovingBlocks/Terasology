@@ -44,6 +44,13 @@ public interface ModuleTestingEnvironment {
     <T> T runUntil(ListenableFuture<T> future);
 
     /**
+     * Runs until this future is complete or gameTimeTimeoutMs has passed in game time.
+     *
+     * @return the result of the future
+     */
+    <T> T runUntil(long gameTimeTimeoutMs, ListenableFuture<T> future);
+
+    /**
      * Runs the engine until {@code condition} holds, failing the test if it does not.
      * <p>
      * Prefer this over {@link #runUntil(Supplier)} in tests: a timeout throws with the description

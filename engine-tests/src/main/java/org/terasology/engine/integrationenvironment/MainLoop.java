@@ -135,13 +135,29 @@ public class MainLoop {
      * @return the result of the future
      */
     public <T> T runUntil(ListenableFuture<T> future) {
-        boolean timedOut = runUntil(future::isDone);
+        return runUntil(ModuleTestingEnvironment.DEFAULT_GAME_TIME_TIMEOUT, future);
+    }
+
+    /**
+     * Runs until this future is complete or gameTimeTimeoutMs has passed in game time.
+     * <p>
+     * Two independent limits apply and the first one reached ends the wait: this one, counted in game time, and
+     * {@link #setSafetyTimeoutMs the safety timeout}, counted in real time. A slow machine waiting on chunk generation
+     * may need both raised.
+     *
+     * @return the result of the future
+     * @throws UncheckedTimeoutException if the future is not complete within {@code gameTimeTimeoutMs} of game time
+     */
+    public <T> T runUntil(long gameTimeTimeoutMs, ListenableFuture<T> future) {
+        boolean timedOut = runUntil(gameTimeTimeoutMs, future::isDone);
         if (timedOut) {
             // TODO: if runUntil returns timedOut but does not throw an exception, it
-            //     means it hit DEFAULT_GAME_TIME_TIMEOUT but not SAFETY_TIMEOUT, and
+            //     means it hit the game time timeout but not SAFETY_TIMEOUT, and
             //     that's a weird interface due for a revision.
             future.cancel(true);  // let it know we no longer expect results
-            throw new UncheckedTimeoutException("No result within default timeout.");
+            throw new UncheckedTimeoutException(String.format("No result within %d ms of game time%s.",
+                    gameTimeTimeoutMs,
+                    gameTimeTimeoutMs == ModuleTestingEnvironment.DEFAULT_GAME_TIME_TIMEOUT ? " (the default timeout)" : ""));
         }
         try {
             return future.get(0, TimeUnit.SECONDS);
