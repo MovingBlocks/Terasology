@@ -6,6 +6,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.context.Lifetime;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
@@ -48,6 +50,8 @@ import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexParameterf;
 
 public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
+
+    private static final Logger logger = LoggerFactory.getLogger(LwjglGraphicsManager.class);
 
     private final BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
 
@@ -110,7 +114,17 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         if (!displayThreadActions.isEmpty()) {
             List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
             displayThreadActions.drainTo(actions);
-            actions.forEach(Runnable::run);
+            // One action failing must not silently drop the rest of the batch. This queue is shared by
+            // every asynchToDisplayThread caller - ShaderManager.recompileAllShaders() alone queues one
+            // action per loaded shader - so an uncaught exception from any single queued action used to
+            // abort every action queued after it in the same frame, not just the one that failed.
+            for (Runnable action : actions) {
+                try {
+                    action.run();
+                } catch (RuntimeException e) {
+                    logger.warn("Display thread action failed: {}", e.getMessage(), e); //NOPMD
+                }
+            }
         }
     }
 
