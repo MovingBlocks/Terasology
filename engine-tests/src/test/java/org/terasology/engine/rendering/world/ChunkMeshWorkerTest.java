@@ -243,4 +243,35 @@ public class ChunkMeshWorkerTest {
     void testWorkerStopsWhenShutDown() {
         fail("TODO: add shutdown method");
     }
+
+    @Test
+    void chunksFrontCountSortsOnlyTheLeadingEntries() {
+        worker = new ChunkMeshWorker(ChunkMeshWorkerTest::alwaysCreateMesh, comparator,
+                Schedulers.parallel(), Schedulers.single());
+
+        var near = newDirtyChunk(position0);
+        var mid = newDirtyChunk(new Vector3i(position0).add(10, 0, 0));
+        var far = newDirtyChunk(new Vector3i(position0).add(100, 0, 0));
+        worker.add(far);
+        worker.add(near);
+        worker.add(mid);
+
+        var result = worker.chunks(2);
+
+        assertThat(result).hasSize(3);
+        assertThat(result.subList(0, 2)).containsExactly(near, mid).inOrder();
+    }
+
+    @Test
+    void chunksZeroFrontCountReturnsAllUnsorted() {
+        worker = new ChunkMeshWorker(ChunkMeshWorkerTest::alwaysCreateMesh, comparator,
+                Schedulers.parallel(), Schedulers.single());
+
+        var far = newDirtyChunk(new Vector3i(position0).add(100, 0, 0));
+        var near = newDirtyChunk(position0);
+        worker.add(far);
+        worker.add(near);
+
+        assertThat(worker.chunks(0)).containsExactly(far, near);
+    }
 }
