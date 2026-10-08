@@ -202,11 +202,23 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     protected void updateViewport(int width, int height) {
         glViewport(0, 0, width, height);
-        
-        //If the screen is minimized, resolution change is stopped to avoid the width and height of FBO being set to 0.
+
+        // GLFW reports the framebuffer as 0x0 while the window is minimized, and
+        // DisplayResolutionDependentFbo.propertyChange regenerates every resolution-dependent FBO at
+        // whatever size the display device reports whenever this event fires - it does not look at
+        // the old/new values below, only at whether the event fired at all. So an unconditional fire
+        // here means minimizing regenerates every FBO at 0x0, and restoring the window leaves them
+        // that way until something else triggers a further resize - the black screen on restore this
+        // is meant to prevent (#4980, #5081).
+        //
+        // PropertyChangeSupport.firePropertyChange skips notifying listeners when old equals new, so
+        // that is used here as the on/off switch: while minimized, pass (1, 1) so the compare matches
+        // and nothing fires; otherwise pass (0, 1) so a genuine resize still does. This was previously
+        // inverted - isMinimized picked the value that differs from newValue, the opposite of what
+        // "stop the resolution change" requires - so it suppressed real resizes instead of minimizes.
         boolean isMinimized = GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_ICONIFIED) == GLFW.GLFW_TRUE;
-        int i = isMinimized ? 0 : 1;       
-        propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, i, 1);
+        int oldValue = isMinimized ? 1 : 0;
+        propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, oldValue, 1);
     }
 
     private GLFWVidMode getFullScreenDisplayMode() {
