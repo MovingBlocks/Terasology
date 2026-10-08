@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
@@ -57,6 +58,8 @@ public class EventSystemReplayImplTest {
         entityManager.setPrefabManager(new PojoPrefabManager(context));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(false);
         recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         RecordedEventStore eventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
@@ -77,7 +80,8 @@ public class EventSystemReplayImplTest {
         selectedClassesToReplay.add(InputEvent.class);
 
         eventSystem = new EventSystemReplayImpl(entitySystemLibrary.getEventLibrary(), networkSystem, entityManager,
-                eventStore, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay, recordAndReplayCurrentStatus);
+                eventStore, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay, recordAndReplayCurrentStatus,
+                displayDevice);
 
         entityManager.setEventSystem(eventSystem);
 

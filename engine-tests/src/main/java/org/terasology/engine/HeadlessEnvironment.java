@@ -22,6 +22,7 @@ import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.core.subsystem.headless.assets.HeadlessShader;
@@ -152,6 +153,9 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupEntitySystem(ServiceRegistry serviceRegistry) {
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(true);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> displayDevice);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
     }
 
