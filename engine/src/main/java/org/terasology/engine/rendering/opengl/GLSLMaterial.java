@@ -132,10 +132,24 @@ public class GLSLMaterial extends BaseMaterial {
         uniformLocationMap.clear();
         bindMap.clear();
 
-        disposalAction.shaderPrograms.put(0, shader.linkShaderProgram(0));
-        for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
-            int featureMask = ShaderProgramFeature.getBitset(permutation);
-            disposalAction.shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
+        // Existing programs are already gone by this point (above). shader already skips (and logs)
+        // any feature combination that failed to compile for the running driver, most reachable here
+        // since ShaderManager.recompileAllShaders() - the video settings screen's path - is what
+        // first exercises feature combinations a lower preset never used. Mirror that here: linking
+        // a hash the shader never compiled would attach shader object 0, a GL-level failure that
+        // doesn't throw, silently producing a broken program instead of a caught, logged one.
+        try {
+            if (shader.hasCompiledPermutation(0)) {
+                disposalAction.shaderPrograms.put(0, shader.linkShaderProgram(0));
+            }
+            for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
+                int featureMask = ShaderProgramFeature.getBitset(permutation);
+                if (shader.hasCompiledPermutation(featureMask)) {
+                    disposalAction.shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
+                }
+            }
+        } catch (RuntimeException e) {
+            logger.warn("Failed to recompile {}: {}", getUrn(), e.getMessage()); //NOPMD
         }
 
         //resolves #966
