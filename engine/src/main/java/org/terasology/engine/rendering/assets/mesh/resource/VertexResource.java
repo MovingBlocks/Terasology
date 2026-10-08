@@ -7,6 +7,9 @@ package org.terasology.engine.rendering.assets.mesh.resource;
  * A resource that represents vertex data
  */
 public class VertexResource extends BufferedResource {
+    public static final int FEATURE_NORMALIZED = 0x1;
+    public static final int FEATURE_INTEGER = 0x2;
+
     private int inStride = 0;
     private VertexDefinition[] attributes;
 
@@ -102,14 +105,17 @@ public class VertexResource extends BufferedResource {
      * describes the metadata and placement into the buffer based off the stride.
      */
     public static class VertexDefinition {
+
         public final int location;
         public final BaseVertexAttribute attribute;
         public final int offset;
+        public final int features;
 
-        public VertexDefinition(int location, int offset, BaseVertexAttribute attribute) {
+        public VertexDefinition(int location, int offset, BaseVertexAttribute attribute, int features) {
             this.location = location;
             this.attribute = attribute;
             this.offset = offset;
+            this.features = features;
         }
     }
 }
