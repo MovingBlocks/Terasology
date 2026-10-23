@@ -6,6 +6,7 @@ package org.terasology.engine.core.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Lifetime;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
@@ -89,6 +90,16 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             FastRandom random = new FastRandom();
             worldInfo.setSeed(random.nextString(16));
         }
+
+        // Only "Create New Game" (GameManifestProvider) and headless setup (StateHeadlessSetup) populate
+        // UniverseConfig themselves; every other load path (CLI --load-last-game/--create-last-game,
+        // "Load Game" in the menu, multiplayer join) reaches here without ever having done so. A later save
+        // (ReadWriteStorageManager) rebuilds the manifest purely from UniverseConfig, so leaving it empty
+        // silently drops this world - including its generator - from the game the next time it's saved.
+        Config config = context.get(Config.class);
+        config.getUniverseConfig().addWorldManager(worldInfo);
+        config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
+        config.getUniverseConfig().setUniverseSeed(gameManifest.getSeed());
 
         serviceRegistry.with(WorldInfo.class).lifetime(Lifetime.Singleton).use(() -> worldInfo);
 
