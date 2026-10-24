@@ -18,6 +18,7 @@ import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.LateLightMerger;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
@@ -26,7 +27,6 @@ import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
-import org.terasology.engine.world.propagation.light.LightMerger;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -50,9 +50,13 @@ import java.util.function.Consumer;
  */
 public class RemoteChunkProvider implements ChunkProvider {
 
+    /** Per-tick allowance for main-thread chunk work, matching LocalChunkProvider's. */
+    private static final int UPDATE_PROCESSING_DEADLINE_MS = 24;
+
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<Vector3ic> invalidateChunks = Queues.newLinkedBlockingQueue();
     private final Map<Vector3ic, Chunk> chunkCache = Maps.newHashMap();
+    private final LateLightMerger lateLightMerger = new LateLightMerger(chunkCache);
     private final BlockManager blockManager;
     private final ChunkProcessingPipeline loadingPipeline;
     private EntityRef worldEntity = EntityRef.NULL;
@@ -68,12 +72,6 @@ public class RemoteChunkProvider implements ChunkProvider {
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return LightMerger.merge(localchunks);
-                }, LightMerger::requiredChunks
-            ))
             .addStage(ChunkTaskProvider.create("", readyChunks::add));
 
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -94,6 +92,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     @Override
     public void update() {
+        long processingStartTime = System.currentTimeMillis();
         if (listener != null) {
             checkForUnload();
         }
@@ -104,11 +103,17 @@ public class RemoteChunkProvider implements ChunkProvider {
                 oldChunk.dispose();
             }
             chunk.markReady();
+            // Light merging is no longer a pipeline stage the chunk waits on before this point - it now
+            // happens here, incrementally, once neighbours are available. See LateLightMerger.
+            lateLightMerger.chunkReady(chunk.getPosition());
             if (listener != null) {
                 listener.onChunkReady(chunk.getPosition());
             }
             worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         }
+        // Bounded by the tick it runs in, matching LocalChunkProvider - merging is main-thread work
+        // now, so it has to compete for frame time rather than be handed its own slice of it.
+        lateLightMerger.processPending(processingStartTime, UPDATE_PROCESSING_DEADLINE_MS);
     }
 
     private void checkForUnload() {
@@ -116,6 +121,9 @@ public class RemoteChunkProvider implements ChunkProvider {
         invalidateChunks.drainTo(positions);
         for (Vector3ic pos : positions) {
             Chunk removed = chunkCache.remove(pos);
+            // Otherwise a position at the edge of the loaded world - which never completes its
+            // neighbourhood and so never gets merged - would sit in this bookkeeping forever.
+            lateLightMerger.chunkUnloaded(pos);
             if (removed != null && !removed.isReady()) {
                 worldEntity.send(new BeforeChunkUnload(pos));
                 removed.dispose();
