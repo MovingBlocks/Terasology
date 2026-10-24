@@ -231,12 +231,20 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
             addAction((ActionNode) node, action);
             JsonElement childJson = jsonElement.getAsJsonObject().get("child");
             BehaviorNode child = context.deserialize(childJson, BehaviorNode.class);
+            if (child == null) {
+                throw new JsonParseException("Malformed behavior tree: decorator '" + type
+                        + "' has no valid child (check for a missing/null \"child\" entry)");
+            }
             node.insertChild(0, child);
         } else if (jsonElement.isJsonArray()) {
             List<BehaviorNode> children = context.deserialize(jsonElement, new TypeToken<List<BehaviorNode>>() {
             }.getType());
             for (int i = 0; i < children.size(); i++) {
                 BehaviorNode child = children.get(i);
+                if (child == null) {
+                    throw new JsonParseException("Malformed behavior tree: '" + type
+                            + "' has a null child at index " + i + " (check for a stray/trailing comma)");
+                }
                 node.insertChild(i, child);
             }
         }
