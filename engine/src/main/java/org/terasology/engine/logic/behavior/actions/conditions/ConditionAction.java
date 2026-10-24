@@ -50,7 +50,7 @@ public class ConditionAction extends BaseAction {
     @Override
     public BehaviorState modify(Actor actor, BehaviorState result) {
         try {
-            if (!condition(actor)) {
+            if (!condition(actor) || result.equals(BehaviorState.FAILURE)) {
                 return BehaviorState.FAILURE;
             }
             return BehaviorState.SUCCESS;
