@@ -11,6 +11,7 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
@@ -57,6 +58,9 @@ public class OwnershipHelperTest {
         serviceRegistry.with(NetworkSystem.class).lifetime(Lifetime.Singleton).use(() -> networkSystem);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> recordAndReplayCurrentStatus);
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(true);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> displayDevice);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         Context context = new ContextImpl(serviceRegistry);

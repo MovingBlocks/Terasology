@@ -7,6 +7,7 @@ import com.google.common.base.VerifyException;
 import org.terasology.context.Lifetime;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
@@ -181,8 +182,9 @@ public final class EntitySystemSetupUtil {
 
     public static final class NetworkEventSystemWrapped extends NetworkEventSystemDecorator {
         @Inject
-        public NetworkEventSystemWrapped(NetworkSystem networkSystem, EntitySystemLibrary entitySystemLibrary) {
-            super(new EventSystemImpl(networkSystem.getMode().isAuthority()),
+        public NetworkEventSystemWrapped(NetworkSystem networkSystem, EntitySystemLibrary entitySystemLibrary,
+                                         DisplayDevice displayDevice) {
+            super(new EventSystemImpl(networkSystem.getMode().isAuthority(), displayDevice.isHeadless()),
                             networkSystem, entitySystemLibrary.getEventLibrary());
         }
     }
@@ -192,8 +194,9 @@ public final class EntitySystemSetupUtil {
         public RecordingEventSystemWrapped(RecordingClasses recordingClasses, NetworkSystem networkSystem,
                                            EntitySystemLibrary entitySystemLibrary,
                                            RecordedEventStore recordedEventStore,
-                                           RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
-            super(new NetworkEventSystemDecorator(new EventSystemImpl(networkSystem.getMode().isAuthority()),
+                                           RecordAndReplayCurrentStatus recordAndReplayCurrentStatus,
+                                           DisplayDevice displayDevice) {
+            super(new NetworkEventSystemDecorator(new EventSystemImpl(networkSystem.getMode().isAuthority(), displayDevice.isHeadless()),
                     networkSystem, entitySystemLibrary.getEventLibrary()), new EventCatcher(recordingClasses, recordedEventStore),
                     recordAndReplayCurrentStatus);
         }
