@@ -42,7 +42,9 @@ public final class GameThread {
      */
     public static void asynch(Runnable process) {
         if (!Thread.currentThread().equals(gameThread)) {
-            pendingRunnables.push(process);
+            // addLast (not push/addFirst): processWaitingProcesses() drains head-first,
+            // so submissions must queue at the tail to run in FIFO order.
+            pendingRunnables.addLast(process);
         } else {
             process.run();
         }
@@ -58,7 +60,7 @@ public final class GameThread {
     public static void synch(Runnable process) throws InterruptedException {
         if (!Thread.currentThread().equals(gameThread)) {
             BlockingProcess blockingProcess = new BlockingProcess(process);
-            pendingRunnables.push(blockingProcess);
+            pendingRunnables.addLast(blockingProcess);
             blockingProcess.waitForCompletion();
         } else {
             process.run();

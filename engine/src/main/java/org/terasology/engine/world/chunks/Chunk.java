@@ -141,6 +141,14 @@ public interface Chunk extends RenderableChunk {
         return new Vector3f(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
+    @Override
+    default float distanceSquared(float x, float y, float z) {
+        float dx = getChunkWorldOffsetX() - x;
+        float dy = getChunkWorldOffsetY() - y;
+        float dz = getChunkWorldOffsetZ() - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
 
     /**
      * Returns X offset of this chunk to the world center (0:0:0), with one unit being one block.
