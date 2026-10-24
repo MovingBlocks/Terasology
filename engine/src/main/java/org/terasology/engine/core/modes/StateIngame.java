@@ -112,6 +112,13 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
+        boolean save = networkSystem.getMode().isAuthority();
+        if (save && storageManager != null && worldRenderer != null) {
+            // Refreshes the FBO the save-preview screenshot reads (#5321, stale/blank otherwise).
+            // Must run before chunkProvider.dispose() / asset disposal below - too late otherwise.
+            worldRenderer.render(RenderingStage.MONO);
+        }
+
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
@@ -128,7 +135,6 @@ public class StateIngame implements GameState {
         assetTypeManager.getAssetType(BlockFamilyDefinition.class).ifPresent(AssetType::disposeAll);
         assetTypeManager.getAssetType(Prefab.class).ifPresent(AssetType::disposeAll);
 
-        boolean save = networkSystem.getMode().isAuthority();
         if (save && storageManager != null) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
