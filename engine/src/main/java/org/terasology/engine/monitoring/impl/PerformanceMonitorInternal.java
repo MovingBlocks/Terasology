@@ -21,4 +21,6 @@ public interface PerformanceMonitorInternal {
     TObjectDoubleMap<String> getDecayingSpikes();
 
     TObjectDoubleMap<String> getAllocationMean();
+
+    void shutdown();
 }

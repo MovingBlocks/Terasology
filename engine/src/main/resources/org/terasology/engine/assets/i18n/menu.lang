@@ -340,6 +340,7 @@
     "settings-debug-mode": "settings-debug-mode",
     "settings-language": "settings-language",
     "settings-monitoring-enabled": "settings-monitoring-enabled",
+    "settings-tracy-profiler-enabled": "settings-tracy-profiler-enabled",
     "settings-saves-enabled": "settings-saves-enabled",
     "settings-seconds-between-saves": "settings-seconds-between-saves",
     "settings-title": "settings-title",

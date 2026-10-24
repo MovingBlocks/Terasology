@@ -68,6 +68,12 @@ public class SystemConfig extends AutoConfig {
             name("${engine:menu#settings-monitoring-enabled}")
     );
 
+    public final Setting<Boolean> tracyProfilerEnabled = setting(
+            type(Boolean.class),
+            defaultValue(false),
+            name("${engine:menu#settings-tracy-profiler-enabled}")
+    );
+
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
             defaultValue(true),
