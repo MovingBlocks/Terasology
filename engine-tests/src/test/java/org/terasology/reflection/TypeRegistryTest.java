@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.reflection;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.engine.ModuleEnvironmentTest;
@@ -25,8 +24,6 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
         Reflections.log = null;
     }
 
-    // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    @Disabled("Seems to intermittently stall, at least on Win10")
     @Test
     public void testNonModuleTypes() {
         assumeTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
@@ -34,8 +31,6 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
         assertTrue(typeRegistry.getSubtypesOf(Map.class).contains(LinkedHashMap.class));
     }
 
-    // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    @Disabled("Seems to intermittently stall, at least on Win10")
     @Test
     public void testModuleTypes() {
         Set<Name> modulesDeclaringComponents =
@@ -46,8 +41,6 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
         assertTrue(modulesDeclaringComponents.contains(new Name("engine")), modulesDeclaringComponents::toString);
     }
 
-    // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    @Disabled("Seems to intermittently stall, at least on Win10")
     @Test
     public void testWhitelistedTypes() {
         Set<Class<?>> allTypes = typeRegistry.getSubtypesOf(Object.class);
