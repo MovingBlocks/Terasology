@@ -31,7 +31,7 @@ dependencyResolutionManagement {
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4j)
             library("slf4j-jul", "org.slf4j", "jul-to-slf4j").versionRef(slf4j)
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
-            val nui = version("nui", "4.0.0-SNAPSHOT")
+            val nui = version("nui", "4.0.0")
             library("terasology-nui", "org.terasology.nui", "nui").versionRef(nui)
             library("terasology-nuigestalt", "org.terasology.nui", "nui-gestalt").versionRef(nui)
             library("terasology-nuireflect", "org.terasology.nui", "nui-reflect").versionRef(nui)

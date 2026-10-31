@@ -23,7 +23,7 @@ dependencies {
     implementation("net.sf.trove4j:trove4j:3.0.3")
 
     implementation("org.terasology:reflections:0.9.12-MB")
-    implementation("org.terasology.nui:nui-reflect:4.0.0-SNAPSHOT")
+    implementation("org.terasology.nui:nui-reflect:4.0.0")
     implementation(libs.gestalt.module)
     implementation(libs.gestalt.core)
 

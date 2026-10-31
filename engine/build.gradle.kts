@@ -182,7 +182,7 @@ println("Version for $project.name loaded as $version for group $group")
 
 // This version info file actually goes inside the built jar and can be used at runtime, contents:
 // displayVersion=alpha-20
-// engineVersion=5.4.0-SNAPSHOT
+// engineVersion=5.4.0
 tasks.register<WriteProperties>("createVersionInfoFile") {
     mapOf(
         "buildNumber" to env["BUILD_NUMBER"],
