@@ -75,6 +75,33 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             viewDistance.bindSelection(BindHelper.bindBeanProperty("viewDistance", config.getRendering(), ViewDistance.class));
         }
 
+        UISlider chunkThreads = find("chunkThreads", UISlider.class);
+        if (chunkThreads != null) {
+            chunkThreads.setIncrement(1.0f);
+            chunkThreads.setPrecision(0);
+            chunkThreads.setMinimum(0);
+            chunkThreads.setRange(Runtime.getRuntime().availableProcessors());
+            chunkThreads.setLabelFunction(input -> {
+                if (input == 0) {
+                    return "Auto";
+                } else {
+                    return String.valueOf(input.intValue());
+                }
+            });
+            chunkThreads.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return (float) config.getRendering().getChunkThreads();
+                }
+
+                @Override
+                public void set(Float value) {
+                    int chunkThreads = value.intValue();
+                    config.getRendering().setChunkThreads(chunkThreads);
+                }
+            });
+        }
+
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
         if (waterReflection != null) {
             waterReflection.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
@@ -291,7 +318,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("vrSupport", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateGrass", BindHelper.bindBeanProperty("animateGrass", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateWater", BindHelper.bindBeanProperty("animateWater", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "volumetricFog", BindHelper.bindBeanProperty("volumetricFog", config.getRendering(), Boolean.TYPE));
@@ -329,7 +355,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     }
 
     public void saveSettings() {
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering())); //NOPMD
         // TODO: add a dirty flag that checks if recompiling is needed
         CoreRegistry.get(ShaderManager.class).recompileAllShaders();
         triggerBackAnimation();

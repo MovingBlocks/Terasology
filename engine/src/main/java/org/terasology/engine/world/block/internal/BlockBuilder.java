@@ -21,6 +21,7 @@ import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.tiles.BlockTile;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.Color;
 
 import java.util.Map;
@@ -33,6 +34,15 @@ public class BlockBuilder implements BlockBuilderHelper {
     private BlockShape lowShape;
     private BlockShape topShape;
 
+    public BlockBuilder(AssetManager assetManager, WorldAtlas worldAtlas) {
+        this.worldAtlas = worldAtlas;
+
+        cubeShape = assetManager.getAsset("engine:cube", BlockShape.class).get();
+        lowShape = assetManager.getAsset("engine:trimmedLoweredCube", BlockShape.class).get();
+        topShape = assetManager.getAsset("engine:trimmedRaisedCube",  BlockShape.class).get();
+    }
+
+    @Deprecated
     public BlockBuilder(WorldAtlas worldAtlas) {
         this.worldAtlas = worldAtlas;
 

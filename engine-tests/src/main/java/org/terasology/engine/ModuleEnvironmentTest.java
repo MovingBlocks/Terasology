@@ -12,6 +12,7 @@ import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public abstract class ModuleEnvironmentTest {
     protected ModuleTypeRegistry typeRegistry;
 
     @BeforeEach
-    public void before(@TempDir Path tempHome) throws Exception {
+    public void before(@TempDir Path tempHome) throws IOException {
         PathManager.getInstance().useOverrideHomePath(tempHome);
 
         moduleManager = ModuleManagerFactory.create();

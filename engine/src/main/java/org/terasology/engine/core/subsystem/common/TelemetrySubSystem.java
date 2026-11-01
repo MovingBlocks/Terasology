@@ -6,6 +6,7 @@ import ch.qos.logback.classic.LoggerContext;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.TelemetryConfig;
 import org.terasology.engine.config.facade.TelemetryConfiguration;
@@ -15,7 +16,9 @@ import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.telemetry.Metrics;
 import org.terasology.engine.telemetry.TelemetryEmitter;
 import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.gestalt.di.ServiceRegistry;
 
+import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -40,21 +43,25 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     private Emitter emitter;
 
+    @Inject
+    public TelemetrySubSystem() {
+    }
+
     @Override
     public String getName() {
         return "Telemetry";
     }
 
     @Override
-    public void preInitialise(Context rootContext) {
+    public void preInitialise(ServiceRegistry serviceRegistry) {
 
         // Add metrics to context, this helps show metric values in ui
         metrics = new Metrics();
-        rootContext.put(Metrics.class, metrics);
+        serviceRegistry.with(Metrics.class).lifetime(Lifetime.Singleton).use(() -> metrics);
 
         // Add snowplow emitter to context, contributors can use this emitter to emit other event
         emitter = TelemetryEmitter.builder().build();
-        rootContext.put(Emitter.class, emitter);
+        serviceRegistry.with(Emitter.class).lifetime(Lifetime.Singleton).use(() -> emitter);
     }
 
     @Override

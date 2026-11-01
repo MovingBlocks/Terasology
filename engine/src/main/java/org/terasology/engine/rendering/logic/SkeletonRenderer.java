@@ -92,9 +92,20 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
         if (skeleton.boneEntities == null) {
             skeleton.boneEntities = Maps.newHashMap();
-            for (Bone bone : skeleton.mesh.getBones()) {
-                LocationComponent loc = new LocationComponent();
-                EntityRef boneEntity = entityManager.create(loc);
+        }
+        for (Bone bone : skeleton.mesh.getBones()) {
+            EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
+            // A saved boneEntities map can reference an entity that failed to restore (e.g. a
+            // dangling id from an older/corrupted save) - recreate it rather than crash the whole
+            // world load on what's otherwise a single skeleton's worth of missing bone state.
+            if (boneEntity == null || !boneEntity.exists() || !boneEntity.hasComponent(LocationComponent.class)) {
+                if (boneEntity != null && boneEntity.exists()) {
+                    logger.warn("Bone entity for \"{}\" exists but has no LocationComponent, recreating", bone.getName());
+                    // Destroy before replacing the map entry, or the old one is orphaned in the
+                    // world - these accumulate on every load of an affected save.
+                    boneEntity.destroy();
+                }
+                boneEntity = entityManager.create(new LocationComponent());
                 skeleton.boneEntities.put(bone.getName(), boneEntity);
             }
         }
@@ -307,7 +318,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneTransform.mul(bone.getInverseBindMatrix());
                     boneTransforms[bone.getIndex()] = boneTransform.transpose();
                 } else {
-                    logger.warn("Unable to resolve bone \"{}\"", bone.getName());
+                    logger.warn("Unable to resolve bone \"{}\"", bone.getName()); //NOPMD
                     boneTransforms[bone.getIndex()] = new Matrix4f();
                 }
             }

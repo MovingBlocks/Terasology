@@ -18,7 +18,6 @@ import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
 import org.terasology.engine.rendering.assets.material.Material;
@@ -43,6 +42,7 @@ import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
 
+import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -91,7 +91,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private Matrix4fStack modelMatrixStack = new Matrix4fStack(10000);
     private Matrix4f projMatrix = new Matrix4f();
 
-    public LwjglCanvasRenderer(Context context) {
+    @Inject
+    public LwjglCanvasRenderer(AssetManager assetManager, Config config, DisplayDevice displayDevice) {
 
         // TODO use context to get assets instead of static methods
         this.textureMat = Assets.getMaterial("engine:UITexture").orElseThrow(
@@ -105,12 +106,12 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 () -> new RuntimeException("Failing to find engine textures"));
 
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
-        this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline",
+        this.fontMeshBuilder = new FontMeshBuilder(assetManager.getAsset("engine:UIUnderline",
                 Material.class).get());
         // failure to load these can be due to failing shaders or missing resources
 
-        this.renderingConfig = context.get(Config.class).getRendering();
-        this.displayDevice = context.get(DisplayDevice.class);
+        this.renderingConfig = config.getRendering();
+        this.displayDevice = displayDevice;
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
 
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);

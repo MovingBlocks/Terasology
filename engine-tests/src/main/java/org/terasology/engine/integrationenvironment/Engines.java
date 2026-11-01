@@ -5,11 +5,13 @@ package org.terasology.engine.integrationenvironment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.PathManagerProvider;
@@ -30,7 +32,6 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
-import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.network.JoinStatus;
@@ -67,10 +68,12 @@ import static org.junit.platform.commons.support.ReflectionSupport.newInstance;
  * host. Currently all engine instances are headless, though it is possible to use headed engines in the future.
  */
 public class Engines {
+    public static final String DEFAULT_WORLD_GENERATOR = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+
     private static final Logger logger = LoggerFactory.getLogger(Engines.class);
 
-    protected final Set<String> dependencies = Sets.newHashSet("engine");
-    protected String worldGeneratorUri = ModuleTestingEnvironment.DEFAULT_WORLD_GENERATOR;
+    protected final Set<String> dependencies = Sets.newHashSet();
+    protected String worldGeneratorUri = DEFAULT_WORLD_GENERATOR;
     protected boolean doneLoading;
     protected Context hostContext;
     protected final List<TerasologyEngine> engines = Lists.newArrayList();
@@ -80,6 +83,9 @@ public class Engines {
     PathManagerProvider.Cleaner pathManagerCleaner;
     TerasologyEngine host;
     private final NetworkMode networkMode;
+
+    /** What {@link CoreRegistry} held before {@link #setup()}, restored by {@link #tearDown()}. */
+    private Context coreRegistryBeforeSetup;
 
     public Engines(List<String> dependencies, String worldGeneratorUri, NetworkMode networkMode,
                    List<Class<? extends EngineSubsystem>> subsystems) {
@@ -98,6 +104,9 @@ public class Engines {
      * Every instance should be shut down properly by calling {@link #tearDown()}.
      */
     public void setup() {
+        // Captured before anything starts an engine: bringing up the host installs its own context
+        // into CoreRegistry, and this needs the one from before this environment existed.
+        coreRegistryBeforeSetup = CoreRegistry.get(Context.class);
         mockPathManager();
         try {
             host = createHost(networkMode);
@@ -106,7 +115,9 @@ public class Engines {
         }
         ScreenGrabber grabber = Mockito.mock(ScreenGrabber.class);
         hostContext.put(ScreenGrabber.class, grabber);
-        CoreRegistry.put(GameEngine.class, host);
+        Context coreContextOverride = new ContextImpl(CoreRegistry.get(Context.class));
+        coreContextOverride.put(GameEngine.class, host);
+        CoreRegistry.setContext(coreContextOverride);
     }
 
     /**
@@ -115,9 +126,19 @@ public class Engines {
      * Used to properly shut down and clean up a testing environment set up and started with {@link #setup()}.
      */
     public void tearDown() {
-        engines.forEach(TerasologyEngine::shutdown);
-        engines.forEach(TerasologyEngine::cleanup);
-        engines.clear();
+        try {
+            engines.forEach(TerasologyEngine::shutdown);
+            engines.forEach(TerasologyEngine::cleanup);
+            engines.clear();
+        } finally {
+            // CoreRegistry is process-global, so this has to happen even if shutdown throws:
+            // leaving this environment's context installed means the next one wraps it as a
+            // parent, and a chain of contexts belonging to shut-down engines accumulates across a
+            // test class. (CoreRegistry is deprecated and on its way out; until it is gone,
+            // anything read from it may be stale.)
+            CoreRegistry.setContext(coreRegistryBeforeSetup);
+            coreRegistryBeforeSetup = null;
+        }
         try {
             pathManagerCleaner.close();
         } catch (RuntimeException e) {
@@ -143,9 +164,7 @@ public class Engines {
         TerasologyEngine client = createHeadlessEngine();
 
         client.changeState(new StateMainMenu());
-        if (!connectToHost(client, mainLoop)) {
-            throw new RuntimeException(String.format("Could not connect client %s to local host - timeout.", client));
-        }
+        connectToHost(client, mainLoop);
         Context context = client.getState().getContext();
         context.put(ScreenGrabber.class, hostContext.get(ScreenGrabber.class));
 
@@ -198,8 +217,7 @@ public class Engines {
                 .add(audio)
                 .add(new LwjglGraphics())
                 .add(new LwjglTimer())
-                .add(new LwjglInput())
-                .add(new OpenVRInput());
+                .add(new LwjglInput());
         createExtraSubsystems().forEach(terasologyEngineBuilder::add);
 
         return createEngine(terasologyEngineBuilder);
@@ -241,7 +259,11 @@ public class Engines {
 
     protected void mockPathManager() {
         PathManager originalPathManager = PathManager.getInstance();
-        pathManager = Mockito.spy(originalPathManager);
+        if (!Mockito.mockingDetails(originalPathManager).isMock()) {
+            pathManager = Mockito.spy(originalPathManager);
+        } else {
+            pathManager = originalPathManager;
+        }
         Mockito.when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
         pathManagerCleaner = new PathManagerProvider.Cleaner(originalPathManager, pathManager);
         PathManagerProvider.setPathManager(pathManager);
@@ -255,7 +277,7 @@ public class Engines {
         doneLoading = false;
         host.subscribeToStateChange(() -> {
             GameState newState = host.getState();
-            logger.debug("New engine state is {}", host.getState());
+            logger.debug("New engine state is {}", newState);
             if (newState instanceof StateIngame) {
                 hostContext = newState.getContext();
                 if (hostContext == null) {
@@ -284,26 +306,74 @@ public class Engines {
     }
 
     /**
+     * Joins {@code client} to the local host and runs the engines until it reaches
+     * {@link StateIngame in-game}.
      *
      * @param client the client engine to connect to the local host
-     * @param mainLoop
-     *
-     * return true if the connection to the host was successful and the client is in state <i>in-game</i>.
+     * @param mainLoop used to tick the engines while the join completes
+     * @throws RuntimeException if the client does not reach in-game before the wait times out. The
+     *         message reports the client's state at that point and the {@link JoinStatus}, which
+     *         distinguishes a join the host refused from one that was merely slow.
      */
-    boolean connectToHost(TerasologyEngine client, MainLoop mainLoop) {
-        CoreRegistry.put(Config.class, client.getFromEngineContext(Config.class));
+    void connectToHost(TerasologyEngine client, MainLoop mainLoop) {
+        Context coreContextOverride = client.createChildContext();
+        CoreRegistry.setContext(coreContextOverride);
+        coreContextOverride.put(Config.class, client.getFromEngineContext(Config.class));
         JoinStatus joinStatus = null;
         try {
-            joinStatus = client.getFromEngineContext(NetworkSystem.class).join("localhost", 25777);
+            joinStatus = coreContextOverride.get(NetworkSystem.class).join("localhost", 25777);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while joining: ", e);
         }
 
         client.changeState(new StateLoading(joinStatus));
-        CoreRegistry.put(GameEngine.class, client);
+        coreContextOverride.put(GameEngine.class, client);
 
         // TODO: subscribe to state change and return an asynchronous result
         //     so that we don't need to pass mainLoop to here.
-        return !mainLoop.runUntil(() -> client.getState() instanceof StateIngame);
+        try {
+            mainLoop.awaitUntil("client to finish joining and reach the in-game state",
+                    () -> client.getState() instanceof StateIngame);
+        } catch (AssertionError | UncheckedTimeoutException e) {
+            // Both timeouts have to be caught here. awaitUntil throws AssertionError when the game-time
+            // limit is reached, but MainLoop throws UncheckedTimeoutException when the real-time safety
+            // timeout is hit first - and for a stuck join that is the likelier of the two, since an
+            // engine that is not progressing may not advance game time at all. Letting that one through
+            // would lose the diagnostics in exactly the case they are most needed.
+            throw new RuntimeException(describeJoinFailure(client, joinStatus), e);
+        }
+    }
+
+    /**
+     * Explain why a client never reached in-game.
+     * <p>
+     * The connection previously failed with a bare "could not connect - timeout", which does not
+     * distinguish a join the host actively <em>refused</em> from one that was merely slow, and gave no
+     * hint where it stalled. {@link JoinStatus} knows all of that and was being discarded, so a flaky
+     * connection failure was effectively undiagnosable after the fact - which matters most in CI,
+     * where re-running to watch it is not an option.
+     */
+    private static String describeJoinFailure(TerasologyEngine client, JoinStatus joinStatus) {
+        // Read the state once: the engine is still running while we build this message, so calling
+        // getState() twice could report one state and describe another, or NPE on the second call.
+        GameState state = client.getState();
+        StringBuilder message = new StringBuilder("Could not connect client ").append(client)
+                .append(" to local host. Client state when we gave up: ")
+                .append(state == null ? "none" : state.getClass().getSimpleName());
+
+        if (joinStatus == null) {
+            message.append("; the join was interrupted before it reported any status");
+            return message.toString();
+        }
+
+        message.append("; join status ").append(joinStatus.getStatus())
+                .append(" during '").append(joinStatus.getCurrentActivity())
+                .append("' (").append(Math.round(joinStatus.getCurrentActivityProgress() * 100)).append("%)");
+
+        String error = joinStatus.getErrorMessage();
+        if (error != null && !error.isEmpty()) {
+            message.append("; error: ").append(error);
+        }
+        return message.toString();
     }
 }

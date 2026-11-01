@@ -147,15 +147,16 @@ public class StateIngame implements GameState {
             worldRenderer.dispose();
             worldRenderer = null;
         }
+
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
+
         componentSystemManager.shutdown();
 
         context.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
-
-        if (storageManager != null) {
-            storageManager.finishSavingAndShutdown();
-        }
 
         ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
         context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
@@ -219,12 +220,7 @@ public class StateIngame implements GameState {
         display.prepareToRender();
 
         if (worldRenderer != null) {
-            if (!context.get(Config.class).getRendering().isVrSupport()) {
-                worldRenderer.render(RenderingStage.MONO);
-            } else {
-                worldRenderer.render(RenderingStage.LEFT_EYE);
-                worldRenderer.render(RenderingStage.RIGHT_EYE);
-            }
+            worldRenderer.render(RenderingStage.MONO);
         }
 
         /* UI */

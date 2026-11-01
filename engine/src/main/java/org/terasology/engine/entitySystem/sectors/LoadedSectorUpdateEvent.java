@@ -4,7 +4,7 @@ package org.terasology.engine.entitySystem.sectors;
 
 import org.joml.Vector3i;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.Set;
 

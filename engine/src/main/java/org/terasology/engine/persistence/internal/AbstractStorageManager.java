@@ -112,7 +112,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
         Path chunkPath = storagePathProvider.getChunkZipPath(chunkZipPos);
         if (Files.isRegularFile(chunkPath)) {
-            try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
+            try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, (ClassLoader) null)) {
                 Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(chunkPos));
                 if (Files.isRegularFile(targetChunk)) {
                     chunkData = Files.readAllBytes(targetChunk);
@@ -180,10 +180,8 @@ public abstract class AbstractStorageManager implements StorageManager {
                     continue;
                 }
                 Vector3f pos = loc.getWorldPosition(new Vector3f());
-                if (pos.isFinite()) {
-                    if (aabb.containsPoint(loc.getWorldPosition(new Vector3f()))) {
-                        entitiesToStore.add(entity);
-                    }
+                if (pos.isFinite() && aabb.containsPoint(loc.getWorldPosition(new Vector3f()))) {
+                    entitiesToStore.add(entity);
                 }
             }
         }

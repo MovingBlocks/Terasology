@@ -31,6 +31,7 @@ public class LocaleConstraint implements SettingConstraint<Locale> {
     }
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void warnUnsatisfiedBy(Locale value) {
         logger.warn("Locale {} should be one of {}",
                 value,

@@ -97,7 +97,7 @@ public interface WorldProviderCore {
 
     /**
      * Places all given blocks of specific types at their corresponding positions
-     * </p>
+     * <p>
      * Chunks are
      *
      * @param blocks A mapping from world position to change to the type of block to set

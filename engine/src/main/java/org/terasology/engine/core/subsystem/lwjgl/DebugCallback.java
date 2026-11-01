@@ -38,26 +38,24 @@ public class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
     @Override
     public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
         String logFormat = "[{}] [{}] [{}] {}";
-        Object[] args = new Object[]{
-                "0x" + Integer.toHexString(id).toUpperCase(Locale.ROOT),
-                getSourceString(source),
-                getTypeString(type),
-                MemoryUtil.memASCII(message).trim()
-        };
+        String idString = "0x" + Integer.toHexString(id).toUpperCase(Locale.ROOT);
+        String sourceString = getSourceString(source);
+        String typeString = getTypeString(type);
+        String messageString = MemoryUtil.memASCII(message).trim();
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                logger.error(logFormat, args);
+                logger.error(logFormat, idString, sourceString, typeString, messageString);
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
-                logger.warn(logFormat, args);
+                logger.warn(logFormat, idString, sourceString, typeString, messageString);
                 break;
             case GL_DEBUG_SEVERITY_LOW:
-                logger.debug(logFormat, args);
+                logger.debug(logFormat, idString, sourceString, typeString, messageString);
                 break;
             default:
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                logger.trace(logFormat, args);
+                logger.trace(logFormat, idString, sourceString, typeString, messageString);
                 break;
         }
     }

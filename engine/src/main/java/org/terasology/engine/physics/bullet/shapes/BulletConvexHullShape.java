@@ -20,8 +20,7 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
 
     public BulletConvexHullShape(List<Vector3f> vertices) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
-        for (int i = 0; i < vertices.size(); i++) {
-            Vector3f vertex = vertices.get(i);
+        for (Vector3f vertex : vertices) {
             buffer.put(vertex.x);
             buffer.put(vertex.y);
             buffer.put(vertex.z);

@@ -5,7 +5,7 @@ package org.terasology.engine.entitySystem.sectors;
 import org.joml.Vector3i;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -31,7 +31,6 @@ import org.terasology.engine.core.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglTimer;
-import org.terasology.engine.core.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -102,13 +101,13 @@ public final class Terasology implements Callable<Integer> {
     )
     private Integer outOfMemoryScore;
 
-    @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
+    @Option(names = "--crash-report", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
 
-    @Option(names = "--sound", defaultValue = "true", negatable = true, description = "Enable sound")
+    @Option(names = "--sound", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable sound")
     private boolean soundEnabled;
 
-    @Option(names = "--splash", defaultValue = "true", negatable = true, description = "Enable splash screen")
+    @Option(names = "--splash", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable splash screen")
     private boolean splashEnabled;
 
     @Option(names = "--load-last-game", description = "Load the latest game on startup")
@@ -120,7 +119,7 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = "--permissive-security")
     private boolean permissiveSecurity;
 
-    @Option(names = "--save-games", defaultValue = "true", negatable = true, description = "Enable new save games")
+    @Option(names = "--save-games", defaultValue = "true", fallbackValue = "true", negatable = true, description = "Enable new save games")
     private boolean saveGamesEnabled;
 
     @Option(names = "--server-port", description = "Change the server port")
@@ -313,18 +312,18 @@ public final class Terasology implements Callable<Integer> {
                     .add(new LwjglGraphics())
                     .add(new LwjglTimer())
                     .add(new LwjglInput())
-                    .add(new BindsSubsystem())
-                    .add(new OpenVRInput());
+                    .add(new BindsSubsystem());
             builder.add(new DiscordRPCSubSystem());
         }
         builder.add(new HibernationSubsystem());
     }
 
+    @SuppressWarnings({"PMD.SystemPrintln", "PMD.AvoidPrintStackTrace"})
     private void reportException(Throwable throwable) {
         Path logPath = LoggingContext.getLoggingPath();
 
         if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
-            CrashReporter.report(throwable, logPath);
+            new Thread(() -> CrashReporter.report(throwable, logPath), "CrashReporter").start();
         } else {
             throwable.printStackTrace();
             System.err.println("For more details, see the log files in " + logPath.toAbsolutePath().normalize());

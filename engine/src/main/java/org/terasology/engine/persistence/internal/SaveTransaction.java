@@ -19,7 +19,6 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
-import org.terasology.engine.utilities.concurrency.AbstractTask;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.protobuf.EntityData;
@@ -27,6 +26,7 @@ import org.terasology.protobuf.EntityData;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -50,7 +50,7 @@ import java.util.concurrent.locks.Lock;
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
  */
-public class SaveTransaction extends AbstractTask {
+public class SaveTransaction implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
 
     private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
@@ -58,7 +58,6 @@ public class SaveTransaction extends AbstractTask {
     private final Lock worldDirectoryWriteLock;
     private final EngineEntityManager privateEntityManager;
     private final EntitySetDeltaRecorder deltaToSave;
-    private volatile SaveTransactionResult result;
 
     // Unprocessed data to save:
     private final Map<String, EntityData.PlayerStore> unloadedPlayers;
@@ -112,8 +111,6 @@ public class SaveTransaction extends AbstractTask {
         this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
     }
 
-
-    @Override
     public String getName() {
         return "Saving";
     }
@@ -139,12 +136,11 @@ public class SaveTransaction extends AbstractTask {
             saveGameManifest();
             perpareChangesForMerge();
             mergeChanges();
-            result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
             saveRecordingData();
-        } catch (IOException | RuntimeException t) {
+        } catch (IOException t) {
             logger.error("Save game creation failed", t);
-            result = SaveTransactionResult.createFailureResult(t);
+            throw new UncheckedIOException("Save game creation failed", t);
         }
     }
 
@@ -407,7 +403,7 @@ public class SaveTransaction extends AbstractTask {
                 Path oldChunkZipPath = storagePathProvider.getChunkZipPath(chunkZipPos);
                 final FileSystem zip = chunkZipEntry.getValue();
                 if (Files.isRegularFile(oldChunkZipPath)) {
-                    try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
+                    try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, (ClassLoader) null)) {
                         for (Path root : oldZip.getRootDirectories()) {
                             Files.walkFileTree(root, new SimpleFileVisitor<>() {
                                 @Override
@@ -435,14 +431,6 @@ public class SaveTransaction extends AbstractTask {
                 }
             }
         }
-    }
-
-    /**
-     * @return the result if there is one yet or null. This method returns the value of a volatile variable and
-     * can thus be used even from another thread.
-     */
-    public SaveTransactionResult getResult() {
-        return result;
     }
 
     private void saveGameManifest() {

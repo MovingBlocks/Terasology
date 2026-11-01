@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.SelectModulesConfig;
+import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
@@ -94,6 +95,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
     @In
     private GameEngine gameEngine;
+    @In
+    private Context context;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -118,6 +121,16 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void onScreenOpened() {
+        super.onScreenOpened();
+
+        final UIText seed = find("seed", UIText.class);
+        if (universeWrapper != null && !universeWrapper.getSeed().isEmpty()) {
+            seed.setText(universeWrapper.getSeed());
+        }
+    }
+
+    @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor(
@@ -127,9 +140,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         .build()).submit(moduleManager.getInstallManager().updateRemoteRegistry());
 
         final UIText seed = find("seed", UIText.class);
-        if (seed != null) {
-            seed.setText(new FastRandom().nextString(32));
-        }
+        seed.setText(createRandomSeed());
 
         // skip loading module configs, limit shown modules to locally present ones
         selectModulesConfig = new SelectModulesConfig();
@@ -394,7 +405,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         filterModules();
                     });
                 } else {
-                    logger.error("Unable to find checkbox named " + checkboxName + " in " + ASSET_URI.toString());
+                    logger.error("Unable to find checkbox named {} in {}", checkboxName, ASSET_URI);
                     selectModulesConfig.unselectStandardModuleExtension(standardModuleExtension);
                 }
             }
@@ -496,9 +507,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
+            universeWrapper.setSeed(seed.getText());
             final UniverseSetupScreen universeSetupScreen = getManager()
                     .createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            universeWrapper.setSeed(seed.getText());
             saveConfiguration();
             universeSetupScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(universeSetupScreen);
@@ -743,7 +754,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     private void select(ModuleSelectionInfo target) {
         if (target.isValidToSelect() && !target.isExplicitSelection()) {
-            boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
             refreshSelection();
         }
@@ -779,7 +789,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
-    public void setUniverseWrapper(UniverseWrapper wrapper) {
+    private String createRandomSeed() {
+        return new FastRandom().nextString(32);
+    }
+
+    public void setEnvironment(UniverseWrapper wrapper) {
         universeWrapper = wrapper;
     }
 }

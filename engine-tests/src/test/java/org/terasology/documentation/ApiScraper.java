@@ -4,11 +4,13 @@ package org.terasology.documentation;
 
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -18,7 +20,10 @@ import java.util.stream.Collectors;
 /**
  * Enumerates all classes and packages that are annotated with {@link API}.
  */
+@SuppressWarnings("PMD.SystemPrintln") // main entrypoint used to generate documentation
 public final class ApiScraper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiScraper.class);
+
     private ApiScraper() {
         // Private constructor, utility class
     }
@@ -35,7 +40,7 @@ public final class ApiScraper {
         SortedSetMultimap<String, String> sortedApi = Multimaps.newSortedSetMultimap(new HashMap<>(), TreeSet::new);
 
         for (Class<?> apiClass : environment.getTypesAnnotatedWith(API.class)) {
-            //System.out.println("Processing: " + apiClass);
+            LOGGER.debug("Processing: {}", apiClass);
             boolean isPackage = apiClass.isSynthetic();
             URL location;
             String category;
@@ -49,7 +54,7 @@ public final class ApiScraper {
             }
 
             if (location == null) {
-                System.out.println("Failed to get a class/package location, skipping " + apiClass);
+                LOGGER.info("Failed to get a class/package location, skipping {}", apiClass);
                 continue;
             }
 
@@ -91,7 +96,7 @@ public final class ApiScraper {
                     break;
 
                 default :
-                    System.out.println("Unknown protocol for: " + apiClass + ", came from " + location);
+                    LOGGER.info("Unknown protocol for: {}, came from {}", apiClass, location);
             }
         }
         sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()

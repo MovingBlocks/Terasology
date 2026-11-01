@@ -32,10 +32,8 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
 
     public SOURCE getLockedSource() {
         for (SOURCE source : soundSources.keySet()) {
-            if (!isActive(source)) {
-                if (lock(source)) {
-                    return source;
-                }
+            if (!isActive(source) && lock(source)) {
+                return source;
             }
         }
 

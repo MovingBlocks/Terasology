@@ -4,10 +4,12 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 /**
  * Used to determine the display mode.
+ * <ul>
  * <li>{@link #FULLSCREEN} - Sets the screen to fullscreen and prevents the mouse from moving out of the game.</li>
  * <li>{@link #WINDOWED_FULLSCREEN} - Sets the screen to borderless windowed fullscreen allowing the player to move the
  * mouse out of the game without minimizing.</li>
  * <li>{@link #WINDOWED} - Sets the screen to windowed with borders allowing the player to resize the window.</li>
+ * </ul>
  */
 public enum DisplayModeSetting {
 

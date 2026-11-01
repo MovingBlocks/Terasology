@@ -6,7 +6,7 @@ import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.audio.StaticSound;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.ArrayList;
 import java.util.Collections;

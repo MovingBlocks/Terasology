@@ -22,7 +22,8 @@ public abstract class Sound<T extends AssetData> extends Asset<T> implements org
      * @param assetType The asset type this asset belongs to.
      */
     protected Sound(ResourceUrn urn, AssetType<?, T> assetType, DisposableResource resource) {
-        super(urn, assetType, resource);
+        super(urn, assetType);
+        setDisposableResource(resource);
     }
 
     /**

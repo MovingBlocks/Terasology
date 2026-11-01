@@ -27,30 +27,6 @@ public class FutureTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary =
             Mockito.spy(new TypeHandlerLibrary(reflections));
 
-    private static final class RecursiveType<T> {
-        final T data;
-        final List<RecursiveType<T>> children;
-
-        @SafeVarargs
-        private RecursiveType(T data, RecursiveType<T>... children) {
-            this.data = data;
-            this.children = Lists.newArrayList(children);
-        }
-    }
-
-    private class ResultCaptor<T> implements Answer {
-        private T result = null;
-        public T getResult() {
-            return result;
-        }
-
-        @Override
-        public T answer(InvocationOnMock invocationOnMock) throws Throwable {
-            result = (T) invocationOnMock.callRealMethod();
-            return result;
-        }
-    }
-
     @Test
     public void testRecursiveType() {
         ResultCaptor<Optional<TypeHandler<RecursiveType<Integer>>>> resultCaptor = new ResultCaptor<>();
@@ -76,5 +52,33 @@ public class FutureTypeHandlerTest {
                 (FutureTypeHandler<RecursiveType<Integer>>) possibleFuture;
 
         assertEquals(typeHandler, future.typeHandler);
+    }
+
+    private static final class RecursiveType<T> {
+        final T data;
+        final List<RecursiveType<T>> children;
+
+        @SafeVarargs
+        private RecursiveType(T data, RecursiveType<T>... children) {
+            this.data = data;
+            this.children = Lists.newArrayList(children);
+        }
+    }
+
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+            value = "SIC_INNER_SHOULD_BE_STATIC",
+            justification = "Test code is not performance-relevant, flagged inner ResultCaptor class is a mock with dynamic behavior" +
+                    " and cannot be static.")
+    private class ResultCaptor<T> implements Answer {
+        private T result = null;
+        public T getResult() {
+            return result;
+        }
+
+        @Override
+        public T answer(InvocationOnMock invocationOnMock) throws Throwable {
+            result = (T) invocationOnMock.callRealMethod();
+            return result;
+        }
     }
 }

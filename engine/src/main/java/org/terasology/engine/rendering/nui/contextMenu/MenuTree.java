@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.List;
 import java.util.function.Consumer;

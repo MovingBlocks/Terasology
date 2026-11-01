@@ -124,10 +124,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
         for (Class<?> type : environment.getTypesAnnotatedWith(RegisterParticleSystemFunction.class)) {
-            RegisterParticleSystemFunction annotation = type.getAnnotation(RegisterParticleSystemFunction.class);
-
             if (!ParticleSystemFunction.class.isAssignableFrom(type)) {
-                logger.error("Cannot register particle system function {}, must be a subclass of ParticleSystemFunction", type.getSimpleName());
+                logger.atError().log("Cannot register particle system function {}, " +
+                        "must be a subclass of ParticleSystemFunction", type.getSimpleName());
             } else {
                 try {
                     ParticleSystemFunction function = (ParticleSystemFunction) type.newInstance();

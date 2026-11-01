@@ -22,18 +22,14 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TypeHandlerLibraryTest {
-    private static Reflections reflections;
     private static TypeHandlerLibrary typeHandlerLibrary;
 
     @BeforeAll
     public static void setup() {
-        reflections = new Reflections(TypeHandlerLibraryTest.class.getClassLoader());
+        Reflections reflections = new Reflections(TypeHandlerLibraryTest.class.getClassLoader());
         typeHandlerLibrary = new TypeHandlerLibrary(reflections);
         TypeHandlerLibrary.populateBuiltInHandlers(typeHandlerLibrary);
     }
-
-    @MappedContainer
-    private static class AMappedContainer { }
 
     @Test
     public void testMappedContainerHandler() {
@@ -93,4 +89,7 @@ class TypeHandlerLibraryTest {
     }
 
     private enum AnEnum { }
+
+    @MappedContainer
+    private static class AMappedContainer { }
 }

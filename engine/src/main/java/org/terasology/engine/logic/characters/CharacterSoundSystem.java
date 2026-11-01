@@ -60,7 +60,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         Block block = worldProvider.getBlock(blockPos);
         if (block != null) {
             if (block.getSounds() == null) {
-                logger.error("Block '{}' has no sounds", block.getURI());
+                logger.error("Block '{}' has no sounds", block.getURI()); //NOPMD
             } else if (!block.getSounds().getStepSounds().isEmpty()) {
                 footstepSounds = block.getSounds().getStepSounds();
             }

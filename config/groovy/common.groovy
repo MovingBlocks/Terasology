@@ -3,12 +3,10 @@ import groovy.json.JsonSlurper
 @Grab(group = 'org.slf4j', module = 'slf4j-api', version = '1.6.1')
 @Grab(group = 'org.slf4j', module = 'slf4j-nop', version = '1.6.1')
 
-// TODO: Temp replacement for jcenter, grgit is not in MavenCentral yet
-@GrabResolver(name = 'ajoberstar-backup', root = 'https://ajoberstar.github.io/bintray-backup/')
-@Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
+@Grab(group = 'org.ajoberstar.grgit', module = 'grgit-core', version = '5.3.3')
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.exception.GrgitException
 import org.ajoberstar.grgit.Remote
+import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 
 import static Ansi.*
@@ -134,7 +132,7 @@ class common {
                 } else {
                     Grgit.clone dir: targetDir, uri: targetUrl
                 }
-            } catch (GrgitException exception) {
+            } catch (GitAPIException exception) {
                 println color("Unable to clone $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
                 return
             }
@@ -274,7 +272,7 @@ class common {
                     } else {
                         println color ("No changes found", Ansi.YELLOW)
                     }
-                } catch (GrgitException exception) {
+                } catch (GitAPIException exception) {
                     println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
                 }
             }
@@ -408,7 +406,9 @@ class common {
                 }
                 currentPageUrl = getLink(connection, "next")
                 // TODO: This comparison is vulnerable to a page request size of "100" or anything that starts with a 1, but just using 99 above ..
-                if (currentPageUrl.contains("page=1")) {
+                // Safe-navigated: getLink returns null when there is no "next" link at all,
+                // which is the normal case for a result set that fits on one page (e.g. libs).
+                if (currentPageUrl?.contains("page=1")) {
                     //println "The pagination warped back to page 1, we're done!"
                     currentPageUrl = null
                 }

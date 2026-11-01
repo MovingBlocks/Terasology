@@ -4,13 +4,15 @@ package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleAttribution;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.util.reflection.ParameterProvider;
 import org.terasology.gestalt.util.reflection.SimpleClassFactory;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -19,6 +21,7 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 /**
@@ -32,21 +35,31 @@ public class BlockFamilyLibrary {
 
     private ClassLibrary<BlockFamily> library;
 
-    public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultModuleClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+    public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        library = new DefaultModuleClassLibrary<>(() -> moduleEnvironment, reflectFactory, copyStrategyLibrary);
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
 
             if (!BlockFamily.class.isAssignableFrom(entry)) {
-                logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName());
+                logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName()); //NOPMD
+                continue;
+            }
+            Name moduleProviding = ModuleAttribution.moduleProvidingOrReport(logger, "load", entry, moduleEnvironment);
+            if (moduleProviding == null) {
+                // Without this the line below dereferences null and takes the whole library down.
                 continue;
             }
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(),
+            library.register(new ResourceUrn(moduleProviding.toString(), registerInfo.value()).toString(),
                     (Class<? extends BlockFamily>) entry);
 
         }
+    }
+
+    @Inject
+    public BlockFamilyLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        this(moduleManager.getEnvironment(), reflectFactory, copyStrategyLibrary);
     }
 
     /**
@@ -96,7 +109,7 @@ public class BlockFamilyLibrary {
 
             return result;
         } catch (Exception e) {
-            logger.error("Failed to load blockFamily {}", blockFamily, e);
+            logger.error("Failed to load blockFamily {}", blockFamily, e); //NOPMD
         }
         return null;
     }

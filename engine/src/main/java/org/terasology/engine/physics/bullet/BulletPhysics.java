@@ -45,12 +45,12 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.components.RigidBodyComponent;
 import org.terasology.engine.physics.components.TriggerComponent;
@@ -64,11 +64,11 @@ import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.joml.geom.AABBf;
 
+import javax.inject.Inject;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,8 +82,7 @@ import java.util.Set;
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
-@RegisterSystem
-public class BulletPhysics implements PhysicsEngine {
+public class BulletPhysics implements PhysicsEngine, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
     public static final float SIMD_EPSILON = 1.1920929E-7F;
@@ -117,8 +116,8 @@ public class BulletPhysics implements PhysicsEngine {
      */
     private ArrayList<btConvexShape> shapes = Lists.newArrayList();
 
-    public BulletPhysics() {
-
+    @Inject
+    public BulletPhysics(BlockEntityRegistry blockEntityRegistry) {
         ghostPairCallback = new btGhostPairCallback();
 
         broadphase = new btDbvtBroadphase();
@@ -129,10 +128,9 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld =
                 new btDiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
         discreteDynamicsWorld.setGravity(new Vector3f(0f, -PhysicsEngine.GRAVITY, 0f));
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        this.blockEntityRegistry = blockEntityRegistry;
 
         discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(ghostPairCallback);
-
     }
 
     public btDiscreteDynamicsWorld getWorld() {
@@ -241,7 +239,7 @@ public class BulletPhysics implements PhysicsEngine {
                             hitNormalWorld,
                             voxelPosition);
                 } else { //we hit something we don't understand, assume its nothing and log a warning
-                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                 }
             }
 
@@ -305,7 +303,7 @@ public class BulletPhysics implements PhysicsEngine {
                                 hitNormalWorld,
                                 voxelPosition);
                     } else { //we hit something we don't understand, assume its nothing and log a warning
-                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData); //NOPMD
                     }
                 }
             }
@@ -692,22 +690,8 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    private void addRigidBody(BulletRigidBody body) {
-        short filter =
-                (short) (btBroadphaseProxy.CollisionFilterGroups.DefaultFilter
-                        | btBroadphaseProxy.CollisionFilterGroups.StaticFilter
-                        | btBroadphaseProxy.CollisionFilterGroups.SensorTrigger);
-        insertionQueue.add(new RigidBodyRequest(body, (short) btBroadphaseProxy.CollisionFilterGroups.DefaultFilter,
-                filter));
-    }
-
     private void addRigidBody(BulletRigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
         insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
-    }
-
-    private void addRigidBody(BulletRigidBody body, short groups, short filter) {
-        insertionQueue.add(new RigidBodyRequest(body, groups,
-                (short) (filter | btBroadphaseProxy.CollisionFilterGroups.SensorTrigger)));
     }
 
     private void removeRigidBody(BulletRigidBody body) {
@@ -839,7 +823,6 @@ public class BulletPhysics implements PhysicsEngine {
 
                             Vector3f a2 = new Vector3f();
                             manifoldPoint.getPositionWorldOnB(a2);
-                            int l = manifoldPoint.getLifeTime();
 
                             Vector3f a3 = new Vector3f();
                             manifoldPoint.getNormalWorldOnB(a3);

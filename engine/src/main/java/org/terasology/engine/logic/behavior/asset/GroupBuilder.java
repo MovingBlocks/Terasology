@@ -5,7 +5,7 @@ package org.terasology.engine.logic.behavior.asset;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.registry.In;
 
 import java.io.InputStream;
@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
  * @see Group
  */
 @API
+@SuppressWarnings("PMD.AvoidPrintStackTrace")
 public class GroupBuilder {
 
     private GroupData groupData;

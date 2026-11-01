@@ -3,19 +3,20 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.engine.context.Context;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 /**
  * Sets up an ExtraBlockDataManager based on @ExtraBlockSystem classes from the loaded modules.
  * Depends on block definitions and module classes already being loaded.
  */
 public class LoadExtraBlockData extends SingleStepLoadProcess {
-    private final Context context;
+    private final ServiceRegistry serviceRegistry;
     
-    public LoadExtraBlockData(Context context) {
-        this.context = context;
+    public LoadExtraBlockData(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
@@ -25,7 +26,7 @@ public class LoadExtraBlockData extends SingleStepLoadProcess {
     
     @Override
     public boolean step() {
-        context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
+        serviceRegistry.with(ExtraBlockDataManager.class).lifetime(Lifetime.Singleton).use(ExtraBlockDataManager.class);
         return true;
     }
     

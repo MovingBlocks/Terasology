@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIList;

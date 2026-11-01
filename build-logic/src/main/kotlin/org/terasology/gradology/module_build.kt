@@ -16,9 +16,7 @@ import java.io.File
 // or something else from gradle.api.artifacts, but it exposes no concrete implementation
 // of those interfaces.
 data class GradleDependencyInfo(val group: String, val module: String, val version: String) {
-    fun asMap(): Map<String, String> {
-        return mapOf("group" to group, "name" to module, "version" to version)
-    }
+    fun asNotation(): String = "$group:$module:$version"
 }
 
 
@@ -66,8 +64,8 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
     }
 
     private fun versionStringFromGestaltDependency(gestaltDependency: DependencyInfo): String {
-        val version = if (gestaltDependency.versionPredicate() is VersionRange) {
-            gestaltDependency.versionPredicate().toString()
+        val version = if (gestaltDependency.versionRange() is VersionRange) {
+            gestaltDependency.versionRange().toString()
         } else {
             // TODO: gradle-compatible version expressions for gestalt dependencies
             //     https://github.com/MovingBlocks/gestalt/issues/114

@@ -34,12 +34,12 @@ public class ConsoleSystem extends BaseComponentSystem {
         if (nuiManager != null) {
             overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
             console.subscribe((Message message) -> {
-                if (!nuiManager.isOpen("engine:console")) {
-                    // make sure the message isn't already shown in the chat overlay
-                    if (message.getType() != CoreMessageType.CHAT && message.getType() != CoreMessageType.NOTIFICATION
-                            || !nuiManager.isOpen("engine:chat")) {
-                        overlay.setVisible(true);
-                    }
+                // make sure the message isn't already shown in the chat overlay
+                if (!nuiManager.isOpen("engine:console")
+                        && (message.getType() != CoreMessageType.CHAT
+                        && message.getType() != CoreMessageType.NOTIFICATION
+                        || !nuiManager.isOpen("engine:chat"))) {
+                    overlay.setVisible(true);
                 }
             });
         }

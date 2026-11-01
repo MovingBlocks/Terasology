@@ -4,12 +4,14 @@ package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.math.TeraMath;
 
+import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Deque;
@@ -47,6 +49,11 @@ public class PerspectiveCamera extends Camera implements PropertyChangeListener 
         renderingConfig.subscribe(RenderingConfig.VIEW_DISTANCE, this);
         renderingConfig.subscribe(RenderingConfig.CHUNK_LODS, this);
         updateFarClippingDistance();
+    }
+
+    @Inject
+    public PerspectiveCamera(Config config, DisplayDevice displayDevice) {
+        this(config.getRendering(), displayDevice);
     }
 
     @Override

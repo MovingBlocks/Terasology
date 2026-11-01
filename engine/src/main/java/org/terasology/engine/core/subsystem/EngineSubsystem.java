@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 
+@IndexInherited
 public interface EngineSubsystem {
 
     /**
@@ -17,21 +20,21 @@ public interface EngineSubsystem {
 
     /**
      * Called on each system before initialisation.
-     * This is an opportunity to add anything into the root context that will carry across the entire rune of the engine,
-     * and may be used by other systems
+     * This is an opportunity to register services that will be available from the root context
+     * for the entire run of the engine, and may be used by other systems.
      *
-     * @param rootContext The root context, that will survive the entire run of the engine
+     * @param serviceRegistry The service registry used to build the root context for the entire run of the engine
      */
-    default void preInitialise(Context rootContext) {
+    default void preInitialise(ServiceRegistry serviceRegistry) {
     }
 
     /**
-     * Called to initialise the system
+     * Called to initialise the system.
      *
-     * @param engine      The game engine
-     * @param rootContext The root context, that will survive the entire run of the engine
+     * @param engine          The game engine
+     * @param serviceRegistry The service registry used to build the context for the entire run of the engine
      */
-    default void initialise(GameEngine engine, Context rootContext) {
+    default void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
     }
 
     /**

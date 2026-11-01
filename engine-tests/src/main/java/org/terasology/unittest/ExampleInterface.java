@@ -3,8 +3,10 @@
 
 package org.terasology.unittest;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
+import org.terasology.context.annotation.IndexInherited;
 
 @API
+@IndexInherited
 public interface ExampleInterface {
 }

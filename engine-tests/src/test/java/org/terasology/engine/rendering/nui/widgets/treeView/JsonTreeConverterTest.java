@@ -11,6 +11,8 @@ import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -18,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class JsonTreeConverterTest {
     @Test
     public void testTreeAdapter() {
-        File file = new File(getClass().getClassLoader().getResource("jsonTreeConverterInput.json").getFile());
+        File file = new File(URLDecoder.decode(
+                getClass().getClassLoader().getResource("jsonTreeConverterInput.json").getFile(), Charset.defaultCharset()));
         String content = null;
         try {
             content = Files.toString(file, Charsets.UTF_8);

@@ -5,7 +5,7 @@ package org.terasology.engine.recording;
 /**
  * Stores the current RecordAndReplayStatus. This class is extremely important since the status is the flag that
  * activates Record and Replay.
- * <p>
+ * <br>
  * <h2>Record Workflow</h2> When the user clicks on the "Record" button on the extras menu, the {@link #status}
  * is set to PREPARING_RECORD. When a game is selected to be loaded from the "Record Screen" and the game is completely
  * loaded, the {@link #status} will be set to RECORDING by the {@link org.terasology.engine.core.modes.loadProcesses.InitialiseRecordAndReplay}
@@ -22,7 +22,7 @@ package org.terasology.engine.recording;
  * and then every recorded data that was not stored yet will be serialized
  * and stored once {@link org.terasology.engine.persistence.internal.SaveTransaction}'s
  * saveRecordingData() method is called right after the game is saved. Once this is done, the {@link #status} is set to NOT_ACTIVATED.
- * <p>
+ * <br>
  * <h2>Replay Workflow</h2> When the user clicks on the "Replay" button on the extras menu, the {@link #status}
  * is set to PREPEARING_REPLAY. During the load process of a Replay, the {@link org.terasology.engine.core.modes.loadProcesses.InitialiseWorld}
  * class gets the game path from the "recordings" folder instead of the "saves" one,

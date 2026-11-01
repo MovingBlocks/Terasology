@@ -214,6 +214,14 @@
                                     "id": "viewDistance"
                                 },
                                 {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#chunk-threads}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "chunkThreads"
+                                },
+                                {
                                     "type": "UISpace",
                                     "size": [1, 13]
                                 },
@@ -360,16 +368,6 @@
                                 {
                                     "type": "UIDropdown",
                                     "id": "shadows"
-                                },
-                                {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#oculus-rift-support}: ",
-                                    "enabled": false
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "oculusVrSupport",
-                                    "enabled": false
                                 },
                                 {
                                     "type": "UILabel",

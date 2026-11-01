@@ -41,10 +41,10 @@ import java.util.Set;
 
 /**
  * Behavior tree system
- * <p/>
+ * <p>
  * Each entity with BehaviorComponent is kept under control by this system. For each such entity a behavior tree
  * is loaded and an interpreter is started.
- * <p/>
+ * <p>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)

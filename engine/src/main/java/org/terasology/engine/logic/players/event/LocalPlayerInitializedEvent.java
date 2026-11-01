@@ -7,7 +7,7 @@ import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event gets sent when the {@link LocalPlayer} object is ready to be used.
- * <br/>
+ * <br>
  * The object can be injected using {@link org.terasology.engine.registry.In}.
  * This event corresponds with its isValid() method returning true for the first time.
  */

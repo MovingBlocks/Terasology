@@ -30,10 +30,6 @@ public class FboConnection extends DependencyConnection<FBO> {
         super.setData(data);
     }
 
-    public String toString() {
-        return super.toString();
-    }
-
     public static String getConnectionName(int number, SimpleUri nodeUri) {
         return new StringBuilder(nodeUri.toString()).append(":FBO").append(number).toString();
     }

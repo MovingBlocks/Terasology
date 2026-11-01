@@ -13,7 +13,7 @@ public class RenderQueuesHelper {
     public final PriorityQueue<RenderableChunk> chunksAlphaReject;
     public final PriorityQueue<RenderableChunk> chunksAlphaBlend;
 
-    RenderQueuesHelper(PriorityQueue<RenderableChunk> chunksOpaque,
+    public RenderQueuesHelper(PriorityQueue<RenderableChunk> chunksOpaque,
                        PriorityQueue<RenderableChunk> chunksOpaqueShadow,
                        PriorityQueue<RenderableChunk> chunksOpaqueReflection,
                        PriorityQueue<RenderableChunk> chunksAlphaReject,

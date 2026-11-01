@@ -10,6 +10,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
@@ -87,6 +88,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private BindsManager bindsManager;
 
+    @In
+    private DisplayDevice display;
+
     private Camera playerCamera;
     private boolean localPlayerInitialized = false;
 
@@ -138,6 +142,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
+        if (!display.hasFocus()) {
+            // Otherwise stale pre-focus-loss deltas get sent as the next command once focus returns.
+            relativeMovement.set(0, 0, 0);
+            lookPitchDelta = 0;
+            lookYawDelta = 0;
+            jump = false;
+            return;
+        }
+
         lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
         lookPitch = (float) Math.clamp(-89, 89, lookPitch + lookPitchDelta);
@@ -146,14 +159,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quaternionf viewRotation = new Quaternionf();
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), 0, 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 break;
             case CLIMBING:
@@ -161,10 +169,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
             default:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), Math.toRadians(lookPitch), 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 relMove.y += relativeMovement.y;
                 break;

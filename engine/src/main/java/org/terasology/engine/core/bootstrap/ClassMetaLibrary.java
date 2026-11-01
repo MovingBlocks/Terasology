@@ -3,7 +3,7 @@
 
 package org.terasology.engine.core.bootstrap;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
 import java.lang.annotation.Annotation;

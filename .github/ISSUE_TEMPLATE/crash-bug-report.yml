@@ -1,0 +1,113 @@
+name: 🐛 Crash/Bug Report
+description: Create a crash or bug report to help us improve Terasology
+title: "Crash/Bug on trying to ..."
+labels: ["Status: Needs Investigation", "Topic: Stabilization", "Type: Bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to submit a thorough issue report for Terasology! :-)
+        Note that for suggestions, general questions & support you can approach us on Discord: https://discord.gg/terasology
+
+  - type: input
+    id: launcher_version
+    attributes:
+      label: Terasology Launcher Version
+    validations:
+      required: false
+
+  - type: input
+    id: terasology_version
+    attributes:
+      label: Terasology Version
+    validations:
+      required: false
+
+  - type: input
+    id: operating_system
+    attributes:
+      label: Operating System
+    validations:
+      required: false
+
+  - type: input
+    id: graphics
+    attributes:
+      label: Onboard / Dedicated Graphics
+    validations:
+      required: false
+
+  - type: input
+    id: java_version
+    attributes:
+      label: Java Version
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: What you were trying to do
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: What actually happened
+      description: >
+        A clear and concise description of what didn't match your expectations, a.k.a. the
+        crash or malfunction you faced.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: How to reproduce
+      description: Your exact steps, as precisely as you can recall them.
+      placeholder: |
+        1. Select Terasology version '...'
+        2. Start Terasology
+        3. Select gameplay '...'
+        4. Add modules '...'
+        5. Start game
+        6. Do '...'
+        7. See error
+    validations:
+      required: false
+
+  - type: textarea
+    id: log_details
+    attributes:
+      label: Log details
+      description: >
+        Note, that the crash reporter often provides multiple tabs with different logs.
+        Please attach (a link to) all of them.
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround
+      description: If applicable, describe any workaround you found to avoid the issue.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Infos / Context
+      description: Feel free to add any other context about the problem here.
+    validations:
+      required: false

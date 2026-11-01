@@ -9,27 +9,32 @@ import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
 import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.utilities.OS;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.nui.canvas.CanvasRenderer;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
-    private Context context;
+    @Inject
+    protected Config rootConfig;
+
     private RenderingConfig config;
 
     private GameEngine engine;
@@ -37,37 +42,40 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private LwjglGraphicsManager graphics = new LwjglGraphicsManager();
 
+    @Inject
+    public LwjglGraphics() {
+    }
+
     @Override
     public String getName() {
         return "Graphics";
     }
 
     @Override
-    public void initialise(GameEngine gameEngine, Context rootContext) {
+    public void initialise(GameEngine gameEngine, ServiceRegistry serviceRegistry) {
         logger.info("Starting initialization of LWJGL");
         this.engine = gameEngine;
-        this.context = rootContext;
-        this.config = context.get(Config.class).getRendering();
-        lwjglDisplay = new LwjglDisplayDevice(context);
-        context.put(DisplayDevice.class, lwjglDisplay);
+        this.config = rootConfig.getRendering();
+        lwjglDisplay = new LwjglDisplayDevice(config);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> lwjglDisplay);
         logger.info("Initial initialization complete");
-    }
 
-    @Override
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        graphics.registerCoreAssetTypes(assetTypeManager);
-    }
-
-    @Override
-    public void postInitialise(Context rootContext) {
-        graphics.registerRenderingSubsystem(context);
+        graphics.registerRenderingSubsystem(serviceRegistry);
 
         initGLFW();
         initWindow();
         initOpenGL();
 
-        context.put(ShaderManager.class, new ShaderManagerLwjgl());
-        context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
+        ShaderManagerLwjgl shaderManager = new ShaderManagerLwjgl();
+        serviceRegistry.with(ShaderManager.class).lifetime(Lifetime.Singleton).use(() -> shaderManager);
+        serviceRegistry.with(CanvasRenderer.class).lifetime(Lifetime.Singleton).use(LwjglCanvasRenderer.class);
+        serviceRegistry.with(TerasologyCanvasRenderer.class).lifetime(Lifetime.Singleton).use(LwjglCanvasRenderer.class);
+        logger.info("LWJGL renderer initialisation complete");
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        graphics.registerCoreAssetTypes(assetTypeManager);
     }
 
     @Override
@@ -80,7 +88,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
 
         lwjglDisplay.update();
-        int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
+        int frameLimit = config.getFrameLimit();
         if (frameLimit > 0) {
             Lwjgl2Sync.sync(frameLimit);
         }

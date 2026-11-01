@@ -47,6 +47,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("particle");
     }
 
+    @SuppressWarnings("PMD.GuardLogStatement")
     private void logCapabilities() {
         logger.info("Loading Terasology shader manager...");
         logger.info("LWJGL: {} / {}", Version.getVersion(), Platform.get().getName());

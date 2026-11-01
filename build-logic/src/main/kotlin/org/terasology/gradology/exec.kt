@@ -21,6 +21,21 @@ const val DEFAULT_MAX_HEAP_SIZE = "768M"
 private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
 
 /**
+ * "amd64" or "arm64", matching the suffix on the native directories in build.gradle.kts.
+ *
+ * The JVM reports "aarch64" for arm64 on every OS, and "amd64"/"x86_64" (varies by OS) for the
+ * other architecture - normalize both down to the two buckets LWJGL actually ships classifiers for.
+ */
+private fun nativeArchName(): String {
+    val arch = System.getProperty("os.arch")
+    return when (arch) {
+        "aarch64", "arm64" -> "arm64"
+        "amd64", "x86_64" -> "amd64"
+        else -> error("Unsupported native architecture: $arch")
+    }
+}
+
+/**
  * The subdirectory for this development environment.
  *
  * Only use this to run local processes. When building releases, you will be targeting other
@@ -29,10 +44,11 @@ private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
  * @return
  */
 fun nativeSubdirectoryName(): String {
+    val arch = nativeArchName()
     return when {
-        Os.isFamily(Os.FAMILY_WINDOWS) -> "windows"
-        Os.isFamily(Os.FAMILY_MAC) -> "macosx"
-        Os.isFamily(Os.FAMILY_UNIX) -> "linux"
+        Os.isFamily(Os.FAMILY_WINDOWS) -> "windows-$arch"
+        Os.isFamily(Os.FAMILY_MAC) -> "macos-$arch"
+        Os.isFamily(Os.FAMILY_UNIX) -> "linux-$arch"
         else -> {
              logger.warn("What kind of libraries do you use on this? {}", System.getProperty("os.name"))
             "UNKNOWN"

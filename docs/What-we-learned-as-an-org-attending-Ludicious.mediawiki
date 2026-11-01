@@ -1,0 +1,40 @@
+== Introduction ==
+On January 17 to January 21, 2018, a group of Terasology contributors attended the Game Festival [http://www.ludicious.ch/ Ludicious], in [https://www.google.com/maps/place/Alte+Kaserne/@47.37675,8.529151,15z/data=!4m5!3m4!1s0x0:0x3abf5a3228988ec7!8m2!3d47.3767502!4d8.5291509?hl=en-US Zürich], Switzerland. We had a stand-up booth in the "Sponsors" section of the festival and we had a nearly permanent presence of the duration of the festival. 
+
+This page intends to collect what we, as an organization, learned through the experience, not so much in terms of exposure to other products and projects exhibited, but in terms of our exposure and participation to the event as a whole. 
+
+If you attended the event, please feel free to contribute liberally to this page and help to make it a great resource for future events we might want to attend. 
+
+== What we learned ==
+* the crowd tends to get bigger in the evening and over the weekend
+* the whole team manning the booth the whole time is not necessary: 2-3 people at any given time are enough
+* manning the booth the whole four days can be tiring: we should organize morning/afternoon shifts next time
+** this was especially the case since the booth was standing only - no chairs! We should aim for seated booths in the future
+** both points above also allow the reminder of the team to attend the conference or simply visit the hosting city
+* our overhead poster looked too similar to MineCraft: we should make it clear we are Open Source and highly moddable
+** achieving this could be tricky: MC has done so much it'll hard to showcase something visually unique. Possibly favor our low-poly models vs the full blocky nature of MC
+* people who look interested but haven't made the first move can be easily approached with a friendly "Hi! Do you have any questions?"
+* it is useful to discuss beforehand what key points we should share with anybody we talk to
+** for example we quickly aligned on the concept "Terasology is a developer's playground" (which is true) beside the admission that we are not quite End-User friendly yet. 
+* university students were a good proportion of the crowd: it's good to mention GSOC to them and the opportunities it represents for both students and Terasology
+* identical team T-shirts would be good. The very clearly label you as a team member for anybody who is interested in the project
+** stinky t-shirts would be bad though: if we make team t-shirts we'd need one per person per day unless we can plan to rely on washing and drying facilities somewhere. 
+* business cards and/or leaflets with Terasology's basic information (website, github, forum, irc) are useful
+** this time we had only business cards for Cervator
+** next time we might want to have generic business cards (maybe with an empty side to write something, as needed) or business cards for a few more people 
+* estimating conference audience is hard (who is our target audience?)
+** there was a lot to learn about art/style, story telling, and publishing, but …
+** … not many technical sessions or dev-centric topics
+* we should have a proper setup where one can try out the game
+** device with decent performance and controls (mouse!)
+** have a game mode/world ready/loaded any time
+* Terasology videos out of YouTube are good!
+** We had a couple of Ludicious-provided monitors that we didn't always use for interactive sessions. We used them to show youtube video of Terasology instead, on a long loop: people can quickly appreciate many features from Terasology that we wouldn't be able to startup or demonstrate as quickly.
+** ''However''... the Terasology feed contains playsessions we held on Minecraft and we shouldn't show those.
+** On top of that YouTube without login doesn't seem to auto-proceed in playlists, leading to one computer only showing the entire channel contents (which would auto-play) rather than a finely edited playlist
+* Cervator tried to keep a running track of metrics on booth attendees, but this proved challenging to do in a way that would be useful / summarizable. May need to think of a better format/approach for "people metrics"
+** This included some bits of feedback, but again not in a very useful format. Main two small takeaways was getting the game on Steam and having a faster-paced multiplayer setup ready to entertain multiple people at once (tricky due to space?)
+
+<br/>
+<br/>
+(...anything else?...)

@@ -45,10 +45,6 @@ public class BufferPairConnection extends DependencyConnection<BufferPair> {
         return super.getData();
     }
 
-    public String toString() {
-        return super.toString();
-    }
-
     public static String getConnectionName(int number, SimpleUri nodeUri) {
         return new StringBuilder(nodeUri.toString()).append(":BufferPair").append(number).toString();
     }

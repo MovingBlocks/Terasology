@@ -9,6 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.modes.StateMainMenu;
 
 import java.util.Optional;
@@ -36,7 +37,13 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (gameEngine != null) {
-            gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
+            // channelInactive runs on a Netty I/O thread; changeState() needs the game thread
+            // (e.g. OpenAL). Guard against a stale callback outliving a newer connection.
+            GameThread.asynch(() -> {
+                if (server != null && server == networkSystem.getServer()) {
+                    gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
+                }
+            });
         }
     }
 

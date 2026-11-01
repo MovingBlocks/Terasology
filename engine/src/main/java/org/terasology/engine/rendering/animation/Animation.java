@@ -63,8 +63,7 @@ public final class Animation {
      * @return the animation
      */
     public static Animation once(Animator animator, float duration, TimeModifier timeModifier) {
-        Animation anim = new Animation(animator, duration, RepeatMode.RUN_ONCE, timeModifier);
-        return anim;
+        return new Animation(animator, duration, RepeatMode.RUN_ONCE, timeModifier);
     }
 
     /**
@@ -75,8 +74,7 @@ public final class Animation {
      * @return the animation
      */
     public static Animation infinite(Animator animator, float duration, TimeModifier timeModifier) {
-        Animation anim = new Animation(animator, duration, RepeatMode.REPEAT_INFINITE, timeModifier);
-        return anim;
+        return new Animation(animator, duration, RepeatMode.REPEAT_INFINITE, timeModifier);
     }
 
     /**

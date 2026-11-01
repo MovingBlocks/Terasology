@@ -44,9 +44,48 @@ public interface ModuleTestingEnvironment {
     <T> T runUntil(ListenableFuture<T> future);
 
     /**
+     * Runs until this future is complete or gameTimeTimeoutMs has passed in game time.
+     *
+     * @return the result of the future
+     */
+    <T> T runUntil(long gameTimeTimeoutMs, ListenableFuture<T> future);
+
+    /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     * <p>
+     * Prefer this over {@link #runUntil(Supplier)} in tests: a timeout throws with the description
+     * instead of returning a status that is easy to drop.
+     * <p>
+     * Two timeouts can end the wait. The game-time one below throws {@link AssertionError}. The
+     * real-time safety timeout is enforced further down in the main loop and throws
+     * {@link com.google.common.util.concurrent.UncheckedTimeoutException} instead - and for a
+     * condition that never becomes true because the engine has stopped progressing, that is the
+     * likelier of the two, since game time only advances while the engine ticks.
+     *
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within DEFAULT_GAME_TIME_TIMEOUT of game time
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #setSafetyTimeoutMs(long)}
+     */
+    void awaitUntil(String description, Supplier<Boolean> condition);
+
+    /**
+     * Runs the engine until {@code condition} holds, failing the test if it does not.
+     *
+     * @param gameTimeTimeoutMs how long to wait, in game time
+     * @param description what is being waited for, phrased to read after "timed out waiting for"
+     * @throws AssertionError if the condition does not hold within {@code gameTimeTimeoutMs} of game time
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #setSafetyTimeoutMs(long)}
+     * @see #awaitUntil(String, Supplier)
+     */
+    void awaitUntil(long gameTimeTimeoutMs, String description, Supplier<Boolean> condition);
+
+    /**
      * Runs tick() on the engine until f evaluates to true or DEFAULT_GAME_TIME_TIMEOUT milliseconds have passed in game time
      *
      * @return true if execution timed out
+     * @see #awaitUntil(String, Supplier) for a variant that fails the test on timeout
      */
     boolean runUntil(Supplier<Boolean> f);
 
@@ -77,6 +116,23 @@ public interface ModuleTestingEnvironment {
      * @return the created client's context object
      */
     Context createClient() throws IOException;
+
+    /**
+     * Runs the engines until at least {@code expectedClients} clients are registered with the host.
+     * <p>
+     * {@link #createClient()} returns once that client itself is in-game, which is not the same as the
+     * host having finished registering it - so a test that creates clients and immediately inspects
+     * {@code NetworkSystem.getPlayers()} can see fewer than it created. Waiting for the host's own view
+     * is the fix, and doing it by hand is easy to get subtly wrong.
+     *
+     * @param expectedClients how many clients the host should know about; zero returns immediately
+     * @throws IllegalArgumentException if {@code expectedClients} is negative, which no wait could satisfy
+     *         meaningfully and which would otherwise pass silently
+     * @throws AssertionError if that many never register within the default game-time timeout
+     * @throws com.google.common.util.concurrent.UncheckedTimeoutException if the real-time safety
+     *         timeout is exceeded first; see {@link #awaitUntil(String, Supplier)}
+     */
+    void awaitClients(int expectedClients);
 
     /**
      * The engines active in this instance of the module testing environment.

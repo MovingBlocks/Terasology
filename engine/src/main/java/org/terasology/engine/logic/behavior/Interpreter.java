@@ -6,7 +6,7 @@ import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BehaviorTreeRunner;
 import org.terasology.engine.logic.common.DisplayNameComponent;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * An interpreter evaluates a behavior tree. Uses BehaviorTreeRunner to actually evaluate the tree. The runner

@@ -207,16 +207,16 @@ public final class Rotation {
     }
 
     /**
-     * Returns all possible rotations for each yaw, pitch & roll combination, including duplicates.
+     * Returns all possible rotations for each yaw, pitch &amp; roll combination, including duplicates.
      *
-     * @return All possible rotations for each yaw, pitch & roll combination.
+     * @return All possible rotations for each yaw, pitch &amp; roll combination.
      */
     public static Iterable<Rotation> allValues() {
         return Arrays.asList(ALL_ROTATIONS);
     }
 
     /**
-     * Returns only unique rotations, in respect to transformations, rather than in respect to yaw, pitch & roll.
+     * Returns only unique rotations, in respect to transformations, rather than in respect to yaw, pitch &amp; roll.
      *
      * @return Unique rotations, in respect to transformations.
      */

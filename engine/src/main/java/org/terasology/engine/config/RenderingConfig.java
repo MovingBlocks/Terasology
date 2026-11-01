@@ -4,7 +4,7 @@
 package org.terasology.engine.config;
 
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -26,6 +26,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
     public static final String CHUNK_LODS = "chunkLods";
+    public static final String CHUNK_THREADS = "chunkThreads";
     public static final String BILLBOARD_LIMIT = "billboardLimit";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
     public static final String ANIMATE_GRASS = "AnimateGrass";
@@ -44,7 +45,6 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String LIGHT_SHAFTS = "LightShafts";
     public static final String EYE_ADAPTATION = "EyeAdaptation";
     public static final String BLOOM = "Bloom";
-    public static final String VR_SUPPORT = "VrSupport";
     public static final String MAX_TEXTURE_ATLAS_RESOLUTION = "MaxTextureAtlasResolution";
     public static final String MAX_CHUNKS_USED_FOR_SHADOW_MAPPING = "MaxChunksUsedForShadowMapping";
     public static final String SHADOW_MAP_RESOLUTION = "ShadowMapResolution";
@@ -77,6 +77,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean animatedMenu;
     private ViewDistance viewDistance;
     private float chunkLods;
+    private int chunkThreads;
     private float billboardLimit;
     private boolean flickeringLight;
     private boolean animateGrass;
@@ -95,7 +96,6 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean eyeAdaptation;
     private boolean bloom;
     private boolean dynamicShadows;
-    private boolean vrSupport;
     private int maxTextureAtlasResolution;
     private int maxChunksUsedForShadowMapping;
     private int shadowMapResolution;
@@ -272,6 +272,16 @@ public class RenderingConfig extends AbstractSubscribable {
         propertyChangeSupport.firePropertyChange(CHUNK_LODS, oldLods, chunkLods);
     }
 
+    public int getChunkThreads() {
+        return chunkThreads;
+    }
+
+    public void setChunkThreads(int chunkThreads) {
+        float oldChunkThreads = this.chunkThreads;
+        this.chunkThreads = chunkThreads;
+        propertyChangeSupport.firePropertyChange(CHUNK_THREADS, oldChunkThreads, chunkThreads);
+    }
+
     public float getBillboardLimit() {
         return billboardLimit;
     }
@@ -387,7 +397,7 @@ public class RenderingConfig extends AbstractSubscribable {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur && !isVrSupport();
+        return motionBlur;
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -454,16 +464,6 @@ public class RenderingConfig extends AbstractSubscribable {
         boolean oldValue = this.bloom;
         this.bloom = bloom;
         propertyChangeSupport.firePropertyChange(BLOOM, oldValue, this.bloom);
-    }
-
-    public boolean isVrSupport() {
-        return vrSupport;
-    }
-
-    public void setVrSupport(boolean vrSupport) {
-        boolean oldValue = this.vrSupport;
-        this.vrSupport = vrSupport;
-        propertyChangeSupport.firePropertyChange(VR_SUPPORT, oldValue, this.vrSupport);
     }
 
     public int getMaxTextureAtlasResolution() {

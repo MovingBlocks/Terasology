@@ -6,15 +6,15 @@ import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
-import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.MethodCommand;
@@ -26,8 +26,6 @@ import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
 import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.rendering.cameras.OpenVRStereoCamera;
-import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.dag.ModuleRendering;
 import org.terasology.engine.rendering.dag.Node;
 import org.terasology.engine.rendering.dag.RenderGraph;
@@ -37,19 +35,13 @@ import org.terasology.engine.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
-import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.WorldProvider;
-import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.LodChunkProvider;
-import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.engine.world.generator.ScalableWorldGenerator;
-import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.math.TeraMath;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -61,12 +53,10 @@ import static org.lwjgl.opengl.GL11.glViewport;
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with
  * elsewhere.
  * <p>
- * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
- * <p>
  * This implementation works closely with a number of support objects, in particular:
  * <p>
  * TODO: update this section to include new, relevant objects - a RenderableWorld instance, providing acceleration
- * structures caching blocks requiring different rendering treatments<br/>
+ * structures caching blocks requiring different rendering treatments<br>
  */
 public final class WorldRendererImpl implements WorldRenderer {
     /*
@@ -87,8 +77,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
 
-    private final OpenVRProvider vrProvider;
-
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
 
@@ -99,7 +87,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
-    private final Console console;
+    private Console console;
 
     private RenderTaskListGenerator renderTaskListGenerator;
     private boolean requestedTaskListRefresh;
@@ -122,92 +110,57 @@ public final class WorldRendererImpl implements WorldRenderer {
      *
      * @param context a context object, to obtain instances of classes such as the rendering config.
      */
+    @Inject
     public WorldRendererImpl(Context context) {
-        this.context = context;
-        renderGraph = new RenderGraph(context);
-
+        this.shaderManager = context.get(ShaderManager.class);
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        this.shaderManager = context.get(ShaderManager.class);
-        // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
-        vrProvider = OpenVRProvider.getInstance();
-        if (renderingConfig.isVrSupport()) {
-            context.put(OpenVRProvider.class, vrProvider);
-            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
-            // reason (for example, no HMD is connected). In that case, even though the configuration requests
-            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
-            // the log.
-            if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
-                /*
-                 * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
-                 * such that the ground plane of the rendering system and the ground plane of the room the VR user is
-                 * in match.
-                 */
-                vrProvider.getState().setGroundPlaneYOffset(
-                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
-                currentRenderingStage = RenderingStage.LEFT_EYE;
-            } else {
-                playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-                currentRenderingStage = RenderingStage.MONO;
-            }
-        } else {
-            playerCamera = new PerspectiveCamera(renderingConfig, context.get(DisplayDevice.class));
-            currentRenderingStage = RenderingStage.MONO;
-        }
+        playerCamera = context.get(Camera.class);
+        currentRenderingStage = RenderingStage.MONO;
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        context.put(ChunkTessellator.class, new ChunkTessellator());
-
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-        ChunkTessellator chunkTessellator = context.get(ChunkTessellator.class);
-        BlockManager blockManager = context.get(BlockManager.class);
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
-        Config config = context.get(Config.class);
-
-
-        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-        LodChunkProvider lodChunkProvider = null;
-        if (worldGenerator instanceof ScalableWorldGenerator) {
-            lodChunkProvider = new LodChunkProvider(chunkProvider, blockManager, extraDataManager,
-                    (ScalableWorldGenerator) worldGenerator, chunkTessellator);
-        }
-        this.renderableWorld = new RenderableWorldImpl(this, lodChunkProvider, chunkProvider, chunkTessellator, worldProvider, config, playerCamera);
+        this.renderableWorld = context.get(RenderableWorld.class);
         renderQueues = renderableWorld.getRenderQueues();
 
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        registerRenderingSupport(serviceRegistry);
+        registerRenderGraph(serviceRegistry);
+        this.context = new ContextImpl(context, serviceRegistry);
+
+        renderGraph = this.context.get(RenderGraph.class);
+    }
+
+    @Override
+    public void init() {
         initRenderingSupport();
-
-        initRenderGraph();
-
         initRenderingModules();
 
         console = context.get(Console.class);
         MethodCommand.registerAvailable(this, console, context);
     }
 
-    private void initRenderingSupport() {
-        ScreenGrabber screenGrabber = new ScreenGrabber(context);
-        context.put(ScreenGrabber.class, screenGrabber);
-
-        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(
-                context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
-        context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
+    private void registerRenderingSupport(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(ScreenGrabber.class).lifetime(Lifetime.Singleton).use(ScreenGrabber.class);
+        serviceRegistry.with(DisplayResolutionDependentFbo.class).lifetime(Lifetime.Singleton).use(DisplayResolutionDependentFbo.class);
 
         shaderManager.initShaders();
 
-        context.put(WorldRenderer.class, this);
-        context.put(RenderQueuesHelper.class, renderQueues);
-        context.put(RenderableWorld.class, renderableWorld);
+        serviceRegistry.with(RenderQueuesHelper.class).lifetime(Lifetime.Singleton).use(() -> renderQueues);
+        serviceRegistry.with(RenderableWorld.class).lifetime(Lifetime.Singleton).use(() -> renderableWorld);
     }
 
-    private void initRenderGraph() {
-        context.put(RenderGraph.class, renderGraph);
+    private void initRenderingSupport() {
+        displayResolutionDependentFbo = context.get(DisplayResolutionDependentFbo.class);
+    }
+
+    private void registerRenderGraph(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(RenderGraph.class).lifetime(Lifetime.Singleton).use(RenderGraph.class);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
-        context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
+        serviceRegistry.with(RenderTaskListGenerator.class).lifetime(Lifetime.Singleton).use(() -> renderTaskListGenerator);
     }
 
     private void initRenderingModules() {
@@ -236,9 +189,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
-                logger.info(String.format("\nInitialising rendering class %s from %s module.\n",
+                logger.atInfo().log("\nInitialising rendering class {} from {} module.\n",
                         moduleRenderingInstance.getClass().getSimpleName(),
-                        moduleRenderingInstance.getProvidingModule()));
+                        moduleRenderingInstance.getProvidingModule());
                 moduleRenderingInstance.initialise();
             }
         }

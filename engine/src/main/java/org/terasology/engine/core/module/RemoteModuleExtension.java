@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.Date;
 /**
  * A set of module extensions for remote modules.
- * NOTE: this is copy&paste from meta-server.
+ * NOTE: this is copy&amp;paste from meta-server.
  */
 public enum RemoteModuleExtension {
 

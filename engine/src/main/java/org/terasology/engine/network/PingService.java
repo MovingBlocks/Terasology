@@ -36,8 +36,7 @@ public class PingService implements Callable<Long> {
             // root privileges under some operating systems
             sock.connect(endpoint, timeout);
             Instant end = Instant.now();
-            long millis = Duration.between(start, end).toMillis();
-            return millis;
+            return Duration.between(start, end).toMillis();
         }
     }
 }

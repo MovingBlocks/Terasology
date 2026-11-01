@@ -88,8 +88,8 @@ public final class GameProvider {
                         result.add(new GameInfo(info, date, world.getValue()));
                     }
                 } catch (NullPointerException npe) {
-                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be " +
-                            "found and restored at: " + gameManifest.toString(), npe);
+                    logger.error("The save file was corrupted for: {}. The manifest can be found and restored at: {}",
+                            world, gameManifest, npe);
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
@@ -113,16 +113,16 @@ public final class GameProvider {
      * game.
      *
      * <pre>
-     *     1. "Game"    -> "Game"
-     *     2. "Game"    -> "Game 1"
-     *     3. "Game 1"  -> "Game 2"
+     *     1. "Game"    → "Game"
+     *     2. "Game"    → "Game 1"
+     *     3. "Game 1"  → "Game 2"
      * </pre>
      * <p>
      * When incrementing the number the currently highest number is incremented by one (i.e., "gaps" are not filled).
      *
      * <pre>
-     *     1. "Gooey 3"     -> "Gooey 3"
-     *     2. "Gooey"       -> "Gooey 4"
+     *     1. "Gooey 3"     → "Gooey 3"
+     *     2. "Gooey"       → "Gooey 4"
      * </pre>
      *
      * @param gameName will to use as game prefix, if saves contains this game name

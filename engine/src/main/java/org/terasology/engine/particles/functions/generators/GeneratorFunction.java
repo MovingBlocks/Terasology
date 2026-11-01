@@ -7,12 +7,14 @@ import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.functions.ParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
+import org.terasology.context.annotation.IndexInherited;
 
 /**
  * A generator function is called on a particle's data when it is created to set its fields.
  */
 @API
+@IndexInherited
 public abstract class GeneratorFunction<T extends Component> extends ParticleSystemFunction<T> {
     public GeneratorFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
         super(dataMask, dataMasks);

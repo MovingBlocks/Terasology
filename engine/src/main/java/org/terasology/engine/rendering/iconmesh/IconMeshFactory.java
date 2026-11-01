@@ -13,7 +13,7 @@ import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Color;

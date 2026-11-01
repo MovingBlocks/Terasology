@@ -6,6 +6,8 @@ package org.terasology.engine.core;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.utilities.OS;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * Manager class that keeps track of the game's various paths and save directories.
  */
 public final class PathManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PathManager.class);
     private static final String TERASOLOGY_FOLDER_NAME = "Terasology";
     private static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
@@ -75,11 +78,9 @@ public final class PathManager {
             URI urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
             Path codeLocation = Paths.get(urlToSource);
             installationSearchPaths.add(codeLocation);
-            // Not using logger because it's usually initialized after PathManager.
-            System.out.println("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
+            LOGGER.atInfo().log("PathManager: Initial code location is " + codeLocation.toAbsolutePath());
         } catch (URISyntaxException e) {
-            System.err.println("PathManager: Failed to convert code location to path.");
-            e.printStackTrace();
+            LOGGER.error("PathManager: Failed to convert code location to path.", e);
         }
 
         // But that's not always true. This jar may be loaded from somewhere else on the classpath.
@@ -89,7 +90,7 @@ public final class PathManager {
         // Use the current directory as a fallback.
         Path currentDirectory = Paths.get("").toAbsolutePath();
         installationSearchPaths.add(currentDirectory);
-        System.out.println("PathManager: Working directory is " + currentDirectory);
+        LOGGER.info("PathManager: Working directory is {}", currentDirectory);
 
         for (Path startPath : installationSearchPaths) {
             Path installationPath = findNativesHome(startPath, 5);
@@ -98,11 +99,11 @@ public final class PathManager {
             }
         }
 
-        System.err.printf(
-                "Native library installation directory not found. %n" +
-                "Things will almost certainly crash as a result, %n" +
-                "unless something else installed everything to java.library.path. %n" +
-                "Searched: %s%n", installationSearchPaths
+        LOGGER.error(
+                "Native library installation directory not found. /n" +
+                "Things will almost certainly crash as a result, /n" +
+                "unless something else installed everything to java.library.path. /n" +
+                "Searched: {}/n", installationSearchPaths
         );
         return currentDirectory;
     }
@@ -339,26 +340,62 @@ public final class PathManager {
         }
 
         // --------------------------------- Setup native paths ---------------------
-        final Path path;
+        // Two layouts coexist, so they need two paths.
+        //
+        // LWJGL natives are extracted per architecture - natives/windows-amd64, natives/macos-arm64
+        // and so on - because "natives-windows" is a substring of "natives-windows-arm64", so a
+        // single directory had one architecture silently overwriting the other. JNBullet and JNLua
+        // still extract to the legacy per-OS directory. Pointing every loader at one path leaves
+        // whichever library is not in that path unable to load.
+        final String legacyDirName;
+        final String lwjglOsName;
         switch (OS.get()) {
             case WINDOWS:
-                path = nativesPath.resolve("windows");
+                legacyDirName = "windows";
+                lwjglOsName = "windows";
                 break;
             case MACOSX:
-                path = nativesPath.resolve("macosx");
+                legacyDirName = "macosx";
+                lwjglOsName = "macos";  // deliberately not "macosx" - matches the LWJGL classifier
                 break;
             case LINUX:
-                path = nativesPath.resolve("linux");
+                legacyDirName = "linux";
+                lwjglOsName = "linux";
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
                         ".name"));
         }
-        final String natives = path.toAbsolutePath().toString();
-        System.setProperty("org.lwjgl.librarypath", natives);
+        final String natives = nativesPath.resolve(legacyDirName).toAbsolutePath().toString();
+        final String lwjglNatives =
+                nativesPath.resolve(lwjglOsName + "-" + nativeArchName()).toAbsolutePath().toString();
+
+        System.setProperty("org.lwjgl.librarypath", lwjglNatives);
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
         System.setProperty("org.terasology.librarypath", natives); // JNBullet
 
+    }
+
+    /**
+     * "amd64" or "arm64", matching the suffix on the native directories produced by the build.
+     *
+     * <p>The JVM reports "aarch64" for arm64 on every OS, and "amd64" or "x86_64" depending on the
+     * platform for the other - normalize both down to the two buckets LWJGL ships classifiers for.
+     * Kept in step with {@code nativeArchName()} in build-logic's {@code exec.kt}, which names the
+     * directories this resolves against.
+     */
+    private static String nativeArchName() {
+        String arch = System.getProperty("os.arch");
+        switch (arch) {
+            case "aarch64":
+            case "arm64":
+                return "arm64";
+            case "amd64":
+            case "x86_64":
+                return "amd64";
+            default:
+                throw new UnsupportedOperationException("Unsupported native architecture: " + arch);
+        }
     }
 
     protected ImmutableList<Path> defaultModPaths() throws IOException {

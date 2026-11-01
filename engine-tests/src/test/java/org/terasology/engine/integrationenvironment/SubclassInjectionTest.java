@@ -4,14 +4,11 @@
 package org.terasology.engine.integrationenvironment;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.integrationenvironment.fixtures.BaseTestingClass;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
+@IntegrationEnvironment
 public class SubclassInjectionTest extends BaseTestingClass {
     @Test
     public void testInjection() {

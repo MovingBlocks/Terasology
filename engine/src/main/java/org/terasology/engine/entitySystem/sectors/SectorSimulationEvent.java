@@ -4,7 +4,7 @@ package org.terasology.engine.entitySystem.sectors;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.gestalt.entitysystem.event.Event;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * This is the event sent to all sector-level entities by the {@link SectorSimulationSystem}, allowing them to do simulation. It

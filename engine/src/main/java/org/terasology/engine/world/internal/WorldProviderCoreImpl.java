@@ -9,13 +9,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.world.WorldChangeListener;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
@@ -36,6 +38,7 @@ import org.terasology.engine.world.propagation.light.SunlightWorldView;
 import org.terasology.engine.world.time.WorldTime;
 import org.terasology.engine.world.time.WorldTimeImpl;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,12 +46,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
+    private static final Logger logger = LoggerFactory.getLogger(WorldProviderCoreImpl.class);
+
+    /** How many example positions to report per chunk before falling silent about that chunk. */
+    private static final int DROPPED_WRITE_SAMPLES_PER_CHUNK = 5;
+
+    /** How many distinct chunks to report at all. Past this it is one bug, not N. */
+    private static final int DROPPED_WRITE_CHUNK_REPORT_LIMIT = 10;
+
+    /** Quiet period after which discarded writes are reported afresh. */
+    private static final long DROPPED_WRITE_REPORT_RESET_MS = 30_000;
+
+    private final Map<Vector3ic, AtomicInteger> droppedWritesPerChunk = new ConcurrentHashMap<>();
+    private final AtomicBoolean droppedWriteLimitAnnounced = new AtomicBoolean();
+    private volatile long lastDroppedWriteReportMs;
+
     private String title;
-    private String customTitle;
     private String seed = "";
     private SimpleUri worldGenerator;
 
@@ -63,16 +83,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private Block unloadedBlock;
 
-    public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
-                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
+                                 ChunkProvider chunkProvider, Block unloadedBlock, EntityManager entityManager) {
         this.title = (title == null) ? seed : title;
-        this.customTitle = customTitle;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         this.unloadedBlock = unloadedBlock;
-        this.entityManager = context.get(EntityManager.class);
-        context.put(ChunkProvider.class, chunkProvider);
+        this.entityManager = entityManager;
 
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -87,11 +105,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, Block unloadedBlock,
-                                 Context context) {
-        this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(),
+    @Inject
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager, EntityManager entityManager) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(),
                 chunkProvider,
-                unloadedBlock, context);
+                blockManager.getBlock(BlockManager.UNLOADED_ID), entityManager);
     }
 
     @Override
@@ -115,7 +133,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, customTitle, seed, worldTime.getMilliseconds(), worldGenerator);
+        return new WorldInfo(title, seed, worldTime.getMilliseconds(), worldGenerator);
     }
 
     @Override
@@ -195,7 +213,64 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             return oldBlockType;
 
         }
+        logDroppedWrite(worldPos, type);
         return null;
+    }
+
+    /**
+     * Report a block write that was thrown away because its chunk was not loaded.
+     * <p>
+     * {@link #setBlock} returning {@code null} is the documented signal for this, but callers
+     * routinely ignore the return value - so the world silently does not change, later reads come
+     * back as {@code engine:unloaded}, and the failure surfaces somewhere else entirely. Saying so
+     * at the point of loss turns that into an ordinary log line.
+     * <p>
+     * Logged at {@code warn}, because dropping a write is a caller bug rather than routine: the
+     * position should have been made relevant first. A caller writing a region into missing chunks
+     * loses thousands of blocks across hundreds of chunks at a time, and that is one bug rather
+     * than hundreds - so this reports at most {@value #DROPPED_WRITE_SAMPLES_PER_CHUNK} positions
+     * each from at most {@value #DROPPED_WRITE_CHUNK_REPORT_LIMIT} chunks. Reaching either limit
+     * says so, so that a silent log is never mistaken for a solved problem.
+     * <p>
+     * A world provider lives for the whole session, so those limits are not spent permanently:
+     * after {@value #DROPPED_WRITE_REPORT_RESET_MS}ms without a discarded write, reporting starts
+     * over. A later, unrelated burst is worth hearing about even if an earlier one used up the
+     * budget.
+     */
+    private void logDroppedWrite(Vector3ic worldPos, Block type) {
+        long now = System.currentTimeMillis();
+        if (now - lastDroppedWriteReportMs > DROPPED_WRITE_REPORT_RESET_MS) {
+            droppedWritesPerChunk.clear();
+            droppedWriteLimitAnnounced.set(false);
+        }
+        lastDroppedWriteReportMs = now;
+
+        Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
+        AtomicInteger dropped = droppedWritesPerChunk.get(chunkPos);
+        if (dropped == null) {
+            if (droppedWritesPerChunk.size() >= DROPPED_WRITE_CHUNK_REPORT_LIMIT) {
+                if (droppedWriteLimitAnnounced.compareAndSet(false, true)) {
+                    logger.warn("Discarded block writes across more than {} chunks."
+                                    + " Reporting limit reached - further discarded writes are silent."
+                                    + " Fix the underlying cause until this message stops appearing.",
+                            DROPPED_WRITE_CHUNK_REPORT_LIMIT);
+                }
+                return;
+            }
+            dropped = droppedWritesPerChunk.computeIfAbsent(chunkPos, unused -> new AtomicInteger());
+        }
+        int seen = dropped.incrementAndGet();
+        if (seen > DROPPED_WRITE_SAMPLES_PER_CHUNK) {
+            return;
+        }
+        logger.warn("Discarding block change to {} at ({}, {}, {}) - its chunk ({}, {}, {}) is not loaded. "
+                        + "Make the position relevant before writing to it.{}",
+                type != null ? type.getURI() : null,
+                worldPos.x(), worldPos.y(), worldPos.z(),
+                chunkPos.x(), chunkPos.y(), chunkPos.z(),
+                seen == DROPPED_WRITE_SAMPLES_PER_CHUNK
+                        ? " Reporting limit reached for this chunk - further discards are silent."
+                        : "");
     }
 
     @Override
@@ -230,6 +305,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 }
                 result.put(worldPos, oldBlockType);
             } else {
+                logDroppedWrite(worldPos, entry.getValue());
                 result.put(worldPos, null);
             }
         }

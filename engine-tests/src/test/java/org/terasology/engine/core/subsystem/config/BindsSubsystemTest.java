@@ -5,6 +5,7 @@ package org.terasology.engine.core.subsystem.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.BindsConfig;
 import org.terasology.engine.config.facade.BindsConfiguration;
 import org.terasology.engine.context.Context;
@@ -17,6 +18,7 @@ import org.terasology.engine.input.BindableButton;
 import org.terasology.engine.input.DefaultBinding;
 import org.terasology.engine.input.RegisterBindAxis;
 import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleMetadata;
@@ -55,13 +57,15 @@ public class BindsSubsystemTest {
     public void setUp() {
         bindsSubsystem = new BindsSubsystem();
         bindsConfiguration = new BindsConfigAdapter(new BindsConfig());
-        context = new ContextImpl();
-        context.put(BindsConfiguration.class, bindsConfiguration);
-        bindsSubsystem.preInitialise(context);
-        setUpMockModuleEnvironment();
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
+        serviceRegistry.with(BindsConfiguration.class).lifetime(Lifetime.Singleton).use(() -> bindsConfiguration);
+        bindsSubsystem.preInitialise(serviceRegistry);
+        setUpMockModuleEnvironment(serviceRegistry);
+        context = new ContextImpl(serviceRegistry);
+        ((ContextImpl) context).inject(bindsSubsystem);
     }
 
-    private void setUpMockModuleEnvironment() {
+    private void setUpMockModuleEnvironment(ServiceRegistry serviceRegistry) {
         ModuleManager moduleManager = mock(ModuleManager.class);
         ModuleRegistry moduleRegistry = new TableModuleRegistry();
 
@@ -81,7 +85,7 @@ public class BindsSubsystemTest {
         when(environment.getTypesAnnotatedWith(eq(RegisterBindAxis.class))).thenReturn(registerRealBindAxisClasses);
         when(environment.getTypesAnnotatedWith(eq(RegisterBindAxis.class), any())).thenReturn(registerRealBindAxisClasses);
         when(environment.getModuleProviding(any())).thenReturn(new Name(TEST_MODULE));
-        context.put(ModuleManager.class, moduleManager);
+        serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
     }
 
     @Test

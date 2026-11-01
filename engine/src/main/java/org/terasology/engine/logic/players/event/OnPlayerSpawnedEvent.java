@@ -6,7 +6,7 @@ import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * This event gets sent when the player spawns.
- * <br/>
+ * <br>
  * <b>Note:</b> that this should be used only as a one time event i.e. when
  * the player spawns for the first time in the game.
  * On every subsequent spawn a onPlayerRespawnedEvent is sent.

@@ -11,12 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TileThreadFactory implements ThreadFactory {
 
+    private static final String NAME_PREFIX = "TileThreadPool-thread-";
     private final AtomicInteger threadNumber = new AtomicInteger(1);
-    private final String namePrefix = "TileThreadPool-thread-";
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
+        Thread t = new Thread(r, NAME_PREFIX + threadNumber.getAndIncrement());
         t.setDaemon(true);
         t.setPriority(Thread.MIN_PRIORITY);
         return t;

@@ -4,7 +4,7 @@ package org.terasology.engine.logic.behavior;
 
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * Entities with this component are handled by a behavior tree. Default tree to fetch may be set.

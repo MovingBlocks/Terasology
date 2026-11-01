@@ -33,6 +33,8 @@ import org.terasology.engine.input.events.MouseAxisEvent;
 import org.terasology.engine.input.events.MouseButtonEvent;
 import org.terasology.engine.input.events.MouseWheelEvent;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.monitoring.Activity;
+import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.rendering.assets.texture.Texture;
@@ -75,6 +77,7 @@ import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -111,6 +114,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private TypeWidgetLibrary typeWidgetLibrary;
 
 
+    @Inject
     public NUIManagerInternal(TerasologyCanvasRenderer renderer, Context context) {
         this.context = context;
         this.hudScreenLayer = new HUDScreenLayer();
@@ -162,7 +166,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
 
         typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistryImpl(context);
-        context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
         registerTypeWidgetFactories();
     }
 
@@ -189,13 +192,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(),
+        widgetsLibrary = new WidgetLibrary(() -> context.get(ModuleManager.class).getEnvironment(),
                 context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
             Name module = verifyNotNull(environment.getModuleProviding(type), "No module provides %s", type);
             widgetsLibrary.register(new ResourceUrn(module.toString(), type.getSimpleName()), type);
         }
+        // Interfaces are not instantiatable and so are not usually stored in the widget library.
+        // We make a special exception in this case since all Terasology UI screens inherit from this base interface to use common styles.
+        widgetsLibrary.register(new ResourceUrn("engine", UIScreenLayer.class.getSimpleName()), UIScreenLayer.class);
     }
 
     @Override
@@ -263,11 +269,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             screens.remove(screen);
             onCloseScreen(screen, screenUri, sendEvents);
         }
-    }
-
-    private void closeScreenWithoutEvent(ResourceUrn screenUri) {
-        boolean sendEvents = false;
-        closeScreen(screenUri, sendEvents);
     }
 
     @Override
@@ -358,7 +359,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = !screenUri.isInstance() && assetManager.isLoaded(screenUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find screen '{}'", screenUri);
         } else {
             UIElement element = opt.get();
@@ -370,7 +371,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 }
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;
@@ -482,7 +483,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         boolean existsAlready = assetManager.isLoaded(overlayUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
-        if (!opt.isPresent()) {
+        if (opt.isEmpty()) {
             logger.error("Can't find overlay '{}'", overlayUri);
         } else {
             UIElement element = opt.get();
@@ -495,21 +496,21 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 addOverlay(overlay, overlayUri);
                 return overlay;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType); //NOPMD
             }
         }
         return null;
     }
 
     private <T extends ControlWidget> void initialiseControlWidget(T overlay, ResourceUrn screenUri) {
-        ContextImpl timedContextForModulesWidgets = new ContextImpl(this.context);
+        ContextImpl widgetContext = new ContextImpl(this.context);
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
         TypeWidgetLibrary moduleLibrary =
-                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, this.context);
-        context.put(TypeWidgetLibrary.class, moduleLibrary);
+                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, widgetContext);
+        widgetContext.put(TypeWidgetLibrary.class, moduleLibrary);
 
-        InjectionHelper.inject(overlay, timedContextForModulesWidgets);
+        InjectionHelper.inject(overlay, widgetContext);
 
         overlay.initialise();
     }
@@ -575,10 +576,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         for (UIScreenLayer screen : screensToRender) {
-            canvas.drawWidget(screen, canvas.getRegion());
+            try (Activity activity = PerformanceMonitor.startActivity("Canvas::drawWidget (Screen " + screen.getClass().getSimpleName() + ")")) {
+                canvas.drawWidget(screen, canvas.getRegion());
+            }
         }
         for (ControlWidget overlay : overlays.values()) {
-            canvas.drawWidget(overlay);
+            try (Activity activity = PerformanceMonitor.startActivity("Canvas::drawWidget (Overlay " + overlay.getClass().getSimpleName() + ")")) {
+                canvas.drawWidget(overlay);
+            }
         }
         canvas.postRender();
     }
@@ -720,20 +725,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void charEvent(CharEvent ev, EntityRef entity) {
         NUICharEvent nuiEvent = new NUICharEvent(mouse, keyboard, ev.getCharacter());
-        if (focus != null) {
-            if (focus.onCharEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onCharEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onCharEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onCharEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;
@@ -747,20 +749,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
         NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getState());
-        if (focus != null) {
-            if (focus.onKeyEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onKeyEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onKeyEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onKeyEvent(nuiEvent)) {
+                    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;
@@ -774,6 +773,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Priority(EventPriority.PRIORITY_HIGH)
     @ReceiveEvent(components = ClientComponent.class)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if (!event.getId().isValid()) {
+            // A malformed bind id (e.g. built from the single-arg SimpleUri(String) constructor without a
+            // ":" separator) would otherwise crash the ResourceUrn constructor below on every press. See #5224.
+            logger.warn("Ignoring bind event with invalid id: {}", event.getId());
+            return;
+        }
         NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard,
                 new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(),
                 event.getState());

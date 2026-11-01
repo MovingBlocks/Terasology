@@ -7,12 +7,17 @@ if (specialBranch) {
     artifactBuildsToKeep = "10"
 }
 
+// Set by the 'Merge Queue Check' stage when this build would only repeat one that already passed.
+boolean alreadyTested = false
+
 properties([
     // Needed due to the Copy Artifact plugin deciding to implement an obnoxious security feature
     // that can't simply be turned off
     copyArtifactPermission('*'),
     // Flag for Jenkins to discard attached artifacts after x builds
-    buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep))
+    buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep)),
+    // configure Jenkins to abort a build if a new one is triggered for the same branch
+    disableConcurrentBuilds(abortPrevious: true)
 ])
 
 /**
@@ -34,11 +39,66 @@ properties([
 
 pipeline {
     agent {
-        label 'ts-engine && heavy && java11'
+        label 'ts-engine && heavy && java17'
     }
     stages {
         // declarative pipeline does `checkout scm` automatically when hitting first stage
+
+        // GitHub's merge queue builds a temporary branch (gh-readonly-queue/<base>/pr-<N>-<base sha>) holding the
+        // base branch plus the PR, and waits for a build of it, even when the PR build has just tested exactly
+        // that combination. The queue makes its own merge commit, so the commits never match; what can match is
+        // the tree, i.e. the content of every file. Each build records the tree it tested, and a queue build
+        // whose tree equals the one the PR's last stable build tested has nothing new to learn.
+        //
+        // Anything short of a proven match (no record, an unstable PR build, a base branch that has moved on, any
+        // error in here) falls through to the full build.
+        stage('Merge Queue Check') {
+            steps {
+                script {
+                    try {
+                        String tree = sh(script: 'git rev-parse "HEAD^{tree}"', returnStdout: true).trim()
+                        writeFile file: 'tested-tree.txt', text: tree
+                        archiveArtifacts 'tested-tree.txt'
+
+                        if (env.BRANCH_NAME.startsWith('gh-readonly-queue/')) {
+                            // "pr-5403-f2b8434a..." -> "5403"
+                            String pr = env.BRANCH_NAME.tokenize('/').last().tokenize('-')[1]
+                            String prJob = '/' + env.JOB_NAME.substring(0, env.JOB_NAME.lastIndexOf('/')) + "/PR-${pr}"
+                            // The workspace outlives a build, and an optional copy that finds nothing leaves the
+                            // target alone: without this, an older build's record could stand in for this PR's.
+                            dir('pr-build') {
+                                deleteDir()
+                            }
+                            copyArtifacts projectName: prJob, selector: lastSuccessful(stable: true),
+                                filter: 'tested-tree.txt', target: 'pr-build', optional: true
+                            if (fileExists('pr-build/tested-tree.txt')) {
+                                String prTree = readFile('pr-build/tested-tree.txt').trim()
+                                if (prTree == tree) {
+                                    alreadyTested = true
+                                    currentBuild.description = "Skipped: same tree as the last stable build of PR-${pr}"
+                                    echo "Merge queue short-circuit: this commit has tree ${tree}, the same tree the " +
+                                        "last stable build of ${prJob} tested. Every file is identical, so the " +
+                                        "remaining stages are skipped and that result stands."
+                                } else {
+                                    echo "Merge queue: tree ${tree} differs from ${prTree} tested by ${prJob} " +
+                                        "(the base branch moved, or the PR changed). Running the full build."
+                                }
+                            } else {
+                                echo "Merge queue: no stable build of ${prJob} recorded a tree. Running the full build."
+                            }
+                        }
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException aborted) {
+                        throw aborted
+                    } catch (err) {
+                        alreadyTested = false
+                        echo "Merge queue check could not complete (${err}). Running the full build."
+                    }
+                }
+            }
+        }
+
         stage('Setup') {
+            when { expression { !alreadyTested } }
             steps {
                 echo 'Automatically checked out the things!'
                 sh 'chmod +x gradlew'
@@ -47,6 +107,7 @@ pipeline {
         }
 
         stage('Build') {
+            when { expression { !alreadyTested } }
             steps {
                 // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
                 sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher testDist'
@@ -66,6 +127,7 @@ pipeline {
         }
 
         stage('Unit Tests') {
+            when { expression { !alreadyTested } }
             steps {
                 sh './gradlew --console=plain unitTest'
             }
@@ -118,15 +180,16 @@ pipeline {
         }
 
         stage('Analytics') {
+            when { expression { !alreadyTested } }
             steps {
                 sh './gradlew --console=plain check -x test'
             }
             post {
                 always {
-                    // the default resolution when omitting `defaultBranch` is to `master`
+                    // the default resolution when omitting `targetBranch` is to `master`
                     // this is wrong in our case, so explicitly set `develop` as default
                     // TODO: does this also work for PRs with different base branch?
-                    discoverGitReferenceBuild(defaultBranch: 'develop')
+                    discoverGitReferenceBuild(targetBranch: 'develop')
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
                         qualityGates: [
@@ -136,11 +199,27 @@ pipeline {
                             [threshold: 1, type: 'TOTAL_NORMAL', unstable: true]    // mark stage "unstable" on existing normal findings
                         ])
 
+                    // JSON asset validation. Assets the engine genuinely cannot load already fail
+                    // the Build stage, so what reaches here is the other half: files that load
+                    // despite being defective, such as a duplicate key whose earlier value is
+                    // silently discarded. Those must stay visible without blocking anyone.
+                    //
+                    // Gated on NEW only, deliberately. There is an existing backlog, and a gate on
+                    // TOTAL would mark every build unstable until it is cleared — which trains
+                    // people to ignore the signal. New findings mark the stage unstable; the
+                    // backlog is reported and trended without crying wolf.
                     recordIssues(skipBlames: true, enabledForFailure: true,
-                        tools: [
-                            spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true),
-                            pmdParser(pattern: '**/build/reports/pmd/*.xml')
+                        tool: checkStyle(id: 'json-assets', name: 'JSON Assets',
+                                         pattern: '**/build/reports/json-assets/*.xml'),
+                        qualityGates: [
+                            [threshold: 1, type: 'NEW_NORMAL', unstable: true]
                         ])
+
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true))
+
+                    recordIssues(skipBlames: true, enabledForFailure: true,
+                        tool: pmdParser(pattern: '**/build/reports/pmd/*.xml', useRankAsPriority: true))
 
                     recordIssues(skipBlames: true, enabledForFailure: true,
                         tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', \
@@ -150,6 +229,7 @@ pipeline {
         }
 
         stage('Documentation') {
+            when { expression { !alreadyTested } }
             steps {
                 sh './gradlew --console=plain javadoc'
                 step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
@@ -157,7 +237,8 @@ pipeline {
             }
         }
 
-        stage('Integration Tests') {
+        stage('Integration Tests (without flaky tests)') {
+            when { expression { !alreadyTested } }
             steps {
                 sh './gradlew --console=plain integrationTest'
             }
@@ -172,6 +253,28 @@ pipeline {
                     // Jenkins truncates large test outputs, so archive it as well.
                     tar file: 'build/integrationTest-results.tgz', archive: true, compress: true, overwrite: true,
                         glob: '**/build/test-results/integrationTest/*.xml'
+                }
+            }
+        }
+
+        stage('Integration Tests (flaky tests only)') {
+            when { expression { !alreadyTested } }
+            steps {
+                warnError("Integration Tests Failed") {  // if this errs, mark the build unstable, not failed.
+                    sh './gradlew --console=plain integrationTestFlaky'
+                }
+            }
+            post {
+                always {
+                    // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*`
+                    // and XML reports to `build/test-results/*`.
+                    // We need to upload the XML reports for visualization in Jenkins.
+                    //
+                    // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
+                    junit testResults: '**/build/test-results/integrationTestFlaky/*.xml', allowEmptyResults: true
+                    // Jenkins truncates large test outputs, so archive it as well.
+                    tar file: 'build/integrationTestFlaky-results.tgz', archive: true, compress: true, overwrite: true,
+                        glob: '**/build/test-results/integrationTestFlaky/*.xml'
                 }
             }
         }

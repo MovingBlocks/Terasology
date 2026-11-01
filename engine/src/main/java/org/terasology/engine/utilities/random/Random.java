@@ -5,7 +5,7 @@ package org.terasology.engine.utilities.random;
 
 import org.joml.Vector3f;
 import org.terasology.math.TeraMath;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.List;
 

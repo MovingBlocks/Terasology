@@ -8,7 +8,7 @@ import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.functions.affectors.AffectorFunction;
 import org.terasology.engine.particles.functions.generators.GeneratorFunction;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -86,12 +86,12 @@ public class ParticleEmitterComponent implements Component<ParticleEmitterCompon
     public transient ParticlePool particlePool;
 
     /**
-     * Maps Generator component -> Function that processes that Generator
+     * Maps Generator component → Function that processes that Generator
      */
     public final Map<Component, GeneratorFunction> generatorFunctionMap = new LinkedHashMap<>();
 
     /**
-     * Maps Affector component -> Function that processes that Affector
+     * Maps Affector component → Function that processes that Affector
      */
     public final Map<Component, AffectorFunction> affectorFunctionMap = new LinkedHashMap<>();
 

@@ -8,7 +8,7 @@ import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.rendering.dag.RenderGraph;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -26,6 +26,11 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
+
+    /**
+     * Initialises the renderer.
+     */
+    void init();
 
     /**
      * @return the number of seconds since last frame, as a float number.

@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
-    private WorldProviderCore base;
+    protected WorldProviderCore base;
 
     public AbstractWorldProviderDecorator(WorldProviderCore base) {
         this.base = base;

@@ -10,10 +10,6 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <!-- map <denyRegex> and <requireRegex> xml elements to RegexFilter -->
-    <newRule pattern="*/appender/denyRegex" actionClass="org.terasology.logback.RegexFilterAction" />
-    <newRule pattern="*/appender/requireRegex" actionClass="org.terasology.logback.RegexFilterAction" />
-
-    <!-- allow include inside appenders (logback 1.2.11 only enabled Include on the root config by default.) -->
+    <!-- allow include inside appenders (logback 1.2 only enabled Include on the root config by default.) -->
     <newRule pattern="*/appender/include" actionClass="ch.qos.logback.core.joran.action.IncludeAction" />
 </included>

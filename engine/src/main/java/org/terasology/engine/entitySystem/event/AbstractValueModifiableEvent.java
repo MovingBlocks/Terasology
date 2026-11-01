@@ -56,7 +56,7 @@ public abstract class AbstractValueModifiableEvent implements Event {
      * result = max(0, ResultValueWithoutCapping)
      * </pre>
      *
-     * <emph>The result value is guaranteed to be non-negative!</emph>
+     * <em>The result value is guaranteed to be non-negative!</em>
      */
     public float getResultValue() {
         //TODO(skaldarnar): Based on a discussion in https://github.com/MovingBlocks/Terasology/pull/4063 we may want
@@ -76,7 +76,7 @@ public abstract class AbstractValueModifiableEvent implements Event {
      *      result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
      * } </pre>
      *
-     * <emph>Negative result values are allowed here.</emph>
+     * <em>Negative result values are allowed here.</em>
      */
     public float getResultValueWithoutCapping() {
         //TODO: Based on an extended discussion from : https://github.com/MovingBlocks/Terasology/pull/4063

@@ -5,7 +5,7 @@ package org.terasology.engine.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -108,6 +108,6 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        logger.info("Set {} property to {}. ", evt.getPropertyName().toUpperCase(), evt.getNewValue()); // for debugging purposes
+        logger.atDebug().log("Set {} property to {}.", evt.getPropertyName().toUpperCase(), evt.getNewValue());
     }
 }

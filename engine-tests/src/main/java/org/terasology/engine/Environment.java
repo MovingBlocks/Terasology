@@ -7,12 +7,15 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.PathManager;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
@@ -37,52 +40,58 @@ class Environment {
     Environment(Name... moduleNames) {
         try {
             reset(Sets.newHashSet(moduleNames));
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException(e);
         }
     }
 
-    protected void reset(Set<Name> moduleNames) throws Exception {
+    protected void reset(Set<Name> moduleNames) throws IOException {
         this.context = new ContextImpl();
+        ServiceRegistry serviceRegistry = new ServiceRegistry();
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
-        context.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
+        serviceRegistry.with(RecordAndReplayCurrentStatus.class).lifetime(Lifetime.Singleton).use(() -> recordAndReplayCurrentStatus);
         CoreRegistry.setContext(context);
 
         setupPathManager();
 
         Bullet.init(true, false);
 
-        setupConfig();
+        setupConfig(serviceRegistry);
 
-        setupModuleManager(moduleNames);
+        ModuleManager moduleManager = setupModuleManager(serviceRegistry, moduleNames);
 
-        setupDisplay();
+        setupDisplay(serviceRegistry);
 
-        setupAudio();
+        setupAudio(serviceRegistry);
 
-        AssetManager assetManager = setupAssetManager();
+        AssetManager assetManager = setupAssetManager(moduleManager, serviceRegistry);
 
-        setupBlockManager(assetManager);
+        setupBlockManager(serviceRegistry, assetManager);
 
-        setupExtraDataManager(context);
+        setupExtraDataManager(serviceRegistry, context);
 
-        setupCollisionManager();
+        setupCollisionManager(serviceRegistry);
 
-        setupNetwork();
+        setupNetwork(serviceRegistry);
 
-        setupEntitySystem();
+        setupEntitySystem(serviceRegistry);
 
-        setupStorageManager();
+        setupStorageManager(serviceRegistry);
 
-        setupComponentManager();
+        setupComponentManager(serviceRegistry);
 
-        setupWorldProvider();
+        setupWorldProvider(serviceRegistry);
 
-        setupCelestialSystem();
+        setupCelestialSystem(serviceRegistry);
+
+        this.context = new ContextImpl(serviceRegistry);
+        CoreRegistry.setContext(this.context);
+
+        registerBlockTypeHandlers(this.context);
+        registerCollisionTypeHandlers(this.context);
+        initComponentManager(this.context);
 
         loadPrefabs();
     }
@@ -91,7 +100,11 @@ class Environment {
         // empty
     }
 
-    protected void setupComponentManager() {
+    protected void setupComponentManager(ServiceRegistry serviceRegistry) {
+        // empty
+    }
+
+    protected void initComponentManager(Context context) {
         // empty
     }
 
@@ -99,70 +112,79 @@ class Environment {
         PathManager.getInstance();
     }
 
-    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        // empty
-    }
-
-    protected void setupDisplay() {
-        // empty
-    }
-
-    protected void setupConfig() {
-        // empty
-    }
-
-    protected void setupAudio() {
-        // empty
-    }
-
-    protected AssetManager setupAssetManager() {
+    protected ModuleManager setupModuleManager(ServiceRegistry serviceRegistry, Set<Name> moduleNames) {
         // empty
         return null;
     }
 
-    protected AssetManager setupEmptyAssetManager() {
+    protected void setupDisplay(ServiceRegistry serviceRegistry) {
+        // empty
+    }
+
+    protected void setupConfig(ServiceRegistry serviceRegistry) {
+        // empty
+    }
+
+    protected void setupAudio(ServiceRegistry serviceRegistry) {
+        // empty
+    }
+
+    protected AssetManager setupAssetManager(ModuleManager moduleManager, ServiceRegistry serviceRegistry) {
         // empty
         return null;
     }
 
-    protected void setupBlockManager(AssetManager assetManager) {
+    protected AssetManager setupEmptyAssetManager(ModuleManager moduleManager, ServiceRegistry serviceRegistry) {
+        // empty
+        return null;
+    }
+
+    protected void setupBlockManager(ServiceRegistry serviceRegistry, AssetManager assetManager) {
         // empty
     }
 
-    protected void setupExtraDataManager(Context context) {
+    protected void registerBlockTypeHandlers(Context context) {
         // empty
     }
 
-    protected void setupCollisionManager() {
+    protected void setupExtraDataManager(ServiceRegistry serviceRegistry, Context context) {
         // empty
     }
 
-    protected void setupEntitySystem() {
+    protected void setupCollisionManager(ServiceRegistry serviceRegistry) {
         // empty
     }
 
-    protected void setupNetwork() {
+    protected void registerCollisionTypeHandlers(Context context) {
         // empty
     }
 
-    protected void setupStorageManager() throws IOException {
+    protected void setupEntitySystem(ServiceRegistry serviceRegistry) {
         // empty
     }
 
-    protected void setupWorldProvider() {
+    protected void setupNetwork(ServiceRegistry serviceRegistry) {
         // empty
     }
 
-    protected void setupCelestialSystem() {
+    protected void setupStorageManager(ServiceRegistry serviceRegistry) throws IOException {
+        // empty
+    }
+
+    protected void setupWorldProvider(ServiceRegistry serviceRegistry) {
+        // empty
+    }
+
+    protected void setupCelestialSystem(ServiceRegistry serviceRegistry) {
         // empty
     }
 
     /**
      * Cleans up all resources (similar to AutoCloseable)
      *
-     * @throws Exception if something goes wrong
+     * @throws RuntimeException if something goes wrong
      */
-    public void close() throws Exception {
+    public void close() {
         CoreRegistry.setContext(null);
         context = null;
     }

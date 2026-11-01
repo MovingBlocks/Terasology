@@ -7,16 +7,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
+@IntegrationEnvironment
 public class ModuleTestingEnvironmentTest {
 
     public static final int THE_ANSWER = 42;
@@ -33,8 +30,35 @@ public class ModuleTestingEnvironmentTest {
     }
 
     @Test
+    public void runUntilFutureHonoursItsOwnGameTimeTimeout(MainLoop mainLoop) {
+        SettableFuture<?> unsatisfiedFuture = SettableFuture.create();
+
+        UncheckedTimeoutException exception = assertThrows(UncheckedTimeoutException.class,
+                () -> mainLoop.runUntil(200, unsatisfiedFuture));
+
+        assertThat(exception).hasMessageThat().contains("200 ms");
+        assertThat(unsatisfiedFuture.isCancelled()).isTrue();
+    }
+
+    @Test
     public void runUntilWithImmediateFutureReturnsValue(MainLoop mainLoop) {
         ListenableFuture<Integer> valueFuture = Futures.immediateFuture(THE_ANSWER);
         assertThat(mainLoop.runUntil(valueFuture)).isEqualTo(THE_ANSWER);
+    }
+
+    @Test
+    public void awaitUntilReturnsQuietlyWhenConditionHolds(MainLoop mainLoop) {
+        mainLoop.awaitUntil("a condition that is already true", () -> true);
+    }
+
+    @Test
+    public void awaitUntilNamesWhatItWasWaitingFor(MainLoop mainLoop) {
+        // A short game-time timeout keeps this well under the safety timeout, so we exercise the
+        // game-time path - the one runUntil reports by returning true rather than throwing.
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> mainLoop.awaitUntil(200, "the thing that never happens", () -> false));
+
+        assertThat(error).hasMessageThat().contains("the thing that never happens");
+        assertThat(error).hasMessageThat().contains("game time");
     }
 }

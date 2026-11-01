@@ -5,20 +5,17 @@ package org.terasology.engine.integrationenvironment;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
+import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
 import org.terasology.engine.registry.In;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
+@IntegrationEnvironment
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class LifecyclePerMethodInjectionTest {
 

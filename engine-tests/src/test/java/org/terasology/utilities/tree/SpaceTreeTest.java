@@ -13,62 +13,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class SpaceTreeTest {
     @Test
     public void test2DTreeErrors() {
         SpaceTree<Object> tree = new SpaceTree<>(2);
 
-        try {
-            tree.add(null, new Object());
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.add(new float[1], new Object());
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.add(new float[3], new Object());
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.add(new float[2], null);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.remove(null);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.remove(new float[1]);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
-
-        try {
-            tree.remove(new float[3]);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException exp) {
-            // Expected
-        }
+        assertThrows(IllegalArgumentException.class, () -> tree.add(null, new Object()));
+        assertThrows(IllegalArgumentException.class, () -> tree.add(new float[1], new Object()));
+        assertThrows(IllegalArgumentException.class, () -> tree.add(new float[3], new Object()));
+        assertThrows(IllegalArgumentException.class, () -> tree.add(new float[2], null));
+        assertThrows(IllegalArgumentException.class, () -> tree.remove(null));
+        assertThrows(IllegalArgumentException.class, () -> tree.remove(new float[1]));
+        assertThrows(IllegalArgumentException.class, () -> tree.remove(new float[3]));
     }
 
     @Test

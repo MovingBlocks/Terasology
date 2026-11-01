@@ -42,21 +42,22 @@ public final class RenderTaskListGenerator {
         taskList = Lists.newArrayList();
     }
 
+    @SuppressWarnings("PMD.GuardLogStatement")
     private void logIntermediateRendererListForDebugging(List<Node> orderedNodes) {
 
         for (Node node : orderedNodes) {
             if (node.isEnabled()) {
 
                 // printing out node name
-                logger.info(String.format(("----- %s"), node.getClass().getSimpleName()));
+                logger.info("----- {}", node.getClass().getSimpleName());
 
                 // printing out individual desired state changes
                 for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
-                    logger.info(desiredStateChange.toString());
+                    logger.info("{}", desiredStateChange);
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s: process()", node.toString()));
+                logger.info("{}: process()", node);
             }
         }
     }
@@ -166,7 +167,7 @@ public final class RenderTaskListGenerator {
 
         long endTimeInNanoSeconds = System.nanoTime();
 
-        // if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
             logger.debug("===== RENDERER TASK LIST =================================");
@@ -176,14 +177,14 @@ public final class RenderTaskListGenerator {
             logger.debug(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
                     nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
             logger.debug("----------------------------------------------------------");
-        // }
+        }
 
         return taskList;
     }
 
     private void logList(List<?> list) {
         for (Object object : list) {
-            logger.debug(object.toString());
+            logger.debug("{}", object);
         }
     }
 

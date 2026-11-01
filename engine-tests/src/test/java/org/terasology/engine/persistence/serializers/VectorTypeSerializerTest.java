@@ -25,18 +25,6 @@ import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 @SuppressWarnings("FieldCanBeLocal")
 class VectorTypeSerializerTest extends ModuleEnvironmentTest {
-    static class TestObject {
-        public Vector3f v1;
-        public Vector2f v2;
-        public Vector4f v3;
-    }
-
-    static class TestObject2 {
-        public Vector3fc v1;
-        public Vector4fc v2;
-        public Vector2fc v3;
-    }
-
     private TypeHandlerLibrary typeHandlerLibrary;
     private Serializer<?> gsonSerializer;
     private Gson gson = new Gson();
@@ -69,5 +57,17 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(new Vector3f(1.0f, 2.0f, 3.0f), o.v1, .00001f);
         assertEquals(new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), o.v2, .00001f);
         assertEquals(new Vector2f(1.0f, 2.0f), o.v3, .00001f);
+    }
+
+    public static class TestObject {
+        public Vector3f v1;
+        public Vector2f v2;
+        public Vector4f v3;
+    }
+
+    public static class TestObject2 {
+        public Vector3fc v1;
+        public Vector4fc v2;
+        public Vector2fc v3;
     }
 }

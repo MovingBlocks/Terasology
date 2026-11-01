@@ -45,6 +45,7 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.reflection.metadata.FieldMetadata;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +74,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
         super(base);
         entityManager = (EngineEntityManager) context.get(EntityManager.class);
         context.get(ComponentSystemManager.class).register(getTime());
+    }
+
+    @Inject
+    public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager, ComponentSystemManager componentSystemManager) {
+        super(base);
+        this.entityManager = entityManager;
+        componentSystemManager.register(getTime());
     }
 
     @Override
@@ -247,10 +255,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
         }
 
         for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType()) {
-                if (entity.hasComponent(metadata.getType())) {
-                    return false;
-                }
+            if (metadata.isForceBlockActive() && ignoreComponent != metadata.getType() && entity.hasComponent(metadata.getType())) {
+                return false;
             }
         }
         return true;
@@ -468,7 +474,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {
-                    entity.addComponent(entityManager.getComponentLibrary().copy(comp));
+                    Component copy = entityManager.getComponentLibrary().copy(comp);
+                    if (copy == null) {
+                        // No registered ComponentMetadata for comp's class, most likely because a
+                        // module it depends on isn't loaded - see BlockPrefabManager.updateBlock().
+                        logger.error("No ComponentMetadata for {}, referenced by prefab {} - skipping",
+                                comp.getClass().getName(), prefab.getUrn());
+                        continue;
+                    }
+                    entity.addComponent(copy);
                 } else {
                     ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                     boolean changed = false;

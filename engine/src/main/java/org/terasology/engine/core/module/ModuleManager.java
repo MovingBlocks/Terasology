@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanner;
@@ -11,9 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.utilities.Jvm;
+import org.terasology.gestalt.di.index.CompoundClassIndex;
+import org.terasology.gestalt.di.index.UrlClassIndex;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -50,9 +55,12 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.PropertyPermission;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Verify.verify;
 
 public class ModuleManager {
     /** Set this property to "true" to allow modules on the classpath. */
@@ -64,6 +72,7 @@ public class ModuleManager {
             new WarnOnlyProviderFactory(permissionProviderFactory);
 
     private final ModuleRegistry registry = new TableModuleRegistry();
+    private final Set<Module> classpathModules = new HashSet<>();
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader = newMetadataReader();
     private final ModuleFactory moduleFactory = newModuleFactory(metadataReader);
@@ -169,9 +178,10 @@ public class ModuleManager {
                     continue;
                 }
                 if (registry.add(module)) {
-                    logger.info("Loaded {} from {}", module.getId(), path);
+                    classpathModules.add(module);
+                    logger.info("Loaded {} from {}", module.getId(), path); //NOPMD
                 } else {
-                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path); //NOPMD
                 }
             }
         }
@@ -194,14 +204,26 @@ public class ModuleManager {
         Module packageModule = moduleFactory.createPackageModule("org.terasology.engine");
 
         // We need to add reflections from our subsystems and other classes.
-        Reflections packageReflections = packageModule.getModuleManifest();
+        CompoundClassIndex packageClassIndex = new CompoundClassIndex();
+        packageClassIndex.add(packageModule.getClassIndex());
+
+        Reflections packageReflections = new Reflections();
         ConfigurationBuilder config = reflectionsConfigurationFrom(packageReflections);
 
         Collection<File> classPaths = new HashSet<>(packageModule.getClasspaths());
         for (Class<?> aClass : classesOnClasspathsToAddToEngine) {
             URL url = ClasspathHelper.forClass(aClass);
+            File classPath = urlToFile(url);
             config.addUrls(url);  // include this in reflections scan
-            classPaths.add(urlToFile(url));  // also include in Module.moduleClasspaths
+            classPaths.add(classPath);  // also include in Module.moduleClasspaths
+            // Index only the classpath entry this class came from. Indexing the whole
+            // classloader pulls in every entry on the classpath - which in a development or test
+            // run includes the modules' own build outputs - while the class predicate below still
+            // (correctly) refuses to own those classes. Anything in that gap is discovered by
+            // getSubtypesOf but has no module to attribute it to, so registering it fails.
+            packageClassIndex.add(classPath.isDirectory()
+                    ? UrlClassIndex.byDirectory(classPath)
+                    : UrlClassIndex.byArchive(classPath));
             logger.debug("Adding path to engine module for class: {} {}", url, aClass);
         }
 
@@ -217,7 +239,7 @@ public class ModuleManager {
                 packageModule.getMetadata(),
                 packageModule.getResources(),
                 classPaths,
-                packageReflections,
+                packageClassIndex,
                 clazz ->
                         packageModule.getClassPredicate().test(clazz)
                                 || config.getUrls().contains(ClasspathHelper.forClass(clazz))
@@ -248,8 +270,17 @@ public class ModuleManager {
         ExternalApiWhitelist.CLASSES.forEach(permissionSet::addAPIClass);
         ExternalApiWhitelist.PACKAGES.forEach(permissionSet::addAPIPackage);
 
+        // Only the engine module, and (in dev mode) modules explicitly loaded onto the JVM
+        // classpath, have classes resolvable via the system classloader APIScanner uses here.
+        // Modules loaded from the application/module path (the normal case) are only ever
+        // accessible through their own ModuleClassLoader - JavaModuleClassLoader#loadClass
+        // doesn't consult this permission set for inter-module access at all, so scanning
+        // those modules here is both guaranteed to fail and pointless.
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        registry.stream().map(Module::getModuleManifest).forEach(apiScanner::scan);
+        apiScanner.scan(engineModule.getClassIndex());
+        for (Module module : classpathModules) {
+            apiScanner.scan(module.getClassIndex());
+        }
 
         permissionSet.grantPermission("com.google.gson", ReflectPermission.class);
         permissionSet.grantPermission("com.google.gson.internal", ReflectPermission.class);
@@ -268,8 +299,13 @@ public class ModuleManager {
             permissionSet.grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
         }
 
-        Policy.setPolicy(new ModuleSecurityPolicy());
-        System.setSecurityManager(new ModuleSecurityManager());
+        if (Runtime.version().feature() < 18 || "allow".equals(System.getProperty("java.security.manager"))) {
+            Policy.setPolicy(new ModuleSecurityPolicy());
+            System.setSecurityManager(new ModuleSecurityManager());
+        } else {
+            logger.warn("SecurityManager is disabled starting with Java 18 - module sandbox functionality is limited!");
+            logger.warn("To enable SecurityManager, use the \"-Djava.security.manager=allow\" JVM option.");
+        }
     }
 
     /**
@@ -277,9 +313,37 @@ public class ModuleManager {
      *
      * @deprecated Use {@link #resolveAndLoadEnvironment} if you need module dependency resolution.
      */
-    @Deprecated/*(since="4.4.0")*/
+    @Deprecated(since = "4.4.0")
     public ModuleRegistry getRegistry() {
         return registry;
+    }
+
+    /**
+     * Look up the module registered with this path.
+     * <p>
+     * This queries modules that have already been registered. It does <em>not</em> register
+     * anything new for the path or make any addition to the current module search path.
+     *
+     * @return empty if no modules match the path
+     * @throws VerifyException if more than one module matches
+     */
+    public Optional<Module> getModuleAt(Path path) {
+        final var matchingModules = new HashSet<Module>();
+        final var absolutePath = path.toAbsolutePath().normalize();
+        for (Module module : registry) {
+            for (Path modulePath : module.getResources().getRootPaths()) {
+                if (modulePath.toAbsolutePath().normalize().equals(absolutePath)) {
+                    matchingModules.add(module);
+                }
+            }
+        }
+        if (matchingModules.isEmpty()) {
+            return Optional.empty();
+        } else {
+            verify(matchingModules.size() == 1,
+                    "Path {} matched multiple modules: {}", path, matchingModules);
+            return Optional.of(matchingModules.iterator().next());
+        }
     }
 
     public ModuleInstallManager getInstallManager() {
@@ -311,7 +375,15 @@ public class ModuleManager {
         resolveAndLoadEnvironment(Arrays.asList(modules));
     }
 
+    public void resolveAndLoadEnvironment(Context context, Name... modules) {
+        resolveAndLoadEnvironment(context, Arrays.asList(modules));
+    }
+
     public void resolveAndLoadEnvironment(Iterable<Name> modules) {
+        resolveAndLoadEnvironment(new ContextImpl(), modules);
+    }
+
+    public void resolveAndLoadEnvironment(Context context, Iterable<Name> modules) {
         DependencyResolver resolver = new DependencyResolver(registry);
         ResolutionResult result = resolver.resolve(modules);
 
@@ -320,18 +392,37 @@ public class ModuleManager {
             throw new RuntimeException("Failed to resolve dependencies for " + modules);
         }
 
-        loadEnvironment(result.getModules(), true);
+        loadEnvironment(context, result.getModules(), true);
     }
 
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
+        return loadEnvironment(new ContextImpl(), modules, asPrimary);
+    }
+
+    /**
+     * Load a module environment backed by the given context's BeanContext.
+     *
+     * @param context must be a {@link ContextImpl} — the BeanContext is extracted for module
+     *                dependency injection. Use {@link #loadEnvironment(Set, boolean)} if no
+     *                specific context is needed.
+     * @param modules the modules to include in the environment
+     * @param asPrimary if true, sets this as the primary environment
+     * @return the loaded module environment
+     * @throws IllegalStateException if context is not a ContextImpl
+     */
+    public ModuleEnvironment loadEnvironment(Context context, Set<Module> modules, boolean asPrimary) {
+        if (!(context instanceof ContextImpl contextImpl)) {
+            throw new IllegalStateException("loadEnvironment requires a ContextImpl but got "
+                    + (context == null ? "null" : context.getClass().getName()));
+        }
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.add(engineModule);
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(contextImpl.getBeanContext(), finalModules, wrappingPermissionProviderFactory);
         } else {
-            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory);
+            newEnvironment = new ModuleEnvironment(contextImpl.getBeanContext(), finalModules, permissionProviderFactory);
         }
         if (asPrimary) {
             environment = newEnvironment;

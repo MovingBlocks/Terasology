@@ -3,7 +3,6 @@
 
 package org.terasology.engine.core.bootstrap;
 
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.naming.Name;
 
@@ -14,10 +13,10 @@ public class ClassMetaLibraryImpl implements ClassMetaLibrary {
     private final ModuleManager moduleManager;
 
     /**
-     * @param context the context that provides a {@link ModuleManager}.
+     * @param moduleManager the {@link ModuleManager} to use.
      */
-    public ClassMetaLibraryImpl(Context context) {
-        moduleManager = context.get(ModuleManager.class);
+    public ClassMetaLibraryImpl(ModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
     }
 
     @Override

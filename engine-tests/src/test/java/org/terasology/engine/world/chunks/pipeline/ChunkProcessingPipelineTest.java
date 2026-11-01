@@ -3,13 +3,14 @@
 
 package org.terasology.engine.world.chunks.pipeline;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -51,7 +52,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -67,7 +68,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
@@ -106,7 +107,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, chunkCache::get, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -140,7 +141,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -169,7 +170,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
+        pipeline = new ChunkProcessingPipeline(0, chunkCache::get, (o1, o2) -> {
             if (position.get() != null) {
                 Vector3ic entityPos = position.get();
                 return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition())
@@ -236,7 +237,52 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         }
     }
 
-    @BeforeEach
+    /**
+     * Only {@link ChunkProcessingPipeline#shutdown()} is meant to stop the reactor. An interrupt from anywhere else
+     * must not end chunk processing for the rest of the pipeline's life.
+     */
+    @Test
+    void strayInterruptDoesNotStopProcessing() throws ExecutionException, InterruptedException, TimeoutException {
+        Thread reactor = createPipelineAndFindReactor();
+        pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
+
+        reactor.interrupt();
+
+        Chunk chunk = createChunkAt(new Vector3i(0, 0, 0));
+        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
+        Chunk chunkAfterProcessing = chunkFuture.get(2, TimeUnit.SECONDS);
+
+        Assertions.assertEquals(chunk.getPosition(), chunkAfterProcessing.getPosition(),
+                "A chunk submitted after a stray interrupt must still be processed");
+    }
+
+    @Test
+    void shutdownStopsReactor() throws InterruptedException {
+        Thread reactor = createPipelineAndFindReactor();
+
+        pipeline.shutdown();
+        reactor.join(2_000);
+
+        Assertions.assertFalse(reactor.isAlive(), "The reactor thread must exit on shutdown");
+    }
+
+    /**
+     * The reactor is private to the pipeline, so it is identified as the one reactor thread that did not exist before
+     * the pipeline was constructed. Other pipelines in this JVM have reactors with the same name.
+     */
+    private Thread createPipelineAndFindReactor() {
+        Set<Thread> before = reactorThreads();
+        pipeline = new ChunkProcessingPipeline(0, (p) -> null, (o1, o2) -> 0);
+        return Iterables.getOnlyElement(Sets.difference(reactorThreads(), before));
+    }
+
+    private static Set<Thread> reactorThreads() {
+        return Thread.getAllStackTraces().keySet().stream()
+                .filter((t) -> "Chunk-Processing-Reactor".equals(t.getName()))
+                .collect(Collectors.toSet());
+    }
+
+    @AfterEach
     void cleanup() {
         if (pipeline != null) {
             pipeline.shutdown();

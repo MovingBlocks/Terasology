@@ -14,7 +14,7 @@ import org.terasology.engine.world.generation.WorldBuilder;
 import org.terasology.engine.world.generation.WorldRasterizer;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.viewer.layers.FacetLayer;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.world.block.Block;

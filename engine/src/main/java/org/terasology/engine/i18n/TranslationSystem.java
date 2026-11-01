@@ -4,7 +4,7 @@
 package org.terasology.engine.i18n;
 
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.translate.Translator;
 
 import java.util.Locale;

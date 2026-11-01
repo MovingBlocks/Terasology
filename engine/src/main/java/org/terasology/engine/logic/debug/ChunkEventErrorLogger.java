@@ -25,14 +25,14 @@ public class ChunkEventErrorLogger extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         if (!loadedChunks.add(chunkAvailable.getChunkPos())) {
-            logger.error("Multiple loads of chunk {}", chunkAvailable.getChunkPos());
+            logger.error("Multiple loads of chunk {}", chunkAvailable.getChunkPos()); //NOPMD
         }
     }
 
     @ReceiveEvent(components = WorldComponent.class)
     public void onRemoveChunk(BeforeChunkUnload chunkUnload, EntityRef worldEntity) {
         if (!loadedChunks.remove(chunkUnload.getChunkPos())) {
-            logger.error("Unload event for not loaded chunk {}", chunkUnload.getChunkPos());
+            logger.error("Unload event for not loaded chunk {}", chunkUnload.getChunkPos()); //NOPMD
         }
     }
 }

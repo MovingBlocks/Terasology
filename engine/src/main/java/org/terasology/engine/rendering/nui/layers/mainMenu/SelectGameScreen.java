@@ -149,20 +149,39 @@ public class SelectGameScreen extends SelectionScreen {
 
     private void loadGame(GameInfo item) {
         if (isLoadingAsServer()) {
-            Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-            Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
-            if (!Files.exists(blacklistPath)) {
+            Path homePath = PathManager.getInstance().getHomePath();
+            Path denylistPath = homePath.resolve("denylist.json");
+            Path allowlistPath = homePath.resolve("allowlist.json");
+            // Migrate each legacy file independently before creating new empty ones,
+            // so existing banned/allowed client IDs are not silently discarded on upgrade.
+            try {
+                Path legacyDenylist = homePath.resolve("blacklist.json");
+                if (Files.exists(legacyDenylist) && !Files.exists(denylistPath)) {
+                    Files.move(legacyDenylist, denylistPath);
+                }
+            } catch (IOException e) {
+                logger.error("Failed to migrate blacklist.json to denylist.json", e);
+            }
+            try {
+                Path legacyAllowlist = homePath.resolve("whitelist.json");
+                if (Files.exists(legacyAllowlist) && !Files.exists(allowlistPath)) {
+                    Files.move(legacyAllowlist, allowlistPath);
+                }
+            } catch (IOException e) {
+                logger.error("Failed to migrate whitelist.json to allowlist.json", e);
+            }
+            if (!Files.exists(denylistPath)) {
                 try {
-                    Files.createFile(blacklistPath);
+                    Files.createFile(denylistPath);
                 } catch (IOException e) {
-                    logger.error("IO Exception on blacklist generation", e);
+                    logger.error("IO Exception on denylist generation", e);
                 }
             }
-            if (!Files.exists(whitelistPath)) {
+            if (!Files.exists(allowlistPath)) {
                 try {
-                    Files.createFile(whitelistPath);
+                    Files.createFile(allowlistPath);
                 } catch (IOException e) {
-                    logger.error("IO Exception on whitelist generation", e);
+                    logger.error("IO Exception on allowlist generation", e);
                 }
             }
         }

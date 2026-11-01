@@ -89,8 +89,7 @@ class EventCopier {
             return newEvent;
         } else if (toBeCopied instanceof AttackEvent) {
             AttackEvent originalEvent = (AttackEvent) toBeCopied;
-            AttackEvent  newEvent = new AttackEvent(originalEvent.getInstigator(), originalEvent.getDirectCause());
-            return newEvent;
+            return new AttackEvent(originalEvent.getInstigator(), originalEvent.getDirectCause());
         } else {
             return null;
         }
@@ -115,7 +114,7 @@ class EventCopier {
                 | InvocationTargetException
                 | InstantiationException
                 exception) {
-            logger.error("ERROR!!! Event not Identified: " + originalEvent.toString(), exception);
+            logger.error("ERROR!!! Event not Identified: {}", originalEvent, exception);
         }
         return null;
     }

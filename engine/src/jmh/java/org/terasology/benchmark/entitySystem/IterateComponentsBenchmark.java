@@ -29,6 +29,25 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 1)
 public class IterateComponentsBenchmark {
 
+    @Benchmark
+    public void iterateMultipleComponent(StateObject state) {
+        for (EntityRef entity : state.entityManager.getEntitiesWith(MeshComponent.class, LocationComponent.class)) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            // benchmark, nothing to be done with result at the momment.
+            @SuppressWarnings("PMD.UnusedLocalVariable")
+            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            loc.getLocalPosition();
+        }
+    }
+
+    @Benchmark
+    public void iterateSingleComponent(StateObject state) {
+        for (EntityRef entity : state.entityManager.getEntitiesWith(LocationComponent.class)) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            loc.getLocalPosition();
+        }
+    }
+
     @State(Scope.Benchmark)
     public static class StateObject {
         private final PojoEntityManager entityManager = new PojoEntityManager();
@@ -48,23 +67,6 @@ public class IterateComponentsBenchmark {
                 }
                 entityManager.create(entityData);
             }
-        }
-    }
-    
-    @Benchmark
-    public void iterateMultipleComponent(StateObject state) {
-        for (EntityRef entity : state.entityManager.getEntitiesWith(MeshComponent.class, LocationComponent.class)) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-            loc.getLocalPosition();
-        }
-    }
-
-    @Benchmark
-    public void iterateSingleComponent(StateObject state) {
-        for (EntityRef entity : state.entityManager.getEntitiesWith(LocationComponent.class)) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            loc.getLocalPosition();
         }
     }
 

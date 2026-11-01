@@ -4,7 +4,6 @@
 package org.terasology.engine.core.subsystem.config;
 
 import org.terasology.engine.config.BindsConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;
@@ -35,14 +34,14 @@ import java.util.Map;
 public interface BindsManager {
 
     /**
-     * The actual binds config. This reflects the current status from {@link #updateDefaultBinds(Context)}
+     * The actual binds config. This reflects the current status from {@link BindsManager#updateConfigWithDefaultBinds()}.
      * and all further modifications like modifications in the user input settings.
      * @return
      */
     BindsConfig getBindsConfig();
 
     /**
-     * The default bindings. This reflects the current status from {@link #updateDefaultBinds(Context)}.
+     * The default bindings. This reflects the current status from {@link BindsManager#updateConfigWithDefaultBinds()}.
      * @return Returns the default bindings. Changes to this config modify the actual instance
      * but become invalid the next time {@link #updateConfigWithDefaultBinds()} is called.
      */

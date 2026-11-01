@@ -7,26 +7,26 @@ import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.integrationenvironment.jupiter.IntegrationEnvironment;
-import org.terasology.engine.integrationenvironment.jupiter.MTEExtension;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.logic.players.event.ResetCameraEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.BlockManager;
+import org.terasology.unittest.stubs.DummyEvent;
 
 import java.io.IOException;
 
-@Tag("MteTest")
-@ExtendWith(MTEExtension.class)
 @IntegrationEnvironment(networkMode = NetworkMode.LISTEN_SERVER)
 public class ExampleTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExampleTest.class);
 
     @In
     private WorldProvider worldProvider;
@@ -40,17 +40,35 @@ public class ExampleTest {
     private ModuleTestingHelper helper;
 
     @Test
-    public void testClientConnection() throws IOException {
+    @Tag("flaky")
+    public void testClientCreation(TestReporter reporter) {
+        logger.info("Starting test 'testClientCreation'");
+        long start = System.currentTimeMillis();
+        Assertions.assertDoesNotThrow(helper::createClient);
+        reporter.publishEntry("client_connect_ms", String.valueOf(System.currentTimeMillis() - start));
+        logger.info("Done with test 'testClientCreation'");
+    }
+
+    @Test
+    @Tag("flaky")
+    public void testClientConnection(TestReporter reporter) throws IOException {
+        long start = System.currentTimeMillis();
         int currentClients = Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size();
 
         // create some clients (the library connects them automatically)
         Context clientContext1 = helper.createClient();
+        reporter.publishEntry("client1_connect_ms", String.valueOf(System.currentTimeMillis() - start));
+
+        long client2Start = System.currentTimeMillis();
         Context clientContext2 = helper.createClient();
+        reporter.publishEntry("client2_connect_ms", String.valueOf(System.currentTimeMillis() - client2Start));
 
         int expectedClients = currentClients + 2;
 
         // wait for both clients to be known to the server
-        helper.runUntil(() -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size() >= expectedClients);
+        helper.awaitUntil("both clients to be known to the server",
+                () -> Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size() >= expectedClients);
+        reporter.publishEntry("both_known_ms", String.valueOf(System.currentTimeMillis() - start));
         Assertions.assertEquals(expectedClients,
                 Lists.newArrayList(entityManager.getEntitiesWith(ClientComponent.class)).size());
     }
@@ -66,11 +84,15 @@ public class ExampleTest {
     }
 
     @Test
-    public void testSendEvent() throws IOException {
+    @Tag("flaky")
+    public void testSendEvent(TestReporter reporter) throws IOException {
+        long start = System.currentTimeMillis();
         Context clientContext = helper.createClient();
+        reporter.publishEntry("client_connect_ms", String.valueOf(System.currentTimeMillis() - start));
 
         // send an event to a client's local player just for fun
-        clientContext.get(LocalPlayer.class).getClientEntity().send(new ResetCameraEvent());
+        clientContext.get(LocalPlayer.class).getClientEntity().send(new DummyEvent());
+        reporter.publishEntry("total_ms", String.valueOf(System.currentTimeMillis() - start));
     }
 
     @Test

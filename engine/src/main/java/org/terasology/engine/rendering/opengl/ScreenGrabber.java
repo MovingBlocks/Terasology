@@ -14,6 +14,7 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -46,6 +47,11 @@ public class ScreenGrabber {
      */
     public ScreenGrabber(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
+    }
+
+    @Inject
+    public ScreenGrabber(Config config) {
+        renderingConfig = config.getRendering();
     }
 
     /**

@@ -6,8 +6,8 @@ import com.google.common.base.Charsets;
 import org.lwjgl.system.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -19,7 +19,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     private static boolean initialised;
 
     @Override
-    public void preInitialise(Context context) {
+    public void preInitialise(ServiceRegistry serviceRegistry) {
         if (!initialised) {
             initLogger();
             initialised = true;

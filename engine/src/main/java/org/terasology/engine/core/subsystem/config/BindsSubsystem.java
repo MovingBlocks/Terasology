@@ -6,11 +6,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.BindsConfig;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.facade.BindsConfiguration;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.input.BindAxisEvent;
@@ -27,6 +28,7 @@ import org.terasology.engine.input.internal.AbstractBindableAxis;
 import org.terasology.engine.input.internal.BindableAxisImpl;
 import org.terasology.engine.input.internal.BindableButtonImpl;
 import org.terasology.engine.input.internal.BindableRealAxis;
+import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
@@ -37,21 +39,27 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
 
+import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.unmodifiableCollection;
 
 public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
-    private BindsConfiguration bindsConfiguration;
+    @Inject
+    protected BindsConfiguration bindsConfiguration;
+    @Inject
+    protected Optional<ModuleManager> moduleManager;
+    @Inject
+    protected Optional<Config> config;
     private BindsConfiguration defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
     private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
     private List<BindableButton> buttonBinds = Lists.newArrayList();
-    private Context context;
     private Map<String, BindableRealAxis> axisLookup = Maps.newHashMap();
     private List<AbstractBindableAxis> axisBinds = Lists.newArrayList();
 
@@ -62,6 +70,10 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     private Map<Input, BindableRealAxis> controllerAxisBinds = Maps.newHashMap();
     private BindableButton mouseWheelUpBind;
     private BindableButton mouseWheelDownBind;
+
+    @Inject
+    public BindsSubsystem() {
+    }
 
     @Override
     public BindableButton getMouseWheelUpBind() {
@@ -109,10 +121,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public void preInitialise(Context passedContext) {
-        context = passedContext;
-        bindsConfiguration = passedContext.get(BindsConfiguration.class);
-        passedContext.put(BindsManager.class, this);
+    public void preInitialise(ServiceRegistry serviceRegistry) {
+        serviceRegistry.with(BindsManager.class).lifetime(Lifetime.Singleton).use(() -> this);
     }
 
     @Override
@@ -127,18 +137,21 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     public void updateConfigWithDefaultBinds() {
         //default bindings are overridden
         defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
-        updateDefaultBinds(context, defaultBindsConfig);
+        updateDefaultBinds(defaultBindsConfig);
         //actual bindings may be actualized
-        updateDefaultBinds(context, bindsConfiguration);
+        updateDefaultBinds(bindsConfiguration);
     }
 
-    private void updateDefaultBinds(Context passedContext, BindsConfiguration config) {
-        ModuleManager moduleManager = passedContext.get(ModuleManager.class);
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+    private void updateDefaultBinds(BindsConfiguration config) {
+        if (moduleManager.isEmpty()) {
+            return;
+        }
+
+        DependencyResolver resolver = new DependencyResolver(moduleManager.get().getRegistry());
+        for (Name moduleId : moduleManager.get().getRegistry().getModuleIds()) {
             ResolutionResult result = resolver.resolve(moduleId);
             if (result.isSuccess()) {
-                try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                try (ModuleEnvironment environment = moduleManager.get().loadEnvironment(result.getModules(), false)) {
                     FromModule filter = new FromModule(environment, moduleId);
                     Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
                     Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
@@ -195,12 +208,13 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     @Override
     public void registerBinds() {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        ModuleEnvironment environment = moduleManager.getEnvironment();
-        clearBinds();
-        registerButtonBinds(environment);
-        registerAxisBinds(environment);
-        registerRealAxisBinds(environment);
+        if (moduleManager.isPresent()) {
+            ModuleEnvironment environment = moduleManager.get().getEnvironment();
+            clearBinds();
+            registerButtonBinds(environment);
+            registerAxisBinds(environment);
+            registerRealAxisBinds(environment);
+        }
     }
 
     private void clearBinds() {
@@ -216,11 +230,25 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         mouseWheelDownBind = null;
     }
 
+    /**
+     * The module a bind belongs to, or null - having said so - if the environment cannot name one.
+     * <p>
+     * A null module here would otherwise produce a bind URI with no module part, which registers
+     * but never matches anything, so the bind is quietly absent in game.
+     */
+    private Name moduleProvidingBind(ModuleEnvironment environment, Class<?> registerBindClass) {
+        return ModuleAttribution.moduleProvidingOrReport(logger, "register bind", registerBindClass, environment);
+    }
+
     private void registerButtonBinds(ModuleEnvironment environment) {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindButton.class);
         for (Class<?> registerBindClass : classes) {
             RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
-            SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
+            SimpleUri bindUri = new SimpleUri(moduleId, info.id());
             if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
                 try {
                     BindableButton bindButton = registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
@@ -245,17 +273,20 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterBindAxis info = registerBindClass.getAnnotation(RegisterBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
             SimpleUri id = new SimpleUri(moduleId, info.id());
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
                 BindableButton positiveButton = getBindButton(new SimpleUri(info.positiveButton()));
                 BindableButton negativeButton = getBindButton(new SimpleUri(info.negativeButton()));
                 if (positiveButton == null) {
-                    logger.warn("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
+                    logger.atWarn().log("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
                     continue;
                 }
                 if (negativeButton == null) {
-                    logger.warn("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
+                    logger.atWarn().log("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
                     continue;
                 }
                 try {
@@ -276,7 +307,10 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
+            Name moduleId = moduleProvidingBind(environment, registerBindClass);
+            if (moduleId == null) {
+                continue;
+            }
             SimpleUri id = new SimpleUri(moduleId, info.id());
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
                 try {
@@ -356,7 +390,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     private BindableAxis registerRealBindAxis(String id, BindAxisEvent event) {
-        BindableRealAxis axis = new BindableRealAxis(id.toString(), event);
+        BindableRealAxis axis = new BindableRealAxis(id, event);
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;
@@ -382,7 +416,9 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     @Override
     public void saveBindsConfig() {
         //TODO replace with flexible config when binds are no longer saved in the Config.
-        context.get(Config.class).save();
+        if (config.isPresent()) {
+            config.get().save();
+        }
     }
 
     /**
@@ -405,11 +441,11 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
             }
         }
 
-        if (mouseWheelUpBind.getId().equals(bindId)) {
+        if (mouseWheelUpBind != null && mouseWheelUpBind.getId().equals(bindId)) {
             inputs.add(MouseInput.WHEEL_UP);
         }
 
-        if (mouseWheelDownBind.getId().equals(bindId)) {
+        if (mouseWheelDownBind != null && mouseWheelDownBind.getId().equals(bindId)) {
             inputs.add(MouseInput.WHEEL_DOWN);
         }
 

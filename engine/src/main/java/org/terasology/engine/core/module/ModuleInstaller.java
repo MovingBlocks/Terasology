@@ -38,7 +38,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
     @Override
     public List<Module> call() throws Exception {
         Map<URI, Path> filesToDownload = getDownloadUrls(moduleList);
-        logger.info("Started downloading {} modules", filesToDownload.size());
+        logger.info("Started downloading {} modules", filesToDownload.size()); //NOPMD
         MultiFileDownloader downloader = new MultiFileDownloader(filesToDownload, downloadProgressListener);
         List<Path> downloadedModulesPaths = downloader.call();
         logger.info("Module download completed, loading the new modules...");
@@ -48,7 +48,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
                 Module module = moduleManager.registerArchiveModule(filePath);
                 newInstalledModules.add(module);
             } catch (IOException e) {
-                logger.warn("Could not load module {}", filePath.getFileName(), e);
+                logger.warn("Could not load module {}", filePath.getFileName(), e); //NOPMD
             }
         }
         logger.info("Finished loading the downloaded modules");
@@ -65,7 +65,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
             try {
                 uri = RemoteModuleExtension.getDownloadUrl(metadata).toURI();
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                logger.error("Couldn't get download URL: ", e);
             }
             String fileName = String.format("%s-%s.jar", id, version);
             Path folder = PathManager.getInstance().getHomeModPath().normalize();

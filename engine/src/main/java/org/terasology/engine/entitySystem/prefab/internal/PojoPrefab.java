@@ -84,7 +84,7 @@ public class PojoPrefab extends Prefab {
         this.persisted = data.isPersisted();
         this.alwaysRelevant = data.isAlwaysRelevant();
         this.parent = data.getParent();
-        if (parent != null && parent instanceof PojoPrefab) {
+        if (parent instanceof PojoPrefab) {
             ((PojoPrefab) parent).children.add(this);
         }
     }

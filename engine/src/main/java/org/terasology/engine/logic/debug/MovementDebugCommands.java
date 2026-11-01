@@ -224,19 +224,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         return "";
     }
-
-    private float getJumpSpeed(float ratio, float defaultValue) {
-        return (float) Math.pow(ratio, 0.74f) * 0.4f * defaultValue + 0.6f * defaultValue;
-    }
-
-    private float getInteractionRange(float ratio, float defaultValue) {
-        return (float) Math.pow(ratio, 0.62f) * defaultValue;
-    }
-
-    private float getRunFactor(float ratio, float defaultValue) {
-        return (float) Math.pow(ratio, 0.68f) * defaultValue;
-    }
-
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String playerHeight(@Sender EntityRef entity, @CommandParam("height") float newHeight) {
@@ -276,7 +263,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             }
             return "";
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            logger.error("Couldn't set player eye height: e");
             return "";
         }
     }

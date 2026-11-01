@@ -10,7 +10,7 @@ import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -63,7 +63,7 @@ final class CompleteApiScraper {
             }
 
             if (location == null) {
-                logger.error("Failed to get a class/package location, skipping " + apiClass);
+                logger.error("Failed to get a class/package location, skipping {}", apiClass);
                 continue;
             }
 
@@ -97,7 +97,7 @@ final class CompleteApiScraper {
                     break;
 
                 default :
-                    logger.error("Unknown protocol for: " + apiClass + ", came from " + location);
+                    logger.error("Unknown protocol for: {} , came from {}", apiClass, location);
             }
         }
         api.putAll(EXTERNAL, ExternalApiWhitelist.CLASSES.stream()

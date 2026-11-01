@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
@@ -29,15 +28,19 @@ import org.terasology.engine.world.chunks.LodChunkProvider;
 import org.terasology.engine.world.chunks.RenderableChunk;
 import org.terasology.joml.geom.AABBfc;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.PriorityQueue;
 
 /**
  * TODO: write javadoc unless this class gets slated for removal, which might be.
  */
-class RenderableWorldImpl implements RenderableWorld {
+public class RenderableWorldImpl implements RenderableWorld {
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
@@ -47,8 +50,10 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private final int maxChunksForShadows;
 
+    private final Provider<WorldRenderer> worldRenderer;
     private final WorldProvider worldProvider;
     private final ChunkProvider chunkProvider;
+    @Nullable
     private final LodChunkProvider lodChunkProvider;
 
     private final ChunkTessellator chunkTessellator;
@@ -57,7 +62,6 @@ class RenderableWorldImpl implements RenderableWorld {
     private final RenderQueuesHelper renderQueues;
     private ChunkMeshRenderer chunkMeshRenderer;
 
-    private final Camera playerCamera;
     private Camera shadowMapCamera;
 
     private final RenderingConfig renderingConfig;
@@ -71,15 +75,16 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private final ChunkMeshWorker chunkWorker;
 
-    RenderableWorldImpl(WorldRenderer worldRenderer, LodChunkProvider lodChunkProvider, ChunkProvider chunkProvider,
-                        ChunkTessellator chunkTessellator, WorldProvider worldProvider, Config config, Camera playerCamera) {
+    @Inject
+    public RenderableWorldImpl(Provider<WorldRenderer> worldRenderer, Optional<LodChunkProvider> lodChunkProvider, ChunkProvider chunkProvider,
+                               ChunkTessellator chunkTessellator, WorldProvider worldProvider, Config config) {
         frontToBackComparator = new RenderableWorldImpl.ChunkFrontToBackComparator(worldRenderer);
         backToFrontComparator = new RenderableWorldImpl.ChunkBackToFrontComparator(worldRenderer);
 
+        this.worldRenderer = worldRenderer;
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
-        this.playerCamera = playerCamera;
-        this.lodChunkProvider = lodChunkProvider;
+        this.lodChunkProvider = lodChunkProvider.orElse(null);
         this.chunkTessellator = chunkTessellator;
         this.renderingConfig = config.getRendering();
         this.maxChunksForShadows = Math.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
@@ -246,7 +251,7 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        Vector3f cameraCoordinates = playerCamera.getPosition();
+        Vector3f cameraCoordinates = worldRenderer.get().getActiveCamera().getPosition();
         return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
 
@@ -357,7 +362,7 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkVisible(RenderableChunk chunk) {
-        return isChunkVisible(playerCamera, chunk);
+        return isChunkVisible(worldRenderer.get().getActiveCamera(), chunk);
     }
 
     private boolean isChunkVisible(Camera camera, RenderableChunk chunk) {
@@ -366,7 +371,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private boolean isChunkVisibleReflection(RenderableChunk chunk) {
         AABBfc bounds = chunk.getAABB();
-        return playerCamera.getViewFrustumReflected().testAab(bounds.minX(), bounds.minY(), bounds.minZ(),
+        return worldRenderer.get().getActiveCamera().getViewFrustumReflected().testAab(bounds.minX(), bounds.minY(), bounds.minZ(),
                 bounds.maxX(), bounds.maxY(), bounds.maxZ());
     }
 
@@ -421,8 +426,8 @@ class RenderableWorldImpl implements RenderableWorld {
     // TODO: and avoid having to find it on a per-comparison basis.
     public static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
 
-        private final WorldRenderer worldRenderer;
-        ChunkFrontToBackComparator(WorldRenderer worldRenderer) {
+        private final Provider<WorldRenderer> worldRenderer;
+        ChunkFrontToBackComparator(Provider<WorldRenderer> worldRenderer) {
             this.worldRenderer = worldRenderer;
         }
 
@@ -430,7 +435,7 @@ class RenderableWorldImpl implements RenderableWorld {
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+            Vector3f cameraPosition = worldRenderer.get().getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
@@ -442,15 +447,15 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     public static class ChunkBackToFrontComparator implements Comparator<RenderableChunk> {
-        private final WorldRenderer worldRenderer;
-        ChunkBackToFrontComparator(WorldRenderer worldRenderer) {
+        private final Provider<WorldRenderer> worldRenderer;
+        ChunkBackToFrontComparator(Provider<WorldRenderer> worldRenderer) {
             this.worldRenderer = worldRenderer;
         }
         @Override
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            Vector3f cameraPosition = worldRenderer.get().getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 

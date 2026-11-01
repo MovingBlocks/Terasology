@@ -101,10 +101,8 @@ public abstract class AbstractNode implements Node {
 
     public void tryBufferPairPass() {
         BufferPairConnection bufferPairConnection = getInputBufferPairConnection(1);
-        if (bufferPairConnection != null) {
-            if (bufferPairConnection.getData() != null) {
-                addOutputBufferPairConnection(1, bufferPairConnection);
-            }
+        if (bufferPairConnection != null && bufferPairConnection.getData() != null) {
+            addOutputBufferPairConnection(1, bufferPairConnection);
         }
     }
 
@@ -197,17 +195,17 @@ public abstract class AbstractNode implements Node {
 
             // set data for all connected connections
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
-                logger.debug("Propagating bufferPair data to all connected connections of " + localBufferPairConnection + ": ");
+                logger.debug("Propagating bufferPair data to all connected connections of {}: ", localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.debug("setting data for: " + v.toString() + " ,");
+                    logger.debug("setting data for: {} ,", v);
                     v.setData(bufferPair);
                 });
                 logger.debug("data propagated.\n");
             }
 
             if (localBufferPairConnection.getData() != null) {
-                logger.warn("Adding output buffer pair to slot id " + id
-                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
+                logger.warn("Adding output buffer pair to slot id {} of {} node overwrites data of existing connection: {}",
+                        id, this.nodeUri, localBufferPairConnection);
             }
             localBufferPairConnection.setData(bufferPair);
             success = true;
@@ -234,17 +232,17 @@ public abstract class AbstractNode implements Node {
 
             // set data for all connected connections
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
-                logger.info("Propagating data from " + from.toString() + " to all connected connections of " + localBufferPairConnection + ": ");
+                logger.info("Propagating data from {} to all connected connections of {}: ", from, localBufferPairConnection);
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.info("setting data for: " + v.toString() + " ,");
+                    logger.info("setting data for: {} ,", v);
                     v.setData(from.getData());
                 });
                 logger.info("data propagated.\n");
             }
 
             if (localBufferPairConnection.getData() != null) {
-                logger.warn("Adding output buffer pair connection " + from.toString() + "\n to slot id " + id
-                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
+                logger.warn("Adding output buffer pair connection to slot id {} of {} node overwrites data of existing connection: {}",
+                        id, this.nodeUri, localBufferPairConnection);
             }
             localBufferPairConnection.setData(from.getData());
 
@@ -305,16 +303,16 @@ public abstract class AbstractNode implements Node {
             FboConnection fboConnection = (FboConnection) outputConnections.get(connectionUri);
 
             if (fboConnection.getData() != null) {
-                logger.warn("Adding output fbo data to slot id " + id
-                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + fboConnection.toString());
+                logger.warn("Adding output fbo data to slot id {} of {} node overwrites data of existing connection: {}",
+                        id, this.nodeUri, fboConnection);
             }
             fboConnection.setData(fboData);
 
             // set data for all connected connections
             if (!fboConnection.getConnectedConnections().isEmpty()) {
-                logger.info("Propagating fbo data to all connected connections of " + fboConnection + ": ");
+                logger.info("Propagating fbo data to all connected connections of {}: ", fboConnection);
                 fboConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.info("setting data for: " + v.toString() + " ,");
+                    logger.info("setting data for: {} ,", v);
                     v.setData(fboData);
                 });
                 logger.info("data propagated.\n");
@@ -339,9 +337,9 @@ public abstract class AbstractNode implements Node {
 
 
     /**
-     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * Is {@code thisNode} dependent on {@code anotherNode}?
      * @param anotherNode
-     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     * @return If this node has at least one {@code anotherNode}'s connection on input - true. Otherwise false.
      */
     public boolean isDependentOn(Node anotherNode) {
         boolean isDependent = false;
@@ -445,9 +443,7 @@ public abstract class AbstractNode implements Node {
     public DependencyConnection getInputConnection(String name) {
         DependencyConnection connection = inputConnections.get(name);
         if (connection == null) {
-            String errorMessage = String.format("Getting input connection named %s returned null." +
-                    " No such input connection in %s", name, this.toString());
-            logger.error(errorMessage);
+            logger.error("Getting input connection named {} returned null. No such input connection in {}", name, this);
             // throw new NullPointerException(errorMessage);
         }
         return connection;
@@ -457,9 +453,7 @@ public abstract class AbstractNode implements Node {
     public DependencyConnection getOutputConnection(String name) {
         DependencyConnection connection = outputConnections.get(name);
         if (connection == null) {
-            String errorMessage = String.format("Getting output connection named %s returned null." +
-                                                " No such output connection in %s", name, this.toString());
-            logger.error(errorMessage);
+            logger.error("Getting output connection named {} returned null. No such output connection in {}.", name, this);
             // throw new NullPointerException(errorMessage);
         }
         return connection;
@@ -478,7 +472,7 @@ public abstract class AbstractNode implements Node {
     }
 
     public void disconnectInputFbo(int inputId) {
-        logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
+        logger.info("Disconnecting {} input Fbo number {}", this.getUri(), inputId); //NOPMD
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputFboToOutput
@@ -515,7 +509,7 @@ public abstract class AbstractNode implements Node {
         if (!fboUsages.containsKey(fboName)) {
             fboUsages.put(fboName, fboManager);
         } else {
-            logger.warn("FBO " + fboName + " is already requested.");
+            logger.warn("FBO {} is already requested.", fboName);
             fbo = fboManager.get(fboName);
             this.addInputFboConnection(inputConnections.size() + 1, fbo);
             return fbo;
@@ -553,8 +547,8 @@ public abstract class AbstractNode implements Node {
      */
     protected void addDesiredStateChange(StateChange stateChange) {
         if (stateChange.isTheDefaultInstance()) {
-            logger.error("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
-                    stateChange.getClass().getSimpleName(), this.toString());
+            logger.atError().log("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
+                    stateChange.getClass().getSimpleName(), this);
         }
         desiredStateChanges.add(stateChange);
     }

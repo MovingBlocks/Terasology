@@ -6,9 +6,7 @@ import com.google.common.base.Suppliers;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryUtil;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.Resolution;
@@ -40,8 +38,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private int windowHeight = 0;
     private boolean isWindowDirty = true;
 
-    public LwjglDisplayDevice(Context context) {
-        this.config = context.get(Config.class).getRendering();
+    public LwjglDisplayDevice(RenderingConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -88,14 +86,18 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 break;
             case WINDOWED_FULLSCREEN:
                 GLFWVidMode vidMode = desktopResolution.get();
-                GLFW.glfwSetWindowMonitor(window,
-                        MemoryUtil.NULL,
-                        0,
-                        0,
-                        vidMode.width(),
-                        vidMode.height(),
-                        GLFW.GLFW_DONT_CARE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                // Attempt to go into fullscreen twice to fix the taskbar showing on-top of the game on Windows.
+                // See also: https://github.com/MovingBlocks/Terasology/issues/5228.
+                for (int i = 0; i < 2; i++) {
+                    GLFW.glfwSetWindowMonitor(window,
+                            MemoryUtil.NULL,
+                            0,
+                            0,
+                            vidMode.width(),
+                            vidMode.height(),
+                            GLFW.GLFW_DONT_CARE);
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                }
                 config.setDisplayModeSetting(displayModeSetting);
                 config.setWindowedFullscreen(true);
                 break;

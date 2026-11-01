@@ -175,7 +175,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             if (id != null) {
                 FieldMetadata<?, ?> fieldMetadata = elementMetadata.getField(ID_FIELD);
                 if (fieldMetadata == null) {
-                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getId());
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getId()); //NOPMD
                 } else {
                     fieldMetadata.setValue(element, id);
                 }
@@ -218,7 +218,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                             field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }
                     } catch (RuntimeException e) {
-                        logger.error("Failed to deserialize field {} of {}", field.getName(), type, e);
+                        logger.error("Failed to deserialize field {} of {}", field.getName(), type, e); //NOPMD
                     }
                 }
             }

@@ -14,6 +14,7 @@ public class GLFWErrorCallback implements GLFWErrorCallbackI {
     private static final Logger logger = LoggerFactory.getLogger("GLFW");
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatement")
     public void invoke(int error, long description) {
         logger.error("Received error. Code: {}, Description: {}", error, MemoryUtil.memASCII(description));
     }

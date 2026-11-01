@@ -238,16 +238,6 @@ public class InputSystemTests {
         testKeyboard.add(rawKeyboardAction);
     }
 
-    private static char characterFor(Key key) {
-        //internal key chars depend on the lwjgl keyboard, this works for all letters
-        String displayName = key.getDisplayName();
-        if (displayName.length() == 1) {
-            return displayName.charAt(0);
-        } else {
-            return ' ';
-        }
-    }
-
     private static class TestKeyboard implements KeyboardDevice {
 
         private Queue<RawKeyboardAction> queue = new LinkedBlockingQueue<>();

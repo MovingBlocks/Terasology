@@ -36,7 +36,8 @@ public class Translation extends Asset<TranslationData> {
      * @param data      The actual translation data. Never <code>null</code>.
      */
     public Translation(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data, Translation.DisposalAction disposalAction) {
-        super(urn, assetType, disposalAction);
+        super(urn, assetType);
+        setDisposableResource(disposalAction);
         this.disposalAction = disposalAction;
         this.disposalAction.setAsset(this);
         reload(data);

@@ -43,7 +43,7 @@ public class PermissionCommands extends BaseComponentSystem {
         PermissionConfig permissionConfig = config.getPermission();
         String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
 
-        if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
+        if (expectedKey != null && !expectedKey.isEmpty() && key.equals(expectedKey)) {
             permissionConfig.setOneTimeAuthorizationKey("");
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             EntityRef clientInfo = clientComponent.clientInfo;

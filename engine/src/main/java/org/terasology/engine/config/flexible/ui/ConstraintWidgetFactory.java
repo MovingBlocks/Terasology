@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config.flexible.ui;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.nui.UIWidget;
@@ -17,6 +18,7 @@ import java.util.Optional;
  * @param <T> type of setting
  * @param <C> concrete type of {@link SettingConstraint}
  */
+@IndexInherited
 public abstract class ConstraintWidgetFactory<T, C extends SettingConstraint<T>> {
     private Setting<T> setting;
 

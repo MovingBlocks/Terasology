@@ -13,7 +13,6 @@ import org.terasology.engine.world.WorldComponent;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
-
     private static final float WORLD_TIME_MULTIPLIER = 48f;
 
     private AtomicLong worldTime = new AtomicLong(0);
@@ -68,17 +67,14 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
             if (startTick != endTick) {
                 long tick = endTime - endTime % TICK_EVENT_RATE;
-                getWorldEntity().send(new WorldTimeEvent(tick));
+                for (EntityRef e : entityManager.getEntitiesWith(WorldComponent.class)) {
+                    // this may not be called if there's no entity with World Component (yet)
+                    // TODO: consider catching / logging this case (someplace better than here)
+                    e.send(new WorldTimeEvent(tick));
+                }
             }
 
             // TODO: consider sending a DailyTick (independent from solar events such as midnight)
         }
-    }
-
-    private EntityRef getWorldEntity() {
-        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
-            return entity;
-        }
-        return EntityRef.NULL;
     }
 }

@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleAttribution;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
@@ -21,9 +22,10 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +59,7 @@ public class ComponentSystemManager {
 
     private boolean initialised;
 
+    @Inject
     public ComponentSystemManager(Context context) {
         this.context = context;
     }
@@ -68,10 +71,15 @@ public class ComponentSystemManager {
         ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
         for (Class<?> type : environment.getTypesAnnotatedWith(RegisterSystem.class)) {
             if (!ComponentSystem.class.isAssignableFrom(type)) {
-                logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName());
+                logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName()); //NOPMD
                 continue;
             }
-            Name moduleId = environment.getModuleProviding(type);
+            Name moduleId = ModuleAttribution.moduleProvidingOrReport(logger, "load", type, environment);
+            if (moduleId == null) {
+                // Filing this under a null key would drop it silently: the loop below walks the
+                // environment's modules, so a system with no module is simply never loaded.
+                continue;
+            }
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode.isAuthority(), isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
                 systemsByModule.put(moduleId, type);
@@ -177,7 +185,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
-            logger.warn("System " + object.getClass().getName() + " registered post-init.");
+            logger.atWarn().log("System {} registered post-init.", object.getClass().getName());
             initialiseSystem(object);
         }
     }

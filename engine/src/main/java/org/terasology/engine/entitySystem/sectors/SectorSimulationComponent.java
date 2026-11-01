@@ -6,7 +6,7 @@ import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * The component that allows the {@link SectorSimulationSystem} to send simulation events to a sector-scope entity.
@@ -46,7 +46,7 @@ public class SectorSimulationComponent implements Component<SectorSimulationComp
      * This is used to calculate the delta between simulation events, and should not be changed outside of this class
      * or the {@link SectorSimulationSystem}.
      */
-    protected long lastSimulationTime;
+    public long lastSimulationTime;
 
     /**
      * Create a new {@link SectorSimulationComponent} with the default max delta.

@@ -3,7 +3,7 @@
 package org.terasology.engine.particles.components.affectors;
 
 import org.terasology.gestalt.entitysystem.component.EmptyComponent;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 @API
 public class VelocityAffectorComponent extends EmptyComponent<VelocityAffectorComponent> {

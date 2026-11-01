@@ -73,6 +73,8 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeRegistry;
 
+import javax.inject.Inject;
+
 /**
  * A library of type handlers. This is used for the construction of class metadata. This library should be initialised
  * by adding a number of base type handlers, describing how to serialize each supported type. It will then produce
@@ -91,8 +93,13 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 
+    @Inject
     public TypeHandlerLibraryImpl(ModuleManager moduleManager, TypeRegistry typeRegistry) {
         super(new ModuleEnvironmentSandbox(moduleManager, typeRegistry));
+        addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
+
+        // TODO: This used to be done in TypeHandlerLibraryImpl.forModuleEnvironment().
+        populateWithDefaultHandlers(this);
     }
 
 
@@ -105,11 +112,8 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
     }
 
     public static TypeHandlerLibrary forModuleEnvironment(ModuleManager moduleManager, TypeRegistry typeRegistry) {
-        TypeHandlerLibrary library = new TypeHandlerLibraryImpl(moduleManager, typeRegistry);
-
-        populateWithDefaultHandlers(library);
-
-        return library;
+        // The @Inject constructor already calls populateWithDefaultHandlers
+        return new TypeHandlerLibraryImpl(moduleManager, typeRegistry);
     }
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {

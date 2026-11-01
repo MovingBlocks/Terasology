@@ -8,6 +8,8 @@ import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.properties.Range;
 
+import javax.inject.Inject;
+
 /**
  * Skysphere based on the Perez all weather luminance model.
  */
@@ -20,8 +22,13 @@ public class Skysphere implements BackdropProvider {
 
     private final CelestialSystem celSystem;
 
+    @Inject
+    public Skysphere(CelestialSystem celestialSystem) {
+        this.celSystem = celestialSystem;
+    }
+
     public Skysphere(Context context) {
-        celSystem = context.get(CelestialSystem.class);
+        this(context.get(CelestialSystem.class));
     }
 
     @Override

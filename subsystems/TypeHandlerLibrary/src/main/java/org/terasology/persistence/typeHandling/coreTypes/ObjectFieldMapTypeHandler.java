@@ -12,15 +12,19 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
+import org.terasology.reflection.ReflectionUtil;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
+ * Serializes objects as a fieldName → fieldValue map. It is used as the last resort while serializing an
  * object through a {@link TypeHandlerLibrary}.
  */
 public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
@@ -48,9 +52,22 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
             Object val;
 
             try {
-                val = field.get(value);
+                if (Modifier.isPrivate(field.getModifiers())) {
+                    Method getter = ReflectionUtil.findGetter(field);
+                    if (getter != null) {
+                        val = getter.invoke(value);
+                    } else {
+                        logger.error("Field {} is inaccessible - private and has no getter.", field);
+                        continue;
+                    }
+                } else {
+                    val = field.get(value);
+                }
             } catch (IllegalAccessException e) {
                 logger.error("Field {} is inaccessible", field);
+                continue;
+            } catch (InvocationTargetException e) {
+                logger.error("Failed to invoke getter for field {}", field);
                 continue;
             }
 
@@ -93,7 +110,7 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 Field field = fieldByName.get(fieldName);
 
                 if (field == null) {
-                    logger.error("Cound not find field with name {}", fieldName);
+                    logger.error("Could not find field with name {}", fieldName);
                     continue;
                 }
 
@@ -101,7 +118,20 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 Optional<?> fieldValue = handler.deserialize(entry.getValue());
 
                 if (fieldValue.isPresent()) {
-                    field.set(result, fieldValue.get());
+                    if (Modifier.isPrivate(field.getModifiers())) {
+                        Method setter = ReflectionUtil.findSetter(field);
+                        if (setter != null) {
+                            try {
+                                setter.invoke(result, fieldValue.get());
+                            } catch (InvocationTargetException e) {
+                                logger.error("Failed to invoke setter for field {}", field);
+                            }
+                        } else {
+                            logger.error("Field {} is inaccessible - private and has no setter.", field);
+                        }
+                    } else {
+                        field.set(result, fieldValue.get());
+                    }
                 } else {
                     logger.error("Could not deserialize field {}", field.getName());
                 }

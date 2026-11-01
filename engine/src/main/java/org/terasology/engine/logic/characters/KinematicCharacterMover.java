@@ -162,12 +162,13 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.5f * movementComp.height;
-        bottom.y -= 0.5f * movementComp.height;
+        bottom.y -= 0.25f * movementComp.height;
 
         final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
         final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
 
-        final boolean newSwimming = !topUnderwater && bottomUnderwater;
+        //We check if either a single point is in water (SWIMMING) or if both points are in water (DIVING).
+        final boolean newSwimming = !topUnderwater && bottomUnderwater || topUnderwater && !bottomUnderwater;
         final boolean newDiving = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
@@ -650,7 +651,7 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
-            if (input.isJumping()) {
+            if (input.isJumping() && state.isGrounded()) {
 
                 state.setGrounded(false);
 

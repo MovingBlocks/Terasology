@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.behavior.core;
 
 import org.terasology.engine.logic.behavior.BehaviorAction;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * BaseAction that uses BehaviorAction annotation as its name.

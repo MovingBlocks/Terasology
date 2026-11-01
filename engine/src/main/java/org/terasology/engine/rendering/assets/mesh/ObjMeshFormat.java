@@ -56,9 +56,9 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                                          List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
         int numIndices = 0;
         int numVerts = 0;
-        for (int x = 0; x < rawIndices.size(); x++) {
-            numIndices += (rawIndices.get(x).length - 2) * 3;
-            numVerts += rawIndices.get(x).length;
+        for (Vector3i[] rawIndex : rawIndices) {
+            numIndices += (rawIndex.length - 2) * 3;
+            numVerts += rawIndex.length;
         }
 
         StandardMeshData result = new StandardMeshData();

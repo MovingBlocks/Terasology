@@ -5,6 +5,7 @@ package org.terasology.engine.core;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.GameState;
+import org.terasology.gestalt.di.ServiceRegistry;
 
 /**
  * The game engine is the core of Terasology. It maintains a stack of game states, that drive the behaviour of
@@ -81,7 +82,23 @@ public interface GameEngine {
 
     /**
      * Creates a context that provides read access to the objects of the engine context and can
-     * be populated with it's own private objects.
+     * be populated with its own private objects.
      */
     Context createChildContext();
+
+    /**
+     * Creates a context that provides read access to the objects of the engine context and can
+     * be populated with its own private objects.
+     *
+     * @param serviceRegistry a registry of services to populate the context with.
+     */
+    Context createChildContext(ServiceRegistry serviceRegistry);
+
+    /**
+     * Creates an immutable context that provides read access to the objects of the engine context and can
+     * be pre-populated with its own private objects (derived from those provided).
+     *
+     * @param serviceRegistry a registry of services to populate the context with.
+     */
+    Context createImmutableChildContext(ServiceRegistry serviceRegistry);
 }

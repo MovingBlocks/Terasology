@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling;
 
+import org.terasology.context.annotation.IndexInherited;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
  * Serializes objects of type {@link T} to and from a {@link PersistedData}.
  */
+@IndexInherited
 public abstract class TypeHandler<T> {
     /**
      * Serializes a single non-null value.

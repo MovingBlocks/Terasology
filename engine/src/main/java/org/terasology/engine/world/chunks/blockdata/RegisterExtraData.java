@@ -3,7 +3,7 @@
 
 package org.terasology.engine.world.chunks.blockdata;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,12 +15,12 @@ import java.lang.annotation.Target;
  * These must be inside classes annotated with {@link ExtraDataSystem}.
  * The valid values for bitSize are 4, 8 and 16.
  * The correct format is
- * {@code
- * @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
+ * <pre>
+ * {@code @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)}
  * public static boolean shouldHaveNutrients(Block block) {
  *     return block.isGrass();
  * }
- * }.
+ * </pre>
  */
 @API
 @Retention(RetentionPolicy.RUNTIME)

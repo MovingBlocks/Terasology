@@ -7,9 +7,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.internal.ContextImpl;
-import org.terasology.engine.context.internal.MockContext;
 import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.ArrayList;
@@ -19,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class IntMathTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntMathTest.class);
     public IntMathTest() {
     }
 
     @BeforeAll
     public static void setUpClass() throws Exception {
-        Config config = new Config(new MockContext());
+        Config config = new Config();
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }
@@ -128,7 +130,7 @@ public class IntMathTest {
             value <<= 1;
         }
 
-        System.out.println(powersOfTwo.get(powersOfTwo.size() - 1));
+        LOGGER.info(String.valueOf(powersOfTwo.get(powersOfTwo.size() - 1)));
 
         return powersOfTwo;
     }

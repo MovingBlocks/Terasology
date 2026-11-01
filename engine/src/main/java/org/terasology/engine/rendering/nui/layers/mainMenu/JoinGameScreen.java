@@ -191,8 +191,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private void join(final String address, final int port) {
         Callable<JoinStatus> operation = () -> {
-            JoinStatus joinStatus = networkSystem.join(address, port);
-            return joinStatus;
+            return networkSystem.join(address, port);
         };
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);

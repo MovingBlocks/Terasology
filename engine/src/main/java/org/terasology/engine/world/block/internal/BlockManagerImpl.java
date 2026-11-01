@@ -72,7 +72,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
-        this.blockBuilder = new BlockBuilder(atlas);
+        this.blockBuilder = new BlockBuilder(assetManager, atlas);
     }
 
     public void initialise(List<String> registeredBlockFamilies,
@@ -95,7 +95,7 @@ public class BlockManagerImpl extends BlockManager {
                         if (id != null) {
                             block.setId(id);
                         } else {
-                            logger.error("Missing id for block {} in provided family {}", block.getURI(), family.get().getURI());
+                            logger.error("Missing id for block {} in provided family {}", block.getURI(), family.get().getURI()); //NOPMD
                             if (generateNewIds) {
                                 block.setId(getNextId());
                             } else {
@@ -133,7 +133,14 @@ public class BlockManagerImpl extends BlockManager {
      */
     private Block getAirBlock() {
         if (airBlock == null) {
-            airBlock = getBlock(AIR_ID);
+            Block resolved = getBlock(AIR_ID);
+            if (resolved == null) {
+                // getBlock(BlockUri) never falls back to getAirBlock() for AIR_ID itself,
+                // to avoid recursing before this field is set (was a StackOverflowError).
+                throw new IllegalStateException("Unable to resolve the air block (" + AIR_ID
+                        + "); the block family system is not fully initialised yet");
+            }
+            airBlock = resolved;
         }
         return airBlock;
     }
@@ -156,7 +163,7 @@ public class BlockManagerImpl extends BlockManager {
                     if (id != null) {
                         block.setId((short) id.intValue());
                     } else {
-                        logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
+                        logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri); //NOPMD
                         block.setId(UNKNOWN_ID);
                     }
                 }
@@ -189,7 +196,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private void registerBlock(Block block, RegisteredState newState) {
         if (block.getId() != UNKNOWN_ID) {
-            logger.info("Registered Block {} with id {}", block, block.getId());
+            logger.info("Registered Block {} with id {}", block, block.getId()); //NOPMD
             newState.blocksById.put(block.getId(), block);
             newState.idByUri.put(block.getURI(), block.getId());
         } else {
@@ -308,6 +315,10 @@ public class BlockManagerImpl extends BlockManager {
                 block = family.getBlockFor(uri);
             }
             if (block == null) {
+                if (uri.equals(AIR_ID)) {
+                    // Don't fall back to getAirBlock() while resolving AIR_ID itself - see getAirBlock().
+                    return null;
+                }
                 return getAirBlock();
             }
         }

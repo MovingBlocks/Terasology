@@ -137,7 +137,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 gameList.setSelection(null);
                 gameList.select(0);
             } catch (Exception e) {
-                logger.error("Failed to delete " + removeString, e);
+                logger.error("Failed to delete {}", removeString, e);
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                         .setMessage("Error Deleting Game", e.getMessage());
             }

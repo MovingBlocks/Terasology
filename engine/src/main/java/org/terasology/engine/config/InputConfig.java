@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config;
 
-import org.terasology.engine.context.internal.MockContext;
-
 public class InputConfig {
 
     private ControllerConfig controllers = new ControllerConfig();
@@ -23,7 +21,7 @@ public class InputConfig {
     }
 
     public void reset() {
-        Config defaultConfig = new Config(new MockContext());
+        Config defaultConfig = new Config();
         defaultConfig.loadDefaults();
         InputConfig defaultInputConfig = defaultConfig.getInput();
 

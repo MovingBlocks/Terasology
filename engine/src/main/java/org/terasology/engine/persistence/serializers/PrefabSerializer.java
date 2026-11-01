@@ -155,7 +155,7 @@ public class PrefabSerializer {
                     }
                 }
             } else if (componentData.hasType()) {
-                logger.warn("Prefab '{}' contains unknown component '{}'", prefabData.getName(), componentData.getType());
+                logger.warn("Prefab '{}' contains unknown component '{}'", prefabData.getName(), componentData.getType()); //NOPMD
             }
         }
     }
@@ -182,8 +182,8 @@ public class PrefabSerializer {
     }
 
     private void deserializeCommonData(EntityData.Prefab prefabData, PrefabData result) {
-        result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
-        result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
+        result.setPersisted(!prefabData.hasPersisted() || prefabData.getPersisted());
+        result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() && prefabData.getAlwaysRelevant());
         if (prefabData.hasParentName()) {
             Prefab parent = Assets.get(prefabData.getParentName(), Prefab.class).orElse(null);
             result.setParent(parent);

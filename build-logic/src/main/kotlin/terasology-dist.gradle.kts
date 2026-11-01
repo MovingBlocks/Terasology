@@ -37,7 +37,7 @@ open class ValidateZipDistribution @Inject constructor(objects: ObjectFactory) :
     }
 
     @TaskAction
-    private fun checkZip() {
+    fun checkZip() {
         zipFile.finalizeValueOnRead()
     }
 

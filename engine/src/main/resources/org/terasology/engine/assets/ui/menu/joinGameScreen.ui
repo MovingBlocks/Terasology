@@ -91,7 +91,7 @@
                             {
                                 "type": "CardLayout",
                                 "id": "cards",
-                                "defaultCard": "onlineServerListScrollArea",
+                                "currentlyDisplayedCard": "onlineServerListScrollArea",
                                 "contents": [
                                     {
                                         "type": "RelativeLayout",

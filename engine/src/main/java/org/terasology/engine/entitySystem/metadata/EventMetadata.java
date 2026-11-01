@@ -38,7 +38,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
             skipInstigator = simpleClass.getAnnotation(BroadcastEvent.class).skipInstigator();
         }
         if (networkEventType != NetworkEventType.NONE && !isConstructable() && !Modifier.isAbstract(simpleClass.getModifiers())) {
-            logger.error("Event '{}' is a network event but lacks a default constructor - will not be replicated", this);
+            logger.error("Event '{}' is a network event but lacks a default constructor - will not be replicated", this); //NOPMD
         }
     }
 

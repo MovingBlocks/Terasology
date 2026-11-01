@@ -14,7 +14,8 @@ import java.util.Collection;
 public abstract class SkeletalMesh extends Asset<SkeletalMeshData> {
 
     protected SkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, DisposableResource disposableResource) {
-        super(urn, assetType, disposableResource);
+        super(urn, assetType);
+        setDisposableResource(disposableResource);
     }
 
     protected SkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType) {

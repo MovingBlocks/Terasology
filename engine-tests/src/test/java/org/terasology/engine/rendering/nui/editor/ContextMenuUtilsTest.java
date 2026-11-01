@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.i18n.TranslationSystemImpl;
@@ -18,6 +19,7 @@ import org.terasology.engine.rendering.nui.editor.layers.PlaceholderScreen;
 import org.terasology.engine.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.nui.layouts.RowLayout;
 import org.terasology.nui.layouts.RowLayoutHint;
@@ -32,6 +34,7 @@ import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -43,11 +46,12 @@ public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     @BeforeAll
     public static void setupInput() {
         context.put(InputSystem.class, new InputSystem());
-        context.put(TranslationSystem.class, new TranslationSystemImpl(context));
+        context.put(TranslationSystem.class, new TranslationSystemImpl(context.get(SystemConfig.class), context.get(AssetManager.class)));
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
         context.put(NUIManager.class, new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context));
 
-        File file = new File(ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
+        File file = new File(URLDecoder.decode(
+                ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile(), Charsets.UTF_8));
         String content = null;
         try {
             content = Files.asCharSource(file, Charsets.UTF_8).read();

@@ -77,8 +77,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public Vector2d getDelta() {
-        Vector2d result = new Vector2d(xposDelta, yposDelta);
-        return result;
+        return new Vector2d(xposDelta, yposDelta);
     }
 
     @Override

@@ -247,6 +247,6 @@
     "water-reflections-ssr": "SSR (experimentel)",
     "widget-selection-prompt": "Bitte wähle ein Widget aus:",
     "widget-selection-title": "Widget-Auswahl",
-    "world-config-preview": "Details ...",
+    "world-name": "Weltname",
     "world-seed": "Seed"
 }

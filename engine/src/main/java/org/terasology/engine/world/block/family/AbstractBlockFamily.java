@@ -3,10 +3,10 @@
 package org.terasology.engine.world.block.family;
 
 import com.google.common.collect.Sets;
-import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
-import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Set;

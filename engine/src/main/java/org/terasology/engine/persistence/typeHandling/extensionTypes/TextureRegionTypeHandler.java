@@ -29,7 +29,7 @@ public class TextureRegionTypeHandler extends StringRepresentationTypeHandler<Te
         if (region.isPresent()) {
             return region.get();
         } else {
-            logger.error("Failed to resolve texture region '" + representation + "'");
+            logger.error("Failed to resolve texture region '{}'", representation);
             return Assets.getTextureRegion("engine:default").get();
         }
     }

@@ -62,19 +62,24 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
     @Override
     public Optional<Map<K, V>> deserialize(PersistedData data) {
-        if (!data.isArray() || data.isValueMap()) {
-            logger.warn("Incorrect map format detected: object instead of array.\n" + getUsageInfo(data));
-            return Optional.empty();
-        }
 
         Map<K, V> result = Maps.newLinkedHashMap();
+
+        if (data.isNull()) {
+            return Optional.of(result);
+        }
+
+        if (!data.isArray() || data.isValueMap()) {
+            logger.warn("Incorrect map format detected: object instead of array.\n{}", getUsageInfo(data));
+            return Optional.empty();
+        }
 
         for (PersistedData entry : data.getAsArray()) {
             PersistedDataMap kvEntry = entry.getAsValueMap();
             PersistedData rawKey = kvEntry.get(KEY);
             PersistedData rawValue = kvEntry.get(VALUE);
             if (rawKey == null || rawValue == null) {
-                logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n" + getUsageInfo(data));
+                logger.warn("Incorrect map format detected: missing map entry with \"key\" or \"value\" key.\n{}", getUsageInfo(data));
                 return Optional.empty();
             }
 
@@ -101,7 +106,7 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
                 "  \"mapName\": [\n" +
                 "    { \"key\": \"...\", \"value\": \"...\" }\n" +
                 "  ]\n" +
-                "but found \n'{}'" + data + "'";
+                "but found \n'" + data + "'";
     }
 
     @Override

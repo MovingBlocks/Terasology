@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
@@ -23,7 +22,7 @@ import org.terasology.engine.utilities.gson.ResolutionHandler;
 import org.terasology.engine.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.gestalt.entitysystem.component.Component;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 import org.terasology.gestalt.naming.gson.NameTypeAdapter;
@@ -54,10 +53,7 @@ public final class Config {
 
     private RootConfig config;
 
-    private Context context;
-
-    public Config(Context context) {
-        this.context = context;
+    public Config() {
     }
 
     public PermissionConfig getPermission() {

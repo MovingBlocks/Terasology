@@ -9,13 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.reflections.Reflections;
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.PathManagerProvider;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.logic.permission.PermissionSetComponent;
 import org.terasology.engine.world.block.structure.AttachSupportRequiredComponent;
+import org.terasology.gestalt.di.index.CompoundClassIndex;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleMetadata;
@@ -59,7 +59,7 @@ public class ModuleManagerTest {
                 new ModuleMetadata(new Name("EmptyTestModule"), new Version("0.0.1")),
                 new EmptyFileSource(),
                 Collections.emptyList(),
-                new Reflections(),
+                new CompoundClassIndex(),
                 (clazz) -> false
         );
     }
@@ -127,7 +127,7 @@ public class ModuleManagerTest {
         environment = manager.getEnvironment();
         engineModule = environment.get(ENGINE_MODULE);
 
-        assertThat(engineModule.getModuleManifest().getSubTypesOf(EngineSubsystem.class)).contains(subsystem);
+        assertThat(engineModule.getClassIndex().getSubtypesOf(EngineSubsystem.class.getName())).contains(subsystem.getName());
 
         assertThat(environment.getSubtypesOf(EngineSubsystem.class)).contains(subsystem);
 

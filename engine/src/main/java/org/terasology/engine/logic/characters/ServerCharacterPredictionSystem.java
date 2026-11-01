@@ -44,6 +44,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     public static final int MAX_INPUT_OVERFLOW = 100;
     public static final int MAX_INPUT_UNDERFLOW = 100;
     private static final int MAX_INPUT_OVERFLOW_REPLAY_INCREASE = 120;
+    // A server-side stall (e.g. a GC pause) can desync lastState's recorded time from the game
+    // clock by far more than any legitimate single input could. A rejected input never advances
+    // lastState, so that gap only grows every subsequent frame - permanently freezing movement
+    // unless it's beyond this bound treated as a stall and resynced instead.
+    private static final float STALL_RESYNC_THRESHOLD_MS = 1000;
 
     private static final Logger logger = LoggerFactory.getLogger(ServerCharacterPredictionSystem.class);
 
@@ -147,6 +152,13 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             lastInputEvent.put(entity, input);
         } else {
             logger.warn("Received too much input from {}, dropping input. Delta difference: {}", entity, delta);
+            if (delta > STALL_RESYNC_THRESHOLD_MS) {
+                CharacterStateEvent resyncedState = new CharacterStateEvent(lastState);
+                resyncedState.setTime(time.getGameTimeInMs());
+                stateBuffer.add(resyncedState);
+                characterMovementSystemUtility.setToState(entity, resyncedState);
+                logger.warn("Resyncing time for {} after an apparent stall (delta {} ms)", entity, delta);
+            }
         }
     }
 

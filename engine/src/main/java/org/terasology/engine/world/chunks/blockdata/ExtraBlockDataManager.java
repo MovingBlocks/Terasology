@@ -8,10 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 
+import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -32,15 +33,15 @@ import java.util.Set;
  * public static method annotated with @RegisterExtraData which determines, for each block,
  * whether the field is applicable for that block. For example:
  *
- * {@code
- * @ExtraDataSystem
+ * <pre>
+ * {@code @ExtraDataSystem}
  * public class ExampleExtraDataSystem {
- *     @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)
+ *     {@code @RegisterExtraData(name="exampleModule.grassNutrients", bitSize=8)}
  *     public static boolean shouldHaveNutrients(Block block) {
  *         return block.isGrass();
  *     }
  *  }
- *  }
+ * </pre>
  */
 @API
 public class ExtraBlockDataManager {
@@ -52,8 +53,8 @@ public class ExtraBlockDataManager {
         TERA_ARRAY_FACTORIES.put(16, new TeraSparseArray16Bit.Factory());
     }
 
-    private Map<String, Integer> slots;
-    private TeraArray.Factory<? extends TeraArray>[] slotFactories;
+    private final Map<String, Integer> slots;
+    private final TeraArray.Factory[] slotFactories;
 
     /**
      * Construct a trivial instance for testing purposes: don't add any data-fields.
@@ -67,7 +68,12 @@ public class ExtraBlockDataManager {
      * Set extra-data fields based on the modules available through the context.
      */
     public ExtraBlockDataManager(Context context) {
-        Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(context);
+        this(context.get(ModuleManager.class), context.get(BlockManager.class));
+    }
+
+    @Inject
+    public ExtraBlockDataManager(ModuleManager moduleManager, BlockManager blockManager) {
+        Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(moduleManager.getEnvironment(), blockManager);
 
         // Work out which fields don't overlap and can be aliased together.
         slots = new HashMap<>();
@@ -84,19 +90,18 @@ public class ExtraBlockDataManager {
         });
         slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
 
-        String loggingOutput = "Extra data slots registered:";
+        StringBuilder loggingOutput = new StringBuilder("Extra data slots registered:");
         boolean first = true;
         for (Map.Entry<String, Integer> entry : slots.entrySet()) {
-            loggingOutput += (first ? " " : ", ") + entry.getKey() + " -> " + entry.getValue();
+            loggingOutput.append(first ? " " : ", ").append(entry.getKey()).append(" -> ").append(entry.getValue());
             first = false;
         }
-        logger.info(loggingOutput);
+        logger.info("{}", loggingOutput);
     }
 
     // Find requests for extensions and which blocks they apply to.
-    private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(Context context) {
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
+    private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(ModuleEnvironment environment, BlockManager blockManager) {
+        Collection<Block> blocks = blockManager.listRegisteredBlocks();
 
         Map<Integer, Map<String, Set<Block>>> fieldss = new HashMap<>();
         TERA_ARRAY_FACTORIES.forEach((size, fac) -> fieldss.put(size, new HashMap<>()));
@@ -107,9 +112,9 @@ public class ExtraBlockDataManager {
                 if (registerAnnotation != null) {
                     String errorType = validRegistrationMethod(method, registerAnnotation);
                     if (errorType != null) {
-                        logger.error("Unable to register extra block data: " + errorType +
-                            " for {}.{}: should be \"public static boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
-                            type.getName(), method.getName(), method.getName());
+                        logger.atError().log("Unable to register extra block data: {} for {}.{}: should be \"public static"
+                                        + " boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
+                                errorType, type.getName(), method.getName(), method.getName());
                         continue;
                     }
                     method.setAccessible(true);
@@ -230,8 +235,8 @@ public class ExtraBlockDataManager {
      * Used to represent the overlaps between requested extra-data fields.
      */
     private static class Graph {
-        private String[] verts;
-        private Map<String, Set<String>> edges;
+        private final String[] verts;
+        private final Map<String, Set<String>> edges;
 
         private Graph(String[] verts, Map<String, Set<String>> edges) {
             this.verts = verts;
@@ -242,7 +247,7 @@ public class ExtraBlockDataManager {
             this.verts = verts.clone();
             this.edges = new HashMap<>();
             for (String vert : verts) {
-                edges.put(vert, new HashSet());
+                edges.put(vert, new HashSet<>());
             }
         }
 
@@ -272,12 +277,8 @@ public class ExtraBlockDataManager {
 
         // Creates a new graph containing the complement of the contraction of the complement.
         public Graph ntract(String s0, String s1) {
-            int v0 = -1;
             int v1 = -1;
             for (int i = 0; i < verts.length; i++) {
-                if (verts[i].equals(s0)) {
-                    v0 = i;
-                }
                 if (verts[i].equals(s1)) {
                     v1 = i;
                 }
@@ -305,15 +306,15 @@ public class ExtraBlockDataManager {
         }
 
         public String toString() {
-            String result = "Graph:";
-            for (int i = 0; i < verts.length; i++) {
-                result += " (" + verts[i] + " ->";
-                for (String v : edges.get(verts[i])) {
-                    result += " " + v;
+            StringBuilder result = new StringBuilder("Graph:");
+            for (String vert : verts) {
+                result.append(" (").append(vert).append(" ->");
+                for (String v : edges.get(vert)) {
+                    result.append(" ").append(v);
                 }
-                result += ")";
+                result.append(")");
             }
-            return result;
+            return result.toString();
         }
     }
 }

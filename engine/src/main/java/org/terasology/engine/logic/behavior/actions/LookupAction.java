@@ -8,7 +8,7 @@ import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BaseAction;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.core.BehaviorState;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.properties.OneOf;
 
 /**

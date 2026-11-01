@@ -14,7 +14,7 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexByteAttributeB
 import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 

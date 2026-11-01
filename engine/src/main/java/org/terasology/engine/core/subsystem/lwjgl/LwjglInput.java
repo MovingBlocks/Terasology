@@ -3,9 +3,11 @@
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
+import org.terasology.context.Lifetime;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ControllerConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.input.InputSystem;
@@ -13,10 +15,17 @@ import org.terasology.engine.input.lwjgl.LwjglControllerDevice;
 import org.terasology.engine.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.engine.input.lwjgl.LwjglMouseDevice;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
+
+import javax.inject.Inject;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
     private Context context;
+
+    @Inject
+    public LwjglInput() {
+    }
 
     @Override
     public String getName() {
@@ -25,6 +34,12 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+    }
+
+    @Override
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
+        InputSystem inputSystem = new InputSystem();
+        serviceRegistry.with(InputSystem.class).lifetime(Lifetime.Singleton).use(() -> inputSystem);
     }
 
     @Override
@@ -41,9 +56,8 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     private void initControls() {
         Config config = context.get(Config.class);
+        InputSystem inputSystem = context.get(InputSystem.class);
 
-        InputSystem inputSystem = new InputSystem();
-        context.put(InputSystem.class, inputSystem);
         inputSystem.setMouseDevice(new LwjglMouseDevice(config.getRendering()));
         inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 

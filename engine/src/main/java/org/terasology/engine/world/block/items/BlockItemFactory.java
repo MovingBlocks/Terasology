@@ -4,6 +4,8 @@ package org.terasology.engine.world.block.items;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.SignedBytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.ComponentContainer;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -37,6 +39,8 @@ import java.util.Set;
  * @see RetainComponentsComponent
  */
 public class BlockItemFactory {
+    private static final Logger logger = LoggerFactory.getLogger(BlockItemFactory.class);
+
     private final EntityManager entityManager;
 
     /**
@@ -186,7 +190,14 @@ public class BlockItemFactory {
 
         for (Component component : components.iterateComponents()) {
             if (keepByAnnotation(component) || retainComponents.contains(component.getClass())) {
-                builder.addComponent(entityManager.getComponentLibrary().copy(component));
+                Component copy = entityManager.getComponentLibrary().copy(component);
+                if (copy == null) {
+                    // No registered ComponentMetadata for component's class, most likely because a
+                    // module it depends on isn't loaded - see BlockPrefabManager.updateBlock().
+                    logger.error("No ComponentMetadata for {} - skipping", component.getClass().getName());
+                    continue;
+                }
+                builder.addComponent(copy);
             }
         }
     }

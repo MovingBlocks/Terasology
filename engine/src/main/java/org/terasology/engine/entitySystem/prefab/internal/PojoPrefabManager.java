@@ -9,6 +9,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.entitysystem.component.Component;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -21,6 +22,11 @@ import java.util.stream.Collectors;
 public class PojoPrefabManager implements PrefabManager {
 
     private final AssetManager assetManager;
+
+    @Inject
+    public PojoPrefabManager(AssetManager assetManager) {
+        this.assetManager = assetManager;
+    }
 
     public PojoPrefabManager(Context context) {
         this.assetManager = context.get(AssetManager.class);

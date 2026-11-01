@@ -3,7 +3,7 @@
 package org.terasology.engine.world.zones;
 
 import org.terasology.engine.world.generation.Region;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * The ZoneRegionFunction determines which blocks are part of a given region.

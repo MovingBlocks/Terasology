@@ -6,7 +6,7 @@ import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 /**
  * Behavior tree asset. Can be loaded and saved into json. Actors should never run the nodes behind a asset directly.

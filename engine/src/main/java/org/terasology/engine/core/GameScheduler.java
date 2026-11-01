@@ -5,7 +5,7 @@ package org.terasology.engine.core;
 
 import org.terasology.engine.monitoring.ThreadActivity;
 import org.terasology.engine.monitoring.ThreadMonitor;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

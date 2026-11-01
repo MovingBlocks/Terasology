@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.family;
 
+import org.terasology.context.annotation.IndexInherited;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockUri;
@@ -11,6 +12,7 @@ import org.terasology.engine.world.block.BlockUri;
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
  */
+@IndexInherited
 public interface BlockFamily {
     ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
 

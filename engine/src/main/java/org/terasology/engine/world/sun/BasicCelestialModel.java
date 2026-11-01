@@ -5,6 +5,8 @@ package org.terasology.engine.world.sun;
 
 import org.terasology.engine.world.time.WorldTime;
 
+import javax.inject.Inject;
+
 /**
  * A simple implementations of {@link CelestialSystem} with constant daily events
  * and perfect radial movement of a single sun.
@@ -15,6 +17,10 @@ public class BasicCelestialModel implements CelestialModel {
     private static final long MIDDAY_TIME = WorldTime.DAY_LENGTH / 2;
     private static final long DUSK_TIME = 3 * WorldTime.DAY_LENGTH / 4;
     private static final long MIDNIGHT_TIME = 0;
+
+    @Inject
+    public BasicCelestialModel() {
+    }
 
     @Override
     public float getSunPosAngle(float days) {

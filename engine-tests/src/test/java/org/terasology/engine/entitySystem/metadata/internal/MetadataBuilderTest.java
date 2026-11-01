@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MetadataBuilderTest {
 
-    private ReflectFactory factory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
+    private final ReflectFactory factory = new ReflectionReflectFactory();
+    private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
 
     @BeforeEach
     public void setup() {

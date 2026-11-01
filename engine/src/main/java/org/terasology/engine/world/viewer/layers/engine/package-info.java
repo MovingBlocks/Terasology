@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.world.viewer.layers.engine;
 
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;

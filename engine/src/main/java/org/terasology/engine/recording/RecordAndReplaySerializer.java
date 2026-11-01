@@ -16,6 +16,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.reflection.TypeRegistry;
 
+import javax.inject.Inject;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
@@ -41,6 +42,7 @@ public final class RecordAndReplaySerializer {
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
     private RecordedEventSerializer recordedEventSerializer;
 
+    @Inject
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
                                      RecordAndReplayUtils recordAndReplayUtils,
                                      CharacterStateEventPositionMap characterStateEventPositionMap,
@@ -103,10 +105,8 @@ public final class RecordAndReplaySerializer {
     }
 
     private void serializeFileAmount(Gson gson, String recordingPath) {
-        try {
-            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + FILE_AMOUNT));
+        try (JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + FILE_AMOUNT))) {
             gson.toJson(recordAndReplayUtils.getFileAmount(), Integer.class, writer);
-            writer.close();
             logger.info("File Amount Serialization completed!");
         } catch (Exception e) {
             logger.error("Error while serializing file amount:", e);
@@ -127,10 +127,8 @@ public final class RecordAndReplaySerializer {
     }
 
     private void serializeCharacterStateEventPositionMap(Gson gson, String recordingPath) {
-        try {
-            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + STATE_EVENT_POSITION));
+        try (JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + STATE_EVENT_POSITION))) {
             gson.toJson(characterStateEventPositionMap.getIdToData(), HashMap.class, writer);
-            writer.close();
             characterStateEventPositionMap.reset();
             logger.info("CharacterStateEvent positions Serialization completed!");
         } catch (Exception e) {
@@ -153,10 +151,8 @@ public final class RecordAndReplaySerializer {
     }
 
     private void serializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
-        try {
-            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + DIRECTION_ORIGIN_LIST));
+        try (JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + DIRECTION_ORIGIN_LIST))) {
             gson.toJson(directionAndOriginPosRecorderList.getList(), ArrayList.class, writer);
-            writer.close();
             directionAndOriginPosRecorderList.reset();
             logger.info("AttackEvent extras serialization completed!");
         } catch (Exception e) {

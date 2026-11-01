@@ -11,13 +11,13 @@ public interface OpenGLMeshBase {
 
     default boolean updateState(VBOContext state) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, state.vbo);
-        for (int x = 0; x < state.entries.length; x++) {
-            if (state.entries[x].version != state.entries[x].resource.getVersion()) {
-                if (state.entries[x].size != state.entries[x].resource.inSize()) {
+        for (VBOContext.VBOSubBuffer subBuffer : state.entries) {
+            if (subBuffer.version != subBuffer.resource.getVersion()) {
+                if (subBuffer.size != subBuffer.resource.inSize()) {
                     return false;
                 }
-                VertexResource resource = state.entries[x].resource;
-                int offset = state.entries[x].offset;
+                VertexResource resource = subBuffer.resource;
+                int offset = subBuffer.offset;
                 resource.writeBuffer((buffer) -> {
                     GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, buffer);
                 });

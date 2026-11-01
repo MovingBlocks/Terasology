@@ -3,12 +3,11 @@
 
 package org.terasology.engine.persistence.typeHandling.reflection;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.io.TempDir;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.core.PathManagerProvider;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.world.block.family.BlockFamily;
@@ -17,13 +16,12 @@ import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.ExampleInterface;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static org.mockito.Mockito.when;
 import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
 
-@ExtendWith(PathManagerProvider.class)
-@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("FieldCanBeLocal")
 public class TestModuleEnvironmentSandbox {
 
@@ -31,10 +29,12 @@ public class TestModuleEnvironmentSandbox {
     private TypeRegistry typeRegistry;
     private ModuleManager moduleManager;
     private ModuleEnvironment environment;
+    private Path originalHomePath;
 
     @BeforeEach
-    protected void provideSandbox(PathManager pathManager) throws Exception {
-        when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
+    protected void provideSandbox(@TempDir Path tempHome) throws Exception {
+        originalHomePath = PathManager.getInstance().getHomePath();
+        PathManager.getInstance().useOverrideHomePath(tempHome);
         moduleManager = ModuleManagerFactory.create();
         environment = moduleManager.getEnvironment();
 
@@ -44,6 +44,26 @@ public class TestModuleEnvironmentSandbox {
         sandbox = new ModuleEnvironmentSandbox(moduleManager, typeRegistry);
 
         // module = environment.get(new Name("unittest"));
+    }
+
+    /**
+     * Put the PathManager singleton back where we found it. Without this the global instance keeps
+     * pointing at the {@link TempDir} above, which JUnit deletes once this class finishes - any later
+     * test class reading {@code PathManager.getHomePath()} then hits a directory that is gone.
+     * <p>
+     * If the original is itself already gone, fall back to a fresh directory that outlives this class
+     * rather than skipping the restore: skipping would leave the singleton on the doomed
+     * {@link TempDir} and pass the same breakage on to whatever runs next. Mirrors PathManagerTest.
+     */
+    @AfterEach
+    public void restorePathManager() throws IOException {
+        if (originalHomePath != null && Files.isDirectory(originalHomePath)) {
+            PathManager.getInstance().useOverrideHomePath(originalHomePath);
+        } else {
+            Path fallback = Files.createTempDirectory("terasology-pathmanager");
+            fallback.toFile().deleteOnExit();
+            PathManager.getInstance().useOverrideHomePath(fallback);
+        }
     }
 
     @Test

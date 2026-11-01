@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UILabel;

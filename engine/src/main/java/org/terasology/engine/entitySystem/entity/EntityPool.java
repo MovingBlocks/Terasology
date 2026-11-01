@@ -133,9 +133,9 @@ public interface EntityPool {
      * All entities containing every one of the given components.
      * <p>
      * Implementation note:
-     * <a href="http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#Topic5"
-     *     title="Designing Generic Methods">Java generic types are a mess</a>, especially where
-     * varargs are involved. We can't use {@link SafeVarargs @SafeVarargs} on any interface methods
+     * Java generic types are a mess (see <a href="http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#Topic5">
+     * Designing Generic Methods</a>), especially where varargs are involved.
+     * We can't use {@link SafeVarargs @SafeVarargs} on any interface methods
      * because there is no way to know the <em>implementations</em> of the interface are safe.
      * <p>
      * In this case, in practice, there are few (if any) callers that pass more than two values.

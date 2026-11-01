@@ -26,7 +26,9 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.NameVersion;
+import org.terasology.gestalt.naming.Version;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -219,16 +221,12 @@ public class GameDetailsScreen extends CoreScreenLayer {
         gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
             @Override
             public void draw(WorldInfo value, Canvas canvas) {
-                if (value.getCustomTitle().isEmpty()) {
-                    canvas.drawText(value.getTitle());
-                } else {
-                    canvas.drawText(value.getCustomTitle());
-                }
+                canvas.drawText(value.getTitle());
             }
 
             @Override
             public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
-                String text = value.getCustomTitle();
+                String text = value.getTitle();
                 return new Vector2i(
                         canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
@@ -237,12 +235,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        String gameTitle;
-        if (worldInfo.getCustomTitle().isEmpty()) {
-            gameTitle = worldInfo.getTitle();
-        } else {
-            gameTitle = worldInfo.getCustomTitle();
-        }
+        String gameTitle = worldInfo.getTitle();
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle
                 + '\n' + '\n'
                 + translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed()
@@ -359,22 +352,24 @@ public class GameDetailsScreen extends CoreScreenLayer {
         final List<ModuleSelectionInfo> sortedGameModules = gameInfo.getManifest().getModules().stream()
                 .sorted(Comparator.comparing(NameVersion::getName))
                 .map(nameVersion -> {
-                    Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
+                    Name name = nameVersion.getName();
+                    Version version = nameVersion.getVersion();
+                    Module module = moduleManager.getRegistry().getModule(name, version);
                     if (module != null) {
                         return ModuleSelectionInfo.strictVersion(module);
                     } else {
-                        logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
-                        module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
+                        logger.warn("Can't find module in your classpath - {}:{}", name, version);
+                        module = moduleManager.getRegistry().getLatestModuleVersion(name);
                         if (module != null) {
-                            logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
+                            logger.debug("Get the latest available version of module {} in your classpath", name);
                             errors.add(String.format("Can't find module %s:%s in your classpath; " +
                                             "loaded description for the latest available version.",
-                                    nameVersion.getName(), nameVersion.getVersion()));
+                                    name, version));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
-                        logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
-                        errors.add(String.format("Can't find any versions of module %s in your classpath!", nameVersion.getName()));
-                        return ModuleSelectionInfo.unavailableVersion(nameVersion.getName().toString(), nameVersion.getVersion().toString());
+                        logger.error("Can't find any versions of module {} in your classpath!", name);
+                        errors.add(String.format("Can't find any versions of module %s in your classpath!", name));
+                        return ModuleSelectionInfo.unavailableVersion(name.toString(), version.toString());
                     }
                 })
                 .filter(Objects::nonNull)

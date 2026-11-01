@@ -4,7 +4,7 @@ package org.terasology.engine.core;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.gestalt.naming.Name;
 
 /**
@@ -58,11 +58,15 @@ public class SimpleUri implements Uri, Comparable<SimpleUri> {
     }
 
     /**
-     * Creates a SimpleUri from a string in the format "module:object". If the string does not match this format, it will be marked invalid
+     * Creates a SimpleUri from a string in the format "module:object". If the string does not match this format
+     * (including {@code null}), it will be marked invalid.
      *
      * @param simpleUri
      */
     public SimpleUri(String simpleUri) {
+        if (simpleUri == null) {
+            return;
+        }
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
             moduleName = new Name(split[0]);

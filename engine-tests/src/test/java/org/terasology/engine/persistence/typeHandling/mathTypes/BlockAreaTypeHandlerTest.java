@@ -23,12 +23,6 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
-
-    static class TestObject {
-        public BlockArea b1;
-        public BlockAreac b2;
-    }
-
     private TypeHandlerLibrary typeHandlerLibrary;
     private Serializer<?> gsonSerializer;
     private Gson gson = new Gson();
@@ -59,5 +53,10 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         }, data).get();
         assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
         assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
+    }
+
+    public static class TestObject {
+        public BlockArea b1;
+        public BlockAreac b2;
     }
 }

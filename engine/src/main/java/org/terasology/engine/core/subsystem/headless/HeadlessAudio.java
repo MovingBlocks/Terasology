@@ -2,19 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless;
 
+import org.terasology.context.Lifetime;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
 import org.terasology.engine.audio.nullAudio.NullAudioManager;
-import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.di.ServiceRegistry;
+
+import javax.inject.Inject;
 
 public class HeadlessAudio implements EngineSubsystem {
 
     private AudioManager audioManager;
+
+    @Inject
+    public HeadlessAudio() {
+    }
 
     @Override
     public String getName() {
@@ -22,8 +29,8 @@ public class HeadlessAudio implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(GameEngine engine, Context context) {
-        initNoSound(context);
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
+        initNoSound(serviceRegistry);
     }
 
     @Override
@@ -42,9 +49,9 @@ public class HeadlessAudio implements EngineSubsystem {
         audioManager.dispose();
     }
 
-    private void initNoSound(Context context) {
+    private void initNoSound(ServiceRegistry serviceRegistry) {
         audioManager = new NullAudioManager();
-        context.put(AudioManager.class, audioManager);
+        serviceRegistry.with(AudioManager.class).lifetime(Lifetime.Singleton).use(() -> audioManager);
     }
 
 }

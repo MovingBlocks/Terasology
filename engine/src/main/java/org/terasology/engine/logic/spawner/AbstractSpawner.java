@@ -88,10 +88,9 @@ public abstract class AbstractSpawner implements Spawner {
         // nothing above sea level found
         for (Vector2ic test : spiral) {
             Optional<Float> val = getWorld.apply(test);
-            if (!val.isPresent()) {
-                continue;
+            if (val.isPresent()) {
+                return new Vector3f(test.x(), TeraMath.floorToInt(val.get()), test.y());
             }
-            return new Vector3f(test.x(), TeraMath.floorToInt(val.get()), test.y());
         }
 
         throw new IllegalStateException("No spawn location found");

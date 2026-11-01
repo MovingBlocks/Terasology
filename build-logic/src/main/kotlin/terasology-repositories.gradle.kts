@@ -37,15 +37,14 @@ repositories {
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
             name = "from alternativeResolutionRepo property"
-            url =  URI(rootProject.properties["alternativeResolutionRepo"] as String)
+            url =  URI(rootProject.property("alternativeResolutionRepo") as String)
         } else if (repoViaEnv != null && repoViaEnv != "") {
             name = "from \$RESOLUTION_REPO"
             url = URI(repoViaEnv)
         } else {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
             name = "Terasology Artifactory"
-            url = URI("http://artifactory.terasology.org/artifactory/virtual-repo-live")
-            isAllowInsecureProtocol = true  // 😱
+            url = URI("https://artifactory.terasology.io/artifactory/virtual-repo-live")
         }
     }
 
@@ -53,7 +52,6 @@ repositories {
     // We've been using it that way for *years* and nothing likewise changed in the area for years as well. This seems to work ....
     maven {
         name = "Terasology snapshot locals"
-        url = URI("http://artifactory.terasology.org/artifactory/terasology-snapshot-local")
-        isAllowInsecureProtocol = true  // 😱
+        url = URI("https://artifactory.terasology.io/artifactory/terasology-snapshot-local")
     }
 }

@@ -157,7 +157,7 @@ public class WorldSerializerImpl implements WorldSerializer {
             PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
             Assets.generateAsset(new ResourceUrn(prefabData.getName()), protoPrefab, Prefab.class);
         } catch (Exception e) {
-            logger.error("Failed to create prefab {}", prefabData.getName());
+            logger.error("Failed to create prefab {}", prefabData.getName()); //NOPMD
         }
 
     }

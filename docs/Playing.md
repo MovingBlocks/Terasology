@@ -143,13 +143,13 @@ Alternatively you can run from source and supply parameters for game configurati
 
 This will all become easier as the project and especially the launcher mature further :-)
 
-### Server Whitelist and Blacklist
+### Server Allowlist and Denylist
 
-Hosting a server will create a whitelist and a blacklist that can be used to manage who is able to connect to that server.
+Hosting a server will create a allowlist and a denylist that can be used to manage who is able to connect to that server.
 
-If the whitelist contains at least one client ID, only the ID(s) on the list will be allowed to connect to the server. All IDs not on the whitelist are effectively blacklisted.
+If the allowlist contains at least one client ID, only the ID(s) on the list will be allowed to connect to the server. All IDs not on the allowlist are effectively denylisted.
 
-If the whitelist is empty, any ID not on the blacklist will be able to connect. 
+If the allowlist is empty, any ID not on the denylist will be able to connect. 
 
 Client IDs are added to the lists in JSON format, for example: ["6a5f11f7-4038-4ef0-91ac-86cb957588b1","01264d12-27cf-4699-b8e2-bdc92ac8ef73"]
 

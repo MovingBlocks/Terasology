@@ -479,7 +479,7 @@ public class CoreCommands extends BaseComponentSystem {
         PrefabSerializer prefabSerializer =
                 new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
-        Path outFile = PathManager.getInstance().getHomePath().resolve(Instant.now() + "-entityDump.json");
+        Path outFile = PathManager.getInstance().getHomePath().resolve(Instant.now().toString().replaceAll(":", "-") + "-entityDump.json");
         if (componentNames.length == 0) {
             savedEntityCount = worldDumper.save(outFile);
         } else {

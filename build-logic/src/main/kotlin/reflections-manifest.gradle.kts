@@ -11,7 +11,7 @@ import java.net.URLClassLoader
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
 
-    val sourceSets = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets
+    val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
     val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
 
     inputs.files(mainSourceSet.output.classesDirs)

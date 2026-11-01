@@ -13,10 +13,6 @@ public class RunOrderConnection extends DependencyConnection {
         super(name, type, parentNode);
     }
 
-    public String toString() {
-        return super.toString();
-    }
-
     public static String getConnectionName(int id, SimpleUri nodeUri) {
         return new StringBuilder(nodeUri.toString()).append(":RunOrder").append(id).toString();
     }

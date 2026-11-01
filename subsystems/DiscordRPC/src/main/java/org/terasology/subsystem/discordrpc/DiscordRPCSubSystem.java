@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.gestalt.di.ServiceRegistry;
 
+import javax.inject.Inject;
 import java.time.OffsetDateTime;
 
 /**
@@ -22,9 +24,12 @@ public final class DiscordRPCSubSystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
     private static DiscordRPCSubSystem instance;
 
-    private DiscordAutoConfig config;
+    @Inject
+    protected DiscordAutoConfig config;
+
     private DiscordRPCThread thread;
 
+    @Inject
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
             throw new IllegalStateException("More then one instance in the DiscordRPC");
@@ -101,13 +106,11 @@ public final class DiscordRPCSubSystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
+    public void initialise(GameEngine engine, ServiceRegistry serviceRegistry) {
         logger.info("Initializing...");
 
         thread = new DiscordRPCThread();
         thread.getBuffer().setState("In Main Menu");
-
-        config = rootContext.get(DiscordAutoConfig.class);
 
         if (config.discordPresence.get()) {
             thread.enable();

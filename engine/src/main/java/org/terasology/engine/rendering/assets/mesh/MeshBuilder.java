@@ -7,7 +7,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.nui.Colorc;
 import org.terasology.engine.utilities.Assets;
 

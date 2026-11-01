@@ -91,7 +91,7 @@ public enum Side {
 
     /**
      * This provides a static List of all Sides defined in the enumeration. The result contains the same values as
-     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
+     * calling {@code Side#values} but this does not create a new copy on every call.<br>
      *
      * @return All available sides
      */

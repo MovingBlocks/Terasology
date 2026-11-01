@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 import com.google.common.base.Preconditions;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 import org.terasology.engine.registry.Share;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      * Iterates through the set of registered MetricsMode and returns the first instance whose method isAvailable()
      * returns true. Notice that this could be the MetricsMode that was current at the time this method was invoked.
      *
-     * @returns a MetricsMode instance
+     * @return a MetricsMode instance
      */
     public MetricsMode toggle() {
         do {

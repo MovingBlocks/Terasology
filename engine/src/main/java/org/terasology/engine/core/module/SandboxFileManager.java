@@ -5,7 +5,7 @@ package org.terasology.engine.core.module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.PathManager;
-import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.context.annotation.API;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -70,7 +70,7 @@ public class SandboxFileManager {
                 // consumer to read the file, if it exists
                 consumer.accept(moduleInputStream);
             } catch (IOException e) {
-                logger.error("Could not read the file: " + filename, e);
+                logger.error("Could not read the file: {}", filename, e);
             }
 
             return null;
@@ -109,7 +109,7 @@ public class SandboxFileManager {
                 // consumer to write the file
                 consumer.accept(moduleInputStream);
             } catch (IOException e) {
-                logger.error("Could not write the file: " + filename, e);
+                logger.error("Could not write the file: {}", filename, e);
             }
 
             return null;

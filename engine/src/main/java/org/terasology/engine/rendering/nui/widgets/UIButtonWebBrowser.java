@@ -68,7 +68,7 @@ public class UIButtonWebBrowser extends UIButton {
             try {
                 desktop.browse(new URI(this.url));
             } catch (IOException | URISyntaxException e) {
-                logger.warn("Can't open {} in default browser of your system.", this.url);
+                logger.warn("Can't open {} in default browser of your system.", this.url); //NOPMD
                 showErrorPopup("Can't open " + this.url + " in default browser of your system.");
             }
         } else {
@@ -83,7 +83,7 @@ public class UIButtonWebBrowser extends UIButton {
                     runtime.exec(createCommand("xdg-open", this.url));
                 }
             } catch (IOException e) {
-                logger.warn("Can't recognize your OS and open the url {}.", this.url);
+                logger.warn("Can't recognize your OS and open the url {}.", this.url); //NOPMD
                 showErrorPopup("Can't recognize your OS and open the url " + this.url);
             }
         }
@@ -125,7 +125,7 @@ public class UIButtonWebBrowser extends UIButton {
                 confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
             }
         } catch (MalformedURLException e) {
-            logger.error(this.url + " is malformed", e);
+            logger.error("{} is malformed", this.url, e); //NOPMD
         }
     }
 
@@ -147,8 +147,6 @@ public class UIButtonWebBrowser extends UIButton {
      * Sets the {@link UIButtonWebBrowser#url} value and sets
      * {@link UIButtonWebBrowser#confirmed} to true if the given URL or Hostname is
      * already trusted, otherwise confirmed is false.
-     *
-     * @throws MalformedURLException
      */
     public UIButtonWebBrowser setUrl(String url) {
         boolean trustedHostName = false;
@@ -159,7 +157,7 @@ public class UIButtonWebBrowser extends UIButton {
                 String hostname = new URL(url).getHost();
                 trustedHostName = webBrowserConfig.isHostNameTrusted(hostname);
             } catch (MalformedURLException e) {
-                logger.error(url + " is malformed", e);
+                logger.error("{} is malformed", url, e);
             }
 
             if (!trustedHostName) {

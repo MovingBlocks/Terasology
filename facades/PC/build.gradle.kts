@@ -4,11 +4,12 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 import Terasology_dist_gradle.ValidateZipDistribution
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.terasology.gradology.RunTerasology
 import org.terasology.gradology.nativeSubdirectoryName
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -21,26 +22,22 @@ plugins {
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply(from = "$rootDir/config/gradle/publish.gradle")
 
-val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
-
 // Default path to store server data if running headless via Gradle
-val localServerDataPath by extra("terasology-server")
+val localServerDataPath = "terasology-server"
 
 // General props
-val mainClassName by extra("org.terasology.engine.Terasology")
+val mainClassName = "org.terasology.engine.Terasology"
 val templatesDir = File(rootDir, "templates")
 val rootDirDist = File(rootDir, "build/distributions")
 
 // Inherited props
-val dirNatives: String by rootProject.extra
-val distsDirectory: DirectoryProperty by project
+val dirNatives = rootProject.extra["dirNatives"] as String
 
 // Read environment variables, including variables passed by jenkins continuous integration server
 val env: MutableMap<String, String> = System.getenv()!!
 
 // Version related
-val startDateTimeString = dateTimeFormat.format(Date())!!
+val startDateTimeString = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
 val versionFileName = "VERSION"
 val versionBase by lazy { File(templatesDir, "version.txt").readText().trim() }
 val displayVersion = versionBase
@@ -49,7 +46,7 @@ val displayVersion = versionBase
 application {
     applicationName = "Terasology"
     executableDir = ""
-    mainClass.set(extra.get("mainClassName") as String)
+    mainClass.set(mainClassName)
 }
 
 // Base the engine tests on the same version number as the engine
@@ -60,8 +57,8 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 dependencies {
-    implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.6.0")
-    implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
+    implementation(libs.jna.platform)
+    implementation("info.picocli:picocli:4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
 
     implementation(project(":engine"))
@@ -69,24 +66,21 @@ dependencies {
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.2.0")
+    implementation("org.terasology.crashreporter:cr-terasology:5.2.0")
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.11") {
+    runtimeOnly(libs.logback) {
         because("to configure logging with logback.xml")
     }
-    runtimeOnly("org.codehaus.janino:janino:3.1.7") {
-        because("allows use of EvaluatorFilter in logback.xml")
-    }
-    runtimeOnly("org.slf4j:jul-to-slf4j:1.7.36") {
+    runtimeOnly(libs.slf4j.jul) {
         because("redirects java.util.logging from miscellaneous dependencies through slf4j")
     }
 
-    testImplementation(platform("org.junit:junit-bom:5.7.1")) {
+    testImplementation(platform("org.junit:junit-bom:5.10.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation(libs.junit.api)
+    testImplementation(libs.junit.params)
+    testRuntimeOnly(libs.junit.engine)
 
     testImplementation("com.google.truth:truth:1.1.2")
     testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")
@@ -168,7 +162,7 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
 
     inputs.property("dateTime", startDateTimeString)
     from(templatesDir)
-    into("$buildDir/versionfile")
+    into(layout.buildDirectory.dir("versionfile").get().asFile)
     include(versionFileName)
     expand(mapOf(
         "buildNumber" to env["BUILD_NUMBER"],
@@ -205,7 +199,8 @@ val distForLauncher = tasks.register<Zip>("distForLauncher") {
             if (this.sourcePath == "Terasology" || this.sourcePath == "Terasology.bat") {
                 // I don't know how the "lib/" makes its way in to the classpath used by CreateStartScripts,
                 // so we're adjusting it after-the-fact.
-                filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory))
+                val rewriter = ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory)
+                filter { line -> rewriter.rewrite(line) }
             }
         }
     })
@@ -248,10 +243,10 @@ tasks.register<Task>("testDist") {
     dependsOn("testDistForLauncher", "testDistZip")
 }
 
-class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String, String> {
+class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) {
     private val isBatchFile = file.name.endsWith(".bat")
 
-    override fun transform(line: String): String = if (isBatchFile) {
+    fun rewrite(line: String): String = if (isBatchFile) {
             line.replace("$oldDirectory\\", "$newDirectory\\")
         } else {
             line.replace("$oldDirectory/", "$newDirectory/")

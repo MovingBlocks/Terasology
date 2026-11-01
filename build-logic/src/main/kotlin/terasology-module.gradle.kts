@@ -6,6 +6,7 @@
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.terasology.gradology.ModuleMetadataForGradle
+import org.terasology.gradology.ValidateJsonAssets
 
 plugins {
     `java-library`
@@ -29,10 +30,10 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
     main {
-        java.outputDir = buildDir.resolve("classes")
+        java.destinationDirectory.set(layout.buildDirectory.dir("classes"))
     }
     test {
-        java.outputDir = buildDir.resolve("testClasses")
+        java.destinationDirectory.set(layout.buildDirectory.dir("testClasses"))
     }
 }
 
@@ -51,19 +52,21 @@ configurations {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
-    testImplementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
+    implementation("org.terasology.engine:engine:${moduleMetadata.engineVersion()}")
+    testImplementation("org.terasology.engine:engine-tests:${moduleMetadata.engineVersion()}")
+
+    annotationProcessor("org.terasology.gestalt:gestalt-inject-java:8.0.2")
 
     for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
-            compileOnly(gradleDep.asMap())
+            compileOnly(gradleDep.asNotation())
             // though modules also sometimes use "optional" to describe their test dependencies;
             // they're not required for runtime, but they *are* required for tests.
-            testImplementation(gradleDep.asMap())
+            testImplementation(gradleDep.asNotation())
         } else {
-            implementation(gradleDep.asMap())
+            implementation(gradleDep.asNotation())
         }
     }
 
@@ -74,12 +77,9 @@ dependencies {
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
-        implementation("ch.qos.logback:logback-classic:1.2.3")
-        runtimeOnly("org.codehaus.janino:janino:3.1.3") {
-            because("logback filters")
-        }
-        add("implementation", platform("org.junit:junit-bom:5.8.1"))
+        implementation("org.terasology.engine:engine-tests:${moduleMetadata.engineVersion()}")
+        implementation("ch.qos.logback:logback-classic:1.6.0")
+        add("implementation", platform("org.junit:junit-bom:5.10.1"))
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.12.4")
     }
@@ -139,9 +139,37 @@ tasks.register<Copy>("syncModuleInfo") {
     into(mainSourceSet.output.classesDirs.first())
 }
 
+// Validate all JSON assets (prefabs, blocks, ui, etc.) at build time
+tasks.register<ValidateJsonAssets>("validateJsonAssets") {
+    val assetsDir = project.file("assets")
+    if (assetsDir.exists()) {
+        listOf("prefabs", "blocks", "blockSounds", "ui", "shapes", "materials", "fonts", "behaviors").forEach { assetType ->
+            val dir = assetsDir.resolve(assetType)
+            if (dir.exists()) {
+                source(project.fileTree(dir) { include("**/*.json", "**/*.prefab", "**/*.block", "**/*.ui") })
+            }
+        }
+        // Also catch any other .json files directly in assets
+        source(project.fileTree(assetsDir) { include("**/*.json") })
+    }
+}
+
 tasks.named("processResources") {
     // Make sure the assets directory is included
-    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo")
+    dependsOn("syncAssets", "syncOverrides", "syncDeltas", "syncModuleInfo", "validateJsonAssets")
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    dependsOn("processResources")
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.main.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.main.get().resources.srcDirs.joinToString(File.pathSeparator)}")
+}
+tasks.named<JavaCompile>("compileTestJava") {
+    dependsOn("processResources")
+    // Create an asset list during compilation (needed for Gestalt 8)
+    inputs.files(sourceSets.test.get().resources.srcDirs)
+    options.compilerArgs = arrayListOf("-Aresource=${sourceSets.test.get().resources.srcDirs.joinToString(File.pathSeparator)}")
 }
 
 tasks.named<Test>("test") {
@@ -174,8 +202,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = buildDir.resolve("classes")
-        testOutputDir = buildDir.resolve("testClasses")
+        outputDir = layout.buildDirectory.dir("classes").get().asFile
+        testOutputDir = layout.buildDirectory.dir("testClasses").get().asFile
         isDownloadSources = true
     }
 }
