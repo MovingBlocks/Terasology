@@ -228,15 +228,6 @@ pipeline {
             }
         }
 
-        stage('Documentation') {
-            when { expression { !alreadyTested } }
-            steps {
-                sh './gradlew --console=plain javadoc'
-                step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
-                recordIssues skipBlames: true, tool: javaDoc()
-            }
-        }
-
         stage('Integration Tests (without flaky tests)') {
             when { expression { !alreadyTested } }
             steps {
