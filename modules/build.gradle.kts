@@ -38,8 +38,21 @@ val jarCollection: Configuration = configurations.create("jarCollection") {
     }
 }
 
+// A module built from source here must not also sit in cachedModules/ as a jar: the engine scans
+// the cache before modules/ and keeps the first copy of a module id and version it meets, so a jar
+// fetched while the module had no source checkout keeps shadowing the checkout after one appears,
+// and changes to that module's assets never reach the game. The sync below cannot clear it: a Sync
+// with nothing to copy is skipped as NO-SOURCE and leaves its destination alone.
+val cleanStaleCachedModules = tasks.register<Delete>("cleanStaleCachedModules") {
+    group = "build"
+    description = "Removes from cachedModules/ the jars of modules that are built from source here"
+    val sourceModuleNames = subprojects.map { it.name }
+    delete(fileTree(CACHE_MODULES_DIR) { sourceModuleNames.forEach { include("$it-*.jar") } })
+}
+
 val fetchModuleDependencies = tasks.register<Sync>("fetchModuleDependencies") {
     group = "build"
+    dependsOn(cleanStaleCachedModules)
 
     destinationDir = CACHE_MODULES_DIR
 
