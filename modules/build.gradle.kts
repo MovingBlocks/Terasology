@@ -47,7 +47,10 @@ val cleanStaleCachedModules = tasks.register<Delete>("cleanStaleCachedModules") 
     group = "build"
     description = "Removes from cachedModules/ the jars of modules that are built from source here"
     val sourceModuleNames = subprojects.map { it.name }
-    delete(fileTree(CACHE_MODULES_DIR) { sourceModuleNames.forEach { include("$it-*.jar") } })
+    // A file tree with no include pattern matches every file, so no source modules means nothing to remove.
+    if (sourceModuleNames.isNotEmpty()) {
+        delete(fileTree(CACHE_MODULES_DIR) { sourceModuleNames.forEach { include("$it-*.jar") } })
+    }
 }
 
 val fetchModuleDependencies = tasks.register<Sync>("fetchModuleDependencies") {
