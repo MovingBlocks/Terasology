@@ -3,8 +3,10 @@
 
 package org.terasology.engine.persistence.internal;
 
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.game.Game;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.ClientComponent;
@@ -12,6 +14,7 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -24,6 +27,18 @@ public final class ReadOnlyStorageManager extends AbstractStorageManager {
     public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
                                   BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(savePath, environment, entityManager, blockManager, extraDataManager, true);
+    }
+
+    /**
+     * Dependency injection constructor. Resolves the save path from the current game title, mirroring
+     * {@link ReadWriteStorageManager}, so that {@code ReadOnlyStorageManager} can be instantiated by the DI
+     * container when save games are disabled (e.g. {@code --no-save-games}).
+     */
+    @Inject
+    public ReadOnlyStorageManager(Game game, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                  BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+        this(PathManager.getInstance().getSavePath(game.getName()), environment, entityManager, blockManager,
+                extraDataManager);
     }
 
     public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
