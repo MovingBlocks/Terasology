@@ -273,7 +273,12 @@ public class RenderableWorldImpl implements RenderableWorld {
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
         int billboardLimit = (int) renderingConfig.getBillboardLimit();
 
-        List<RenderableChunk> allChunks = new ArrayList<>(chunkWorker.chunks());
+        // only shadow/billboard limits need order, capped at the larger of the two
+        int frontCount = billboardLimit > 0 ? billboardLimit : 0;
+        if (isDynamicShadows && isFirstRenderingStageForCurrentFrame) {
+            frontCount = java.lang.Math.max(frontCount, maxChunksForShadows);
+        }
+        List<RenderableChunk> allChunks = new ArrayList<>(chunkWorker.chunks(frontCount));
         allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
         if (lodChunkProvider != null) {
             lodChunkProvider.addAllChunks(allChunks);
