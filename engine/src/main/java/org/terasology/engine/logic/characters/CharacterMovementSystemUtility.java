@@ -97,6 +97,15 @@ public final class CharacterMovementSystemUtility {
     }
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
+        // Mirrors setToState's own null-checks above: an entity mid-death can lose
+        // CharacterMovementComponent (or LocationComponent) between being queued for a state update
+        // and this actually running - see ServerCharacterPredictionSystem#onDestroy. Extrapolating a
+        // now-nonexistent state is meaningless, not an error; skip it like setToState does.
+        if (entity.getComponent(LocationComponent.class) == null
+                || entity.getComponent(CharacterMovementComponent.class) == null) {
+            return;
+        }
+
         float t = (time - state.getTime()) * 0.0001f;
         Vector3f newPos = new Vector3f(state.getVelocity());
         newPos.mul(t);

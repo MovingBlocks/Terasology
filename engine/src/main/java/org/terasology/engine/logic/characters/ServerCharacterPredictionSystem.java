@@ -103,6 +103,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             AliveCharacterComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         physics.removeCharacterCollider(entity);
+        // Queued rather than removed immediately: this fires whenever any of the three required
+        // components is dropped (e.g. a dying entity losing AliveCharacterComponent mid-animation,
+        // before the rest of it is torn down), so characterStates can still hold this entity - with
+        // some of its components already gone - until update() batches the actual removal below.
+        // lagCompensate()/restoreToPresent() skip anything in this queue for the same reason.
         characterStatesToRemove.add(entity);
         lastInputEvent.remove(entity);
     }
@@ -260,6 +265,14 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     @Override
     public void lagCompensate(EntityRef client, long timeMs) {
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
+            // onDestroy queues the entity here rather than removing it immediately (see its own
+            // comment); until the next update() drains that queue, characterStates can still hold an
+            // entity whose CharacterMovementComponent (or LocationComponent) is already gone - e.g.
+            // a mob that died mid-tick but is still finishing its death animation. Skipping it here
+            // matches what update()'s own replication loop already does for the same reason.
+            if (characterStatesToRemove.contains(entry.getKey())) {
+                continue;
+            }
             if (networkSystem.getOwnerEntity(entry.getKey()).equals(client)) {
                 characterMovementSystemUtility.setToState(entry.getKey(), entry.getValue().getLast());
             } else {
@@ -272,6 +285,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     public void restoreToPresent() {
         long renderTime = time.getGameTimeInMs() - RENDER_DELAY;
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
+            // See the matching comment in lagCompensate(): entries pending removal can already be
+            // missing the components setToTime -> setToExtrapolateState needs.
+            if (characterStatesToRemove.contains(entry.getKey())) {
+                continue;
+            }
             setToTime(renderTime, entry.getKey(), entry.getValue());
         }
     }
