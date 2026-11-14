@@ -8,6 +8,7 @@ import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.InjectionHelper;
 
 /**
  * An action node uses a associated Action to control the result state.
@@ -85,7 +86,26 @@ public class ActionNode implements BehaviorNode {
 
     @Override
     public BehaviorNode deepCopy() {
+        reinjectAction();
         return new ActionNode(action);
+    }
+
+    /**
+     * Re-runs {@code @In} field injection on the shared {@link #action} instance.
+     * <p>
+     * {@link BehaviorTreeBuilder} already injects {@link #action} once, when the tree's JSON is first
+     * deserialized - but that can happen as early as {@code LoadPrefabs}, which runs before
+     * {@code RegisterSystems} has shared anything into {@link CoreRegistry} yet, leaving {@code @In}
+     * fields silently null (see #5004). {@code deepCopy()} instead runs once an {@link Actor} actually
+     * exists to attach the tree to, which is always well after the engine has finished loading, so
+     * re-injecting here is a safe, cheap way to guarantee valid values without reordering the load
+     * sequence itself. {@link InjectionHelper#inject(Object)} only overwrites a field when it finds a
+     * non-null value, so repeating this on every copy is idempotent.
+     */
+    protected void reinjectAction() {
+        if (action != null) {
+            InjectionHelper.inject(action);
+        }
     }
 
     @Override
