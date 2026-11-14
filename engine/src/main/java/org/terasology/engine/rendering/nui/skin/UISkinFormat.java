@@ -23,6 +23,7 @@ import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactor
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
 import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.nui.Color;
 import org.terasology.nui.UITextureRegion;
@@ -110,9 +111,32 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
             if (inherit != null) {
+                // UISkinBuilder.build() below copies the base skin's *current* properties into this
+                // skin at build time - it's a one-time snapshot, not a live reference. Assets.get()
+                // alone only returns whatever's already cached, which during a module environment
+                // switch can be the base skin's pre-switch data if reloadAssets() hasn't reached it
+                // yet (it reloads every already-loaded skin once, in whatever order
+                // getLoadedAssetUrns() returns - no dependency ordering between them). Forcing the
+                // reload here, at the one place this skin actually reads from its base, guarantees a
+                // current copy regardless of where either skin falls in that pass - see #1621.
+                // Resolved the same way Assets.get() below resolves it (full or partial urn), so the
+                // asset reloaded here is exactly the one that lookup will find.
+                Assets.resolveAssetUri(inherit, UISkinAsset.class).forEach(inheritUrn ->
+                        CoreRegistry.get(ModuleAwareAssetTypeManager.class)
+                                .getAssetType(UISkinAsset.class)
+                                .ifPresent(assetType -> assetType.reload(inheritUrn)));
+
                 Optional<? extends UISkinAsset> skin = Assets.get(inherit, UISkinAsset.class);
                 if (skin.isPresent()) {
                     builder.setBaseSkin(skin.get().getSkin());
+                } else {
+                    // Silently proceeding here is what made #1621 so hard to track down: an unresolved
+                    // "inherit" doesn't fail this skin's load, it just quietly omits every property the
+                    // base skin would have supplied (textures included) - the skin loads "successfully"
+                    // with nothing wrong logged anywhere.
+                    logger.warn("Could not resolve inherited skin '{}' - properties from it (including "
+                            + "textures) will be missing from this skin. The module providing it may not "
+                            + "be available in the current module environment.", inherit);
                 }
             }
             if (families != null) {
