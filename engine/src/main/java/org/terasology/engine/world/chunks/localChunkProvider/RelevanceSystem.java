@@ -26,13 +26,13 @@ import org.terasology.engine.world.chunks.pipeline.PositionFuture;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.StreamSupport;
 
 /**
  * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and
@@ -47,8 +47,11 @@ import java.util.stream.StreamSupport;
 public class RelevanceSystem implements UpdateSubscriberSystem {
 
     private static final Vector3i UNLOAD_LEEWAY = new Vector3i(1, 1, 1);
-    private final ReadWriteLock regionLock = new ReentrantReadWriteLock();
-    private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
+    // ConcurrentHashMap rather than a HashMap guarded by a lock: regionsDistanceScore() is called
+    // from ChunkTaskRelevanceComparator, on every PriorityBlockingQueue comparison in the chunk
+    // processing pipeline - a lock acquired there for every comparison is pure overhead compared to
+    // a lock-free read.
+    private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newConcurrentMap();
     private final LocalChunkProvider chunkProvider;
 
     @Inject
@@ -96,14 +99,9 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param distance new distance for setting to entity's region.
      */
     public void updateRelevanceEntityDistance(EntityRef entity, Vector3ic distance) {
-        regionLock.readLock().lock();
-        try {
-            ChunkRelevanceRegion region = regions.get(entity);
-            if (region != null) {
-                region.setRelevanceDistance(distance);
-            }
-        } finally {
-            regionLock.readLock().unlock();
+        ChunkRelevanceRegion region = regions.get(entity);
+        if (region != null) {
+            region.setRelevanceDistance(distance);
         }
     }
 
@@ -113,12 +111,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param entity entity for remove.
      */
     public void removeRelevanceEntity(EntityRef entity) {
-        regionLock.writeLock().lock();
-        try {
-            regions.remove(entity);
-        } finally {
-            regionLock.writeLock().unlock();
-        }
+        regions.remove(entity);
     }
 
     /**
@@ -157,39 +150,37 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         if (!entity.exists()) {
             return null;  // Futures.immediateFailedFuture(new IllegalArgumentException("Entity does not exist."));
         }
-        regionLock.readLock().lock();
-        try {
-            ChunkRelevanceRegion region = regions.get(entity);
-            if (region != null) {
-                region.setRelevanceDistance(distance);
-                return new BlockRegion(region.getCurrentRegion());  // Future of “when region.currentRegion is no longer dirty”?
-            }
-        } finally {
-            regionLock.readLock().unlock();
+        ChunkRelevanceRegion existing = regions.get(entity);
+        if (existing != null) {
+            existing.setRelevanceDistance(distance);
+            return new BlockRegion(existing.getCurrentRegion());  // Future of “when region.currentRegion is no longer dirty”?
         }
         ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, distance);
         if (listener != null) {
             region.setListener(listener);
         }
-        regionLock.writeLock().lock();
-        try {
-            regions.put(entity, region);
-        } finally {
-            regionLock.writeLock().unlock();
-        }
+        regions.put(entity, region);
 
-        StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
-                .sorted(new PositionRelevanceComparator()) //<-- this is n^2 cost. not sure why this needs to be sorted like this.
-                .forEach(pos -> {
-                            Chunk chunk = chunkProvider.getChunk(pos);
-                            if (chunk != null) {
-                                region.checkIfChunkIsRelevant(chunk);
-                                // return Futures.immediateFuture(chunk);
-                            } else {
-                                chunkProvider.createOrLoadChunk(pos); // return this
-                            }
-                        }
-                );
+        // BlockRegion's iterator hands back the same mutable Vector3i every call (mutated in place) -
+        // safe for immediate per-element use, but not for buffering, which .sorted() must do. Each
+        // position is copied here before it's reused for the next one, and its score is computed once
+        // up front rather than repeatedly during the sort's comparisons.
+        List<Vector3ic> positions = new ArrayList<>();
+        region.getCurrentRegion().forEach(pos -> positions.add(new Vector3i(pos)));
+        Map<Vector3ic, Integer> relevanceScores = new HashMap<>(positions.size());
+        for (Vector3ic pos : positions) {
+            relevanceScores.put(pos, regionsDistanceScore(pos));
+        }
+        positions.sort(Comparator.comparingInt(relevanceScores::get));
+        for (Vector3ic pos : positions) {
+            Chunk chunk = chunkProvider.getChunk(pos);
+            if (chunk != null) {
+                region.checkIfChunkIsRelevant(chunk);
+                // return Futures.immediateFuture(chunk);
+            } else {
+                chunkProvider.createOrLoadChunk(pos); // return this
+            }
+        }
         return new BlockRegion(region.getCurrentRegion());  // whenAllComplete
     }
 
@@ -257,23 +248,16 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     private int regionsDistanceScore(Vector3ic chunk) {
         int score = Integer.MAX_VALUE;
-
-        regionLock.readLock().lock();
-        try {
-
-            for (ChunkRelevanceRegion region : regions.values()) {
-                int dist = (int) chunk.gridDistance(region.getCenter());
-                if (dist < score) {
-                    score = dist;
-                }
-                if (score == 0) {
-                    break;
-                }
+        for (ChunkRelevanceRegion region : regions.values()) {
+            int dist = (int) chunk.gridDistance(region.getCenter());
+            if (dist < score) {
+                score = dist;
             }
-            return score;
-        } finally {
-            regionLock.readLock().unlock();
+            if (score == 0) {
+                break;
+            }
         }
+        return score;
     }
 
     /**
@@ -288,22 +272,6 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
         private int score(PositionFuture<?> task) {
             return RelevanceSystem.this.regionsDistanceScore(task.getPosition());
-        }
-    }
-
-
-    /**
-     * Compare ChunkTasks by distance from region's centers.
-     */
-    private class PositionRelevanceComparator implements Comparator<Vector3ic> {
-
-        @Override
-        public int compare(Vector3ic o1, Vector3ic o2) {
-            return score(o1) - score(o2);
-        }
-
-        private int score(Vector3ic position) {
-            return RelevanceSystem.this.regionsDistanceScore(position);
         }
     }
 }
