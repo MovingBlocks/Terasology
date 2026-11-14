@@ -20,7 +20,15 @@ import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvide
 // TODO: Refactor the core gameplay components like the list of players into a separate system.
 public interface NetworkSystem extends BlockRegistrationListener {
 
+    /**
+     * @param port 0 lets the OS pick a free port - see {@link #getBoundPort()}.
+     */
     void host(int port, boolean dedicatedServer) throws HostingFailedException;
+
+    /**
+     * @return the port actually bound by {@link #host}, or -1 if not hosting.
+     */
+    int getBoundPort();
 
     JoinStatus join(String address, int port) throws InterruptedException;
 
