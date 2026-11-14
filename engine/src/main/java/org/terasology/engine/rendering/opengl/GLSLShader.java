@@ -116,6 +116,18 @@ public class GLSLShader extends Shader {
         return availableFeatures;
     }
 
+    /**
+     * @return true if the given feature combination's fragment/vertex programs actually compiled -
+     * false if {@link #registerAllShaderPermutations} skipped it after a compile failure. Callers
+     * (GLSLMaterial) must check this before {@link #linkShaderProgram} - linking a feature hash that
+     * was never compiled attaches shader object 0, a GL-level failure {@code glLinkProgram} doesn't
+     * surface as a Java exception, so it would otherwise silently produce a broken program instead
+     * of a caught, logged failure.
+     */
+    boolean hasCompiledPermutation(int featureHash) {
+        return disposalAction.fragmentPrograms.containsKey(featureHash);
+    }
+
     // made package-private after CheckStyle suggestion
     int linkShaderProgram(int featureHash) {
         int shaderProgram = GL20.glCreateProgram();
@@ -133,7 +145,16 @@ public class GLSLShader extends Shader {
     @Override
     public void recompile() {
         graphicsProcessing.asynchToDisplayThread(() -> {
-            registerAllShaderPermutations();
+            // registerAllShaderPermutations() already isolates a single bad permutation - this catch
+            // is a generic safety net for anything else going wrong, same as doReload()'s. This entry
+            // point reaches the same compile paths from ShaderManager.recompileAllShaders(), driven by
+            // the video settings screen switching feature presets, which is exactly where a
+            // never-before-compiled combination of features is first exercised.
+            try {
+                registerAllShaderPermutations();
+            } catch (RuntimeException e) {
+                logger.warn("{}", e.getMessage()); //NOPMD
+            }
         });
     }
 
@@ -264,21 +285,30 @@ public class GLSLShader extends Shader {
     private void registerAllShaderPermutations() {
         Set<Set<ShaderProgramFeature>> allPermutations = Sets.powerSet(availableFeatures);
 
+        int compiledCount = 0;
         for (Set<ShaderProgramFeature> permutation : allPermutations) {
-            int featureHash = ShaderProgramFeature.getBitset(permutation);
+            // Caught per-permutation, not around the whole loop: one bad feature combination must
+            // not also skip every later permutation in iteration order - those would otherwise
+            // never get registered at all, not just the one that actually failed to compile.
+            try {
+                int featureHash = ShaderProgramFeature.getBitset(permutation);
 
-            int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
-            int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
-            if (shaderProgramBase.getGeometryProgram() != null) {
-                int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
-                disposalAction.geometryPrograms.put(featureHash, geomShaderId);
+                int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
+                int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
+                if (shaderProgramBase.getGeometryProgram() != null) {
+                    int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
+                    disposalAction.geometryPrograms.put(featureHash, geomShaderId);
+                }
+
+                disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
+                disposalAction.vertexPrograms.put(featureHash, vertShaderId);
+                compiledCount++;
+            } catch (RuntimeException e) {
+                logger.warn("Skipping shader permutation {} for {}: {}", permutation, getUrn(), e.getMessage()); //NOPMD
             }
-
-            disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
-            disposalAction.vertexPrograms.put(featureHash, vertShaderId);
         }
 
-        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn()); //NOPMD
+        logger.debug("Compiled {} of {} permutations for {}.", compiledCount, allPermutations.size(), getUrn()); //NOPMD
     }
 
     private String assembleShader(int type, Set<ShaderProgramFeature> features) {
