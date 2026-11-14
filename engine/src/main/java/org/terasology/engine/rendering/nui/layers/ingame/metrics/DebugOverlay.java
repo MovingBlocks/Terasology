@@ -271,6 +271,7 @@ public class DebugOverlay extends CoreScreenLayer {
      */
     public void toggleMetricsMode() {
         MetricsMode mode = debugMetricsSystem.toggle();
+        PerformanceMonitor.setTracyEnabled(systemConfig.tracyProfilerEnabled.get());
         PerformanceMonitor.setEnabled(mode.isPerformanceManagerMode());
     }
 }

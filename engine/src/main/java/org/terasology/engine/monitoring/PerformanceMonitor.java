@@ -19,6 +19,7 @@ import org.terasology.engine.monitoring.impl.PerformanceMonitorInternal;
  */
 public final class PerformanceMonitor {
     private static PerformanceMonitorInternal instance;
+    private static boolean tracyEnabled;
 
     static {
         instance = new NullPerformanceMonitor();
@@ -127,6 +128,10 @@ public final class PerformanceMonitor {
         return instance.getAllocationMean();
     }
 
+    public static void setTracyEnabled(boolean enabled) {
+        tracyEnabled = enabled;
+    }
+
     /**
      * Enables or disables the Performance Monitoring system.
      * <br><br>
@@ -136,8 +141,14 @@ public final class PerformanceMonitor {
      */
     public static void setEnabled(boolean enabled) {
         if (enabled && !(instance instanceof PerformanceMonitorImpl)) {
-            instance = new PerformanceMonitorImpl();
+            if (instance != null) {
+                instance.shutdown();
+            }
+            instance = new PerformanceMonitorImpl(tracyEnabled);
         } else if (!enabled && !(instance instanceof NullPerformanceMonitor)) {
+            if (instance != null) {
+                instance.shutdown();
+            }
             instance = new NullPerformanceMonitor();
         }
     }
