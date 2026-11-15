@@ -2,13 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.PathManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
@@ -36,6 +41,7 @@ public class ScreenGrabber {
     private static final String SCREENSHOT_FILENAME_PATTERN = "Terasology-%s-%dx%d.%s";
 
     private RenderingConfig renderingConfig;
+    private SystemConfig systemConfig;
     private float currentExposure;
     private boolean isTakingScreenshot;
     private DisplayResolutionDependentFbo displayResolutionDependentFBOs;
@@ -46,12 +52,13 @@ public class ScreenGrabber {
      * @param context
      */
     public ScreenGrabber(Context context) {
-        renderingConfig = context.get(Config.class).getRendering();
+        this(context.get(Config.class), context.get(SystemConfig.class));
     }
 
     @Inject
-    public ScreenGrabber(Config config) {
+    public ScreenGrabber(Config config, SystemConfig systemConfig) {
         renderingConfig = config.getRendering();
+        this.systemConfig = systemConfig;
     }
 
     /**
@@ -88,8 +95,15 @@ public class ScreenGrabber {
      * The file is then saved in the designated screenshot folder, or if it's a game preview image, it'll be placed in the save game folder.
      *
      * If no screenshot data is available an error is logged and the method returns doing nothing.
+     *
+     * While debug mode is on, a non-preview screenshot is left pending. The scene buffer is not read here;
+     * {@link #saveCompositedScreenshot(DisplayDevice)} reads the default framebuffer after the UI has been drawn.
      */
     public void saveScreenshot() {
+        if (capturesCompositedFramebuffer()) {
+            return;
+        }
+
         // Since ScreenGrabber is initialized before DisplayResolutionDependentFbo (because the latter contains a reference to the former)
         // on first call on saveScreenshot() displayResolutionDependentFBOs will be null.
         if (displayResolutionDependentFBOs == null) {
@@ -116,6 +130,35 @@ public class ScreenGrabber {
         }
 
         GameScheduler.scheduleParallel("Write screenshot", task);
+        isTakingScreenshot = false;
+    }
+
+    /**
+     * Reads the default framebuffer (framebuffer 0) at the current display size and schedules the image to be written.
+     *
+     * <p>Call this after the user interface has been drawn, and only while {@link #capturesCompositedFramebuffer()}
+     * is true. A headless display skips the read and clears the pending screenshot.</p>
+     *
+     * @param displayDevice the display that was just rendered
+     */
+    public void saveCompositedScreenshot(DisplayDevice displayDevice) {
+        if (!capturesCompositedFramebuffer()) {
+            return;
+        }
+        if (displayDevice.isHeadless()) {
+            isTakingScreenshot = false;
+            return;
+        }
+
+        int width = displayDevice.getWidth();
+        int height = displayDevice.getHeight();
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 4);
+
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL11.glReadBuffer(GL11.GL_BACK);
+        GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+        GameScheduler.scheduleParallel("Write screenshot", () -> saveScreenshotTask(buffer, width, height));
         isTakingScreenshot = false;
     }
 
@@ -185,6 +228,18 @@ public class ScreenGrabber {
      */
     public boolean isTakingScreenshot() {
         return isTakingScreenshot;
+    }
+
+    /**
+     * True when the in-progress screenshot should be read from the default framebuffer after the
+     * user interface has been drawn, so the debug overlay and HUD are included.
+     *
+     * <p>This is the case only while a screenshot (not a save-game preview) is pending and debug mode is on.</p>
+     *
+     * @return true when the capture must wait for the composited framebuffer
+     */
+    public boolean capturesCompositedFramebuffer() {
+        return isTakingScreenshot && systemConfig.debugEnabled.get() && !savingGamePreview;
     }
 
     /**
