@@ -126,7 +126,8 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
      * Invoked before real-rendering starts
      */
     public void update() {
-        if (!screenGrabber.isTakingScreenshot()) {
+        // A debug-mode screenshot is read from the display after NUI, so the scene stays at display resolution.
+        if (screenGrabber.capturesCompositedFramebuffer() || !screenGrabber.isTakingScreenshot()) {
             if (wasTakingScreenshotLastFrame) {
                 updateFullScale();
                 regenerateFbos();

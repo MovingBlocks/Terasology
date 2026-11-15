@@ -28,6 +28,7 @@ import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
@@ -227,6 +228,13 @@ public class StateIngame implements GameState {
         PerformanceMonitor.startActivity("Render and Update UI");
         renderUserInterface();
         PerformanceMonitor.endActivity();
+
+        ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+        if (screenGrabber != null
+                && screenGrabber.isTakingScreenshot()
+                && screenGrabber.capturesCompositedFramebuffer()) {
+            screenGrabber.saveCompositedScreenshot(display);
+        }
     }
 
     @Override
