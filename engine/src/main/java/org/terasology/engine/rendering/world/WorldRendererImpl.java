@@ -22,6 +22,7 @@ import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.logic.players.LocalPlayerSystem;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
@@ -137,6 +138,20 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void init() {
         initRenderingSupport();
         initRenderingModules();
+
+        // ScreenGrabber lives only in this.context - the child ContextImpl this class builds over the
+        // constructor's outer context plus its own ServiceRegistry (see the constructor). ContextImpl's
+        // lookup walks child-to-parent, never the other way: a parent context has no path to a child's
+        // exclusive registrations. ReadWriteStorageManager.saveGamePreviewImage() resolves ScreenGrabber
+        // via the static CoreRegistry, which is bound to the outer/parent context - so without this,
+        // that lookup returns null and save preview images come out black (#5321). This was removed once
+        // on the theory that ScreenGrabber "should already be resolvable from CoreRegistry" because it's
+        // in the ServiceRegistry LwjglRenderingSubsystemFactory populates - that ServiceRegistry is this
+        // child context's, not the parent's, so the theory doesn't hold; restored.
+        ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+        if (screenGrabber != null) {
+            CoreRegistry.put(ScreenGrabber.class, screenGrabber);
+        }
 
         console = context.get(Console.class);
         MethodCommand.registerAvailable(this, console, context);
