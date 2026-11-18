@@ -118,6 +118,18 @@ If you already have a Java Development Kit (JDK) installed, you may use a direct
 
 ßDirect download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](https://jenkins.terasology.io/job/Terasology/job/Omega/job/develop/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip).
 
+#### macOS (Homebrew)
+
+On macOS, Terasology can also be installed via our [Homebrew tap](https://github.com/MovingBlocks/homebrew-terasology):
+
+```sh
+brew tap MovingBlocks/terasology
+brew install terasology            # latest stable release
+brew install terasology-latest-bin # latest develop build (Omega CI)
+```
+
+Both install a launchable `Terasology.app` in `/Applications` (plus a matching terminal command) and can be installed side by side. `openjdk` is pulled in automatically as a dependency.
+
 
 ## Development
 
