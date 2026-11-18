@@ -67,6 +67,9 @@ dependencies {
     testImplementation(libs.logback) {
         because("implementation: a test directly uses logback.classic classes")
     }
+    testImplementation(libs.jna.platform) {
+        because("PathManagerTest independently checks Windows known-folder paths against the same Win32 API PathManager calls")
+    }
 
 
     // Test lib dependencies
