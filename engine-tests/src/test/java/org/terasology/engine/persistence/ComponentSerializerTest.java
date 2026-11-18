@@ -13,6 +13,7 @@ import org.terasology.context.Lifetime;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
@@ -73,6 +74,9 @@ public class ComponentSerializerTest {
         serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton).use(() -> assetManager);
         TypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
         serviceRegistry.with(TypeRegistry.class).lifetime(Lifetime.Singleton).use(() -> typeRegistry);
+        DisplayDevice displayDevice = mock(DisplayDevice.class);
+        when(displayDevice.isHeadless()).thenReturn(true);
+        serviceRegistry.with(DisplayDevice.class).lifetime(Lifetime.Singleton).use(() -> displayDevice);
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
         context = new ContextImpl(context, serviceRegistry);
