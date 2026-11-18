@@ -379,14 +379,6 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#clamp-lighting}: "
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "clampLighting"
-                                },
-                                {
-                                    "type": "UILabel",
                                     "text": "${engine:menu#bloom-effect}: "
                                 },
                                 {
