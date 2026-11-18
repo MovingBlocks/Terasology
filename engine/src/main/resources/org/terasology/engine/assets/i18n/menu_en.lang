@@ -350,6 +350,7 @@
     "settings-debug-mode": "Debug mode",
     "settings-language": "Language",
     "settings-monitoring-enabled": "Monitoring",
+    "settings-tracy-profiler-enabled": "Tracy Profiler",
     "settings-saves-enabled": "Game saves",
     "settings-seconds-between-saves": "Seconds between saves",
     "settings-title": "Settings",
