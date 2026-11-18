@@ -51,6 +51,8 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
             builder = new BehaviorTreeBuilder();
             CoreRegistry.put(BehaviorTreeBuilder.class, builder);
         }
+        // gestalt isolates unchecked load failures on its own now (MovingBlocks/gestalt#169) - no need
+        // to catch and rewrap JsonParseException here.
         try (InputStream stream = list.get(0).openStream()) {
             return load(stream);
         }
