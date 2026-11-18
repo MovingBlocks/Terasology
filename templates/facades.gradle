@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':engine')
+    implementation project(':engine')
 }
 
 checkstyle {
