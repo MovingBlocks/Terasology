@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
@@ -16,6 +17,7 @@ import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardReferenceEntityRef;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
@@ -23,6 +25,8 @@ import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.protobuf.EntityData;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,9 +58,14 @@ final class GlobalStoreLoader {
         loadComponentMapping(globalStore);
         loadMissingPrefabs(globalStore);
 
+        List<EntityRef> restoredEntities = new ArrayList<>();
         for (EntityData.Entity entityData : globalStore.getEntityList()) {
-            entitySerializer.deserialize(entityData);
+            restoredEntities.add(entitySerializer.deserialize(entityData));
         }
+
+        // Fix-up pass: replace any ForwardReferenceEntityRef proxies with real EntityRefs now that
+        // all entities in this batch exist. This eliminates the per-call exists()-retry overhead.
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, restoredEntities);
     }
 
     private void loadMissingPrefabs(EntityData.GlobalStore globalStore) {

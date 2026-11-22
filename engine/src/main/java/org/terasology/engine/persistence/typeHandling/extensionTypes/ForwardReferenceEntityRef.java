@@ -5,11 +5,14 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
+import org.terasology.engine.entitySystem.metadata.ComponentFieldMetadata;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.util.List;
+import java.util.Collection;
 
 /**
  * An {@link EntityRef} for an id not registered yet. Retries the lookup on every delegated call until the
@@ -171,5 +174,50 @@ public class ForwardReferenceEntityRef extends EntityRef {
     @Override
     public Iterable<Component> iterateComponents() {
         return resolve().iterateComponents();
+    }
+
+    /**
+     * Fix-up pass: after a batch of entities has been fully deserialized, replaces every
+     * {@link ForwardReferenceEntityRef} field still stored in a component with the now-resolvable
+     * real {@link EntityRef}. This eliminates the per-call {@code exists()} re-lookup overhead
+     * that the proxy would otherwise carry for the lifetime of the reference.
+     *
+     * <p>Call this once at the end of each batch-restore site (EntityRestorer, GlobalStoreLoader,
+     * WorldSerializerImpl) after all entities in the session have been deserialized.</p>
+     *
+     * @param entityManager the entity manager whose component library is used for field inspection
+     * @param entities      the set of entities created in this restore session
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static void resolveForwardReferences(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
+        for (EntityRef entity : entities) {
+            if (!entity.exists()) {
+                continue;
+            }
+            for (Component component : entity.iterateComponents()) {
+                ComponentMetadata metadata = entityManager.getComponentLibrary().getMetadata(component);
+                if (metadata == null) {
+                    continue;
+                }
+                boolean dirty = false;
+                for (ComponentFieldMetadata<?, ?> field : (Iterable<ComponentFieldMetadata<?, ?>>) metadata.getFields()) {
+                    if (!EntityRef.class.isAssignableFrom(field.getType())) {
+                        continue;
+                    }
+                    Object value = field.getValue(component);
+                    if (value instanceof ForwardReferenceEntityRef) {
+                        ForwardReferenceEntityRef fref = (ForwardReferenceEntityRef) value;
+                        EntityRef real = entityManager.getEntity(fref.id);
+                        if (real.exists()) {
+                            ((ComponentFieldMetadata) field).setValue(component, real);
+                            dirty = true;
+                        }
+                    }
+                }
+                if (dirty) {
+                    entity.saveComponent(component);
+                }
+            }
+        }
     }
 }

@@ -17,12 +17,14 @@ import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardReferenceEntityRef;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.protobuf.EntityData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -142,14 +144,18 @@ public class WorldSerializerImpl implements WorldSerializer {
             }
         }
 
+        List<EntityRef> restoredEntities = new ArrayList<>();
         for (EntityData.Entity entityData : world.getEntityList()) {
-            entitySerializer.deserialize(entityData);
+            restoredEntities.add(entitySerializer.deserialize(entityData));
         }
+
+        // Fix-up pass: replace any ForwardReferenceEntityRef proxies with real EntityRefs now that
+        // all entities in this batch exist. This eliminates the per-call exists()-retry overhead.
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, restoredEntities);
 
         entitySerializer.removeComponentIdMapping();
         prefabSerializer.removeComponentIdMapping();
     }
-
 
     private void createPrefab(EntityData.Prefab prefabData) {
         SimpleUri uri = new SimpleUri(prefabData.getName());
