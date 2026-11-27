@@ -12,7 +12,6 @@ import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.util.List;
-import java.util.Collection;
 
 /**
  * An {@link EntityRef} for an id not registered yet. Retries the lookup on every delegated call until the

@@ -14,25 +14,32 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.serializers.PrefabSerializer;
+import org.terasology.engine.persistence.serializers.WorldSerializerImpl;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardReferenceEntityRef;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.di.ServiceRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.unittest.stubs.EntityRefComponent;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,7 +58,6 @@ public class ForwardReferenceResolveTest {
     private static Context baseContext;
     private static ModuleManager moduleManager;
 
-    private Context context;
     private EngineEntityManager entityManager;
 
     @BeforeAll
@@ -73,7 +79,11 @@ public class ForwardReferenceResolveTest {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
+        entityManager = createEntityManager();
+    }
+
+    private EngineEntityManager createEntityManager() {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
 
@@ -86,21 +96,22 @@ public class ForwardReferenceResolveTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(serviceRegistry);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(serviceRegistry);
 
-        context = new ContextImpl(baseContext, serviceRegistry);
-        CoreRegistry.setContext(context);
+        Context newContext = new ContextImpl(baseContext, serviceRegistry);
+        CoreRegistry.setContext(newContext);
 
         EntitySystemSetupUtil.configureEntityManagementRelatedClasses(
-                context.get(TypeHandlerLibrary.class),
-                context.get(EntitySystemLibrary.class),
+                newContext.get(TypeHandlerLibrary.class),
+                newContext.get(EntitySystemLibrary.class),
                 moduleManager.getEnvironment(),
-                context.get(EngineEntityManager.class));
+                newContext.get(EngineEntityManager.class));
 
-        entityManager = context.get(EngineEntityManager.class);
-        ((PojoEntityManager) entityManager).setPrefabManager(context.get(PrefabManager.class));
+        EngineEntityManager manager = newContext.get(EngineEntityManager.class);
+        ((PojoEntityManager) manager).setPrefabManager(newContext.get(PrefabManager.class));
 
-        entityManager.getComponentLibrary().register(
-                new org.terasology.gestalt.assets.ResourceUrn("unittest", "EntityRefComponent"),
+        manager.getComponentLibrary().register(
+                new ResourceUrn("unittest", "EntityRefComponent"),
                 EntityRefComponent.class);
+        return manager;
     }
 
     /**
@@ -109,7 +120,7 @@ public class ForwardReferenceResolveTest {
      * real {@link EntityRef} once the target entity exists.
      */
     @Test
-    public void resolveForwardRef_replacesProxyWithRealEntityRef() {
+    public void resolveForwardRefReplacesProxyWithRealEntityRef() {
         // Given: two real entities
         EntityRef target = entityManager.create();
         EntityRef holder = entityManager.create();
@@ -132,7 +143,7 @@ public class ForwardReferenceResolveTest {
         assertFalse(stored instanceof ForwardReferenceEntityRef,
                 "ForwardReferenceEntityRef proxy must have been replaced after fix-up");
         assertTrue(stored.exists(), "Resolved ref must point to a live entity");
-        assertTrue(stored.getId() == target.getId(),
+        assertEquals(target.getId(), stored.getId(),
                 "Resolved ref must point to the original target entity id");
     }
 
@@ -141,7 +152,7 @@ public class ForwardReferenceResolveTest {
      * yet exist (genuinely dangling reference), the fix-up pass must leave it untouched.
      */
     @Test
-    public void resolveForwardRef_leavesUnresolvableProxyUntouched() {
+    public void resolveForwardRefLeavesUnresolvableProxyUntouched() {
         EntityRef holder = entityManager.create();
 
         // A proxy for an id that does not correspond to any entity
@@ -162,7 +173,7 @@ public class ForwardReferenceResolveTest {
      * deserialization and the fix-up call).
      */
     @Test
-    public void resolveForwardRef_skipsDestroyedEntities() {
+    public void resolveForwardRefSkipsDestroyedEntities() {
         EntityRef target = entityManager.create();
         EntityRef holder = entityManager.create();
 
@@ -174,5 +185,46 @@ public class ForwardReferenceResolveTest {
         ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
 
         assertFalse(holder.exists(), "Destroyed entity must still not exist after fix-up");
+    }
+
+    /**
+     * End-to-end regression test through {@link WorldSerializerImpl#deserializeWorld}: when a holder
+     * entity is serialized before its target in the batch, deserialization must resolve and replace
+     * the {@link ForwardReferenceEntityRef} proxy with the live {@link EntityRef}.
+     */
+    @Test
+    public void worldSerializerResolvesForwardRefWhenHolderPrecedesTarget() {
+        EntityRef holder = entityManager.create();
+        EntityRef target = entityManager.create();
+        long holderId = holder.getId();
+        long targetId = target.getId();
+        holder.addComponent(new EntityRefComponent(target));
+
+        PrefabSerializer prefabSerializer = new PrefabSerializer(
+                entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+        WorldSerializerImpl sourceSerializer = new WorldSerializerImpl(entityManager, prefabSerializer);
+        EntityData.GlobalStore serializedWorld = sourceSerializer.serializeWorld(false);
+
+        List<EntityData.Entity> orderedEntities = new ArrayList<>(serializedWorld.getEntityList());
+        orderedEntities.sort(Comparator.comparingInt(entity -> entity.getId() == holderId ? 0 : 1));
+        EntityData.GlobalStore worldWithHolderFirst = serializedWorld.toBuilder()
+                .clearEntity()
+                .addAllEntity(orderedEntities)
+                .build();
+
+        EngineEntityManager freshManager = createEntityManager();
+        PrefabSerializer freshPrefabSerializer = new PrefabSerializer(
+                freshManager.getComponentLibrary(), freshManager.getTypeSerializerLibrary());
+        WorldSerializerImpl targetSerializer = new WorldSerializerImpl(freshManager, freshPrefabSerializer);
+        targetSerializer.deserializeWorld(worldWithHolderFirst);
+
+        EntityRef loadedHolder = freshManager.getEntity(holderId);
+        assertTrue(loadedHolder.exists(), "Loaded holder entity must exist");
+        EntityRef storedRef = loadedHolder.getComponent(EntityRefComponent.class).entityRef;
+        assertFalse(storedRef instanceof ForwardReferenceEntityRef,
+                "ForwardReferenceEntityRef proxy must be replaced after WorldSerializerImpl.deserializeWorld");
+        assertTrue(storedRef.exists(), "Resolved ref must point to a live entity");
+        assertEquals(targetId, storedRef.getId(),
+                "Resolved ref must point to the original target entity id");
     }
 }
