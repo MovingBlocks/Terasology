@@ -8,6 +8,7 @@ import com.jagrosh.discordipc.entities.RichPresence;
 import com.jagrosh.discordipc.entities.pipe.PipeStatus;
 import com.jagrosh.discordipc.exceptions.NoDiscordClientException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -158,6 +159,30 @@ class DiscordRPCThreadTest {
     }
 
     @Test
+    void interruptDuringConnectClosesClientAndExitsThread() throws Exception {
+        AtomicReference<DiscordRPCThread> threadRef = new AtomicReference<>();
+
+        when(ipcClient.getStatus()).thenReturn(PipeStatus.CONNECTED);
+        doAnswer(invocation -> {
+            DiscordRPCThread current = threadRef.get();
+            current.onReady(ipcClient);
+            current.disable();
+            current.stop();
+            return null;
+        }).when(ipcClient).connect();
+
+        rpcThread = new DiscordRPCThread(ipcClient, 1L);
+        threadRef.set(rpcThread);
+        rpcThread.enable();
+        rpcThread.start();
+
+        rpcThread.joinThread(2000L);
+
+        assertThat(rpcThread.isThreadAlive()).isFalse();
+        verify(ipcClient, times(1)).close();
+    }
+
+    @Test
     void nonIoRuntimeExceptionExitsThreadWithoutRetrying() throws Exception {
         doThrow(new RuntimeException("Unsupported OS: test"))
                 .when(ipcClient).connect();
@@ -173,6 +198,7 @@ class DiscordRPCThreadTest {
     }
 
     @Test
+    @Tag("RealIpc")
     void realIpcClientStaysAliveOrConnectsGracefully() throws Exception {
         IPCClient realClient = new IPCClient(DISCORD_APP_CLIENT_ID);
         rpcThread = new DiscordRPCThread(realClient, 1L);

@@ -159,6 +159,10 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
                         }
 
                         ipcClient.connect();
+                        if (Thread.currentThread().isInterrupted()) {
+                            closeClientIfConnected();
+                            return;
+                        }
 
                         tries = 0;
                         autoReconnect = true;
