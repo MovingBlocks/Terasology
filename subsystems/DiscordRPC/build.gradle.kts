@@ -29,3 +29,30 @@ dependencies {
         implementation("org.json:json:20220320")
     }
 }
+
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        excludeTags("RealIpc")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+tasks.register<Test>("unitTest") {
+    group = "Verification"
+    description = "Runs unit tests (fast)"
+
+    useJUnitPlatform {
+        excludeTags("MteTest", "TteTest", "RealIpc")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+tasks.register<Test>("realIpcTest") {
+    group = "Verification"
+    description = "Runs Discord IPC smoke tests against the host environment. Opt-in."
+
+    useJUnitPlatform {
+        includeTags("RealIpc")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
