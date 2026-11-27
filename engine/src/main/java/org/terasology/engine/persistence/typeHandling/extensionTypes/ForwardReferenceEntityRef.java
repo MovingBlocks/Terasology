@@ -11,7 +11,15 @@ import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An {@link EntityRef} for an id not registered yet. Retries the lookup on every delegated call until the
@@ -177,9 +185,10 @@ public class ForwardReferenceEntityRef extends EntityRef {
 
     /**
      * Fix-up pass: after a batch of entities has been fully deserialized, replaces every
-     * {@link ForwardReferenceEntityRef} field still stored in a component with the now-resolvable
-     * real {@link EntityRef}. This eliminates the per-call {@code exists()} re-lookup overhead
-     * that the proxy would otherwise carry for the lifetime of the reference.
+     * {@link ForwardReferenceEntityRef} stored in component fields (including collections, maps,
+     * arrays, and nested objects) with the now-resolvable real {@link EntityRef}. This eliminates
+     * the per-call {@code exists()} re-lookup overhead that the proxy would otherwise carry for the
+     * lifetime of the reference, without firing component-changed events via {@code saveComponent}.
      *
      * <p>Call this once at the end of each batch-restore site (EntityRestorer, GlobalStoreLoader,
      * WorldSerializerImpl) after all entities in the session have been deserialized.</p>
@@ -189,6 +198,7 @@ public class ForwardReferenceEntityRef extends EntityRef {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void resolveForwardReferences(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
+        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         for (EntityRef entity : entities) {
             if (!entity.exists()) {
                 continue;
@@ -198,25 +208,174 @@ public class ForwardReferenceEntityRef extends EntityRef {
                 if (metadata == null) {
                     continue;
                 }
-                boolean dirty = false;
                 for (ComponentFieldMetadata<?, ?> field : (Iterable<ComponentFieldMetadata<?, ?>>) metadata.getFields()) {
-                    if (!EntityRef.class.isAssignableFrom(field.getType())) {
-                        continue;
-                    }
                     Object value = field.getValue(component);
-                    if (value instanceof ForwardReferenceEntityRef) {
-                        ForwardReferenceEntityRef fref = (ForwardReferenceEntityRef) value;
-                        EntityRef real = entityManager.getEntity(fref.id);
-                        if (real.exists()) {
-                            ((ComponentFieldMetadata) field).setValue(component, real);
-                            dirty = true;
-                        }
+                    Object resolved = resolveValue(entityManager, value, visited);
+                    if (resolved != value) {
+                        ((ComponentFieldMetadata) field).setValue(component, resolved);
                     }
-                }
-                if (dirty) {
-                    entity.saveComponent(component);
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object resolveValue(EngineEntityManager entityManager, Object value, Set<Object> visited) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof ForwardReferenceEntityRef) {
+            ForwardReferenceEntityRef fref = (ForwardReferenceEntityRef) value;
+            EntityRef real = entityManager.getEntity(fref.id);
+            return real.exists() ? real : value;
+        }
+        if (value instanceof EntityRef || isLeafType(value.getClass()) || !visited.add(value)) {
+            return value;
+        }
+        if (value instanceof List<?>) {
+            resolveList(entityManager, (List<Object>) value, visited);
+        } else if (value instanceof Collection<?>) {
+            resolveCollection(entityManager, (Collection<Object>) value, visited);
+        } else if (value instanceof Map<?, ?>) {
+            resolveMap(entityManager, (Map<Object, Object>) value, visited);
+        } else if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+            resolveArray(entityManager, (Object[]) value, visited);
+        } else if (!isJdkOrExternalLeafPackage(value.getClass())) {
+            resolveObjectFields(entityManager, value, visited);
+        }
+        return value;
+    }
+
+    private static void resolveList(EngineEntityManager entityManager, List<Object> list, Set<Object> visited) {
+        for (int i = 0; i < list.size(); i++) {
+            Object item = list.get(i);
+            Object resolved = resolveValue(entityManager, item, visited);
+            if (resolved != item) {
+                try {
+                    list.set(i, resolved);
+                } catch (UnsupportedOperationException ignored) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private static void resolveCollection(EngineEntityManager entityManager, Collection<Object> collection,
+                                          Set<Object> visited) {
+        List<Object[]> replacements = null;
+        for (Object item : collection) {
+            Object resolved = resolveValue(entityManager, item, visited);
+            if (resolved != item) {
+                if (replacements == null) {
+                    replacements = new ArrayList<>();
+                }
+                replacements.add(new Object[]{item, resolved});
+            }
+        }
+        if (replacements != null) {
+            for (Object[] pair : replacements) {
+                try {
+                    collection.remove(pair[0]);
+                    collection.add(pair[1]);
+                } catch (UnsupportedOperationException ignored) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private static void resolveMap(EngineEntityManager entityManager, Map<Object, Object> map, Set<Object> visited) {
+        List<Object[]> keyReplacements = null;
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            Object key = entry.getKey();
+            Object val = entry.getValue();
+            Object resolvedVal = resolveValue(entityManager, val, visited);
+            if (resolvedVal != val) {
+                try {
+                    entry.setValue(resolvedVal);
+                } catch (UnsupportedOperationException ignored) {
+                    return;
+                }
+            }
+            Object resolvedKey = resolveValue(entityManager, key, visited);
+            if (resolvedKey != key) {
+                if (keyReplacements == null) {
+                    keyReplacements = new ArrayList<>();
+                }
+                keyReplacements.add(new Object[]{key, resolvedKey, resolvedVal});
+            }
+        }
+        if (keyReplacements != null) {
+            for (Object[] triple : keyReplacements) {
+                try {
+                    map.remove(triple[0]);
+                    map.put(triple[1], triple[2]);
+                } catch (UnsupportedOperationException ignored) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private static void resolveArray(EngineEntityManager entityManager, Object[] array, Set<Object> visited) {
+        for (int i = 0; i < array.length; i++) {
+            Object resolved = resolveValue(entityManager, array[i], visited);
+            if (resolved != array[i]) {
+                array[i] = resolved;
+            }
+        }
+    }
+
+    private static void resolveObjectFields(EngineEntityManager entityManager, Object target, Set<Object> visited) {
+        for (Class<?> cls = target.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
+            if (isJdkOrExternalLeafPackage(cls)) {
+                break;
+            }
+            for (Field field : cls.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+                if (!field.trySetAccessible()) {
+                    continue;
+                }
+                try {
+                    Object value = field.get(target);
+                    Object resolved = resolveValue(entityManager, value, visited);
+                    if (resolved != value && !Modifier.isFinal(field.getModifiers())) {
+                        field.set(target, resolved);
+                    }
+                } catch (IllegalAccessException ignored) {
+                    // Skip inaccessible fields
+                }
+            }
+        }
+    }
+
+    private static boolean isLeafType(Class<?> type) {
+        if (type.isPrimitive() || type.isEnum()) {
+            return true;
+        }
+        Package pkg = type.getPackage();
+        if (pkg == null) {
+            return false;
+        }
+        String name = pkg.getName();
+        return name.startsWith("java.lang")
+                || name.startsWith("java.time")
+                || name.startsWith("java.math")
+                || name.startsWith("org.joml");
+    }
+
+    private static boolean isJdkOrExternalLeafPackage(Class<?> type) {
+        Package pkg = type.getPackage();
+        if (pkg == null) {
+            return false;
+        }
+        String name = pkg.getName();
+        return name.startsWith("java.")
+                || name.startsWith("javax.")
+                || name.startsWith("sun.")
+                || name.startsWith("jdk.")
+                || name.startsWith("org.joml.");
     }
 }

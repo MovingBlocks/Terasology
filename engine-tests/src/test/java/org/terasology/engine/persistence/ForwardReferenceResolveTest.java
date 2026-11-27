@@ -13,10 +13,14 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.PingComponent;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.engine.persistence.serializers.WorldSerializerImpl;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardReferenceEntityRef;
@@ -28,6 +32,7 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.di.ServiceRegistry;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.ModuleTypeRegistry;
@@ -111,6 +116,12 @@ public class ForwardReferenceResolveTest {
         manager.getComponentLibrary().register(
                 new ResourceUrn("unittest", "EntityRefComponent"),
                 EntityRefComponent.class);
+        manager.getComponentLibrary().register(
+                new ResourceUrn("engine", "Location"),
+                LocationComponent.class);
+        manager.getComponentLibrary().register(
+                new ResourceUrn("engine", "Ping"),
+                PingComponent.class);
         return manager;
     }
 
@@ -226,5 +237,43 @@ public class ForwardReferenceResolveTest {
         assertTrue(storedRef.exists(), "Resolved ref must point to a live entity");
         assertEquals(targetId, storedRef.getId(),
                 "Resolved ref must point to the original target entity id");
+    }
+
+    @Test
+    public void resolveForwardRefReplacesProxiesInCollectionsAndMapsWithoutSavingComponent() {
+        List<EntityRef> changedEntities = new ArrayList<>();
+        entityManager.getEventSystem().registerEventHandler(new BaseComponentSystem() {
+            @ReceiveEvent
+            public void onChanged(OnChangedComponent event, EntityRef entity) {
+                changedEntities.add(entity);
+            }
+        });
+
+        EntityRef target = entityManager.create();
+        EntityRef holder = entityManager.create();
+
+        LocationComponent location = new LocationComponent();
+        location.children.add(new ForwardReferenceEntityRef(entityManager, target.getId()));
+        holder.addComponent(location);
+
+        PingComponent ping = new PingComponent();
+        ping.pings.put(new ForwardReferenceEntityRef(entityManager, target.getId()), 42L);
+        holder.addComponent(ping);
+
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
+
+        EntityRef resolvedChild = holder.getComponent(LocationComponent.class).children.get(0);
+        assertFalse(resolvedChild instanceof ForwardReferenceEntityRef,
+                "Proxy inside LocationComponent.children must be replaced");
+        assertEquals(target.getId(), resolvedChild.getId());
+
+        EntityRef resolvedKey = holder.getComponent(PingComponent.class).pings.keySet().iterator().next();
+        assertFalse(resolvedKey instanceof ForwardReferenceEntityRef,
+                "Proxy key inside PingComponent.pings must be replaced");
+        assertEquals(target.getId(), resolvedKey.getId());
+        assertEquals(42L, holder.getComponent(PingComponent.class).pings.get(resolvedKey));
+
+        assertTrue(changedEntities.isEmpty(),
+                "resolveForwardReferences must not fire OnChangedComponent events");
     }
 }
