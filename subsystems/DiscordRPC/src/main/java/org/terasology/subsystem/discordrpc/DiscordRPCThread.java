@@ -266,6 +266,7 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
                     }
                 }
             } catch (InterruptedException ignored) {
+                closeClientIfConnected();
                 return false; // End when the thread is being interrupted
             }
         }

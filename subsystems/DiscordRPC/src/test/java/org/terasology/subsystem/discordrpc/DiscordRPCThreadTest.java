@@ -183,6 +183,22 @@ class DiscordRPCThreadTest {
     }
 
     @Test
+    void interruptDuringWaitClosesConnectedClient() throws Exception {
+        when(ipcClient.getStatus()).thenReturn(PipeStatus.CONNECTED);
+
+        rpcThread = new DiscordRPCThread(ipcClient, 1L);
+        rpcThread.start();
+
+        awaitTrue(rpcThread::isWaiting, 2000L);
+
+        rpcThread.stop();
+        rpcThread.joinThread(2000L);
+
+        assertThat(rpcThread.isThreadAlive()).isFalse();
+        verify(ipcClient, times(1)).close();
+    }
+
+    @Test
     void nonIoRuntimeExceptionExitsThreadWithoutRetrying() throws Exception {
         doThrow(new RuntimeException("Unsupported OS: test"))
                 .when(ipcClient).connect();
