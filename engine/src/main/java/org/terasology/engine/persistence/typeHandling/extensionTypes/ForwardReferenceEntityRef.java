@@ -26,6 +26,7 @@ import java.util.Set;
  * target, deserialized later in the same batch, exists.
  */
 public class ForwardReferenceEntityRef extends EntityRef {
+    private static final int MAX_TRAVERSAL_DEPTH = 32;
     private final EngineEntityManager entityManager;
     private final long id;
     private EntityRef resolved;
@@ -210,7 +211,7 @@ public class ForwardReferenceEntityRef extends EntityRef {
                 }
                 for (ComponentFieldMetadata<?, ?> field : (Iterable<ComponentFieldMetadata<?, ?>>) metadata.getFields()) {
                     Object value = field.getValue(component);
-                    Object resolved = resolveValue(entityManager, value, visited);
+                    Object resolved = resolveValue(entityManager, value, visited, 0);
                     if (resolved != value) {
                         ((ComponentFieldMetadata) field).setValue(component, resolved);
                     }
@@ -220,9 +221,10 @@ public class ForwardReferenceEntityRef extends EntityRef {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object resolveValue(EngineEntityManager entityManager, Object value, Set<Object> visited) {
-        if (value == null) {
-            return null;
+    private static Object resolveValue(EngineEntityManager entityManager, Object value, Set<Object> visited,
+                                       int depth) {
+        if (value == null || depth > MAX_TRAVERSAL_DEPTH) {
+            return value;
         }
         if (value instanceof ForwardReferenceEntityRef) {
             ForwardReferenceEntityRef fref = (ForwardReferenceEntityRef) value;
@@ -232,24 +234,26 @@ public class ForwardReferenceEntityRef extends EntityRef {
         if (value instanceof EntityRef || isLeafType(value.getClass()) || !visited.add(value)) {
             return value;
         }
+        int nextDepth = depth + 1;
         if (value instanceof List<?>) {
-            resolveList(entityManager, (List<Object>) value, visited);
+            resolveList(entityManager, (List<Object>) value, visited, nextDepth);
         } else if (value instanceof Collection<?>) {
-            resolveCollection(entityManager, (Collection<Object>) value, visited);
+            resolveCollection(entityManager, (Collection<Object>) value, visited, nextDepth);
         } else if (value instanceof Map<?, ?>) {
-            resolveMap(entityManager, (Map<Object, Object>) value, visited);
+            resolveMap(entityManager, (Map<Object, Object>) value, visited, nextDepth);
         } else if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
-            resolveArray(entityManager, (Object[]) value, visited);
+            resolveArray(entityManager, (Object[]) value, visited, nextDepth);
         } else if (!isJdkOrExternalLeafPackage(value.getClass())) {
-            resolveObjectFields(entityManager, value, visited);
+            resolveObjectFields(entityManager, value, visited, nextDepth);
         }
         return value;
     }
 
-    private static void resolveList(EngineEntityManager entityManager, List<Object> list, Set<Object> visited) {
+    private static void resolveList(EngineEntityManager entityManager, List<Object> list, Set<Object> visited,
+                                    int depth) {
         for (int i = 0; i < list.size(); i++) {
             Object item = list.get(i);
-            Object resolved = resolveValue(entityManager, item, visited);
+            Object resolved = resolveValue(entityManager, item, visited, depth);
             if (resolved != item) {
                 try {
                     list.set(i, resolved);
@@ -261,10 +265,10 @@ public class ForwardReferenceEntityRef extends EntityRef {
     }
 
     private static void resolveCollection(EngineEntityManager entityManager, Collection<Object> collection,
-                                          Set<Object> visited) {
+                                          Set<Object> visited, int depth) {
         List<Object[]> replacements = null;
         for (Object item : collection) {
-            Object resolved = resolveValue(entityManager, item, visited);
+            Object resolved = resolveValue(entityManager, item, visited, depth);
             if (resolved != item) {
                 if (replacements == null) {
                     replacements = new ArrayList<>();
@@ -284,12 +288,13 @@ public class ForwardReferenceEntityRef extends EntityRef {
         }
     }
 
-    private static void resolveMap(EngineEntityManager entityManager, Map<Object, Object> map, Set<Object> visited) {
+    private static void resolveMap(EngineEntityManager entityManager, Map<Object, Object> map, Set<Object> visited,
+                                   int depth) {
         List<Object[]> keyReplacements = null;
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
             Object key = entry.getKey();
             Object val = entry.getValue();
-            Object resolvedVal = resolveValue(entityManager, val, visited);
+            Object resolvedVal = resolveValue(entityManager, val, visited, depth);
             if (resolvedVal != val) {
                 try {
                     entry.setValue(resolvedVal);
@@ -297,7 +302,7 @@ public class ForwardReferenceEntityRef extends EntityRef {
                     return;
                 }
             }
-            Object resolvedKey = resolveValue(entityManager, key, visited);
+            Object resolvedKey = resolveValue(entityManager, key, visited, depth);
             if (resolvedKey != key) {
                 if (keyReplacements == null) {
                     keyReplacements = new ArrayList<>();
@@ -317,16 +322,18 @@ public class ForwardReferenceEntityRef extends EntityRef {
         }
     }
 
-    private static void resolveArray(EngineEntityManager entityManager, Object[] array, Set<Object> visited) {
+    private static void resolveArray(EngineEntityManager entityManager, Object[] array, Set<Object> visited,
+                                     int depth) {
         for (int i = 0; i < array.length; i++) {
-            Object resolved = resolveValue(entityManager, array[i], visited);
+            Object resolved = resolveValue(entityManager, array[i], visited, depth);
             if (resolved != array[i]) {
                 array[i] = resolved;
             }
         }
     }
 
-    private static void resolveObjectFields(EngineEntityManager entityManager, Object target, Set<Object> visited) {
+    private static void resolveObjectFields(EngineEntityManager entityManager, Object target, Set<Object> visited,
+                                            int depth) {
         for (Class<?> cls = target.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
             if (isJdkOrExternalLeafPackage(cls)) {
                 break;
@@ -340,7 +347,7 @@ public class ForwardReferenceEntityRef extends EntityRef {
                 }
                 try {
                     Object value = field.get(target);
-                    Object resolved = resolveValue(entityManager, value, visited);
+                    Object resolved = resolveValue(entityManager, value, visited, depth);
                     if (resolved != value && !Modifier.isFinal(field.getModifiers())) {
                         field.set(target, resolved);
                     }

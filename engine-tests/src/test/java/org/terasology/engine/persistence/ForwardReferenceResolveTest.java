@@ -16,7 +16,6 @@ import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
-import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
@@ -32,7 +31,7 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.di.ServiceRegistry;
-import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.ModuleTypeRegistry;
@@ -122,6 +121,9 @@ public class ForwardReferenceResolveTest {
         manager.getComponentLibrary().register(
                 new ResourceUrn("engine", "Ping"),
                 PingComponent.class);
+        manager.getComponentLibrary().register(
+                new ResourceUrn("unittest", "NestedHolderComponent"),
+                NestedHolderComponent.class);
         return manager;
     }
 
@@ -242,12 +244,12 @@ public class ForwardReferenceResolveTest {
     @Test
     public void resolveForwardRefReplacesProxiesInCollectionsAndMapsWithoutSavingComponent() {
         List<EntityRef> changedEntities = new ArrayList<>();
-        entityManager.getEventSystem().registerEventHandler(new BaseComponentSystem() {
-            @ReceiveEvent
-            public void onChanged(OnChangedComponent event, EntityRef entity) {
-                changedEntities.add(entity);
-            }
-        });
+        entityManager.getEventSystem().registerEventReceiver(
+                (event, entity) -> changedEntities.add(entity),
+                OnChangedComponent.class, LocationComponent.class);
+        entityManager.getEventSystem().registerEventReceiver(
+                (event, entity) -> changedEntities.add(entity),
+                OnChangedComponent.class, PingComponent.class);
 
         EntityRef target = entityManager.create();
         EntityRef holder = entityManager.create();
@@ -259,6 +261,11 @@ public class ForwardReferenceResolveTest {
         PingComponent ping = new PingComponent();
         ping.pings.put(new ForwardReferenceEntityRef(entityManager, target.getId()), 42L);
         holder.addComponent(ping);
+
+        // Positive control: saveComponent emits OnChangedComponent; resolveForwardReferences must not.
+        holder.saveComponent(ping);
+        assertEquals(1, changedEntities.size());
+        changedEntities.clear();
 
         ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
 
@@ -275,5 +282,69 @@ public class ForwardReferenceResolveTest {
 
         assertTrue(changedEntities.isEmpty(),
                 "resolveForwardReferences must not fire OnChangedComponent events");
+    }
+
+    @Test
+    public void resolveForwardRefHandlesNestedObjectsArraysCyclesAndImmutableLists() {
+        EntityRef target = entityManager.create();
+        EntityRef holder = entityManager.create();
+        EntityRef secondHolder = entityManager.create();
+
+        NestedNode root = new NestedNode();
+        root.ref = new ForwardReferenceEntityRef(entityManager, target.getId());
+        NestedNode cycleChild = new NestedNode();
+        cycleChild.ref = new ForwardReferenceEntityRef(entityManager, target.getId());
+        root.next = cycleChild;
+        cycleChild.next = root;
+
+        List<EntityRef> sharedList = new ArrayList<>();
+        sharedList.add(new ForwardReferenceEntityRef(entityManager, target.getId()));
+
+        NestedHolderComponent component = new NestedHolderComponent();
+        component.nested = root;
+        component.secondPath = cycleChild;
+        component.array = new EntityRef[]{new ForwardReferenceEntityRef(entityManager, target.getId())};
+        component.sharedList = sharedList;
+        component.immutableList = List.of(new ForwardReferenceEntityRef(entityManager, target.getId()));
+        holder.addComponent(component);
+
+        NestedHolderComponent secondComponent = new NestedHolderComponent();
+        secondComponent.sharedList = sharedList;
+        secondHolder.addComponent(secondComponent);
+
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, List.of(holder, secondHolder));
+
+        assertFalse(component.nested.ref instanceof ForwardReferenceEntityRef);
+        assertEquals(target.getId(), component.nested.ref.getId());
+        assertFalse(component.nested.next.ref instanceof ForwardReferenceEntityRef);
+        assertEquals(target.getId(), component.nested.next.ref.getId());
+        assertFalse(component.array[0] instanceof ForwardReferenceEntityRef);
+        assertEquals(target.getId(), component.array[0].getId());
+        assertFalse(sharedList.get(0) instanceof ForwardReferenceEntityRef);
+        assertEquals(target.getId(), sharedList.get(0).getId());
+        assertInstanceOf(ForwardReferenceEntityRef.class, component.immutableList.get(0),
+                "Immutable list must not throw and should leave its element intact");
+    }
+
+    public static final class NestedNode {
+        public EntityRef ref;
+        public NestedNode next;
+    }
+
+    public static final class NestedHolderComponent implements Component<NestedHolderComponent> {
+        public NestedNode nested;
+        public NestedNode secondPath;
+        public EntityRef[] array;
+        public List<EntityRef> sharedList;
+        public List<EntityRef> immutableList;
+
+        @Override
+        public void copyFrom(NestedHolderComponent other) {
+            this.nested = other.nested;
+            this.secondPath = other.secondPath;
+            this.array = other.array;
+            this.sharedList = other.sharedList;
+            this.immutableList = other.immutableList;
+        }
     }
 }
