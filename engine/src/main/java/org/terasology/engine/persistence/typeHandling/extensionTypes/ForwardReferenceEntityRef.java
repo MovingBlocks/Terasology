@@ -2,20 +2,49 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
+import org.terasology.engine.core.Uri;
+import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
+import org.terasology.engine.entitySystem.metadata.ComponentFieldMetadata;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.math.IntegerRange;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockAreac;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.entitysystem.event.Event;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.Colorc;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An {@link EntityRef} for an id not registered yet. Retries the lookup on every delegated call until the
  * target, deserialized later in the same batch, exists.
  */
 public class ForwardReferenceEntityRef extends EntityRef {
+    private static final int MAX_TRAVERSAL_DEPTH = 32;
+    private static final Map<Class<?>, List<Field>> RESOLVABLE_FIELDS_CACHE = new ConcurrentHashMap<>();
     private final EngineEntityManager entityManager;
     private final long id;
     private EntityRef resolved;
@@ -171,5 +200,371 @@ public class ForwardReferenceEntityRef extends EntityRef {
     @Override
     public Iterable<Component> iterateComponents() {
         return resolve().iterateComponents();
+    }
+
+    /**
+     * Fix-up pass: after a batch of entities has been fully deserialized, replaces every
+     * {@link ForwardReferenceEntityRef} stored in component fields (including collections, maps,
+     * arrays, and nested objects) with the now-resolvable real {@link EntityRef}. This eliminates
+     * the per-call {@code exists()} re-lookup overhead that the proxy would otherwise carry for the
+     * lifetime of the reference, without firing component-changed events via {@code saveComponent}.
+     *
+     * <p>Call this once at the end of each batch-restore site (EntityRestorer, GlobalStoreLoader,
+     * WorldSerializerImpl) after all entities in the session have been deserialized.</p>
+     *
+     * @param entityManager the entity manager whose component library is used for field inspection
+     * @param entities      the set of entities created in this restore session
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static void resolveForwardReferences(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
+        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (EntityRef entity : entities) {
+            if (!entity.exists()) {
+                continue;
+            }
+            for (Component component : entity.iterateComponents()) {
+                ComponentMetadata metadata = entityManager.getComponentLibrary().getMetadata(component);
+                if (metadata == null) {
+                    continue;
+                }
+                for (ComponentFieldMetadata<?, ?> field : (Iterable<ComponentFieldMetadata<?, ?>>) metadata.getFields()) {
+                    Field reflectField = field.getField();
+                    if (reflectField != null && !isResolvableType(reflectField.getType())) {
+                        continue;
+                    }
+                    Object value = field.getValue(component);
+                    Object resolved = resolveValue(entityManager, value, visited, 0);
+                    if (resolved != value) {
+                        ((ComponentFieldMetadata) field).setValue(component, resolved);
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object resolveValue(EngineEntityManager entityManager, Object value, Set<Object> visited,
+                                       int depth) {
+        if (value == null || depth > MAX_TRAVERSAL_DEPTH) {
+            return value;
+        }
+        if (value instanceof ForwardReferenceEntityRef) {
+            ForwardReferenceEntityRef fref = (ForwardReferenceEntityRef) value;
+            EntityRef real = entityManager.getEntity(fref.id);
+            return real.exists() ? real : value;
+        }
+        if (value instanceof EntityRef || isLeafType(value.getClass()) || !visited.add(value)) {
+            return value;
+        }
+        int nextDepth = depth + 1;
+        if (value instanceof List<?>) {
+            resolveList(entityManager, (List<Object>) value, visited, nextDepth);
+        } else if (value instanceof Collection<?>) {
+            resolveCollection(entityManager, (Collection<Object>) value, visited, nextDepth);
+        } else if (value instanceof Map<?, ?>) {
+            resolveMap(entityManager, (Map<Object, Object>) value, visited, nextDepth);
+        } else if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+            resolveArray(entityManager, (Object[]) value, visited, nextDepth);
+        } else if (!isJdkOrExternalLeafPackage(value.getClass())) {
+            resolveObjectFields(entityManager, value, visited, nextDepth);
+        }
+        return value;
+    }
+
+    private static void resolveList(EngineEntityManager entityManager, List<Object> list, Set<Object> visited,
+                                    int depth) {
+        for (int i = 0; i < list.size(); i++) {
+            Object item = list.get(i);
+            Object resolved = resolveValue(entityManager, item, visited, depth);
+            if (resolved != item) {
+                try {
+                    list.set(i, resolved);
+                } catch (UnsupportedOperationException ignored) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private static void resolveCollection(EngineEntityManager entityManager, Collection<Object> collection,
+                                          Set<Object> visited, int depth) {
+        if (collection instanceof LinkedHashSet) {
+            resolveLinkedHashSet(entityManager, collection, visited, depth);
+            return;
+        }
+        List<Object[]> replacements = null;
+        for (Object item : collection) {
+            Object resolved = resolveValue(entityManager, item, visited, depth);
+            if (resolved != item) {
+                if (replacements == null) {
+                    replacements = new ArrayList<>();
+                }
+                replacements.add(new Object[]{item, resolved});
+            }
+        }
+        if (replacements != null) {
+            for (Object[] pair : replacements) {
+                try {
+                    if (collection.remove(pair[0])) {
+                        try {
+                            collection.add(pair[1]);
+                        } catch (Exception e) {
+                            collection.add(pair[0]);
+                        }
+                    }
+                } catch (UnsupportedOperationException ignored) {
+                    // Continue to next replacement
+                }
+            }
+        }
+    }
+
+    private static void resolveLinkedHashSet(EngineEntityManager entityManager, Collection<Object> collection,
+                                             Set<Object> visited, int depth) {
+        List<Object> original = new ArrayList<>(collection);
+        List<Object> updated = new ArrayList<>(original.size());
+        boolean changed = false;
+        for (Object item : original) {
+            Object resolved = resolveValue(entityManager, item, visited, depth);
+            if (resolved != item) {
+                changed = true;
+                updated.add(resolved);
+            } else {
+                updated.add(item);
+            }
+        }
+        if (!changed) {
+            return;
+        }
+        try {
+            collection.clear();
+            collection.addAll(updated);
+        } catch (Exception e) {
+            try {
+                collection.clear();
+                collection.addAll(original);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private static void resolveMap(EngineEntityManager entityManager, Map<Object, Object> map, Set<Object> visited,
+                                   int depth) {
+        if (map instanceof LinkedHashMap) {
+            resolveLinkedHashMap(entityManager, map, visited, depth);
+            return;
+        }
+        List<Object[]> valueReplacements = null;
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            Object val = entry.getValue();
+            Object resolvedVal = resolveValue(entityManager, val, visited, depth);
+            if (resolvedVal != val) {
+                try {
+                    entry.setValue(resolvedVal);
+                } catch (UnsupportedOperationException e) {
+                    if (valueReplacements == null) {
+                        valueReplacements = new ArrayList<>();
+                    }
+                    valueReplacements.add(new Object[]{entry.getKey(), resolvedVal});
+                }
+            }
+        }
+        if (valueReplacements != null) {
+            for (Object[] pair : valueReplacements) {
+                try {
+                    map.put(pair[0], pair[1]);
+                } catch (UnsupportedOperationException ignored) {
+                    // Continue to next replacement
+                }
+            }
+        }
+
+        List<Object[]> keyReplacements = null;
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            Object key = entry.getKey();
+            Object resolvedKey = resolveValue(entityManager, key, visited, depth);
+            if (resolvedKey != key) {
+                if (keyReplacements == null) {
+                    keyReplacements = new ArrayList<>();
+                }
+                Object resolvedVal = resolveValue(entityManager, entry.getValue(), visited, depth);
+                keyReplacements.add(new Object[]{key, resolvedKey, resolvedVal});
+            }
+        }
+        if (keyReplacements != null) {
+            for (Object[] triple : keyReplacements) {
+                Object oldKey = triple[0];
+                Object newKey = triple[1];
+                Object val = triple[2];
+                try {
+                    boolean removed = map.containsKey(oldKey);
+                    map.remove(oldKey);
+                    if (removed) {
+                        try {
+                            map.put(newKey, val);
+                        } catch (Exception e) {
+                            // Rollback removed key
+                            map.put(oldKey, val);
+                        }
+                    }
+                } catch (UnsupportedOperationException ignored) {
+                    // Continue to next replacement
+                }
+            }
+        }
+    }
+
+    private static void resolveLinkedHashMap(EngineEntityManager entityManager, Map<Object, Object> map,
+                                             Set<Object> visited, int depth) {
+        List<Map.Entry<Object, Object>> entries = new ArrayList<>(map.entrySet());
+        boolean hasKeyChanges = false;
+        boolean hasValueChanges = false;
+        List<Object[]> resolvedEntries = new ArrayList<>(entries.size());
+
+        for (Map.Entry<Object, Object> entry : entries) {
+            Object key = entry.getKey();
+            Object val = entry.getValue();
+            Object resolvedKey = resolveValue(entityManager, key, visited, depth);
+            Object resolvedVal = resolveValue(entityManager, val, visited, depth);
+            if (resolvedKey != key) {
+                hasKeyChanges = true;
+            }
+            if (resolvedVal != val) {
+                hasValueChanges = true;
+            }
+            resolvedEntries.add(new Object[]{resolvedKey, resolvedVal});
+        }
+
+        if (!hasKeyChanges && !hasValueChanges) {
+            return;
+        }
+
+        try {
+            map.clear();
+            for (Object[] pair : resolvedEntries) {
+                map.put(pair[0], pair[1]);
+            }
+        } catch (Exception e) {
+            try {
+                map.clear();
+                for (Map.Entry<Object, Object> entry : entries) {
+                    map.put(entry.getKey(), entry.getValue());
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private static void resolveArray(EngineEntityManager entityManager, Object[] array, Set<Object> visited,
+                                     int depth) {
+        for (int i = 0; i < array.length; i++) {
+            Object resolved = resolveValue(entityManager, array[i], visited, depth);
+            if (resolved != array[i]) {
+                array[i] = resolved;
+            }
+        }
+    }
+
+    private static void resolveObjectFields(EngineEntityManager entityManager, Object target, Set<Object> visited,
+                                            int depth) {
+        List<Field> fields = getResolvableFields(target.getClass());
+        for (Field field : fields) {
+            try {
+                Object value = field.get(target);
+                Object resolved = resolveValue(entityManager, value, visited, depth);
+                if (resolved != value && !Modifier.isFinal(field.getModifiers())) {
+                    field.set(target, resolved);
+                }
+            } catch (IllegalAccessException ignored) {
+                // Skip inaccessible fields
+            }
+        }
+    }
+
+    private static List<Field> getResolvableFields(Class<?> targetClass) {
+        return RESOLVABLE_FIELDS_CACHE.computeIfAbsent(targetClass, cls -> {
+            List<Field> fields = new ArrayList<>();
+            for (Class<?> current = cls; current != null && current != Object.class; current = current.getSuperclass()) {
+                if (isJdkOrExternalLeafPackage(current) || isLeafType(current)) {
+                    break;
+                }
+                for (Field field : current.getDeclaredFields()) {
+                    int mods = field.getModifiers();
+                    if (Modifier.isStatic(mods) || Modifier.isTransient(mods)) {
+                        continue;
+                    }
+                    if (!isResolvableType(field.getType())) {
+                        continue;
+                    }
+                    if (field.trySetAccessible()) {
+                        fields.add(field);
+                    }
+                }
+            }
+            return fields;
+        });
+    }
+
+    private static boolean isResolvableType(Class<?> type) {
+        if (type == null) {
+            return false;
+        }
+        if (EntityRef.class.isAssignableFrom(type) || Object.class.equals(type)) {
+            return true;
+        }
+        if (Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (type.isArray()) {
+            return !type.getComponentType().isPrimitive() && isResolvableType(type.getComponentType());
+        }
+        return !isLeafType(type) && !isJdkOrExternalLeafPackage(type);
+    }
+
+    private static boolean isLeafType(Class<?> type) {
+        if (type.isPrimitive() || type.isEnum()) {
+            return true;
+        }
+        if (Asset.class.isAssignableFrom(type)
+                || Block.class.isAssignableFrom(type)
+                || BlockFamily.class.isAssignableFrom(type)
+                || Component.class.isAssignableFrom(type)
+                || EntityManager.class.isAssignableFrom(type)
+                || TypeHandlerLibrary.class.isAssignableFrom(type)
+                || CollisionGroup.class.isAssignableFrom(type)
+                || UITextureRegion.class.isAssignableFrom(type)
+                || Name.class.isAssignableFrom(type)
+                || ResourceUrn.class.isAssignableFrom(type)
+                || Uri.class.isAssignableFrom(type)
+                || Colorc.class.isAssignableFrom(type)
+                || BlockRegion.class.isAssignableFrom(type)
+                || BlockAreac.class.isAssignableFrom(type)
+                || IntegerRange.class.isAssignableFrom(type)) {
+            return true;
+        }
+        Package pkg = type.getPackage();
+        if (pkg == null) {
+            return false;
+        }
+        String name = pkg.getName();
+        return name.startsWith("java.lang")
+                || name.startsWith("java.time")
+                || name.startsWith("java.math")
+                || name.equals("org.joml")
+                || name.startsWith("org.joml.");
+    }
+
+    private static boolean isJdkOrExternalLeafPackage(Class<?> type) {
+        Package pkg = type.getPackage();
+        if (pkg == null) {
+            return false;
+        }
+        String name = pkg.getName();
+        return name.startsWith("java.")
+                || name.startsWith("javax.")
+                || name.startsWith("sun.")
+                || name.startsWith("jdk.")
+                || name.equals("org.joml")
+                || name.startsWith("org.joml.");
     }
 }
