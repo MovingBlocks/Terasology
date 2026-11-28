@@ -11,11 +11,15 @@ import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
@@ -26,6 +30,7 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.ForwardRefe
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
@@ -41,7 +46,11 @@ import org.terasology.unittest.stubs.EntityRefComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -74,6 +83,7 @@ public class ForwardReferenceResolveTest {
         serviceRegistry.with(ModuleManager.class).lifetime(Lifetime.Singleton).use(() -> moduleManager);
 
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         serviceRegistry.with(AssetManager.class).lifetime(Lifetime.Singleton)
                 .use(() -> assetTypeManager.getAssetManager());
@@ -326,6 +336,142 @@ public class ForwardReferenceResolveTest {
                 "Immutable list must not throw and should leave its element intact");
     }
 
+    @Test
+    public void resolveForwardRefWithPrefabBasedEntityDoesNotTraverseAssetTree() {
+        PrefabData prefabData = new PrefabData();
+        Prefab prefab = Assets.generateAsset(new ResourceUrn("unittest:testPrefab"), prefabData, Prefab.class);
+
+        EntityRef target = entityManager.create();
+        EntityRef holder = entityManager.create(prefab);
+        assertTrue(holder.hasComponent(EntityInfoComponent.class));
+        assertEquals(prefab, holder.getComponent(EntityInfoComponent.class).parentPrefab);
+
+        ForwardReferenceEntityRef proxy = new ForwardReferenceEntityRef(entityManager, target.getId());
+        holder.addComponent(new EntityRefComponent(proxy));
+
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
+
+        EntityRef resolved = holder.getComponent(EntityRefComponent.class).entityRef;
+        assertFalse(resolved instanceof ForwardReferenceEntityRef, "Proxy must be resolved");
+        assertEquals(target.getId(), resolved.getId());
+        EntityInfoComponent info = holder.getComponent(EntityInfoComponent.class);
+        assertEquals(prefab, info.parentPrefab);
+    }
+
+    @Test
+    public void worldSerializerResolvesForwardRefForPrefabBasedEntity() {
+        PrefabData prefabData = new PrefabData();
+        Prefab prefab = Assets.generateAsset(new ResourceUrn("unittest:serializerPrefab"), prefabData, Prefab.class);
+
+        EntityRef target = entityManager.create();
+        EntityRef holder = entityManager.create(prefab);
+        long holderId = holder.getId();
+        long targetId = target.getId();
+        holder.addComponent(new EntityRefComponent(target));
+
+        PrefabSerializer prefabSerializer = new PrefabSerializer(
+                entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+        WorldSerializerImpl sourceSerializer = new WorldSerializerImpl(entityManager, prefabSerializer);
+        EntityData.GlobalStore serializedWorld = sourceSerializer.serializeWorld(false);
+
+        List<EntityData.Entity> orderedEntities = new ArrayList<>(serializedWorld.getEntityList());
+        orderedEntities.sort(Comparator.comparingInt(entity -> entity.getId() == holderId ? 0 : 1));
+        EntityData.GlobalStore worldWithHolderFirst = serializedWorld.toBuilder()
+                .clearEntity()
+                .addAllEntity(orderedEntities)
+                .build();
+
+        EngineEntityManager freshManager = createEntityManager();
+        PrefabSerializer freshPrefabSerializer = new PrefabSerializer(
+                freshManager.getComponentLibrary(), freshManager.getTypeSerializerLibrary());
+        WorldSerializerImpl targetSerializer = new WorldSerializerImpl(freshManager, freshPrefabSerializer);
+        targetSerializer.deserializeWorld(worldWithHolderFirst);
+
+        EntityRef loadedHolder = freshManager.getEntity(holderId);
+        assertTrue(loadedHolder.exists(), "Loaded holder entity must exist");
+        EntityRef storedRef = loadedHolder.getComponent(EntityRefComponent.class).entityRef;
+        assertFalse(storedRef instanceof ForwardReferenceEntityRef,
+                "ForwardReferenceEntityRef proxy must be replaced after deserializeWorld on prefab-based entity");
+        assertEquals(targetId, storedRef.getId());
+        assertEquals(prefab, loadedHolder.getComponent(EntityInfoComponent.class).parentPrefab);
+    }
+
+    @Test
+    public void resolveForwardRefPreservesLinkedHashMapAndLinkedHashSetOrder() {
+        EntityRef t1 = entityManager.create();
+        EntityRef t2 = entityManager.create();
+        EntityRef t3 = entityManager.create();
+        EntityRef holder = entityManager.create();
+
+        NestedHolderComponent comp = new NestedHolderComponent();
+
+        comp.orderedSet.add(t1);
+        comp.orderedSet.add(new ForwardReferenceEntityRef(entityManager, t2.getId()));
+        comp.orderedSet.add(t3);
+
+        comp.orderedKeyMap.put(t1, "one");
+        comp.orderedKeyMap.put(new ForwardReferenceEntityRef(entityManager, t2.getId()), "two");
+        comp.orderedKeyMap.put(t3, "three");
+
+        comp.orderedValueMap.put("k1", t1);
+        comp.orderedValueMap.put("k2", new ForwardReferenceEntityRef(entityManager, t2.getId()));
+        comp.orderedValueMap.put("k3", t3);
+
+        holder.addComponent(comp);
+
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
+
+        NestedHolderComponent resolvedComp = holder.getComponent(NestedHolderComponent.class);
+
+        List<EntityRef> setList = new ArrayList<>(resolvedComp.orderedSet);
+        assertEquals(3, setList.size());
+        assertEquals(t1, setList.get(0));
+        assertEquals(t2, setList.get(1));
+        assertEquals(t3, setList.get(2));
+        assertFalse(setList.get(1) instanceof ForwardReferenceEntityRef);
+
+        List<EntityRef> keyList = new ArrayList<>(resolvedComp.orderedKeyMap.keySet());
+        assertEquals(3, keyList.size());
+        assertEquals(t1, keyList.get(0));
+        assertEquals(t2, keyList.get(1));
+        assertEquals(t3, keyList.get(2));
+        assertFalse(keyList.get(1) instanceof ForwardReferenceEntityRef);
+        assertEquals("two", resolvedComp.orderedKeyMap.get(t2));
+
+        List<Map.Entry<String, EntityRef>> valueEntries = new ArrayList<>(resolvedComp.orderedValueMap.entrySet());
+        assertEquals(3, valueEntries.size());
+        assertEquals("k1", valueEntries.get(0).getKey());
+        assertEquals(t1, valueEntries.get(0).getValue());
+        assertEquals("k2", valueEntries.get(1).getKey());
+        assertEquals(t2, valueEntries.get(1).getValue());
+        assertFalse(valueEntries.get(1).getValue() instanceof ForwardReferenceEntityRef);
+        assertEquals("k3", valueEntries.get(2).getKey());
+        assertEquals(t3, valueEntries.get(2).getValue());
+    }
+
+    @Test
+    public void resolveForwardRefContinuesWhenMapEntrySetValueThrowsUnsupportedOperation() {
+        EntityRef target1 = entityManager.create();
+        EntityRef target2 = entityManager.create();
+        EntityRef holder = entityManager.create();
+
+        Map<String, EntityRef> map = Map.of(
+                "first", new ForwardReferenceEntityRef(entityManager, target1.getId()),
+                "second", new ForwardReferenceEntityRef(entityManager, target2.getId())
+        );
+
+        NestedHolderComponent comp = new NestedHolderComponent();
+        comp.unmodifiableMap = map;
+        holder.addComponent(comp);
+
+        ForwardReferenceEntityRef.resolveForwardReferences(entityManager, Collections.singletonList(holder));
+
+        NestedHolderComponent resolvedComp = holder.getComponent(NestedHolderComponent.class);
+        assertEquals(2, resolvedComp.unmodifiableMap.size());
+        assertInstanceOf(ForwardReferenceEntityRef.class, resolvedComp.unmodifiableMap.get("first"));
+        assertInstanceOf(ForwardReferenceEntityRef.class, resolvedComp.unmodifiableMap.get("second"));
+    }
+
     public static final class NestedNode {
         public EntityRef ref;
         public NestedNode next;
@@ -337,6 +483,10 @@ public class ForwardReferenceResolveTest {
         public EntityRef[] array;
         public List<EntityRef> sharedList;
         public List<EntityRef> immutableList;
+        public Set<EntityRef> orderedSet = new LinkedHashSet<>();
+        public Map<EntityRef, String> orderedKeyMap = new LinkedHashMap<>();
+        public Map<String, EntityRef> orderedValueMap = new LinkedHashMap<>();
+        public Map<String, EntityRef> unmodifiableMap;
 
         @Override
         public void copyFrom(NestedHolderComponent other) {
@@ -345,6 +495,10 @@ public class ForwardReferenceResolveTest {
             this.array = other.array;
             this.sharedList = other.sharedList;
             this.immutableList = other.immutableList;
+            this.orderedSet = other.orderedSet != null ? new LinkedHashSet<>(other.orderedSet) : null;
+            this.orderedKeyMap = other.orderedKeyMap != null ? new LinkedHashMap<>(other.orderedKeyMap) : null;
+            this.orderedValueMap = other.orderedValueMap != null ? new LinkedHashMap<>(other.orderedValueMap) : null;
+            this.unmodifiableMap = other.unmodifiableMap;
         }
     }
 }
